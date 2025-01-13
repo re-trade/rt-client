@@ -1,12 +1,10 @@
 import type { Config } from "tailwindcss";
-import flowbite from "flowbite-react/tailwind";
+import daisyui from "daisyui"
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/primereact/**/*.{js,ts,jsx,tsx}",
-    flowbite.content()
   ],
   theme: {
     extend: {
@@ -17,7 +15,7 @@ const config: Config = {
     },
   },
   plugins: [
-    flowbite.plugin(),
+    daisyui
   ],
 };
 export default config;
