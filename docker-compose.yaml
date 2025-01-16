@@ -1,0 +1,6 @@
+services:
+  sea-client:
+    build:
+      context: .
+      no_cache: true
+      dockerfile: Dockerfile
