@@ -1,6 +1,6 @@
 services:
-  sea-client:
+  sea-client-customer:
     build:
       context: .
       no_cache: true
-      dockerfile: Dockerfile
+      dockerfile: apps/customer/Dockerfile
