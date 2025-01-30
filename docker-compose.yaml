@@ -4,3 +4,13 @@ services:
       context: .
       no_cache: true
       dockerfile: apps/customer/Dockerfile
+  sea-client-admin:
+   build:
+      context: .
+      no_cache: true
+      dockerfile: apps/admin/Dockerfile
+  sea-client-partner:
+   build:
+      context: .
+      no_cache: true
+      dockerfile: apps/partner/Dockerfile

@@ -1,0 +1,8 @@
+{
+  "name": "@vietnam-sea/util",
+  "version": "1.0.0",
+  "description": "Utils for vietnam sea client",
+  "author": "@AnataAria",
+  "license": "MIT",
+  "private": false
+}

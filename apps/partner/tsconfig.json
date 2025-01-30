@@ -1,4 +1,3 @@
-
 {
   "extends": "@vietnam-sea/typescript-config/nextjs.json",
   "compilerOptions": {
