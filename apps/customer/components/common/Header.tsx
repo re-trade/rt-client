@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FaSearch, FaUser, FaGlobe } from 'react-icons/fa';
+import Search from '@components/input/Search';
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
