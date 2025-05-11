@@ -30,7 +30,7 @@
     "@types/react-dom": "19.0.2",
     "@vietnam-sea/typescript-config": "*",
     "autoprefixer": "^10.4.20",
-    "daisyui": "^4.12.22",
+    "daisyui": "^5.0.35",
     "eslint": "^8",
     "eslint-config-next": "15.1.1",
     "postcss": "^8",

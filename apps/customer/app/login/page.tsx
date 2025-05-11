@@ -30,7 +30,7 @@ export default function Login() {
           <div className="md:w-1/2 text-white text-center md:text-left mb-6 md:mb-0">
             <div className="flex justify-center md:justify-start items-center space-x-4">
               <Image
-                src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/3-1512755474923.jpg" // Replace with Retrade Shop logo
+                src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/3-1512755474923.jpg" 
                 alt="Retrade Shop Logo"
                 width={100}
                 height={100}
@@ -51,7 +51,7 @@ export default function Login() {
                 <button className="text-yellow-500">QR</button>
                 <button>
                   <Image
-                    src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/3-1512755474923.jpg" // Replace with QR icon
+                    src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/3-1512755474923.jpg" 
                     alt="QR Code"
                     width={20}
                     height={20}
