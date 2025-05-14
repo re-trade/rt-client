@@ -23,8 +23,8 @@ RUN addgroup --system --gid 1001 retrade
 RUN adduser --system --uid 1001 retrade
 USER retrade
 
-COPY --from=installer --chown=retrade:retrade /installer/apps/partner/.next/standalone ./
-COPY --from=installer --chown=retrade:retrade /installer/apps/partner/.next/static ./apps/partner/.next/static
-COPY --from=installer --chown=retrade:retrade /installer/apps/partner/public ./apps/partner/public
+COPY --from=installer --chown=retrade:retrade /installer/apps/seller/.next/standalone ./
+COPY --from=installer --chown=retrade:retrade /installer/apps/seller/.next/static ./apps/seller/.next/static
+COPY --from=installer --chown=retrade:retrade /installer/apps/seller/public ./apps/seller/public
 
 ENTRYPOINT [ "node", "apps/seller/server.js" ]
