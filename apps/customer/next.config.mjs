@@ -27,6 +27,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'hcm.ss.bfcplatform.vn',
             },
+            {
+                protocol: "https",
+                hostname: "statictuoitre.mediacdn.vn",
+            },
         ]
     }
 };
