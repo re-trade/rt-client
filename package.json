@@ -1,5 +1,5 @@
 {
-  "name": "sea-client-v2",
+  "name": "retrade-client",
   "private": true,
   "scripts": {
     "build": "turbo build",

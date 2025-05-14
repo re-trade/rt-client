@@ -1,6 +1,6 @@
 
 {
-  "extends": "@vietnam-sea/typescript-config/nextjs.json",
+  "extends": "@retrade/typescript-config/nextjs.json",
   "compilerOptions": {
     "plugins": [
       {

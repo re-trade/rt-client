@@ -1,8 +1,8 @@
 {
-  "name": "@vietnam-sea/util",
+  "name": "@retrade/util",
   "version": "1.0.0",
-  "description": "Utils for vietnam sea client",
-  "author": "@AnataAria",
+  "description": "Utils for retrade client",
+  "author": "@Retrade",
   "license": "MIT",
   "private": false
 }
