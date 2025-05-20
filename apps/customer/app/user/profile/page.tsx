@@ -1,6 +1,5 @@
 'use client';
 import Image from 'next/image';
-
 interface Profile {
     name: string;
     username: string;
@@ -122,13 +121,9 @@ export default function ProfilePage() {
                                 type="email"
                                 value={profile.email}
                                 readOnly
-                                className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white"
+                                className="w-fit p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white"
                             />
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">{profile.lastUpdated}</p>
-                        <button className="mt-2 bg-[#FFD2B2] text-black px-4 py-2 rounded hover:bg-[#ffbf99] transition">
-                            +Add Email Address
-                        </button>
                     </div>
                 </div>
             </div>
