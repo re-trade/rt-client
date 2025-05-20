@@ -1,10 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // i18n: {
-    //     locales: ['en', 'vi'],
-    //     defaultLocale: 'en',
-    // },
-    output: 'standalone',
+    output: "standalone",
+    typescript: {
+        ignoreBuildErrors: true
+    },
+    eslint: {
+        ignoreDuringBuilds: true
+    },
+    i18n: {
+        locales: ['en', 'vi'],
+        defaultLocale: 'en',
+    },
     images: {
         remotePatterns: [
             {

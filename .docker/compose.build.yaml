@@ -1,0 +1,19 @@
+services:
+  rt-client-customer:
+    image: ${REGISTRY}/rt-client-customer:latest
+    build:
+      context: ..
+      no_cache: true
+      dockerfile: apps/customer/Dockerfile
+  rt-client-admin:
+    image: ${REGISTRY}/rt-client-admin:latest
+    build:
+      context: ..
+      no_cache: true
+      dockerfile: apps/admin/Dockerfile
+  rt-client-seller:
+    image: ${REGISTRY}/rt-client-seller:latest
+    build:
+      context: ..
+      no_cache: true
+      dockerfile: apps/seller/Dockerfile

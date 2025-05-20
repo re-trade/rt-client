@@ -1,14 +1,13 @@
 FROM node:20-alpine AS base
+RUN apk update && apk add --no-cache libc6-compat
+RUN yarn global add turbo@^2
 
 FROM base AS builder
-RUN apk update && apk add --no-cache libc6-compat
 WORKDIR /build
-RUN yarn global add turbo@^2
 COPY . .
-RUN turbo prune @vietnam-sea/sea-client-partner --docker
+RUN turbo prune @retrade/rt-client-seller --docker
 
 FROM base AS installer
-RUN apk update && apk add --no-cache libc6-compat
 WORKDIR /installer
 
 COPY --from=builder /build/out/json/ ./
@@ -20,12 +19,12 @@ RUN yarn turbo run build
 FROM base AS runner
 WORKDIR /app
  
-RUN addgroup --system --gid 1001 vietnamsea
-RUN adduser --system --uid 1001 vietnamsea
-USER vietnamsea
+RUN addgroup --system --gid 1001 retrade
+RUN adduser --system --uid 1001 retrade
+USER retrade
 
-COPY --from=installer --chown=vietnamsea:vietnamsea /installer/apps/partner/.next/standalone ./
-COPY --from=installer --chown=vietnamsea:vietnamsea /installer/apps/partner/.next/static ./apps/partner/.next/static
-COPY --from=installer --chown=vietnamsea:vietnamsea /installer/apps/partner/public ./apps/partner/public
+COPY --from=installer --chown=retrade:retrade /installer/apps/seller/.next/standalone ./
+COPY --from=installer --chown=retrade:retrade /installer/apps/seller/.next/static ./apps/seller/.next/static
+COPY --from=installer --chown=retrade:retrade /installer/apps/seller/public ./apps/seller/public
 
-ENTRYPOINT [ "node", "apps/partner/server.js" ]
+ENTRYPOINT [ "node", "apps/seller/server.js" ]

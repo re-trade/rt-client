@@ -1,0 +1,33 @@
+services:
+  rt-client-customer:
+    container_name: rt-client-customer
+    image: rt-client-customer:latest
+    build:
+      context: ..
+      no_cache: true
+      dockerfile: apps/customer/Dockerfile
+    networks:
+      - rt-clientdev-networks
+  rt-client-admin:
+    container_name: rt-client-admin
+    image: rt-client-admin:latest
+    build:
+      context: ..
+      no_cache: true
+      dockerfile: apps/admin/Dockerfile
+    networks:
+      - rt-clientdev-networks
+  rt-client-seller:
+    container_name: rt-client-seller
+    image: rt-client-seller:latest
+    build:
+      context: ..
+      no_cache: true
+      dockerfile: apps/seller/Dockerfile
+    networks:
+      - rt-clientdev-networks
+
+
+networks:
+  rt-clientdev-networks:
+    name: rt-clientdev-networks
