@@ -6,7 +6,7 @@ export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const togglePasswordVisibility = (field) => {
+    const togglePasswordVisibility = (field: 'password' | 'confirmPassword') => {
         if (field === 'password') setShowPassword(!showPassword);
         else if (field === 'confirmPassword') setShowConfirmPassword(!showConfirmPassword);
     };

@@ -1,6 +1,5 @@
 'use client';
 import Image from 'next/image';
-import Menu from '@/components/common/UserMenu';
 
 interface Profile {
     name: string;
@@ -28,7 +27,7 @@ export default function ProfilePage() {
     const profile = fakeProfile;
 
     return (
-        <div className="w-full bg-[#FFF8F3] flex items-center justify-center p-10">
+        <div className="w-full bg-white flex items-center justify-center p-10">
             <div className="w-[900px] bg-[#FFF8F3] rounded-lg shadow-lg p-6">
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center">
@@ -36,8 +35,8 @@ export default function ProfilePage() {
                             <Image
                                 src={profile.avatarUrl}
                                 alt={profile.name}
-                                width={160}
-                                height={160}
+                                width={150}
+                                height={150}
                                 className="w-full h-full object-cover"
                             />
                         </div>
@@ -51,7 +50,7 @@ export default function ProfilePage() {
                     </button>
                 </div>
 
-                <form className="space-y-4">
+                <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Tên đăng nhập</label>
@@ -123,7 +122,7 @@ export default function ProfilePage() {
                                 type="email"
                                 value={profile.email}
                                 readOnly
-                                className="w-auto p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white"
+                                className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white"
                             />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">{profile.lastUpdated}</p>
@@ -131,7 +130,7 @@ export default function ProfilePage() {
                             +Add Email Address
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
