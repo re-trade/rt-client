@@ -1,5 +1,3 @@
-import {config, DotenvConfigOptions} from "dotenv";
-
 type TEnvConfig = {
     [key: string]: string;
 }
