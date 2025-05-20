@@ -20,7 +20,7 @@ export default function login() {
                 className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white"
               />
             </div>
-            <div>
+            <div className="relative">
               <input
                 id="password"
                 type={isVisible ? "text" : "password"}
@@ -61,7 +61,7 @@ export default function login() {
                 height={20}
                 className="mr-2"
               />
-             Đăng nhập với Google
+              Đăng nhập với Google
             </button>
             <button className="w-full border border-gray-300 py-2 rounded flex items-center text-black justify-center gap-2">
               <Image
