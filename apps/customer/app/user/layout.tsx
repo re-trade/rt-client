@@ -4,6 +4,14 @@ import { useState } from "react";
 type UserLayoutProps = {
   children: React.ReactNode;
 };
+
+type TRouterItem = {
+    name: string;
+    icon?: string;
+    path: string;
+    subMenu?: TRouterItem[];
+}
+
 export default function UserLayout({ children }: UserLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -19,7 +27,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
     router.push(`/user/${path}`);
   };
 
-  const menuItems = [
+  const menuItems: TRouterItem[] = [
     { name: "Thông Báo", icon: "bell", path: "notifications" },
     {
       name: "Tài Khoản Của Tôi",
@@ -48,7 +56,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
             Vu
           </div>
           <div>
-            <h2 className="text-gray-50 font-semibold">vominhvu2002</h2>
+            <h2 className="text-gray-700 font-semibold">vominhvu2002</h2>
             <p className="text-gray-500 text-sm flex items-center">
               Sửa Hồ Sơ
               <svg
