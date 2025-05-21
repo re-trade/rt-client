@@ -36,7 +36,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
       subMenu: [
         { name: "Hồ Sơ", path: "profile" },
         { name: "Địa Chỉ", path: "address" },
-        { name: "Đổi Mật Khẩu", path: "change-password" },
+        { name: "Bảo Mật", path: "security" },
         { name: "Cài Đặt Thông Báo", path: "notification-settings" },
         { name: "Những Thiết Lập Riêng Tư", path: "privacy-settings" },
       ],
