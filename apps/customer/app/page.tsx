@@ -27,7 +27,7 @@ const HomePage = () => {
                         ngay hôm nay để tìm hiểu thêm về các sản phẩm đa dạng và chất lượng
                         của chúng tôi.
                     </p>
-                    <button className="mt-6 bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600">
+                    <button className="mt-6 bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-300">
                         TƯ VẤN NGAY
                     </button>
                 </div>
@@ -40,7 +40,7 @@ const HomePage = () => {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Product Card 1 */}
-                    <div className="bg-blue-600 text-white p-4 rounded-lg">
+                    <div className="bg-orange-300 text-white p-4 rounded-lg">
                         <Image
                             src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
                             alt="Chảo chổng đơn simple"
@@ -53,7 +53,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Product Card 2 */}
-                    <div className="bg-blue-600 text-white p-4 rounded-lg">
+                    <div className="bg-orange-300 text-white p-4 rounded-lg">
                         <Image
                             src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
                             alt="Bộ dụng cụ nhà bếp 7P"
@@ -66,7 +66,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Product Card 3 */}
-                    <div className="bg-blue-600 text-white p-4 rounded-lg">
+                    <div className="bg-orange-300 text-white p-4 rounded-lg">
                         <Image
                             src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
                             alt="Chảo chổng đơn simple"

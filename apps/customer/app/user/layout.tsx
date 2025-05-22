@@ -6,10 +6,10 @@ type UserLayoutProps = {
 };
 
 type TRouterItem = {
-    name: string;
-    icon?: string;
-    path: string;
-    subMenu?: TRouterItem[];
+  name: string;
+  icon?: string;
+  path: string;
+  subMenu?: TRouterItem[];
 }
 
 export default function UserLayout({ children }: UserLayoutProps) {
@@ -27,8 +27,16 @@ export default function UserLayout({ children }: UserLayoutProps) {
     router.push(`/user/${path}`);
   };
 
+  const isActive = (item: TRouterItem) => {
+    if (item.path === activeTab) return true;
+    if (item.subMenu) {
+      return item.subMenu.some((sub) => sub.path === activeTab);
+    }
+    return false;
+  };
+
   const menuItems: TRouterItem[] = [
-    { name: "Thông Báo", icon: "bell", path: "notifications" },
+    { name: "Thông Báo", icon: "bell", path: "notification" },
     {
       name: "Tài Khoản Của Tôi",
       icon: "user",
@@ -49,7 +57,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const activeTab = pathname.split("/user/")[1] || "profile";
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-100 flex pl-1">
       <aside className="w-64 bg-white shadow-md p-4">
         <div className="flex items-center mb-6">
           <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4">
@@ -86,7 +94,10 @@ export default function UserLayout({ children }: UserLayoutProps) {
                       ? toggleMenu(item.path)
                       : handleNavigation(item.path)
                   }
-                  className={`flex items-center justify-between p-2 mb-2 cursor-pointer rounded-lg ${activeTab === item.path ? "bg-orange-100 text-orange-500" : "hover:bg-gray-100 text-black"}`}
+                  className={`flex items-center justify-between p-2 mb-2 cursor-pointer rounded-lg ${isActive(item)
+                      ? "bg-orange-100 text-orange-500"
+                      : "hover:bg-gray-100 text-black"
+                    }`}
                 >
                   <div className="flex items-center">
                     <svg
@@ -169,7 +180,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
           })}
         </nav>
       </aside>
-      <main className="flex-1 p-6">{children}</main>
+      <main className="flex-1">{children}</main>
     </div>
   );
 }
