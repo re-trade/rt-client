@@ -1,88 +1,140 @@
-import Image from "next/image";
-const HomePage = () => {
-    return (<>
-    <div className="min-h-screen bg-gray-50">
-            {/* Hero Section */}
-            <section className="container mx-auto py-10 px-4 flex flex-col md:flex-row items-center">
-                {/* Left Side: Image */}
-                <div className="md:w-1/2">
-                    <Image
-                        src="https://statictuoitre.mediacdn.vn/thumb_w/640/2017/7-1512755474943.jpg"
-                        alt="Kitchen Items"
-                        width={600}
-                        height={400}
-                        className="rounded-lg"
-                    />
-                </div>
+// import Head from "next/head";
+import CarouselComponent from "@/components/Carousel";
+import Footer from "@/components/common/Footer";
 
-                {/* Right Side: Text and CTA */}
-                <div className="md:w-1/2 mt-6 md:mt-0 md:ml-6 bg-pink-100 p-6 rounded-lg">
-                    <p className="text-sm text-gray-600">Vận hành 10 năm trong ngành dịch vụ</p>
-                    <h1 className="text-3xl font-bold text-blue-600 mt-2">
-                        Chào mừng đến với Retrade Shop
-                    </h1>
-                    <p className="mt-4 text-gray-700">
-                        Với hơn 10 năm kinh nghiệm trong việc thiết kế Retrade Shop đã cung cấp
-                        các giải pháp cho hơn 500 doanh nghiệp tại Việt Nam. Hãy khám phá
-                        ngay hôm nay để tìm hiểu thêm về các sản phẩm đa dạng và chất lượng
-                        của chúng tôi.
-                    </p>
-                    <button className="mt-6 bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600">
-                        TƯ VẤN NGAY
-                    </button>
-                </div>
-            </section>
+export default function Home() {
+  const categories = [
+    "Quần áo",
+    "Điện tử",
+    "Nội thất",
+    "Sách",
+    "Đồ gia dụng",
+    "Đồ chơi",
+    "Thể thao",
+    "Làm đẹp",
+    "Thời trang",
+    "Phụ kiện",
+    "Xe cộ",
+    "Văn phòng phẩm",
+    "Nhạc cụ",
+    "Thú cưng",
+    "Khác",
+    "Đồ gia dụng",
+    "Đồ chơi",
+    "Thể thao",
+    "Làm đẹp",
+    "Thời trang",
+    "Phụ kiện",
+    "Xe cộ",
+    "Văn phòng phẩm",
+    "Nhạc cụ",
+    "Thú cưng",
+    "Khác",
+  ];
+  const featuredItems = Array.from({ length: 6 }, (_, i) => ({
+    title: `Đồ cũ #${i + 1}`,
+    price: i % 2 === 0 ? "Trao đổi" : `${(i + 1) * 10}.000đ`,
+  }));
 
-            {/* Product Showcase Section */}
-            <section className="container mx-auto py-10 px-4">
-                <h2 className="text-2xl font-semibold text-blue-600 mb-6">
-                    Nhứng sản phẩm nổi bật tại Retrade Shop
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Product Card 1 */}
-                    <div className="bg-blue-600 text-white p-4 rounded-lg">
-                        <Image
-                            src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
-                            alt="Chảo chổng đơn simple"
-                            width={300}
-                            height={200}
-                            className="rounded-lg mb-4"
-                        />
-                        <h3 className="text-lg font-semibold">Chảo chổng đơn simple</h3>
-                        <p>Chảo chổng đơn simple được đúc</p>
-                    </div>
-
-                    {/* Product Card 2 */}
-                    <div className="bg-blue-600 text-white p-4 rounded-lg">
-                        <Image
-                            src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
-                            alt="Bộ dụng cụ nhà bếp 7P"
-                            width={300}
-                            height={200}
-                            className="rounded-lg mb-4"
-                        />
-                        <h3 className="text-lg font-semibold">Bộ dụng cụ nhà bếp 7P</h3>
-                        <p>Sản phẩm được làm từ chất liệu cao cấp</p>
-                    </div>
-
-                    {/* Product Card 3 */}
-                    <div className="bg-blue-600 text-white p-4 rounded-lg">
-                        <Image
-                            src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
-                            alt="Chảo chổng đơn simple"
-                            width={300}
-                            height={200}
-                            className="rounded-lg mb-4"
-                        />
-                        <h3 className="text-lg font-semibold">Chảo chổng đơn simple</h3>
-                        <p>Chất liệu nhôm đúc nguyên khối</p>
-                    </div>
-                </div>
-            </section>
+  return (
+    <>
+      <div className="grid grid-cols-8 gap-6 mt-6 bg-white">
+        <div className="col-span-1 hidden md:flex flex-col">
+          <div className="flex-1 bg-white rounded p-4 flex items-center justify-center">
+            <p className="text-amber-900 font-bold">Banner Left</p>
+          </div>
         </div>
-    </>);
+
+        <div className="col-span-8 md:col-span-6 flex flex-col gap-6 bg-orange">
+          <CarouselComponent />
+
+          <div className="bg-white py-4 px-2 rounded">
+            <nav className="flex gap-4 overflow-x-auto px-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-orange-100">
+              {categories.map((cat, idx) => (
+                <button
+                  key={idx}
+                  className="whitespace-nowrap bg-[#FFD2B2] text-amber-900 px-4 py-2 rounded-full hover:bg-amber-300 transition"
+                >
+                  {cat}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <section className="bg-white p-4 shadow">
+            <h2 className="text-xl font-bold text-amber-900 mb-3">
+              Đồ đang được quan tâm
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {featuredItems.map((item, i) => (
+                <div
+                  key={i}
+                  className="border rounded p-3 hover:shadow-md transition"
+                >
+                   <div className="bg-amber-100 h-40 mb-2 rounded" />
+                  <h3 className="font-medium text-amber-800">{item.title}</h3>
+                  <p className="text-amber-700 font-semibold">{item.price}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="bg-white p-4 shadow">
+            <h2 className="text-xl font-bold text-amber-900 mb-3">
+              Đồ đang được quan tâm
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {featuredItems.map((item, i) => (
+                <div
+                  key={i}
+                  className="border rounded p-3 hover:shadow-md transition"
+                >
+                  <div className="bg-amber-100 h-40 mb-2 rounded" />
+                  <h3 className="font-medium text-amber-800">{item.title}</h3>
+                  <p className="text-amber-700 font-semibold">{item.price}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="col-span-1 hidden md:flex flex-col">
+          <div className="flex-1 bg-white  rounded p-4 flex items-center justify-center">
+            <p className="text-amber-900 font-bold">Banner Right</p>
+          </div>
+        </div>
+      </div>
+
+      <section className="bg-amber-50 p-6 mt-6 text-center">
+        <h2 className="text-2xl font-bold text-amber-900 mb-4">
+          Cách hoạt động
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6 text-left">
+          <div>
+            <h3 className="font-semibold mb-1 text-amber-800">
+              1. Đăng đồ bạn muốn trao đổi
+            </h3>
+            <p className="text-sm text-amber-700">Miễn phí và dễ dàng.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-1 text-amber-800">
+              2. Tìm món bạn cần
+            </h3>
+            <p className="text-sm text-amber-700">
+              Tìm kiếm theo khu vực hoặc danh mục.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-1 text-amber-800">
+              3. Liên hệ & trao đổi
+            </h3>
+            <p className="text-sm text-amber-700">
+              Thỏa thuận trực tiếp với người đăng.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </>
+  );
 }
-
-export default HomePage;
-
-
