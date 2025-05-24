@@ -7,7 +7,7 @@ type Props = {
   toggleShippingMethod: (method: ShippingMethodKey) => void;
 };
 
-export default function Step2({ shippingMethods, toggleShippingMethod }: Props) {
+export default function AccountRegisterStep2({ shippingMethods, toggleShippingMethod }: Props) {
   const shippingOptions: { label: string; key: ShippingMethodKey; note: string }[] = [
     { label: "Hỏa Tốc", key: "express", note: "[COD đã được kích hoạt]" },
     { label: "Nhanh", key: "fast", note: "[COD đã được kích hoạt]" },

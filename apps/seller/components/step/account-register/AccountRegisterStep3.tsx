@@ -5,7 +5,7 @@ type Props = {
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 };
 
-export default function Step4({ formData, handleChange }: Props) {
+export default function AccountResisterStep3({ formData, handleChange }: Props) {
   return (
     <>
       <div className="mb-4">
