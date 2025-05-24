@@ -38,14 +38,8 @@ export default function Home() {
 
   return (
     <>
-      <div className="grid grid-cols-8 gap-6 mt-6 bg-white">
-        <div className="col-span-1 hidden md:flex flex-col">
-          <div className="flex-1 bg-white rounded p-4 flex items-center justify-center">
-            <p className="text-amber-900 font-bold">Banner Left</p>
-          </div>
-        </div>
-
-        <div className="col-span-8 md:col-span-6 flex flex-col gap-6 bg-orange">
+      <section className="container gap-6 mt-6 mx-auto max-w-[120rem]">
+        <div className="col-span-8 md:col-span-6 flex flex-col gap-6 bg-orange w-full">
           <CarouselComponent />
 
           <div className="bg-white py-4 px-2 rounded">
@@ -71,7 +65,7 @@ export default function Home() {
                   key={i}
                   className="border rounded p-3 hover:shadow-md transition"
                 >
-                   <div className="bg-amber-100 h-40 mb-2 rounded" />
+                  <div className="bg-amber-100 h-40 mb-2 rounded" />
                   <h3 className="font-medium text-amber-800">{item.title}</h3>
                   <p className="text-amber-700 font-semibold">{item.price}</p>
                 </div>
@@ -97,13 +91,7 @@ export default function Home() {
             </div>
           </section>
         </div>
-
-        <div className="col-span-1 hidden md:flex flex-col">
-          <div className="flex-1 bg-white  rounded p-4 flex items-center justify-center">
-            <p className="text-amber-900 font-bold">Banner Right</p>
-          </div>
-        </div>
-      </div>
+      </section>
 
       <section className="bg-amber-50 p-6 mt-6 text-center">
         <h2 className="text-2xl font-bold text-amber-900 mb-4">
@@ -134,7 +122,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
     </>
   );
 }
