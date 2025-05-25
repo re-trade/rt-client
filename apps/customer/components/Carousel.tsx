@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const images = [
-  { src: '/image_login.jpg', alt: 'Slide 1' },
-  { src: '/image_login.jpg', alt: 'Slide 2' },
-  { src: '/image_login.jpg', alt: 'Slide 3' },
-  { src: '/image_login.jpg', alt: 'Slide 4' },
-  { src: '/image_login.jpg', alt: 'Slide 5' },
+  { src: "/image_login.jpg", alt: "Slide 1" },
+  { src: "/image_login.jpg", alt: "Slide 2" },
+  { src: "/image_login.jpg", alt: "Slide 3" },
+  { src: "/image_login.jpg", alt: "Slide 4" },
+  { src: "/image_login.jpg", alt: "Slide 5" },
 ];
 
 export default function CarouselComponent() {
@@ -28,7 +28,7 @@ export default function CarouselComponent() {
   };
 
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000); // 
+    const interval = setInterval(nextSlide, 5000); //
   }, []);
 
   return (
@@ -45,8 +45,8 @@ export default function CarouselComponent() {
               <Image
                 src={image.src}
                 alt={image.alt}
-                width={1920} 
-                height={1080} 
+                width={1920}
+                height={1080}
                 className="w-full h-auto object-cover"
                 priority={index === currentIndex}
               />

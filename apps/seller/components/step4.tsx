@@ -2,20 +2,34 @@ import React from "react";
 
 type Props = {
   formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => void;
 };
 
 export default function Step4({ formData, handleChange }: Props) {
   return (
     <>
       <div className="mb-4">
-        <label className="font-medium block mb-2 text-sm">Ảnh mặt trước CMND/CCCD</label>
-        <input type="file" accept="image/*" className="w-full border rounded p-2" />
+        <label className="font-medium block mb-2 text-sm">
+          Ảnh mặt trước CMND/CCCD
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          className="w-full border rounded p-2"
+        />
       </div>
 
       <div className="mb-4">
-        <label className="font-medium block mb-2 text-sm">Ảnh mặt sau CMND/CCCD</label>
-        <input type="file" accept="image/*" className="w-full border rounded p-2" />
+        <label className="font-medium block mb-2 text-sm">
+          Ảnh mặt sau CMND/CCCD
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          className="w-full border rounded p-2"
+        />
       </div>
 
       <div className="mb-4">
@@ -71,7 +85,9 @@ export default function Step4({ formData, handleChange }: Props) {
       </div>
 
       <div className="mb-4">
-        <label className="block mb-1 font-medium text-sm">Quốc gia cư trú</label>
+        <label className="block mb-1 font-medium text-sm">
+          Quốc gia cư trú
+        </label>
         <input
           name="residenceCountry"
           value={formData.residenceCountry}
@@ -91,7 +107,9 @@ export default function Step4({ formData, handleChange }: Props) {
       </div>
 
       <div className="mb-4">
-        <label className="block mb-1 font-medium text-sm">Số CMND/CCCD/Hộ chiếu</label>
+        <label className="block mb-1 font-medium text-sm">
+          Số CMND/CCCD/Hộ chiếu
+        </label>
         <input
           name="identityNumber"
           value={formData.identityNumber}

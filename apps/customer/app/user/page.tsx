@@ -98,10 +98,6 @@
 //         </div>
 //     );
 // }
-export default function User(){
-    return(
-        <h1>
-            hehehehehhe
-        </h1>
-    );
+export default function User() {
+  return <h1>hehehehehhe</h1>;
 }

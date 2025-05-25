@@ -71,7 +71,7 @@ export default function Home() {
                   key={i}
                   className="border rounded p-3 hover:shadow-md transition"
                 >
-                   <div className="bg-amber-100 h-40 mb-2 rounded" />
+                  <div className="bg-amber-100 h-40 mb-2 rounded" />
                   <h3 className="font-medium text-amber-800">{item.title}</h3>
                   <p className="text-amber-700 font-semibold">{item.price}</p>
                 </div>
@@ -135,7 +135,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer/>
+      <Footer />
     </>
   );
 }

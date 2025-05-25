@@ -1,30 +1,30 @@
-import React, { useState } from 'react'
-import { IconType } from 'react-icons'
+import React, { useState } from "react";
+import { IconType } from "react-icons";
 
 interface SearchProps {
-  placeholder: string
-  onSearch: (query: string) => void,
-  icon?: IconType
+  placeholder: string;
+  onSearch: (query: string) => void;
+  icon?: IconType;
 }
 
 const Search: React.FC<SearchProps> = ({ placeholder, onSearch }) => {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value)
-  }
+    setQuery(e.target.value);
+  };
 
   const handleSearch = () => {
     if (query.trim()) {
-      onSearch(query)
+      onSearch(query);
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && query.trim()) {
-      onSearch(query)
+    if (e.key === "Enter" && query.trim()) {
+      onSearch(query);
     }
-  }
+  };
 
   return (
     <div className="flex items-center space-x-2">
@@ -43,7 +43,7 @@ const Search: React.FC<SearchProps> = ({ placeholder, onSearch }) => {
         Search
       </button>
     </div>
-  )
-}
+  );
+};
 
 export default Search;

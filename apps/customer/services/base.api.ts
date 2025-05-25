@@ -31,7 +31,7 @@ export const createResponseObject = <T>(params: {
   const { content, messages, code, success, pagination } = params;
   return {
     content,
-    messages: typeof messages === 'string' ? [messages] : messages ?? [],
+    messages: typeof messages === "string" ? [messages] : (messages ?? []),
     code,
     success,
     pagination,
@@ -44,14 +44,17 @@ export const unwrapPaginationWrapper = <T extends any[]>(
     code?: string;
     messages?: string[] | string;
     success?: boolean;
-  }
+  },
 ): IResponseObject<T> => {
   if (!wrapper?.data) throw new Error("Invalid wrapper: data is undefined");
 
   return {
     content: wrapper.data,
-    messages: typeof options?.messages === 'string' ? [options.messages] : options?.messages ?? [],
-    code: options?.code ?? '200',
+    messages:
+      typeof options?.messages === "string"
+        ? [options.messages]
+        : (options?.messages ?? []),
+    code: options?.code ?? "200",
     success: options?.success ?? true,
     pagination: {
       page: wrapper.page,

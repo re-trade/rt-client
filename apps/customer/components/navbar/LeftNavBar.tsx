@@ -1,8 +1,8 @@
-'use client';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { IconType } from 'react-icons';
-import { cn } from '@/lib/utils';
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { IconType } from "react-icons";
+import { cn } from "@/lib/utils";
 
 interface MenuItem {
   name: string;
@@ -28,10 +28,10 @@ const LeftNavbar: React.FC<LeftNavbarProps> = ({ title, menuItems }) => {
               <Link
                 href={href}
                 className={cn(
-                  'flex items-center gap-4 p-3 rounded-lg transition duration-300 font-medium',
+                  "flex items-center gap-4 p-3 rounded-lg transition duration-300 font-medium",
                   pathname === href
-                    ? 'bg-blue-500 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? "bg-blue-500 text-white shadow-md"
+                    : "text-gray-600 hover:bg-gray-100",
                 )}
               >
                 <Icon className="w-5 h-5 text-blue-500" />

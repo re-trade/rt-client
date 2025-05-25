@@ -6,11 +6,11 @@ type UserLayoutProps = {
 };
 
 type TRouterItem = {
-    name: string;
-    icon?: string;
-    path: string;
-    subMenu?: TRouterItem[];
-}
+  name: string;
+  icon?: string;
+  path: string;
+  subMenu?: TRouterItem[];
+};
 
 export default function UserLayout({ children }: UserLayoutProps) {
   const router = useRouter();

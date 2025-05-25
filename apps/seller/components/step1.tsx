@@ -2,14 +2,16 @@ import React from "react";
 
 type Props = {
   formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => void;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function Step1({ formData, handleChange, setShowModal }: Props) {
   return (
     <>
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 px-8">
         <label className="w-32 text-sm font-medium">Tên Shop</label>
         <input
           name="shopName"
@@ -20,7 +22,7 @@ export default function Step1({ formData, handleChange, setShowModal }: Props) {
         />
       </div>
 
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 px-8">
         <label className="w-32 text-sm font-medium">Email</label>
         <input
           name="email"
@@ -32,7 +34,7 @@ export default function Step1({ formData, handleChange, setShowModal }: Props) {
         />
       </div>
 
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 px-8">
         <label className="text-sm font-medium w-32">Địa chỉ nhận hàng</label>
         <button
           onClick={() => setShowModal(true)}
@@ -42,7 +44,7 @@ export default function Step1({ formData, handleChange, setShowModal }: Props) {
         </button>
       </div>
 
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 px-8">
         <label className="w-32 text-sm font-medium">Số điện thoại</label>
         <input
           name="phone"
@@ -56,4 +58,3 @@ export default function Step1({ formData, handleChange, setShowModal }: Props) {
     </>
   );
 }
-    

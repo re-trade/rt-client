@@ -66,7 +66,7 @@ export default function Footer() {
 
         {/* Về chúng tôi */}
         <div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-base text-[#121212] mb-4">
+          <h3 className="font-['Reddit_Sans'] font-semibold text-xl text-base text-[#121212] mb-4">
             Về chúng tôi
           </h3>
           <div className="flex flex-col gap-3">

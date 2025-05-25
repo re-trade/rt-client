@@ -1,9 +1,5 @@
-const NotificationSetting:React.FC = () => {
-    return (
-    <div>
-        Notification Setting
-    </div>
-    );
-}
+const NotificationSetting: React.FC = () => {
+  return <div>Notification Setting</div>;
+};
 
 export default NotificationSetting;

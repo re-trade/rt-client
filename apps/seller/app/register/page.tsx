@@ -472,14 +472,13 @@
 //   );
 // }
 "use client";
-import React, { useState } from "react";
+import Footer from "@/components/Footer";
 import Step1 from "@/components/step1";
 import Step2 from "@/components/step2";
 import Step3 from "@/components/step3";
 import Step4 from "@/components/step4";
 import Step5 from "@/components/step5";
-import Footer from "@/components/Footer";
-
+import React, { useState } from "react";
 const steps = [
   "Thông tin shop",
   "Cài đặt vận chuyển",
@@ -514,7 +513,7 @@ export default function RegisterPage() {
   });
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -529,8 +528,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="container mx-auto p-4 max-w-xl border rounded shadow">
-        {/* Process line stepper mới */}
+      <div className="container mx-auto p-4 max-w-3xl border rounded shadow">
         <div className="flex justify-between mb-10 relative">
           {steps.map((label, index) => {
             const stepNumber = index + 1;
@@ -548,8 +546,8 @@ export default function RegisterPage() {
                     isActive
                       ? "bg-blue-600"
                       : isCompleted
-                      ? "bg-green-600"
-                      : "bg-gray-300"
+                        ? "bg-green-600"
+                        : "bg-gray-300"
                   }`}
                 >
                   {stepNumber}
@@ -583,11 +581,14 @@ export default function RegisterPage() {
             toggleShippingMethod={toggleShippingMethod}
           />
         )}
-        {step === 3 && <Step3 formData={formData} handleChange={handleChange} />}
-        {step === 4 && <Step4 formData={formData} handleChange={handleChange} />}
+        {step === 3 && (
+          <Step3 formData={formData} handleChange={handleChange} />
+        )}
+        {step === 4 && (
+          <Step4 formData={formData} handleChange={handleChange} />
+        )}
         {step === 5 && <Step5 formData={formData} />}
 
-        {/* Nút chuyển bước */}
         <div className="flex justify-between mt-6">
           <button
             disabled={step === 1}
@@ -607,7 +608,6 @@ export default function RegisterPage() {
           ) : (
             <button
               onClick={() => {
-                // xử lý lưu hoặc submit form ở đây
                 alert("Lưu form hoặc gửi dữ liệu đi!");
               }}
               className="px-4 py-2 bg-green-600 text-white rounded"
