@@ -1,3 +1,4 @@
+/*
 import Image from "next/image";
 
 export default function Home() {
@@ -16,7 +17,7 @@ export default function Home() {
           <li className="mb-2">
             Get started by editing{" "}
             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
+              app/page.tsx{/!**!/}
             </code>
             .
           </li>
@@ -98,4 +99,16 @@ export default function Home() {
       </footer>
     </div>
   );
+}
+*/
+import Link from "next/link";
+
+export default function Home() {
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+            <Link href="/admin" className="text-xl text-[#4A4039] hover:underline">
+                Go to Admin Dashboard
+            </Link>
+        </div>
+    );
 }
