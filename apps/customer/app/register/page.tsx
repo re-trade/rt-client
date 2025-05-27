@@ -132,7 +132,7 @@ export default function Register() {
                                 <a className="text-black">
                                     Bạn đã có tài khoản?
                                 </a>
-                                <a href="/forgot-password" className="text-black font-bold ml-1 ">
+                                <a href="/login" className="text-black font-bold ml-1 ">
                                     Đăng nhập ở đây
                                 </a>
                             </div>

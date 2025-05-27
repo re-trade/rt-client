@@ -3,7 +3,7 @@ const HomePage = () => {
     return (<>
     <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="container mx-auto py-10 px-4 flex flex-col md:flex-row items-center">
+            <section className="container mx-auto py-4 px-4 flex flex-col md:flex-row items-center">
                 {/* Left Side: Image */}
                 <div className="md:w-1/2">
                     <Image
@@ -23,7 +23,7 @@ const HomePage = () => {
                     </h1>
                     <p className="mt-4 text-gray-700">
                         Với hơn 10 năm kinh nghiệm trong việc thiết kế Retrade Shop đã cung cấp
-                        các giải pháp cho hơn 500 doanh nghiệp tại Việt Nam. Hãy khám phá
+                        các sản phẩm dịch vụ tốt tại Việt Nam. Hãy khám phá
                         ngay hôm nay để tìm hiểu thêm về các sản phẩm đa dạng và chất lượng
                         của chúng tôi.
                     </p>
@@ -34,26 +34,26 @@ const HomePage = () => {
             </section>
 
             {/* Product Showcase Section */}
-            <section className="container mx-auto py-10 px-4">
+            <section className="container py-3 mx-auto px-4">
                 <h2 className="text-2xl font-semibold text-blue-600 mb-6">
                     Nhứng sản phẩm nổi bật tại Retrade Shop
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Product Card 1 */}
-                    <div className="bg-orange-300 text-white p-4 rounded-lg">
+                    <div className="bg-[#FFD2B2] text-white p-4 rounded-lg mx-auto w-fit">
                         <Image
                             src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
                             alt="Chảo chổng đơn simple"
                             width={300}
                             height={200}
-                            className="rounded-lg mb-4"
+                            className="rounded-lg mb-4 "
                         />
-                        <h3 className="text-lg font-semibold">Chảo chổng đơn simple</h3>
-                        <p>Chảo chổng đơn simple được đúc</p>
+                        <h3 className="text-black font-semibold text-center">Chảo chổng đơn simple</h3>
+                        <p className="text-center text-black ">Chảo chổng đơn simple được đúc</p>
                     </div>
 
                     {/* Product Card 2 */}
-                    <div className="bg-orange-300 text-white p-4 rounded-lg">
+                    <div className="bg-[#FFD2B2] text-white p-4 rounded-lg mx-auto w-fit">
                         <Image
                             src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
                             alt="Bộ dụng cụ nhà bếp 7P"
@@ -61,12 +61,12 @@ const HomePage = () => {
                             height={200}
                             className="rounded-lg mb-4"
                         />
-                        <h3 className="text-lg font-semibold">Bộ dụng cụ nhà bếp 7P</h3>
-                        <p>Sản phẩm được làm từ chất liệu cao cấp</p>
+                        <h3 className="text-black font-semibold text-center">Bộ dụng cụ nhà bếp 7P</h3>
+                        <p className="text-center text-black">Sản phẩm được làm từ chất liệu cao cấp</p>
                     </div>
 
                     {/* Product Card 3 */}
-                    <div className="bg-orange-300 text-white p-4 rounded-lg">
+                    <div className="bg-[#FFD2B2] text-white p-4 rounded-lg mx-auto w-fit">
                         <Image
                             src="https://statictuoitre.mediacdn.vn/thumb_w/730/2017/1-1512755474911.jpg" 
                             alt="Chảo chổng đơn simple"
@@ -74,8 +74,8 @@ const HomePage = () => {
                             height={200}
                             className="rounded-lg mb-4"
                         />
-                        <h3 className="text-lg font-semibold">Chảo chổng đơn simple</h3>
-                        <p>Chất liệu nhôm đúc nguyên khối</p>
+                        <h3 className="text-black font-semibold text-center">Chảo chổng đơn simple</h3>
+                        <p className="text-center text-black">Chất liệu nhôm đúc nguyên khối</p>
                     </div>
                 </div>
             </section>
