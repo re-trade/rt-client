@@ -1,10 +1,6 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Cross-platform pre-commit hook that works on Windows PowerShell, Linux, and macOS
-echo "Running pre-commit formatting..."
-
-# Check if we're on Windows and try PowerShell first, then fallback to yarn
 if command -v powershell.exe >/dev/null 2>&1; then
   echo "Detected Windows - using PowerShell"
   powershell.exe -Command "yarn format"
@@ -15,5 +11,3 @@ else
   echo "Using standard shell"
   yarn format
 fi
-
-echo "Pre-commit formatting completed!"
