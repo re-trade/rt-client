@@ -1,21 +1,15 @@
-"use client";
-import { useEffect, useState } from "react";
-import {
-  FaBell,
-  FaGlobe,
-  FaSearch,
-  FaShoppingCart,
-  FaUser,
-} from "react-icons/fa";
+'use client';
+import { useEffect, useState } from 'react';
+import { FaBell, FaGlobe, FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [searchFocus, setSearchFocus] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   useEffect(() => {
-    const history = localStorage.getItem("searchHistory");
+    const history = localStorage.getItem('searchHistory');
     if (history) {
       setSearchHistory(JSON.parse(history));
     }
@@ -25,13 +19,10 @@ const Header: React.FC = () => {
   const handleSearch = () => {
     if (!search.trim()) return;
 
-    const newHistory = [
-      search,
-      ...searchHistory.filter((h) => h !== search),
-    ].slice(0, 5);
+    const newHistory = [search, ...searchHistory.filter((h) => h !== search)].slice(0, 5);
     setSearchHistory(newHistory);
-    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
-    setSearch("");
+    localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    setSearch('');
   };
 
   return (
@@ -55,10 +46,7 @@ const Header: React.FC = () => {
             </ul>
           </details>
           <div className="hidden md:flex items-center space-x-3">
-            <a
-              href="/login"
-              className="hover:text-orange-500 flex items-center"
-            >
+            <a href="/login" className="hover:text-orange-500 flex items-center">
               <FaUser className="mr-1" /> Login
             </a>
             <span>|</span>
@@ -126,11 +114,7 @@ const Header: React.FC = () => {
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 6h16M4 12h16m-16 6h16"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-16 6h16" />
             </svg>
           </button>
         </div>

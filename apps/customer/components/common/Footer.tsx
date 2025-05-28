@@ -1,11 +1,11 @@
 import {
-  FaMapMarkerAlt,
   FaEnvelope,
   FaFacebookF,
   FaInstagram,
-  FaYoutube,
+  FaMapMarkerAlt,
   FaTiktok,
-} from "react-icons/fa";
+  FaYoutube,
+} from 'react-icons/fa';
 
 function DiagonalBackground() {
   return (
@@ -13,15 +13,15 @@ function DiagonalBackground() {
       <div
         className="absolute top-0 left-0 w-full h-full"
         style={{
-          backgroundColor: "#FFD2B2",
-          clipPath: "polygon(0 0, 0 20%, 100% 0)",
+          backgroundColor: '#FFD2B2',
+          clipPath: 'polygon(0 0, 0 20%, 100% 0)',
         }}
       ></div>
       <div
         className="absolute top-0 left-0 w-full h-full"
         style={{
-          backgroundColor: "#FDFEF9",
-          clipPath: "polygon(0 20%, 0 100%, 100% 100%, 100% 0)",
+          backgroundColor: '#FDFEF9',
+          clipPath: 'polygon(0 20%, 0 100%, 100% 100%, 100% 0)',
         }}
       ></div>
     </div>
@@ -36,17 +36,17 @@ export default function Footer() {
       <div className="relative max-w-[1440px] mx-auto px-6 grid grid-cols-4 gap-8 h-full pt-16">
         <div>
           <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
-            {" "}
+            {' '}
             Dịch vụ khách hàng
           </h3>
           <div className="flex flex-col gap-3">
             {[
-              "Chính sách hỗ trợ khách hàng",
-              "Hướng dẫn Mua hàng/ Đặt hàng",
-              "Hướng dẫn bán hàng",
-              "Trả hàng/ Hoàn tiền",
-              "Chính sách bảo hành",
-              "Đơn vị vận chuyển",
+              'Chính sách hỗ trợ khách hàng',
+              'Hướng dẫn Mua hàng/ Đặt hàng',
+              'Hướng dẫn bán hàng',
+              'Trả hàng/ Hoàn tiền',
+              'Chính sách bảo hành',
+              'Đơn vị vận chuyển',
             ].map((item) => (
               <a
                 key={item}
@@ -64,12 +64,12 @@ export default function Footer() {
           </h3>
           <div className="flex flex-col gap-3">
             {[
-              "Về Retrade Shop",
-              "Tuyển dụng",
-              "Chính sách bảo mật",
-              "Kênh người bán",
-              "Tiếp thị liên kết",
-              "Liên hệ truyền thông",
+              'Về Retrade Shop',
+              'Tuyển dụng',
+              'Chính sách bảo mật',
+              'Kênh người bán',
+              'Tiếp thị liên kết',
+              'Liên hệ truyền thông',
             ].map((item) => (
               <a
                 key={item}
@@ -88,8 +88,7 @@ export default function Footer() {
           <div className="flex items-center gap-2 mb-4">
             <FaMapMarkerAlt className="w-5 h-5 text-[#121212]" />
             <span className="font-['Reddit_Sans'] font-normal  text-1.5xl text-[#121212]">
-              Tòa nhà Vietcomreal, 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.
-              HCM
+              Tòa nhà Vietcomreal, 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. HCM
             </span>
           </div>
           <div className="flex items-center gap-2 mb-4">
@@ -103,10 +102,10 @@ export default function Footer() {
           </h3>
           <div className="flex gap-4">
             {[
-              { icon: FaFacebookF, href: "#" },
-              { icon: FaInstagram, href: "#" },
-              { icon: FaYoutube, href: "#" },
-              { icon: FaTiktok, href: "#" },
+              { icon: FaFacebookF, href: '#' },
+              { icon: FaInstagram, href: '#' },
+              { icon: FaYoutube, href: '#' },
+              { icon: FaTiktok, href: '#' },
             ].map((social, index) => (
               <a
                 key={index}
@@ -142,17 +141,13 @@ export default function Footer() {
       <div className="relative max-w-[1440px] mx-auto px-6 mt-12 pt-6 border-t border-[#525252]/20 flex justify-between items-center text-[#525252] font-['Reddit_Sans'] text-[10px]">
         <span>© 2021 All Rights Reserved</span>
         <div className="flex gap-6">
-          {[
-            "Privacy Policy",
-            "Terms of Use",
-            "Sales and Refunds",
-            "Legal",
-            "Site Map",
-          ].map((item) => (
-            <a key={item} href="#" className="hover:text-[#121212]">
-              {item}
-            </a>
-          ))}
+          {['Privacy Policy', 'Terms of Use', 'Sales and Refunds', 'Legal', 'Site Map'].map(
+            (item) => (
+              <a key={item} href="#" className="hover:text-[#121212]">
+                {item}
+              </a>
+            ),
+          )}
         </div>
       </div>
     </footer>

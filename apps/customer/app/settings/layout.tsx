@@ -1,6 +1,6 @@
-"use client"
+'use client';
 import LeftNavbar from '@components/navbar/LeftNavBar';
-import { FaUser, FaCog, FaLock, FaBell, FaCreditCard } from 'react-icons/fa';
+import { FaBell, FaCog, FaCreditCard, FaLock, FaUser } from 'react-icons/fa';
 
 const generalPath: string = '/settings';
 const settingsMenu = [

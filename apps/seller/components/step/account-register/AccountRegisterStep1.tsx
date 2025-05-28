@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type Props = {
   formData: any;
@@ -56,4 +56,3 @@ export default function AccountRegisterStep1({ formData, handleChange, setShowMo
     </>
   );
 }
-    

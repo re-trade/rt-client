@@ -1,39 +1,38 @@
 // import Head from "next/head";
-import CarouselComponent from "@/components/Carousel";
-import Footer from "@/components/common/Footer";
+import CarouselComponent from '@/components/Carousel';
 
 export default function Home() {
   const categories = [
-    "Quần áo",
-    "Điện tử",
-    "Nội thất",
-    "Sách",
-    "Đồ gia dụng",
-    "Đồ chơi",
-    "Thể thao",
-    "Làm đẹp",
-    "Thời trang",
-    "Phụ kiện",
-    "Xe cộ",
-    "Văn phòng phẩm",
-    "Nhạc cụ",
-    "Thú cưng",
-    "Khác",
-    "Đồ gia dụng",
-    "Đồ chơi",
-    "Thể thao",
-    "Làm đẹp",
-    "Thời trang",
-    "Phụ kiện",
-    "Xe cộ",
-    "Văn phòng phẩm",
-    "Nhạc cụ",
-    "Thú cưng",
-    "Khác",
+    'Quần áo',
+    'Điện tử',
+    'Nội thất',
+    'Sách',
+    'Đồ gia dụng',
+    'Đồ chơi',
+    'Thể thao',
+    'Làm đẹp',
+    'Thời trang',
+    'Phụ kiện',
+    'Xe cộ',
+    'Văn phòng phẩm',
+    'Nhạc cụ',
+    'Thú cưng',
+    'Khác',
+    'Đồ gia dụng',
+    'Đồ chơi',
+    'Thể thao',
+    'Làm đẹp',
+    'Thời trang',
+    'Phụ kiện',
+    'Xe cộ',
+    'Văn phòng phẩm',
+    'Nhạc cụ',
+    'Thú cưng',
+    'Khác',
   ];
   const featuredItems = Array.from({ length: 6 }, (_, i) => ({
     title: `Đồ cũ #${i + 1}`,
-    price: i % 2 === 0 ? "Trao đổi" : `${(i + 1) * 10}.000đ`,
+    price: i % 2 === 0 ? 'Trao đổi' : `${(i + 1) * 10}.000đ`,
   }));
 
   return (
@@ -56,15 +55,10 @@ export default function Home() {
           </div>
 
           <section className="bg-white p-4 shadow">
-            <h2 className="text-xl font-bold text-amber-900 mb-3">
-              Đồ đang được quan tâm
-            </h2>
+            <h2 className="text-xl font-bold text-amber-900 mb-3">Đồ đang được quan tâm</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {featuredItems.map((item, i) => (
-                <div
-                  key={i}
-                  className="border rounded p-3 hover:shadow-md transition"
-                >
+                <div key={i} className="border rounded p-3 hover:shadow-md transition">
                   <div className="bg-amber-100 h-40 mb-2 rounded" />
                   <h3 className="font-medium text-amber-800">{item.title}</h3>
                   <p className="text-amber-700 font-semibold">{item.price}</p>
@@ -74,15 +68,10 @@ export default function Home() {
           </section>
 
           <section className="bg-white p-4 shadow">
-            <h2 className="text-xl font-bold text-amber-900 mb-3">
-              Đồ đang được quan tâm
-            </h2>
+            <h2 className="text-xl font-bold text-amber-900 mb-3">Đồ đang được quan tâm</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {featuredItems.map((item, i) => (
-                <div
-                  key={i}
-                  className="border rounded p-3 hover:shadow-md transition"
-                >
+                <div key={i} className="border rounded p-3 hover:shadow-md transition">
                   <div className="bg-amber-100 h-40 mb-2 rounded" />
                   <h3 className="font-medium text-amber-800">{item.title}</h3>
                   <p className="text-amber-700 font-semibold">{item.price}</p>
@@ -94,31 +83,19 @@ export default function Home() {
       </section>
 
       <section className="bg-amber-50 p-6 mt-6 text-center">
-        <h2 className="text-2xl font-bold text-amber-900 mb-4">
-          Cách hoạt động
-        </h2>
+        <h2 className="text-2xl font-bold text-amber-900 mb-4">Cách hoạt động</h2>
         <div className="grid md:grid-cols-3 gap-6 text-left">
           <div>
-            <h3 className="font-semibold mb-1 text-amber-800">
-              1. Đăng đồ bạn muốn trao đổi
-            </h3>
+            <h3 className="font-semibold mb-1 text-amber-800">1. Đăng đồ bạn muốn trao đổi</h3>
             <p className="text-sm text-amber-700">Miễn phí và dễ dàng.</p>
           </div>
           <div>
-            <h3 className="font-semibold mb-1 text-amber-800">
-              2. Tìm món bạn cần
-            </h3>
-            <p className="text-sm text-amber-700">
-              Tìm kiếm theo khu vực hoặc danh mục.
-            </p>
+            <h3 className="font-semibold mb-1 text-amber-800">2. Tìm món bạn cần</h3>
+            <p className="text-sm text-amber-700">Tìm kiếm theo khu vực hoặc danh mục.</p>
           </div>
           <div>
-            <h3 className="font-semibold mb-1 text-amber-800">
-              3. Liên hệ & trao đổi
-            </h3>
-            <p className="text-sm text-amber-700">
-              Thỏa thuận trực tiếp với người đăng.
-            </p>
+            <h3 className="font-semibold mb-1 text-amber-800">3. Liên hệ & trao đổi</h3>
+            <p className="text-sm text-amber-700">Thỏa thuận trực tiếp với người đăng.</p>
           </div>
         </div>
       </section>

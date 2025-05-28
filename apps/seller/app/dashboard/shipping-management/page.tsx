@@ -1,67 +1,80 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Plus, Edit } from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Edit, Plus } from 'lucide-react';
+import { useState } from 'react';
 
 interface ShippingMethod {
-  id: string
-  name: string
-  description: string
-  basePrice: number
-  freeShippingThreshold?: number
-  estimatedDays: string
-  isActive: boolean
+  id: string;
+  name: string;
+  description: string;
+  basePrice: number;
+  freeShippingThreshold?: number;
+  estimatedDays: string;
+  isActive: boolean;
 }
 
 const mockShippingMethods: ShippingMethod[] = [
   {
-    id: "1",
-    name: "Giao hàng tiêu chuẩn",
-    description: "Giao hàng trong 3-5 ngày làm việc",
+    id: '1',
+    name: 'Giao hàng tiêu chuẩn',
+    description: 'Giao hàng trong 3-5 ngày làm việc',
     basePrice: 30000,
     freeShippingThreshold: 500000,
-    estimatedDays: "3-5 ngày",
+    estimatedDays: '3-5 ngày',
     isActive: true,
   },
   {
-    id: "2",
-    name: "Giao hàng nhanh",
-    description: "Giao hàng trong 1-2 ngày làm việc",
+    id: '2',
+    name: 'Giao hàng nhanh',
+    description: 'Giao hàng trong 1-2 ngày làm việc',
     basePrice: 50000,
     freeShippingThreshold: 1000000,
-    estimatedDays: "1-2 ngày",
+    estimatedDays: '1-2 ngày',
     isActive: true,
   },
   {
-    id: "3",
-    name: "Giao hàng hỏa tốc",
-    description: "Giao hàng trong ngày",
+    id: '3',
+    name: 'Giao hàng hỏa tốc',
+    description: 'Giao hàng trong ngày',
     basePrice: 100000,
-    estimatedDays: "Trong ngày",
+    estimatedDays: 'Trong ngày',
     isActive: false,
   },
-]
+];
 
 export default function ShippingManagement() {
-  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>(mockShippingMethods)
-  const [selectedMethod, setSelectedMethod] = useState<ShippingMethod | null>(null)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>(mockShippingMethods);
+  const [selectedMethod, setSelectedMethod] = useState<ShippingMethod | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    basePrice: "",
-    freeShippingThreshold: "",
-    estimatedDays: "",
+    name: '',
+    description: '',
+    basePrice: '',
+    freeShippingThreshold: '',
+    estimatedDays: '',
     isActive: true,
-  })
+  });
 
   const handleCreate = () => {
     const newMethod: ShippingMethod = {
@@ -69,17 +82,19 @@ export default function ShippingManagement() {
       name: formData.name,
       description: formData.description,
       basePrice: Number(formData.basePrice),
-      freeShippingThreshold: formData.freeShippingThreshold ? Number(formData.freeShippingThreshold) : undefined,
+      freeShippingThreshold: formData.freeShippingThreshold
+        ? Number(formData.freeShippingThreshold)
+        : undefined,
       estimatedDays: formData.estimatedDays,
       isActive: formData.isActive,
-    }
-    setShippingMethods([...shippingMethods, newMethod])
-    resetForm()
-    setIsCreateOpen(false)
-  }
+    };
+    setShippingMethods([...shippingMethods, newMethod]);
+    resetForm();
+    setIsCreateOpen(false);
+  };
 
   const handleUpdate = () => {
-    if (!selectedMethod) return
+    if (!selectedMethod) return;
 
     const updatedMethods = shippingMethods.map((method) =>
       method.id === selectedMethod.id
@@ -88,45 +103,47 @@ export default function ShippingManagement() {
             name: formData.name,
             description: formData.description,
             basePrice: Number(formData.basePrice),
-            freeShippingThreshold: formData.freeShippingThreshold ? Number(formData.freeShippingThreshold) : undefined,
+            freeShippingThreshold: formData.freeShippingThreshold
+              ? Number(formData.freeShippingThreshold)
+              : undefined,
             estimatedDays: formData.estimatedDays,
             isActive: formData.isActive,
           }
         : method,
-    )
-    setShippingMethods(updatedMethods)
-    setIsDetailOpen(false)
-    setSelectedMethod(null)
-  }
+    );
+    setShippingMethods(updatedMethods);
+    setIsDetailOpen(false);
+    setSelectedMethod(null);
+  };
 
   const resetForm = () => {
     setFormData({
-      name: "",
-      description: "",
-      basePrice: "",
-      freeShippingThreshold: "",
-      estimatedDays: "",
+      name: '',
+      description: '',
+      basePrice: '',
+      freeShippingThreshold: '',
+      estimatedDays: '',
       isActive: true,
-    })
-  }
+    });
+  };
 
   const openCreateDialog = () => {
-    resetForm()
-    setIsCreateOpen(true)
-  }
+    resetForm();
+    setIsCreateOpen(true);
+  };
 
   const openDetailDialog = (method: ShippingMethod) => {
-    setSelectedMethod(method)
+    setSelectedMethod(method);
     setFormData({
       name: method.name,
       description: method.description,
       basePrice: method.basePrice.toString(),
-      freeShippingThreshold: method.freeShippingThreshold?.toString() || "",
+      freeShippingThreshold: method.freeShippingThreshold?.toString() || '',
       estimatedDays: method.estimatedDays,
       isActive: method.isActive,
-    })
-    setIsDetailOpen(true)
-  }
+    });
+    setIsDetailOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -178,7 +195,9 @@ export default function ShippingManagement() {
                   id="freeShippingThreshold"
                   type="number"
                   value={formData.freeShippingThreshold}
-                  onChange={(e) => setFormData({ ...formData, freeShippingThreshold: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, freeShippingThreshold: e.target.value })
+                  }
                   placeholder="Để trống nếu không có"
                 />
               </div>
@@ -226,20 +245,22 @@ export default function ShippingManagement() {
                 <TableRow key={method.id}>
                   <TableCell className="font-medium">{method.name}</TableCell>
                   <TableCell>{method.description}</TableCell>
-                  <TableCell>{method.basePrice.toLocaleString("vi-VN")}đ</TableCell>
+                  <TableCell>{method.basePrice.toLocaleString('vi-VN')}đ</TableCell>
                   <TableCell>
                     {method.freeShippingThreshold
-                      ? `${method.freeShippingThreshold.toLocaleString("vi-VN")}đ`
-                      : "Không có"}
+                      ? `${method.freeShippingThreshold.toLocaleString('vi-VN')}đ`
+                      : 'Không có'}
                   </TableCell>
                   <TableCell>{method.estimatedDays}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        method.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                        method.isActive
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {method.isActive ? "Hoạt động" : "Không hoạt động"}
+                      {method.isActive ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -291,7 +312,9 @@ export default function ShippingManagement() {
                 id="edit-freeShippingThreshold"
                 type="number"
                 value={formData.freeShippingThreshold}
-                onChange={(e) => setFormData({ ...formData, freeShippingThreshold: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, freeShippingThreshold: e.target.value })
+                }
                 placeholder="Để trống nếu không có"
               />
             </div>
@@ -318,5 +341,5 @@ export default function ShippingManagement() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

@@ -1,63 +1,76 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Plus, Edit } from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Edit, Plus } from 'lucide-react';
+import { useState } from 'react';
 
 interface Address {
-  id: string
-  name: string
-  phone: string
-  address: string
-  ward: string
-  district: string
-  city: string
-  isDefault: boolean
+  id: string;
+  name: string;
+  phone: string;
+  address: string;
+  ward: string;
+  district: string;
+  city: string;
+  isDefault: boolean;
 }
 
 const mockAddresses: Address[] = [
   {
-    id: "1",
-    name: "Nguyễn Văn A",
-    phone: "0123456789",
-    address: "123 Đường ABC",
-    ward: "Phường 1",
-    district: "Quận 1",
-    city: "TP. Hồ Chí Minh",
+    id: '1',
+    name: 'Nguyễn Văn A',
+    phone: '0123456789',
+    address: '123 Đường ABC',
+    ward: 'Phường 1',
+    district: 'Quận 1',
+    city: 'TP. Hồ Chí Minh',
     isDefault: true,
   },
   {
-    id: "2",
-    name: "Trần Thị B",
-    phone: "0987654321",
-    address: "456 Đường XYZ",
-    ward: "Phường 2",
-    district: "Quận 2",
-    city: "TP. Hồ Chí Minh",
+    id: '2',
+    name: 'Trần Thị B',
+    phone: '0987654321',
+    address: '456 Đường XYZ',
+    ward: 'Phường 2',
+    district: 'Quận 2',
+    city: 'TP. Hồ Chí Minh',
     isDefault: false,
   },
-]
+];
 
 export default function AddressManagement() {
-  const [addresses, setAddresses] = useState<Address[]>(mockAddresses)
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [addresses, setAddresses] = useState<Address[]>(mockAddresses);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    address: "",
-    ward: "",
-    district: "",
-    city: "",
+    name: '',
+    phone: '',
+    address: '',
+    ward: '',
+    district: '',
+    city: '',
     isDefault: false,
-  })
+  });
 
   const handleCreate = () => {
     const newAddress: Address = {
@@ -69,21 +82,21 @@ export default function AddressManagement() {
       district: formData.district,
       city: formData.city,
       isDefault: formData.isDefault,
-    }
+    };
 
     // If this is set as default, remove default from others
-    let updatedAddresses = addresses
+    let updatedAddresses = addresses;
     if (formData.isDefault) {
-      updatedAddresses = addresses.map((addr) => ({ ...addr, isDefault: false }))
+      updatedAddresses = addresses.map((addr) => ({ ...addr, isDefault: false }));
     }
 
-    setAddresses([...updatedAddresses, newAddress])
-    resetForm()
-    setIsCreateOpen(false)
-  }
+    setAddresses([...updatedAddresses, newAddress]);
+    resetForm();
+    setIsCreateOpen(false);
+  };
 
   const handleUpdate = () => {
-    if (!selectedAddress) return
+    if (!selectedAddress) return;
 
     let updatedAddresses = addresses.map((address) =>
       address.id === selectedAddress.id
@@ -98,39 +111,39 @@ export default function AddressManagement() {
             isDefault: formData.isDefault,
           }
         : address,
-    )
+    );
 
     // If this is set as default, remove default from others
     if (formData.isDefault) {
       updatedAddresses = updatedAddresses.map((addr) =>
         addr.id === selectedAddress.id ? addr : { ...addr, isDefault: false },
-      )
+      );
     }
 
-    setAddresses(updatedAddresses)
-    setIsDetailOpen(false)
-    setSelectedAddress(null)
-  }
+    setAddresses(updatedAddresses);
+    setIsDetailOpen(false);
+    setSelectedAddress(null);
+  };
 
   const resetForm = () => {
     setFormData({
-      name: "",
-      phone: "",
-      address: "",
-      ward: "",
-      district: "",
-      city: "",
+      name: '',
+      phone: '',
+      address: '',
+      ward: '',
+      district: '',
+      city: '',
       isDefault: false,
-    })
-  }
+    });
+  };
 
   const openCreateDialog = () => {
-    resetForm()
-    setIsCreateOpen(true)
-  }
+    resetForm();
+    setIsCreateOpen(true);
+  };
 
   const openDetailDialog = (address: Address) => {
-    setSelectedAddress(address)
+    setSelectedAddress(address);
     setFormData({
       name: address.name,
       phone: address.phone,
@@ -139,9 +152,9 @@ export default function AddressManagement() {
       district: address.district,
       city: address.city,
       isDefault: address.isDefault,
-    })
-    setIsDetailOpen(true)
-  }
+    });
+    setIsDetailOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -258,7 +271,9 @@ export default function AddressManagement() {
                   <TableCell>{address.city}</TableCell>
                   <TableCell>
                     {address.isDefault && (
-                      <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">Mặc định</span>
+                      <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                        Mặc định
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -344,5 +359,5 @@ export default function AddressManagement() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

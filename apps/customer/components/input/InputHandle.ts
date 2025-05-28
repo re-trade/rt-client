@@ -1,5 +1,3 @@
-
-
 export const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
   e.target.value = e.target.value.replace(/\D/g, ''); // chỉ giữ số
 };
@@ -12,6 +10,6 @@ export const handleNumberInput = (e: React.ChangeEvent<HTMLInputElement>) => {
   e.target.value = e.target.value.replace(/[^0-9]/g, ''); // chỉ giữ số
 };
 
-export const handleUsernameInput =(e : React.ChangeEvent<HTMLInputElement>)=>{
-  e.target.value = e.target.value.replace(/\d/g,'');
-}
+export const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  e.target.value = e.target.value.replace(/\d/g, '');
+};
