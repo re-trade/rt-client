@@ -62,22 +62,29 @@ export default function Home() {
           </div>
 
           <section className="bg-white p-4 shadow">
-            <h2 className="text-xl font-bold text-amber-900 mb-3">
-              Đồ đang được quan tâm
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {featuredItems.map((item, i) => (
-                <div
-                  key={i}
-                  className="border rounded p-3 hover:shadow-md transition"
-                >
-                  <div className="bg-amber-100 h-40 mb-2 rounded" />
-                  <h3 className="font-medium text-amber-800">{item.title}</h3>
-                  <p className="text-amber-700 font-semibold">{item.price}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+  <div className="flex justify-between items-center mb-3">
+    <h2 className="text-xl font-bold text-amber-900">Được quan tâm</h2>
+    <a
+      href="#"
+      className="text-sm text-amber-600 hover:text-amber-800 font-medium"
+    >
+  Xem thêm &gt;&gt;    </a>
+  </div>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    {featuredItems.map((item, i) => (
+      <div
+        key={i}
+        className="border rounded p-3 hover:shadow-md transition"
+      >
+        <div className="bg-amber-100 h-40 mb-2 rounded" />
+        <h3 className="font-medium text-amber-800">{item.title}</h3>
+        <p className="text-amber-700 font-semibold">{item.price}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
 
           <section className="bg-white p-4 shadow">
             <h2 className="text-xl font-bold text-amber-900 mb-3">

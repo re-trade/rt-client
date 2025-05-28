@@ -9,8 +9,7 @@ import {
 
 function DiagonalBackground() {
   return (
-    <div className="absolute inset-0 h-full w-full">
-      {/* Mảng màu trái #FFD2B2 */}
+    <div className="absolute inset-0 h-full w-full pointer-events-none">
       <div
         className="absolute top-0 left-0 w-full h-full"
         style={{
@@ -18,8 +17,6 @@ function DiagonalBackground() {
           clipPath: "polygon(0 0, 0 20%, 100% 0)",
         }}
       ></div>
-
-      {/* Mảng màu phải #FDFEF9 */}
       <div
         className="absolute top-0 left-0 w-full h-full"
         style={{
@@ -33,15 +30,12 @@ function DiagonalBackground() {
 
 export default function Footer() {
   return (
-    <footer className="relative w-full py-12 h-[400px] ">
-      {/* Background chéo */}
+    <footer className="relative w-full py-12 min-h-[380px] bg-amber-50">
       <DiagonalBackground />
 
-      <div className="relative max-w-[1440px] mx-auto px-6 grid grid-cols-4 gap-8 h-full pt-16">
-        {/* Dịch vụ khách hàng */}
+      <div className="relative max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 h-full pt-16">
         <div>
           <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
-            {" "}
             Dịch vụ khách hàng
           </h3>
           <div className="flex flex-col gap-3">
@@ -56,7 +50,7 @@ export default function Footer() {
               <a
                 key={item}
                 href="#"
-                className="font-['Reddit_Sans'] font-normal text-1.5xl text-[#121212] hover:text-[#525252]"
+                className="font-['Reddit_Sans'] font-normal text-lg text-[#121212] hover:text-[#525252]"
               >
                 {item}
               </a>
@@ -64,9 +58,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Về chúng tôi */}
         <div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-xl text-base text-[#121212] mb-4">
+          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
             Về chúng tôi
           </h3>
           <div className="flex flex-col gap-3">
@@ -81,7 +74,7 @@ export default function Footer() {
               <a
                 key={item}
                 href="#"
-                className="font-['Reddit_Sans'] font-normal text-1.5xl text-[#121212] hover:text-[#525252]"
+                className="font-['Reddit_Sans'] font-normal text-lg text-[#121212] hover:text-[#525252]"
               >
                 {item}
               </a>
@@ -89,21 +82,19 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Liên hệ chúng tôi */}
         <div>
           <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
             Liên hệ chúng tôi
           </h3>
           <div className="flex items-center gap-2 mb-4">
             <FaMapMarkerAlt className="w-5 h-5 text-[#121212]" />
-            <span className="font-['Reddit_Sans'] font-normal  text-1.5xl text-[#121212]">
-              Tòa nhà Vietcomreal, 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.
-              HCM
+            <span className="font-['Reddit_Sans'] font-normal text-lg text-[#121212]">
+              Tòa nhà Vietcomreal, 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. HCM
             </span>
           </div>
           <div className="flex items-center gap-2 mb-4">
             <FaEnvelope className="w-5 h-5 text-[#121212]" />
-            <span className="font-['Reddit_Sans'] font-normal text-1.5xl text-[#121212]">
+            <span className="font-['Reddit_Sans'] font-normal text-lg text-[#121212]">
               retradeshopsupport@gmail.com
             </span>
           </div>
@@ -128,7 +119,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Liên hệ hỗ trợ */}
         <div>
           <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
             Liên hệ hỗ trợ
@@ -151,9 +141,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Phần dưới cùng */}
-      <div className="relative max-w-[1440px] mx-auto px-6 mt-12 pt-6 border-t border-[#525252]/20 flex justify-between items-center text-[#525252] font-['Reddit_Sans'] text-[10px]">
-        <span>© 2021 All Rights Reserved</span>
+      <div className="relative max-w-[1440px] mx-auto px-6 mt-12 pt-6 border-t border-[#525252]/20 flex justify-between items-center text-[#525252] font-['Reddit_Sans'] text-xs">
+        <span>© 2025 All Rights Reserved</span>
         <div className="flex gap-6">
           {[
             "Privacy Policy",

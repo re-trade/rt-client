@@ -21,6 +21,9 @@
     "packages/*"
   ],
   "dependencies": {
+    "@types/highcharts": "^5.0.44",
+    "highcharts": "^12.2.0",
+    "highcharts-react-official": "^3.2.2",
     "next": "^15.3.2"
   }
 }
