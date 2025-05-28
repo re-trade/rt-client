@@ -1,6 +1,9 @@
 'use client';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FaBell, FaGlobe, FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
+import Search from '../input/Search';
+import { FaCartPlus } from "react-icons/fa";
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,12 +62,14 @@ const Header: React.FC = () => {
         </Link>
 
         <div className="w-full md:max-w-2xl flex flex-col">
-          <SearchBox />
+          <Search placeholder={''} onSearch={function (query: string): void {
+            throw new Error('Function not implemented.');
+          } } />
         </div>
 
         <div className="flex items-center space-x-5 text-sm text-gray-700">
           <Link href="/cart" className="relative hover:bg-gray-300">
-            🛒
+            <FaCartPlus size={"1.5rem"}/>
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
               3
             </span>

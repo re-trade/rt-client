@@ -1,54 +1,76 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  shopId: number;
+  shopName: string; 
+  image: string; 
+}
+
+interface RecommendedItem {
+  id: number;
+  name: string;
+  originalPrice: number;
+  discountedPrice: number;
+  description: string;
+  image: string; 
+}
+
 const ShoppingCart: React.FC = () => {
-  const cartItems = [
+  const cartItems: CartItem[] = [
     {
       id: 1,
+      shopId: 101,
+      shopName: 'TechTrend Innovations',
       name: 'PC system All in One APPLE iMac (2023) mqrq3ro/a, Apple M3, 24" Retina 4.5K, 8GB, SSD 256GB, 10-core GPU, Keyboard layout INT',
       price: 1499,
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg',
     },
     {
       id: 2,
+      shopId: 101,
+      shopName: 'TechTrend Innovations',
       name: 'Restored Apple Watch Series 8 (GPS) 41mm Midnight Aluminum Case with Midnight Sport Band',
       price: 598,
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg',
     },
     {
       id: 3,
+      shopId: 102,
+      shopName: 'GadgetZone',
       name: 'Apple - MacBook Pro 16" Laptop, M3 Pro chip, 36GB Memory, 18-core GPU, 512GB SSD, Space Black',
       price: 1799,
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/macbook-pro-light.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/macbook-pro-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/macbook-pro-light.svg',
     },
     {
       id: 4,
+      shopId: 102,
+      shopName: 'GadgetZone',
       name: 'Tablet APPLE iPad Pro 12.9" 6th Gen, 128GB, Wi-Fi, Gold',
       price: 699,
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ipad-light.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ipad-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ipad-light.svg',
     },
     {
       id: 5,
+      shopId: 103,
+      shopName: 'ElectroMart',
       name: 'APPLE iPhone 15 5G phone, 256GB, Gold',
       price: 999,
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/iphone-light.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/iphone-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/iphone-light.svg',
     },
   ];
 
-  const recommendedItems = [
+  const recommendedItems: RecommendedItem[] = [
     {
       id: 6,
       name: 'iMac 27”',
       originalPrice: 399.99,
       discountedPrice: 299,
       description: 'This generation has some improvements, including a longer continuous battery life.',
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg',
     },
     {
       id: 7,
@@ -56,8 +78,7 @@ const ShoppingCart: React.FC = () => {
       originalPrice: 799.99,
       discountedPrice: 499,
       description: 'This generation has some improvements, including a longer continuous battery life.',
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ps5-light.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ps5-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ps5-light.svg',
     },
     {
       id: 8,
@@ -65,15 +86,12 @@ const ShoppingCart: React.FC = () => {
       originalPrice: 1799.99,
       discountedPrice: 1199,
       description: 'This generation has some improvements, including a longer continuous battery life.',
-      imageLight: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg',
-      imageDark: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-dark.svg',
+      image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg',
     },
   ];
 
-  // State to track selected products
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  
-  // State for order summary calculations
+
   const [orderSummary, setOrderSummary] = useState({
     originalPrice: 0,
     savings: 0,
@@ -82,13 +100,12 @@ const ShoppingCart: React.FC = () => {
     total: 0,
   });
 
-  // Calculate order summary based on selected items
   useEffect(() => {
     const selectedProducts = cartItems.filter(item => selectedItems.includes(item.id));
     const originalPrice = selectedProducts.reduce((sum, item) => sum + item.price, 0);
-    const savings = selectedProducts.length > 0 ? 299 : 0; // Fixed savings from original
-    const storePickup = selectedProducts.length > 0 ? 99 : 0; // Fixed store pickup fee
-    const tax = selectedProducts.length > 0 ? 799 : 0; // Fixed tax from original
+    const savings = selectedProducts.length > 0 ? 299 : 0;
+    const storePickup = selectedProducts.length > 0 ? 99 : 0;
+    const tax = selectedProducts.length > 0 ? 799 : 0;
     const total = originalPrice - savings + storePickup + tax;
 
     setOrderSummary({
@@ -100,12 +117,41 @@ const ShoppingCart: React.FC = () => {
     });
   }, [selectedItems]);
 
-  // Handle checkbox toggle
   const handleCheckboxChange = (id: number) => {
-    setSelectedItems(prev =>
-      prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
-    );
+    const item = cartItems.find(i => i.id === id);
+    if (!item) return;
+
+    if (selectedItems.length === 0) {
+      setSelectedItems([id]);
+      return;
+    }
+
+    const currentShopId = cartItems.find(i => i.id === selectedItems[0])?.shopId;
+    if (item.shopId === currentShopId) {
+      setSelectedItems(prev =>
+        prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+      );
+    } else {
+      alert('You can only select products from the same shop at once.');
+    }
   };
+
+  const handleRemove = (id: number) => {
+    setSelectedItems(prev => prev.filter(itemId => itemId !== id));
+    alert(`Item ${id} removed from cart.`);
+  };
+
+  const handleAddToFavorites = (id: number) => {
+    alert(`Item ${id} added to favorites.`);
+  };
+
+  const groupedItems = cartItems.reduce((acc: Record<number, CartItem[]>, item) => {
+    if (!acc[item.shopId]) {
+      acc[item.shopId] = [];
+    }
+    acc[item.shopId].push(item);
+    return acc;
+  }, {});
 
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
@@ -115,83 +161,91 @@ const ShoppingCart: React.FC = () => {
         <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
           <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
             <div className="space-y-6">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-6"
-                >
-                  <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-                    <div className="flex items-center md:order-1">
-                      <input
-                        type="checkbox"
-                        id={`select-item-${item.id}`}
-                        checked={selectedItems.includes(item.id)}
-                        onChange={() => handleCheckboxChange(item.id)}
-                        className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-primary-600"
-                      />
-                      <label htmlFor={`select-item-${item.id}`} className="sr-only">
-                        Select item for order
-                      </label>
-                    </div>
-                    <a href="#" className="shrink-0 md:order-2">
-                      <img className="h-20 w-20 dark:hidden" src={item.imageLight} alt={`${item.name} image`} />
-                      <img className="hidden h-20 w-20 dark:block" src={item.imageDark} alt={`${item.name} image`} />
-                    </a>
+              {Object.entries(groupedItems).map(([shopId, items]) => (
+                <div key={shopId} className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                    Shop: {items[0].shopName}
+                  </h3>
+                  {items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-6"
+                    >
+                      <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
+                        <div className="flex items-center md:order-1">
+                          <input
+                            type="checkbox"
+                            id={`select-item-${item.id}`}
+                            checked={selectedItems.includes(item.id)}
+                            onChange={() => handleCheckboxChange(item.id)}
+                            className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-primary-600"
+                          />
+                          <label htmlFor={`select-item-${item.id}`} className="sr-only">
+                            Select item for order
+                          </label>
+                        </div>
+                        <a href="#" className="shrink-0 md:order-2">
+                          <img className="h-20 w-20" src={item.image} alt={`${item.name} image`} />
+                        </a>
 
-                    <div className="flex items-center justify-between md:order-4 md:justify-end">
-                      <div className="text-end md:w-32">
-                        <p className="text-base font-bold text-gray-900 dark:text-white">${item.price.toLocaleString()}</p>
+                        <div className="flex items-center justify-between md:order-4 md:justify-end">
+                          <div className="text-end md:w-32">
+                            <p className="text-base font-bold text-gray-900 dark:text-white">${item.price.toLocaleString()}</p>
+                          </div>
+                        </div>
+
+                        <div className="w-full min-w-0 flex-1 space-y-4 md:order-3 md:max-w-md">
+                          <a href="#" className="text-base font-medium text-gray-900 hover:underline dark:text-white">
+                            {item.name}
+                          </a>
+                          <div className="flex items-center gap-4">
+                            <button
+                              type="button"
+                              onClick={() => handleAddToFavorites(item.id)}
+                              className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
+                            >
+                              <svg
+                                className="me-1.5 h-5 w-5"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"
+                                />
+                              </svg>
+                              Add to Favorites
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemove(item.id)}
+                              className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
+                            >
+                              <svg
+                                className="me-1.5 h-5 w-5"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                              </svg>
+                              Remove
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-
-                    <div className="w-full min-w-0 flex-1 space-y-4 md:order-3 md:max-w-md">
-                      <a href="#" className="text-base font-medium text-gray-900 hover:underline dark:text-white">
-                        {item.name}
-                      </a>
-                      <div className="flex items-center gap-4">
-                        <button
-                          type="button"
-                          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
-                        >
-                          <svg
-                            className="me-1.5 h-5 w-5"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"
-                            />
-                          </svg>
-                          Add to Favorites
-                        </button>
-                        <button
-                          type="button"
-                          className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
-                        >
-                          <svg
-                            className="me-1.5 h-5 w-5"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                          </svg>
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               ))}
               <div className="hidden xl:mt-8 xl:block">
@@ -203,8 +257,7 @@ const ShoppingCart: React.FC = () => {
                       className="space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                     >
                       <a href="#" className="overflow-hidden rounded">
-                        <img className="mx-auto h-44 w-44 dark:hidden" src={item.imageLight} alt={`${item.name} image`} />
-                        <img className="mx-auto hidden h-44 w-44 dark:block" src={item.imageDark} alt={`${item.name} image`} />
+                        <img className="mx-auto h-44 w-44" src={item.image} alt={`${item.name} image`} />
                       </a>
                       <div>
                         <a href="#" className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">

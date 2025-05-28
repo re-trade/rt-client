@@ -156,7 +156,7 @@ export default function ProductListPage() {
   });
 
   return (
-    <div className="max-w-[80%] mx-auto px-10 py-10 grid grid-cols-12 gap-6">
+    <div className="max-w-[80%] mx-auto px-10 py-10 grid grid-cols-12 gap-6 font-[Open_Sans]">
       <aside className="col-span-12 md:col-span-3 border border-gray-300 rounded-md p-4">
         <div className="flex items-center gap-2 mb-4">
           <svg

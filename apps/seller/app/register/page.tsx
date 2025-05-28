@@ -1,5 +1,4 @@
 'use client';
-import Footer from '@/components/Footer';
 import AccountRegisterStep1 from '@/components/step/account-register/AccountRegisterStep1';
 import Step2 from '@/components/step/account-register/AccountRegisterStep2';
 import Step3 from '@/components/step/account-register/AccountRegisterStep3';
@@ -53,7 +52,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-[Open_Sans]">
       <div className="container mx-auto p-4 max-w-3xl border rounded shadow">
         <div className="flex justify-between mb-10 relative">
           {steps.map((label, index) => {

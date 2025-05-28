@@ -114,7 +114,7 @@ export default function Register() {
               {/* Register button */}
               <button
                 type="submit"
-                className="w-full bg-orange-400 text-white p-3 rounded-lg hover:bg-orange-500 transition"
+                className="w-full bg-orange-400 text-white p-3 sans-serif rounded-lg hover:bg-orange-500 transition"
                 onClick={() => router.push('/login')}
               >
                 Đăng ký

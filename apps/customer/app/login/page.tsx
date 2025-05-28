@@ -25,7 +25,7 @@ export default function Login() {
   }, []);
 
   return (
-    <section className="flex justify-center min-h-screen bg-gray-100">
+    <section className="flex justify-center min-h-screen bg-gray-100 font-[Open_Sans]">
       <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center">
         {/* Form */}
         <div ref={formRef} className="w-full max-w-xl bg-white p-6 rounded-lg shadow-md">
