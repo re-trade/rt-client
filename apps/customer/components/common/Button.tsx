@@ -1,12 +1,12 @@
 'use client';
 
-import { ButtonHTMLAttributes } from 'react';
 import clsx from 'clsx';
+import { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg';
-  className?: string
+  className?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({

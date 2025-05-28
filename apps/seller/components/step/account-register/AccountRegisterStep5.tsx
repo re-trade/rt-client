@@ -1,10 +1,8 @@
-import React from "react";
-
 type Props = {
   formData: any;
 };
 
-export default function Step5({ formData }: Props) {
+export default function AccountRegisterStep5({ formData }: Props) {
   return (
     <div className="mb-4">
       <h3 className="font-semibold text-lg mb-2">Thông tin xác nhận</h3>

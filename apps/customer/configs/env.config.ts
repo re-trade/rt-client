@@ -1,10 +1,10 @@
 type TEnvConfig = {
-    [key: string]: string;
-}
+  [key: string]: string;
+};
 
 export class ConfigLoader<T extends {}> {
-    private env = {};
-    constructor(requiteEnv?: string[]) {
-        const envList = process?.env;
-    }
+  private env = {};
+  constructor(requiteEnv?: string[]) {
+    const envList = process?.env;
+  }
 }

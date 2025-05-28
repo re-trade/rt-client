@@ -1,10 +1,10 @@
-"use client";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { FaFacebook } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+'use client';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { FaFacebook } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function login() {
   const [isVisible, setIsVisible] = useState(false);
@@ -39,8 +39,7 @@ export default function login() {
             Chào mừng bạn trở lại với Retrade Shop!
           </h1>
           <p className="text-center text-gray-600 mb-6">
-            Nơi tìm món đồ đẹp, dùng món chất lượng – và gặp cơ hội đổi đời
-            trong tích tắc!
+            Nơi tìm món đồ đẹp, dùng món chất lượng – và gặp cơ hội đổi đời trong tích tắc!
           </p>
           <form className="space-y-4">
             <div>
@@ -53,7 +52,7 @@ export default function login() {
             <div className="relative">
               <input
                 id="password"
-                type={isVisible ? "text" : "password"}
+                type={isVisible ? 'text' : 'password'}
                 className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white hover:bg-gray-100"
                 placeholder="Mật khẩu"
                 aria-label="Password"
@@ -96,8 +95,8 @@ export default function login() {
             </button>
           </Link>
           <p className="text-center text-gray-500 text-sm mt-4">
-            Bằng cách nhấn vào đăng nhập hoặc đăng ký, bạn đồng ý với Điều khoản
-            sử dụng và Chính sách bảo mật của chúng tôi.
+            Bằng cách nhấn vào đăng nhập hoặc đăng ký, bạn đồng ý với Điều khoản sử dụng và Chính
+            sách bảo mật của chúng tôi.
           </p>
         </div>
       </div>

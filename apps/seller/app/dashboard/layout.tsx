@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import {
   Sidebar,
@@ -12,45 +12,37 @@ import {
   SidebarProvider,
   SidebarTrigger,
   useSidebar,
-} from "@/components/ui/sidebar"
-import {
-  DollarSign,
-  LayoutDashboard,
-  MapPin,
-  Package,
-  Store,
-  Ticket,
-  Truck,
-} from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import type React from "react"
+} from '@/components/ui/sidebar';
+import { DollarSign, LayoutDashboard, MapPin, Package, Store, Ticket, Truck } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import type React from 'react';
 
 const menuItems = [
-  { title: "Tổng quan", icon: LayoutDashboard, href: "/dashboard" },
-  { title: "Quản lý sản phẩm", icon: Package, href: "/dashboard/product-management" },
-  { title: "Quản lý doanh thu", icon: DollarSign, href: "/dashboard/revenue-management" },
-  { title: "Quản lý voucher", icon: Ticket, href: "/dashboard/voucher-management" },
-  { title: "Phương thức vận chuyển", icon: Truck, href: "/dashboard/shipping-management" },
-  { title: "Quản lý địa chỉ", icon: MapPin, href: "/dashboard/address-management" },
-  { title: "Thông tin shop", icon: Store, href: "/dashboard/shop-info-management" },
-]
+  { title: 'Tổng quan', icon: LayoutDashboard, href: '/dashboard' },
+  { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product-management' },
+  { title: 'Quản lý doanh thu', icon: DollarSign, href: '/dashboard/revenue-management' },
+  { title: 'Quản lý voucher', icon: Ticket, href: '/dashboard/voucher-management' },
+  { title: 'Phương thức vận chuyển', icon: Truck, href: '/dashboard/shipping-management' },
+  { title: 'Quản lý địa chỉ', icon: MapPin, href: '/dashboard/address-management' },
+  { title: 'Thông tin shop', icon: Store, href: '/dashboard/shop-info-management' },
+];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <DashboardContent>{children}</DashboardContent>
     </SidebarProvider>
-  )
+  );
 }
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const { state } = useSidebar()
+  const pathname = usePathname();
+  const { state } = useSidebar();
 
   return (
     <div className="flex min-h-screen w-full">
-      {state === "expanded" && (
+      {state === 'expanded' && (
         <div className="w-64 shrink-0 transition-all duration-300">
           <Sidebar>
             <SidebarContent>
@@ -80,11 +72,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-4 mb-6">
           <SidebarTrigger />
           <h1 className="text-2xl font-bold">
-            {menuItems.find((item) => item.href === pathname)?.title || "Dashboard"}
+            {menuItems.find((item) => item.href === pathname)?.title || 'Dashboard'}
           </h1>
         </div>
         {children}
       </main>
     </div>
-  )
+  );
 }
