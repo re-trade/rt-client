@@ -1,63 +1,76 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Edit } from "lucide-react"
-import Image from "next/image"
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
+import { Edit, Plus } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface Product {
-  id: string
-  name: string
-  price: number
-  stock: number
-  category: string
-  description: string
-  image: string
-  status: "active" | "inactive"
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  category: string;
+  description: string;
+  image: string;
+  status: 'active' | 'inactive';
 }
 
 const mockProducts: Product[] = [
   {
-    id: "1",
-    name: "Áo thun nam",
+    id: '1',
+    name: 'Áo thun nam',
     price: 299000,
     stock: 50,
-    category: "Thời trang",
-    description: "Áo thun nam chất liệu cotton cao cấp",
-    image: "/placeholder.svg?height=100&width=100",
-    status: "active",
+    category: 'Thời trang',
+    description: 'Áo thun nam chất liệu cotton cao cấp',
+    image: '/placeholder.svg?height=100&width=100',
+    status: 'active',
   },
   {
-    id: "2",
-    name: "Quần jeans nữ",
+    id: '2',
+    name: 'Quần jeans nữ',
     price: 599000,
     stock: 30,
-    category: "Thời trang",
-    description: "Quần jeans nữ form slim fit",
-    image: "/placeholder.svg?height=100&width=100",
-    status: "active",
+    category: 'Thời trang',
+    description: 'Quần jeans nữ form slim fit',
+    image: '/placeholder.svg?height=100&width=100',
+    status: 'active',
   },
-]
+];
 
 export default function ProductManagement() {
-  const [products, setProducts] = useState<Product[]>(mockProducts)
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    category: "",
-    description: "",
-    image: "",
-  })
+    name: '',
+    price: '',
+    stock: '',
+    category: '',
+    description: '',
+    image: '',
+  });
 
   const handleCreate = () => {
     const newProduct: Product = {
@@ -67,16 +80,16 @@ export default function ProductManagement() {
       stock: Number(formData.stock),
       category: formData.category,
       description: formData.description,
-      image: formData.image || "/placeholder.svg?height=100&width=100",
-      status: "active",
-    }
-    setProducts([...products, newProduct])
-    setFormData({ name: "", price: "", stock: "", category: "", description: "", image: "" })
-    setIsCreateOpen(false)
-  }
+      image: formData.image || '/placeholder.svg?height=100&width=100',
+      status: 'active',
+    };
+    setProducts([...products, newProduct]);
+    setFormData({ name: '', price: '', stock: '', category: '', description: '', image: '' });
+    setIsCreateOpen(false);
+  };
 
   const handleUpdate = () => {
-    if (!selectedProduct) return
+    if (!selectedProduct) return;
 
     const updatedProducts = products.map((product) =>
       product.id === selectedProduct.id
@@ -90,19 +103,19 @@ export default function ProductManagement() {
             image: formData.image || product.image,
           }
         : product,
-    )
-    setProducts(updatedProducts)
-    setIsDetailOpen(false)
-    setSelectedProduct(null)
-  }
+    );
+    setProducts(updatedProducts);
+    setIsDetailOpen(false);
+    setSelectedProduct(null);
+  };
 
   const openCreateDialog = () => {
-    setFormData({ name: "", price: "", stock: "", category: "", description: "", image: "" })
-    setIsCreateOpen(true)
-  }
+    setFormData({ name: '', price: '', stock: '', category: '', description: '', image: '' });
+    setIsCreateOpen(true);
+  };
 
   const openDetailDialog = (product: Product) => {
-    setSelectedProduct(product)
+    setSelectedProduct(product);
     setFormData({
       name: product.name,
       price: product.price.toString(),
@@ -110,9 +123,9 @@ export default function ProductManagement() {
       category: product.category,
       description: product.description,
       image: product.image,
-    })
-    setIsDetailOpen(true)
-  }
+    });
+    setIsDetailOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -202,7 +215,7 @@ export default function ProductManagement() {
                 <TableRow key={product.id} className="cursor-pointer hover:bg-muted/50">
                   <TableCell>
                     <Image
-                      src={product.image || "/placeholder.svg"}
+                      src={product.image || '/placeholder.svg'}
                       alt={product.name}
                       width={50}
                       height={50}
@@ -210,16 +223,18 @@ export default function ProductManagement() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.price.toLocaleString("vi-VN")}đ</TableCell>
+                  <TableCell>{product.price.toLocaleString('vi-VN')}đ</TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell>{product.category}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        product.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        product.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {product.status === "active" ? "Hoạt động" : "Không hoạt động"}
+                      {product.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -289,5 +304,5 @@ export default function ProductManagement() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

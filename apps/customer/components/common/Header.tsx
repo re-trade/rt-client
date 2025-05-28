@@ -1,11 +1,29 @@
-"use client";
-
-import Link from "next/link";
-import SearchBox from "@/components/input/Search";
-import { useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
+import { FaBell, FaGlobe, FaSearch, FaShoppingCart, FaUser } from 'react-icons/fa';
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [searchFocus, setSearchFocus] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+
+  useEffect(() => {
+    const history = localStorage.getItem('searchHistory');
+    if (history) {
+      setSearchHistory(JSON.parse(history));
+    }
+  }, []);
+  useEffect(() => {}, []);
+
+  const handleSearch = () => {
+    if (!search.trim()) return;
+
+    const newHistory = [search, ...searchHistory.filter((h) => h !== search)].slice(0, 5);
+    setSearchHistory(newHistory);
+    localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    setSearch('');
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50 border-b">
@@ -24,9 +42,9 @@ const Header: React.FC = () => {
             </ul>
           </details>
           <div className="hidden md:flex items-center space-x-3">
-            <Link href="/login" className="hover:text-orange-500 flex items-center">
-              👤 Login
-            </Link>
+            <a href="/login" className="hover:text-orange-500 flex items-center">
+              <FaUser className="mr-1" /> Login
+            </a>
             <span>|</span>
             <Link href="/register" className="hover:text-orange-500">
               Sign Up
@@ -56,7 +74,13 @@ const Header: React.FC = () => {
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle Menu"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-16 6h16" />
             </svg>
           </button>

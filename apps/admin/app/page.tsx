@@ -101,14 +101,14 @@ export default function Home() {
   );
 }
 */
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Home() {
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <Link href="/admin" className="text-xl text-[#4A4039] hover:underline">
-                Go to Admin Dashboard
-            </Link>
-        </div>
-    );
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <Link href="/admin" className="text-xl text-[#4A4039] hover:underline">
+        Go to Admin Dashboard
+      </Link>
+    </div>
+  );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type Props = {
   formData: any;
@@ -6,7 +6,7 @@ type Props = {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function Step1({ formData, handleChange, setShowModal }: Props) {
+export default function AccountRegisterStep1({ formData, handleChange, setShowModal }: Props) {
   return (
     <>
       <div className="flex items-center mb-4">
@@ -56,4 +56,3 @@ export default function Step1({ formData, handleChange, setShowModal }: Props) {
     </>
   );
 }
-    

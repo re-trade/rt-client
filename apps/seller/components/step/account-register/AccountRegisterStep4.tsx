@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type Props = {
   formData: any;
@@ -7,7 +7,7 @@ type Props = {
   ) => void;
 };
 
-export default function Step4({ formData, handleChange }: Props) {
+export default function AccountRegisterStep4({ formData, handleChange }: Props) {
   return (
     <>
       <div className="mb-4">
@@ -40,7 +40,7 @@ export default function Step4({ formData, handleChange }: Props) {
               type="radio"
               name="gender"
               value="male"
-              checked={formData.gender === "male"}
+              checked={formData.gender === 'male'}
               onChange={handleChange}
             />
             Nam
@@ -50,7 +50,7 @@ export default function Step4({ formData, handleChange }: Props) {
               type="radio"
               name="gender"
               value="female"
-              checked={formData.gender === "female"}
+              checked={formData.gender === 'female'}
               onChange={handleChange}
             />
             Nữ

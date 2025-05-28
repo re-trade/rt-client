@@ -1,35 +1,36 @@
+'use client';
+import Footer from '@/components/Footer';
+import AccountRegisterStep1 from '@/components/step/account-register/AccountRegisterStep1';
+import Step2 from '@/components/step/account-register/AccountRegisterStep2';
+import Step3 from '@/components/step/account-register/AccountRegisterStep3';
+import Step4 from '@/components/step/account-register/AccountRegisterStep4';
+import Step5 from '@/components/step/account-register/AccountRegisterStep5';
+import React, { useState } from 'react';
 
-"use client";
-import Step1 from "@/components/step1";
-import Step2 from "@/components/step2";
-import Step3 from "@/components/step3";
-import Step4 from "@/components/step4";
-import Step5 from "@/components/step5";
-import React, { useState } from "react";
 const steps = [
-  "Thông tin shop",
-  "Cài đặt vận chuyển",
-  "Thông tin thuế",
-  "Thông tin định danh",
-  "Hoàn tất",
+  'Thông tin shop',
+  'Cài đặt vận chuyển',
+  'Thông tin thuế',
+  'Thông tin định danh',
+  'Hoàn tất',
 ];
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    shopName: "",
-    email: "",
-    phone: "",
-    businessType: "personal",
-    businessAddress: "",
-    receiveEmail: "",
-    taxCode: "",
-    gender: "male",
-    dob: "",
-    nationality: "",
-    residenceCountry: "",
-    residenceAddress: "",
-    identityNumber: "",
+    shopName: '',
+    email: '',
+    phone: '',
+    businessType: 'personal',
+    businessAddress: '',
+    receiveEmail: '',
+    taxCode: '',
+    gender: 'male',
+    dob: '',
+    nationality: '',
+    residenceCountry: '',
+    residenceAddress: '',
+    identityNumber: '',
   });
 
   const [shippingMethods, setShippingMethods] = useState({
@@ -39,9 +40,7 @@ export default function RegisterPage() {
     extra: false,
   });
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
@@ -70,11 +69,7 @@ export default function RegisterPage() {
               >
                 <div
                   className={`w-8 h-8 mx-auto rounded-full text-white flex items-center justify-center relative z-10 ${
-                    isActive
-                      ? "bg-blue-600"
-                      : isCompleted
-                        ? "bg-green-600"
-                        : "bg-gray-300"
+                    isActive ? 'bg-blue-600' : isCompleted ? 'bg-green-600' : 'bg-gray-300'
                   }`}
                 >
                   {stepNumber}
@@ -84,9 +79,9 @@ export default function RegisterPage() {
                 {index < steps.length - 1 && (
                   <div
                     className={`absolute top-4 right-0 w-full h-0.5 ${
-                      isCompleted ? "bg-green-600" : "bg-gray-300"
+                      isCompleted ? 'bg-green-600' : 'bg-gray-300'
                     }`}
-                    style={{ left: "50%", right: "-50%" }}
+                    style={{ left: '50%', right: '-50%' }}
                   />
                 )}
               </div>
@@ -95,17 +90,14 @@ export default function RegisterPage() {
         </div>
 
         {step === 1 && (
-          <Step1
+          <AccountRegisterStep1
             formData={formData}
             handleChange={handleChange}
             setShowModal={() => {}}
           />
         )}
         {step === 2 && (
-          <Step2
-            shippingMethods={shippingMethods}
-            toggleShippingMethod={toggleShippingMethod}
-          />
+          <Step2 shippingMethods={shippingMethods} toggleShippingMethod={toggleShippingMethod} />
         )}
         {step === 3 && (
           <Step3 formData={formData} handleChange={handleChange} />
@@ -134,7 +126,8 @@ export default function RegisterPage() {
           ) : (
             <button
               onClick={() => {
-                alert("Lưu form hoặc gửi dữ liệu đi!");
+                // xử lý lưu hoặc submit form ở đây
+                alert('Lưu form hoặc gửi dữ liệu đi!');
               }}
               className="px-4 py-2 bg-green-600 text-white rounded"
             >

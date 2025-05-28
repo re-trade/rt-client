@@ -1,102 +1,102 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Edit, Save, X, Upload } from "lucide-react"
-import Image from "next/image"
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Edit, Save, Upload, X } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface ShopInfo {
-  name: string
-  description: string
-  logo: string
-  coverImage: string
-  email: string
-  phone: string
-  address: string
-  website: string
-  businessLicense: string
-  taxCode: string
-  bankAccount: string
-  bankName: string
-  rating: number
-  totalProducts: number
-  totalOrders: number
-  joinDate: string
-  status: "active" | "pending" | "suspended"
+  name: string;
+  description: string;
+  logo: string;
+  coverImage: string;
+  email: string;
+  phone: string;
+  address: string;
+  website: string;
+  businessLicense: string;
+  taxCode: string;
+  bankAccount: string;
+  bankName: string;
+  rating: number;
+  totalProducts: number;
+  totalOrders: number;
+  joinDate: string;
+  status: 'active' | 'pending' | 'suspended';
 }
 
 const mockShopInfo: ShopInfo = {
-  name: "Shop Thời Trang ABC",
+  name: 'Shop Thời Trang ABC',
   description:
-    "Chuyên cung cấp các sản phẩm thời trang chất lượng cao với giá cả hợp lý. Cam kết mang đến cho khách hàng những trải nghiệm mua sắm tuyệt vời nhất.",
-  logo: "/placeholder.svg?height=100&width=100",
-  coverImage: "/placeholder.svg?height=200&width=400",
-  email: "shop@example.com",
-  phone: "0123456789",
-  address: "123 Đường ABC, Phường 1, Quận 1, TP. Hồ Chí Minh",
-  website: "https://shop-abc.com",
-  businessLicense: "0123456789",
-  taxCode: "0123456789",
-  bankAccount: "1234567890",
-  bankName: "Ngân hàng ABC",
+    'Chuyên cung cấp các sản phẩm thời trang chất lượng cao với giá cả hợp lý. Cam kết mang đến cho khách hàng những trải nghiệm mua sắm tuyệt vời nhất.',
+  logo: '/placeholder.svg?height=100&width=100',
+  coverImage: '/placeholder.svg?height=200&width=400',
+  email: 'shop@example.com',
+  phone: '0123456789',
+  address: '123 Đường ABC, Phường 1, Quận 1, TP. Hồ Chí Minh',
+  website: 'https://shop-abc.com',
+  businessLicense: '0123456789',
+  taxCode: '0123456789',
+  bankAccount: '1234567890',
+  bankName: 'Ngân hàng ABC',
   rating: 4.8,
   totalProducts: 150,
   totalOrders: 1250,
-  joinDate: "2023-01-15",
-  status: "active",
-}
+  joinDate: '2023-01-15',
+  status: 'active',
+};
 
 export default function ShopInfoManagement() {
-  const [shopInfo, setShopInfo] = useState<ShopInfo>(mockShopInfo)
-  const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState(shopInfo)
+  const [shopInfo, setShopInfo] = useState<ShopInfo>(mockShopInfo);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState(shopInfo);
 
   const handleEdit = () => {
-    setFormData(shopInfo)
-    setIsEditing(true)
-  }
+    setFormData(shopInfo);
+    setIsEditing(true);
+  };
 
   const handleSave = () => {
-    setShopInfo(formData)
-    setIsEditing(false)
-  }
+    setShopInfo(formData);
+    setIsEditing(false);
+  };
 
   const handleCancel = () => {
-    setFormData(shopInfo)
-    setIsEditing(false)
-  }
+    setFormData(shopInfo);
+    setIsEditing(false);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800"
-      case "pending":
-        return "bg-yellow-100 text-yellow-800"
-      case "suspended":
-        return "bg-red-100 text-red-800"
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'suspended':
+        return 'bg-red-100 text-red-800';
       default:
-        return "bg-gray-100 text-gray-800"
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "active":
-        return "Hoạt động"
-      case "pending":
-        return "Chờ duyệt"
-      case "suspended":
-        return "Tạm ngưng"
+      case 'active':
+        return 'Hoạt động';
+      case 'pending':
+        return 'Chờ duyệt';
+      case 'suspended':
+        return 'Tạm ngưng';
       default:
-        return "Không xác định"
+        return 'Không xác định';
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -158,7 +158,11 @@ export default function ShopInfoManagement() {
                   <AvatarFallback>Shop</AvatarFallback>
                 </Avatar>
                 {isEditing && (
-                  <Button size="sm" className="absolute -bottom-2 -right-2 h-6 w-6 p-0" variant="secondary">
+                  <Button
+                    size="sm"
+                    className="absolute -bottom-2 -right-2 h-6 w-6 p-0"
+                    variant="secondary"
+                  >
                     <Upload className="h-3 w-3" />
                   </Button>
                 )}
@@ -174,7 +178,9 @@ export default function ShopInfoManagement() {
                   <h3 className="text-lg font-semibold">{shopInfo.name}</h3>
                 )}
                 <div className="flex items-center gap-2">
-                  <Badge className={getStatusColor(shopInfo.status)}>{getStatusText(shopInfo.status)}</Badge>
+                  <Badge className={getStatusColor(shopInfo.status)}>
+                    {getStatusText(shopInfo.status)}
+                  </Badge>
                   <span className="text-sm text-muted-foreground">⭐ {shopInfo.rating}/5.0</span>
                 </div>
               </div>
@@ -271,7 +277,9 @@ export default function ShopInfoManagement() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Ngày tham gia</span>
-                <span className="font-medium">{new Date(shopInfo.joinDate).toLocaleDateString("vi-VN")}</span>
+                <span className="font-medium">
+                  {new Date(shopInfo.joinDate).toLocaleDateString('vi-VN')}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -335,5 +343,5 @@ export default function ShopInfoManagement() {
         </div>
       </div>
     </div>
-  )
+  );
 }

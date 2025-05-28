@@ -1,6 +1,4 @@
-import React from "react";
-
-type ShippingMethodKey = "express" | "fast" | "economy" | "extra";
+type ShippingMethodKey = 'express' | 'fast' | 'economy' | 'extra';
 
 type Props = {
   shippingMethods: Record<ShippingMethodKey, boolean>;
