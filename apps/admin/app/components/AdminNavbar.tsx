@@ -1,8 +1,6 @@
 "use client";
 
-// Import Link từ Next.js để điều hướng giữa các trang
 import Link from "next/link";
-// Import useState để xử lý trạng thái mở/đóng menu trên mobile
 import { useState } from "react";
 
 // Component Navbar cho Admin
@@ -12,7 +10,7 @@ export default function AdminNavbar() {
 
     return (
         <>
-            {/* Nút hamburger để mở menu trên mobile */}
+            {/*hamburger mở menu trên mobile */}
             <button
                 className="md:hidden p-4 text-gray-700 focus:outline-none"
                 onClick={() => setIsOpen(!isOpen)}
