@@ -27,32 +27,30 @@ const fakeProfile: Profile = {
 export default function ProfilePage() {
   const profile = fakeProfile;
 
-  return (
-    <div className="w-full bg-white flex items-center justify-center p-10">
-      <div className="w-[900px] bg-[#FFF8F3] rounded-lg shadow-lg p-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center">
-            <div className="w-40 h-40 bg-gray-300 rounded-full mr-4 overflow-hidden">
-              <Image
-                src={profile.avatarUrl}
-                alt={profile.name}
-                width={150}
-                height={150}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-black">
-                {profile.name}
-              </h2>
-              <p className="text-sm text-gray-600">{profile.email}</p>
-            </div>
-          </div>
-          <button className="bg-[#FFD2B2] text-black px-4 py-2 rounded hover:bg-[#ffbf99] transition">
-            Lưu
-          </button>
-        </div>
+    return (
+        <div className="w-full bg-white flex items-center justify-center p-10">
+            <div className="w-[900px] bg-[#FFF8F3] rounded-lg shadow-lg p-6">
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center">
+                        <div className="w-40 h-40 bg-gray-300 rounded-full mr-4 overflow-hidden">
+                            <Image
+                                src={profile.avatarUrl}
+                                alt={profile.name}
+                                width={150}
+                                height={150}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-semibold text-black">{profile.name}</h2>
+                            <p className="text-lg text-gray-600">{profile.email}</p>
+                        </div>
+                    </div>
+                    <button className="bg-[#FFD2B2] text-black px-4 py-2 rounded hover:bg-[#ffbf99] transition">
+                        Lưu
+                    </button>
+                </div>
 
         {/* Form Fields */}
         <div className="space-y-4">
