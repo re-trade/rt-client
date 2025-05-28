@@ -23,13 +23,15 @@ const ShopeeTaxForm = () => {
       <div className="bg-blue-50 border-l-4 border-blue-400 text-blue-700 p-4 text-sm mb-6">
         Việc thu thập Thông Tin Thuế và Thông Tin Định Danh là bắt buộc theo quy định của Luật an
         ninh mạng, Thương mại điện tử và Thuế của Việt Nam. Thông Tin Thuế và Thông Tin Định Danh sẽ
-        được bảo vệ theo chính sách bảo mật của Shopee. Người bán hoàn toàn chịu trách nhiệm về
-        tính chính xác của thông tin.
+        được bảo vệ theo chính sách bảo mật của Shopee. Người bán hoàn toàn chịu trách nhiệm về tính
+        chính xác của thông tin.
       </div>
 
       <form className="space-y-6">
         <div>
-          <label className="block font-medium mb-2 text-sm">Loại hình kinh doanh <span className="text-red-500">*</span></label>
+          <label className="block font-medium mb-2 text-sm">
+            Loại hình kinh doanh <span className="text-red-500">*</span>
+          </label>
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2">
               <input
@@ -59,7 +61,9 @@ const ShopeeTaxForm = () => {
         </div>
 
         <div>
-          <label className="block font-medium mb-2 text-sm">Địa chỉ đăng ký kinh doanh <span className="text-red-500">*</span></label>
+          <label className="block font-medium mb-2 text-sm">
+            Địa chỉ đăng ký kinh doanh <span className="text-red-500">*</span>
+          </label>
           <select className="w-full border rounded-md px-3 py-2 text-sm">
             <option>An Giang / Huyện An Phú / Thị Trấn An Phú</option>
           </select>
@@ -72,14 +76,15 @@ const ShopeeTaxForm = () => {
         </div>
 
         <div>
-          <label className="block font-medium mb-2 text-sm">Email nhận hóa đơn điện tử <span className="text-red-500">*</span></label>
+          <label className="block font-medium mb-2 text-sm">
+            Email nhận hóa đơn điện tử <span className="text-red-500">*</span>
+          </label>
           <input
             type="email"
             value="testing111@yopmail.com"
             readOnly
             className="w-full border rounded-md px-3 py-2 text-sm bg-gray-100"
           />
-          
         </div>
 
         <div>
@@ -91,11 +96,10 @@ const ShopeeTaxForm = () => {
             className="w-full border rounded-md px-3 py-2 text-sm"
           />
           <p className="text-gray-500 text-xs mt-1">
-            Theo Nghị định 52/2013/NĐ-CP, người bán phải cung cấp thông tin Mã số thuế cho sàn thương mại điện tử.
+            Theo Nghị định 52/2013/NĐ-CP, người bán phải cung cấp thông tin Mã số thuế cho sàn
+            thương mại điện tử.
           </p>
         </div>
-
-        
       </form>
     </div>
   );

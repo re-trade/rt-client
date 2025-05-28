@@ -72,8 +72,12 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           <div className="mt-6 flex justify-end space-x-4">
-            <button type="reset" className="bg-gray-200 px-6 py-2 rounded-lg">Reset</button>
-            <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg">Search</button>
+            <button type="reset" className="bg-gray-200 px-6 py-2 rounded-lg">
+              Reset
+            </button>
+            <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg">
+              Search
+            </button>
           </div>
         </form>
       </div>

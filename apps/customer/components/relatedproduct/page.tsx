@@ -15,7 +15,7 @@ interface Product {
 }
 
 export default function RelatedProducts() {
-  const currentProductId = '1'; 
+  const currentProductId = '1';
   const currentProductShop = 'Cool Shop';
   const currentProductCategory = 'Electronics';
 
@@ -256,14 +256,14 @@ export default function RelatedProducts() {
   ];
 
   const otherFromShop = allProducts.filter(
-    (p) => p.shopName === currentProductShop && p.id !== currentProductId
+    (p) => p.shopName === currentProductShop && p.id !== currentProductId,
   );
 
   const similarProducts = allProducts.filter(
     (p) =>
       p.category === currentProductCategory &&
       p.id !== currentProductId &&
-      p.shopName !== currentProductShop
+      p.shopName !== currentProductShop,
   );
 
   const MAX_PRODUCTS_TO_SHOW = 10;
@@ -275,7 +275,7 @@ export default function RelatedProducts() {
       <div className="bg-white shadow rounded-lg overflow-hidden border hover:shadow-lg transition">
         <div className="relative w-full h-40 bg-gray-100">
           <Image
-            src={product.images[0]}
+            src={product.images[0] || '/placeholder.svg'}
             alt={product.name}
             fill
             className="object-cover"

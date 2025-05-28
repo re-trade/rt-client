@@ -4,11 +4,11 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const images = [
-  { src: "/image_login.jpg", alt: "Slide 1" },
-  { src: "/image_login.jpg", alt: "Slide 2" },
-  { src: "/image_login.jpg", alt: "Slide 3" },
-  { src: "/image_login.jpg", alt: "Slide 4" },
-  { src: "/image_login.jpg", alt: "Slide 5" },
+  { src: '/image_login.jpg', alt: 'Slide 1' },
+  { src: '/image_login.jpg', alt: 'Slide 2' },
+  { src: '/image_login.jpg', alt: 'Slide 3' },
+  { src: '/image_login.jpg', alt: 'Slide 4' },
+  { src: '/image_login.jpg', alt: 'Slide 5' },
 ];
 
 export default function CarouselComponent() {

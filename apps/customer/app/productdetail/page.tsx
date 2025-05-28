@@ -34,8 +34,10 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 md:px-12 py-8 font-[Open_Sans]
-">
+    <div
+      className="container mx-auto px-4 sm:px-6 md:px-12 py-8 font-[Open_Sans]
+"
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-4">
           <div className="relative w-full h-72 sm:h-96 bg-gray-100 rounded-lg overflow-hidden">

@@ -1,13 +1,13 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface CartItem {
   id: number;
   name: string;
   price: number;
   shopId: number;
-  shopName: string; 
-  image: string; 
+  shopName: string;
+  image: string;
 }
 
 interface RecommendedItem {
@@ -16,7 +16,7 @@ interface RecommendedItem {
   originalPrice: number;
   discountedPrice: number;
   description: string;
-  image: string; 
+  image: string;
 }
 
 const ShoppingCart: React.FC = () => {
@@ -69,7 +69,8 @@ const ShoppingCart: React.FC = () => {
       name: 'iMac 27”',
       originalPrice: 399.99,
       discountedPrice: 299,
-      description: 'This generation has some improvements, including a longer continuous battery life.',
+      description:
+        'This generation has some improvements, including a longer continuous battery life.',
       image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg',
     },
     {
@@ -77,7 +78,8 @@ const ShoppingCart: React.FC = () => {
       name: 'Playstation 5',
       originalPrice: 799.99,
       discountedPrice: 499,
-      description: 'This generation has some improvements, including a longer continuous battery life.',
+      description:
+        'This generation has some improvements, including a longer continuous battery life.',
       image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ps5-light.svg',
     },
     {
@@ -85,7 +87,8 @@ const ShoppingCart: React.FC = () => {
       name: 'Apple Watch Series 8',
       originalPrice: 1799.99,
       discountedPrice: 1199,
-      description: 'This generation has some improvements, including a longer continuous battery life.',
+      description:
+        'This generation has some improvements, including a longer continuous battery life.',
       image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg',
     },
   ];
@@ -101,7 +104,7 @@ const ShoppingCart: React.FC = () => {
   });
 
   useEffect(() => {
-    const selectedProducts = cartItems.filter(item => selectedItems.includes(item.id));
+    const selectedProducts = cartItems.filter((item) => selectedItems.includes(item.id));
     const originalPrice = selectedProducts.reduce((sum, item) => sum + item.price, 0);
     const savings = selectedProducts.length > 0 ? 299 : 0;
     const storePickup = selectedProducts.length > 0 ? 99 : 0;
@@ -118,7 +121,7 @@ const ShoppingCart: React.FC = () => {
   }, [selectedItems]);
 
   const handleCheckboxChange = (id: number) => {
-    const item = cartItems.find(i => i.id === id);
+    const item = cartItems.find((i) => i.id === id);
     if (!item) return;
 
     if (selectedItems.length === 0) {
@@ -126,10 +129,10 @@ const ShoppingCart: React.FC = () => {
       return;
     }
 
-    const currentShopId = cartItems.find(i => i.id === selectedItems[0])?.shopId;
+    const currentShopId = cartItems.find((i) => i.id === selectedItems[0])?.shopId;
     if (item.shopId === currentShopId) {
-      setSelectedItems(prev =>
-        prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+      setSelectedItems((prev) =>
+        prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
       );
     } else {
       alert('You can only select products from the same shop at once.');
@@ -137,7 +140,7 @@ const ShoppingCart: React.FC = () => {
   };
 
   const handleRemove = (id: number) => {
-    setSelectedItems(prev => prev.filter(itemId => itemId !== id));
+    setSelectedItems((prev) => prev.filter((itemId) => itemId !== id));
     alert(`Item ${id} removed from cart.`);
   };
 
@@ -156,7 +159,9 @@ const ShoppingCart: React.FC = () => {
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Shopping Cart</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+          Shopping Cart
+        </h2>
 
         <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
           <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
@@ -190,12 +195,17 @@ const ShoppingCart: React.FC = () => {
 
                         <div className="flex items-center justify-between md:order-4 md:justify-end">
                           <div className="text-end md:w-32">
-                            <p className="text-base font-bold text-gray-900 dark:text-white">${item.price.toLocaleString()}</p>
+                            <p className="text-base font-bold text-gray-900 dark:text-white">
+                              ${item.price.toLocaleString()}
+                            </p>
                           </div>
                         </div>
 
                         <div className="w-full min-w-0 flex-1 space-y-4 md:order-3 md:max-w-md">
-                          <a href="#" className="text-base font-medium text-gray-900 hover:underline dark:text-white">
+                          <a
+                            href="#"
+                            className="text-base font-medium text-gray-900 hover:underline dark:text-white"
+                          >
                             {item.name}
                           </a>
                           <div className="flex items-center gap-4">
@@ -237,7 +247,13 @@ const ShoppingCart: React.FC = () => {
                                 fill="none"
                                 viewBox="0 0 24 24"
                               >
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M6 18 17.94 6M18 18 6.06 6"
+                                />
                               </svg>
                               Remove
                             </button>
@@ -249,7 +265,9 @@ const ShoppingCart: React.FC = () => {
                 </div>
               ))}
               <div className="hidden xl:mt-8 xl:block">
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">People also bought</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  People also bought
+                </h3>
                 <div className="mt-6 grid grid-cols-3 gap-4 sm:mt-8">
                   {recommendedItems.map((item) => (
                     <div
@@ -257,19 +275,30 @@ const ShoppingCart: React.FC = () => {
                       className="space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                     >
                       <a href="#" className="overflow-hidden rounded">
-                        <img className="mx-auto h-44 w-44" src={item.image} alt={`${item.name} image`} />
+                        <img
+                          className="mx-auto h-44 w-44"
+                          src={item.image}
+                          alt={`${item.name} image`}
+                        />
                       </a>
                       <div>
-                        <a href="#" className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">
+                        <a
+                          href="#"
+                          className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white"
+                        >
                           {item.name}
                         </a>
-                        <p className="mt-2 text-base font-normal text-gray-500 dark:text-gray-400">{item.description}</p>
+                        <p className="mt-2 text-base font-normal text-gray-500 dark:text-gray-400">
+                          {item.description}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg font-bold text-gray-900 dark:text-white">
                           <span className="line-through">${item.originalPrice.toFixed(2)}</span>
                         </p>
-                        <p className="text-lg font-bold leading-tight text-red-600 dark:text-red-500">${item.discountedPrice}</p>
+                        <p className="text-lg font-bold leading-tight text-red-600 dark:text-red-500">
+                          ${item.discountedPrice}
+                        </p>
                       </div>
                       <div className="mt-6 flex items-center gap-2.5">
                         <button
@@ -329,25 +358,61 @@ const ShoppingCart: React.FC = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <dl className="flex items-center justify-between gap-4">
-                    <dt className="text-base font-normal text-gray-500 dark:text-gray-400">Original price</dt>
-                    <dd className="text-base font-medium text-gray-900 dark:text-white">${orderSummary.originalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                    <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
+                      Original price
+                    </dt>
+                    <dd className="text-base font-medium text-gray-900 dark:text-white">
+                      $
+                      {orderSummary.originalPrice.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </dd>
                   </dl>
                   <dl className="flex items-center justify-between gap-4">
-                    <dt className="text-base font-normal text-gray-500 dark:text-gray-400">Savings</dt>
-                    <dd className="text-base font-medium text-green-600">-${orderSummary.savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                    <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
+                      Savings
+                    </dt>
+                    <dd className="text-base font-medium text-green-600">
+                      -$
+                      {orderSummary.savings.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </dd>
                   </dl>
                   <dl className="flex items-center justify-between gap-4">
-                    <dt className="text-base font-normal text-gray-500 dark:text-gray-400">Store Pickup</dt>
-                    <dd className="text-base font-medium text-gray-900 dark:text-white">${orderSummary.storePickup.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                    <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
+                      Store Pickup
+                    </dt>
+                    <dd className="text-base font-medium text-gray-900 dark:text-white">
+                      $
+                      {orderSummary.storePickup.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </dd>
                   </dl>
                   <dl className="flex items-center justify-between gap-4">
                     <dt className="text-base font-normal text-gray-500 dark:text-gray-400">Tax</dt>
-                    <dd className="text-base font-medium text-gray-900 dark:text-white">${orderSummary.tax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                    <dd className="text-base font-medium text-gray-900 dark:text-white">
+                      $
+                      {orderSummary.tax.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </dd>
                   </dl>
                 </div>
                 <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
                   <dt className="text-base font-bold text-gray-900 dark:text-white">Total</dt>
-                  <dd className="text-base font-bold text-gray-900 dark:text-white">${orderSummary.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                  <dd className="text-base font-bold text-gray-900 dark:text-white">
+                    $
+                    {orderSummary.total.toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </dd>
                 </dl>
               </div>
               <a
@@ -384,7 +449,10 @@ const ShoppingCart: React.FC = () => {
             <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
               <form className="space-y-4">
                 <div>
-                  <label htmlFor="voucher" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="voucher"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Do you have a voucher or gift card?
                   </label>
                   <input

@@ -98,12 +98,8 @@ export default function RegisterPage() {
         {step === 2 && (
           <Step2 shippingMethods={shippingMethods} toggleShippingMethod={toggleShippingMethod} />
         )}
-        {step === 3 && (
-          <Step3 formData={formData} handleChange={handleChange} />
-        )}
-        {step === 4 && (
-          <Step4 formData={formData} handleChange={handleChange} />
-        )}
+        {step === 3 && <Step3 formData={formData} handleChange={handleChange} />}
+        {step === 4 && <Step4 formData={formData} handleChange={handleChange} />}
         {step === 5 && <Step5 formData={formData} />}
 
         <div className="flex justify-between mt-6">
