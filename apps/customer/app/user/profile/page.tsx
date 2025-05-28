@@ -43,8 +43,8 @@ export default function ProfilePage() {
                             />
                         </div>
                         <div>
-                            <h2 className="text-xl font-semibold text-black">{profile.name}</h2>
-                            <p className="text-sm text-gray-600">{profile.email}</p>
+                            <h2 className="text-2xl font-semibold text-black">{profile.name}</h2>
+                            <p className="text-lg text-gray-600">{profile.email}</p>
                         </div>
                     </div>
                     <button className="bg-[#FFD2B2] text-black px-4 py-2 rounded hover:bg-[#ffbf99] transition">
