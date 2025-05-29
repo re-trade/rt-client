@@ -1,6 +1,6 @@
 'use client';
 
-import RelatedProducts from '@/components/relatedproduct/page';
+import RelatedProducts from '@/components/related-product/page';
 import Chart from '@components/chart/chart';
 import Image from 'next/image';
 import { useState } from 'react';
