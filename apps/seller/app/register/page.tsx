@@ -1,5 +1,4 @@
 'use client';
-import Footer from '@/components/Footer';
 import AccountRegisterStep1 from '@/components/step/account-register/AccountRegisterStep1';
 import Step2 from '@/components/step/account-register/AccountRegisterStep2';
 import Step3 from '@/components/step/account-register/AccountRegisterStep3';
@@ -53,9 +52,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="container mx-auto p-4 max-w-xl border rounded shadow">
-        {/* Process line stepper mới */}
+    <div className="flex flex-col min-h-screen font-[Open_Sans]">
+      <div className="container mx-auto p-4 max-w-3xl border rounded shadow">
         <div className="flex justify-between mb-10 relative">
           {steps.map((label, index) => {
             const stepNumber = index + 1;
@@ -90,7 +88,6 @@ export default function RegisterPage() {
           })}
         </div>
 
-        {/* Nội dung bước hiện tại */}
         {step === 1 && (
           <AccountRegisterStep1
             formData={formData}
@@ -105,7 +102,6 @@ export default function RegisterPage() {
         {step === 4 && <Step4 formData={formData} handleChange={handleChange} />}
         {step === 5 && <Step5 formData={formData} />}
 
-        {/* Nút chuyển bước */}
         <div className="flex justify-between mt-6">
           <button
             disabled={step === 1}
@@ -135,7 +131,6 @@ export default function RegisterPage() {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

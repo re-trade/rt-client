@@ -2,11 +2,8 @@
 /*
 
 const Dashboard = () => {
-    return (
-        <>
-        </>
-    );
-}
+  return <></>;
+};
 
 export default Dashboard;*/
 // app/admin/page.tsx
