@@ -10,159 +10,189 @@ const Dashboard = () => {
 
 export default Dashboard;*/
 // app/admin/page.tsx
-import React, { useState } from 'react';
+import {
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  DollarSign,
+  Package,
+  Store,
+  Users,
+} from 'lucide-react';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
-// Định nghĩa kiểu cho Product
-interface Product {
-  sellerId: number;
-  name: string;
-  description: string;
-  brand: string;
-  tags: string[];
-}
-
-// Định nghĩa kiểu cho User
-interface User {
-  name: string;
-  email: string;
-  date: string;
-  phone: string;
-}
-
-// Dữ liệu mẫu cho products
-const sampleProducts: Product[] = [
-  {
-    sellerId: 1,
-    name: 'Sample Product 1',
-    description: 'This is a description of product 1',
-    brand: 'Brand A',
-    tags: ['tag1', 'tag2'],
-  },
-  {
-    sellerId: 2,
-    name: 'Sample Product 2',
-    description: 'This is a description of product 2',
-    brand: 'Brand B',
-    tags: ['tag3', 'tag4'],
-  },
-];
-
-// Dữ liệu mẫu cho users
-const sampleUsers: User[] = [
-  {
-    name: 'John Doe',
-    email: 'john@example.com',
-    date: '2025-01-15',
-    phone: '+1234567890',
-  },
-  {
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    date: '2024-11-30',
-    phone: '+0987654321',
-  },
-];
-
-// Component chính cho trang Admin
-const AdminPage: React.FC = () => {
-  // State để lưu view hiện tại: 'products' hoặc 'users'
-  const [activeView, setActiveView] = useState<'products' | 'users'>('products');
-
-  return (
-    // Container: flex layout, trên màn rộng flex-row, trên mobile flex-col
-    <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Sidebar bên trái: trên desktop width 1/4, trên mobile full width */}
-      <nav className="bg-[#FFD2B2] text-black md:w-1/4 w-full">
-        <ul>
-          {/* Link Products: click để chuyển activeView thành 'products' */}
-          <li
-            className={`p-4 cursor-pointer hover:bg-gray-700 ${
-              activeView === 'products' ? 'bg-gray-700' : ''
-            }`}
-            onClick={() => setActiveView('products')}
-          >
-            Products
-          </li>
-
-          {/* Link Users: click để chuyển activeView thành 'users' */}
-          <li
-            className={`p-4 cursor-pointer hover:bg-gray-700 ${
-              activeView === 'users' ? 'bg-gray-700' : ''
-            }`}
-            onClick={() => setActiveView('users')}
-          >
-            Users
-          </li>
-        </ul>
-      </nav>
-
-      {/* Main content bên phải: flex-1 để chiếm phần còn lại */}
-      <main className="flex-1 p-6 bg-[#fff4eb]">
-        {activeView === 'products' ? (
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Product List</h2>
-            {/* Container table có thể cuộn ngang trên mobile */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white">
-                <thead>
-                  <tr>
-                    <th className="py-2 px-4 border-b">SellerId</th>
-                    <th className="py-2 px-4 border-b">Name</th>
-                    <th className="py-2 px-4 border-b">Description</th>
-                    <th className="py-2 px-4 border-b">Brand</th>
-                    <th className="py-2 px-4 border-b">Tags</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Lặp qua sampleProducts để tạo các dòng */}
-                  {sampleProducts.map((product, index) => (
-                    <tr key={index} className="hover:bg-gray-100">
-                      <td className="py-2 px-4 border-b">{product.sellerId}</td>
-                      <td className="py-2 px-4 border-b">{product.name}</td>
-                      <td className="py-2 px-4 border-b">{product.description}</td>
-                      <td className="py-2 px-4 border-b">{product.brand}</td>
-                      <td className="py-2 px-4 border-b">
-                        {/* Nối mảng tags thành chuỗi ngăn cách ', ' */}
-                        {product.tags.join(', ')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
+const StatCard = ({
+  title,
+  value,
+  change,
+  icon: Icon,
+  trend = 'up',
+}: {
+  title: string;
+  value: string;
+  change: string;
+  icon: React.ElementType;
+  trend?: 'up' | 'down';
+}) => (
+  <Card>
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
+      <Icon className="h-4 w-4 text-gray-500" />
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{value}</div>
+      <div className="flex items-center text-xs mt-1">
+        {trend === 'up' ? (
+          <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
         ) : (
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">User List</h2>
-            {/* Container table có thể cuộn ngang trên mobile */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white">
-                <thead>
-                  <tr>
-                    <th className="py-2 px-4 border-b">Name</th>
-                    <th className="py-2 px-4 border-b">Email</th>
-                    <th className="py-2 px-4 border-b">Date</th>
-                    <th className="py-2 px-4 border-b">Phone</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Lặp qua sampleUsers để tạo các dòng */}
-                  {sampleUsers.map((user, index) => (
-                    <tr key={index} className="hover:bg-gray-100">
-                      <td className="py-2 px-4 border-b">{user.name}</td>
-                      <td className="py-2 px-4 border-b">{user.email}</td>
-                      <td className="py-2 px-4 border-b">{user.date}</td>
-                      <td className="py-2 px-4 border-b">{user.phone}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
+          <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
         )}
-      </main>
+        <span className={trend === 'up' ? 'text-green-500' : 'text-red-500'}>{change}</span>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const ActivityCard = ({
+  title,
+  items,
+}: {
+  title: string;
+  items: Array<{
+    title: string;
+    description: string;
+    time: string;
+    status: 'success' | 'warning' | 'error';
+  }>;
+}) => (
+  <Card>
+    <CardHeader>
+      <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-4">
+        {items.map((item, index) => (
+          <div key={index} className="flex items-start space-x-4">
+            <div
+              className={`p-2 rounded-full ${
+                item.status === 'success'
+                  ? 'bg-green-100'
+                  : item.status === 'warning'
+                    ? 'bg-yellow-100'
+                    : 'bg-red-100'
+              }`}
+            >
+              <Activity
+                className={`h-4 w-4 ${
+                  item.status === 'success'
+                    ? 'text-green-600'
+                    : item.status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-red-600'
+                }`}
+              />
+            </div>
+            <div className="flex-1 space-y-1">
+              <p className="text-sm font-medium leading-none">{item.title}</p>
+              <p className="text-sm text-gray-500">{item.description}</p>
+              <p className="text-xs text-gray-400">{item.time}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
+
+export default function AdminPage() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold">Tổng quan hệ thống</h2>
+        <p className="text-muted-foreground">Xem tổng quan về hoạt động của hệ thống admin</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Tổng số shop"
+          value="150"
+          change="+5% so với tháng trước"
+          icon={Store}
+          trend="up"
+        />
+        <StatCard
+          title="Tổng số người dùng"
+          value="12,500"
+          change="+8% so với tháng trước"
+          icon={Users}
+          trend="up"
+        />
+        <StatCard
+          title="Tổng số sản phẩm"
+          value="45,231"
+          change="+12% so với tháng trước"
+          icon={Package}
+          trend="up"
+        />
+        <StatCard
+          title="Doanh thu hệ thống"
+          value="1.2 tỷ"
+          change="+15% so với tháng trước"
+          icon={DollarSign}
+          trend="up"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ActivityCard
+          title="Hoạt động gần đây"
+          items={[
+            {
+              title: 'Shop mới đăng ký',
+              description: 'Shop Thời Trang ABC đã đăng ký thành công',
+              time: '2 phút trước',
+              status: 'success',
+            },
+            {
+              title: 'Cảnh báo hệ thống',
+              description: 'Phát hiện hoạt động bất thường từ IP 192.168.1.1',
+              time: '15 phút trước',
+              status: 'warning',
+            },
+            {
+              title: 'Lỗi thanh toán',
+              description: 'Giao dịch #12345 thất bại do lỗi kết nối',
+              time: '1 giờ trước',
+              status: 'error',
+            },
+          ]}
+        />
+
+        <ActivityCard
+          title="Đơn hàng cần xử lý"
+          items={[
+            {
+              title: 'Đơn hàng #ORD1001',
+              description: 'Shop Thời Trang ABC - 2,990,000đ',
+              time: 'Cần xác nhận',
+              status: 'warning',
+            },
+            {
+              title: 'Đơn hàng #ORD1002',
+              description: 'Shop Mỹ Phẩm XYZ - 5,990,000đ',
+              time: 'Cần xử lý khiếu nại',
+              status: 'error',
+            },
+            {
+              title: 'Đơn hàng #ORD1003',
+              description: 'Shop Điện Tử 123 - 1,990,000đ',
+              time: 'Cần xác nhận',
+              status: 'warning',
+            },
+          ]}
+        />
+      </div>
     </div>
   );
-};
-
-export default AdminPage;
+}
