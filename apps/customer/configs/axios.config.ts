@@ -74,4 +74,3 @@ authApi.interceptors.response.use(
 
 export { authApi, ETokenName, unAuthApi };
 export type { CustomAxiosRequestConfig };
-

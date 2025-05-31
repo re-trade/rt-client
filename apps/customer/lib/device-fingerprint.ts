@@ -25,7 +25,9 @@ async function getDeviceFingerprint(): Promise<string> {
 
 async function getIPInfo(): Promise<{ ip: string; location: string }> {
   try {
-    const response = await axios.get('http://ip-api.com/json/?fields=status,message,country,city,query');
+    const response = await axios.get(
+      'http://ip-api.com/json/?fields=status,message,country,city,query',
+    );
     if (response.data.status === 'success') {
       return {
         ip: response.data.query,
@@ -43,10 +45,7 @@ async function getIPInfo(): Promise<{ ip: string; location: string }> {
 }
 
 export async function getDeviceInfo(): Promise<IDeviceInfo> {
-  const [fingerprint, ipInfo] = await Promise.all([
-    getDeviceFingerprint(),
-    getIPInfo(),
-  ]);
+  const [fingerprint, ipInfo] = await Promise.all([getDeviceFingerprint(), getIPInfo()]);
 
   let deviceName = 'Unknown Device';
   try {

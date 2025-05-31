@@ -1,11 +1,11 @@
 'use client';
+import { loginInternal } from '@/services/auth.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FaFacebook } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
-import { loginInternal } from '@/services/auth.api';
 
 export default function Login() {
   const [isVisible, setIsVisible] = useState(false);
@@ -51,12 +51,9 @@ export default function Login() {
         username: formData.username,
         password: formData.password,
       });
-      router.push('/'); 
+      router.push('/');
     } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-          'Đăng nhập thất bại. Vui lòng thử lại.'
-      );
+      setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
@@ -65,18 +62,14 @@ export default function Login() {
   return (
     <section className="flex justify-center min-h-screen bg-gray-100 font-[Open_Sans]">
       <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center">
-        <div
-          ref={formRef}
-          className="w-full max-w-xl bg-white p-6 rounded-lg shadow-md"
-        >
+        <div ref={formRef} className="w-full max-w-xl bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-center w-full">
             <div className="w-full max-w-sm">
               <h1 className="text-2xl md:text-3xl font-bold mb-2 text-black text-center">
                 Chào mừng bạn trở lại với Retrade Shop!
               </h1>
               <p className="text-center text-gray-600 mb-6">
-                Nơi tìm món đồ đẹp, dùng món chất lượng – và gặp cơ hội đổi đời trong
-                tích tắc!
+                Nơi tìm món đồ đẹp, dùng món chất lượng – và gặp cơ hội đổi đời trong tích tắc!
               </p>
 
               {error && (
@@ -131,9 +124,7 @@ export default function Login() {
                   type="submit"
                   disabled={isLoading}
                   className={`w-full bg-orange-400 text-white p-3 rounded-lg transition ${
-                    isLoading
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'hover:bg-orange-500'
+                    isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-500'
                   }`}
                 >
                   {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}

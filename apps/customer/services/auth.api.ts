@@ -1,6 +1,6 @@
 import { ETokenName, unAuthApi } from '@/configs/axios.config';
+import { getDeviceInfo } from '@/lib/device-fingerprint';
 import { IResponseObject } from '@/services/base.api';
-import { getDeviceInfo, type IDeviceInfo } from '@/lib/device-fingerprint';
 
 type TLocalLogin = {
   username: string;
@@ -15,8 +15,9 @@ type TTokenResponse = {
 
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
-  
-  const result = await unAuthApi.post<IResponseObject<TTokenResponse>>('/auth/local', 
+
+  const result = await unAuthApi.post<IResponseObject<TTokenResponse>>(
+    '/auth/local',
     { ...loginForm },
     {
       headers: {
@@ -24,8 +25,8 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
         'x-device-name': deviceInfo.deviceName,
         'x-ip-address': deviceInfo.ipAddress,
         'x-location': deviceInfo.location,
-      }
-    }
+      },
+    },
   );
 
   if (result.data.success) {
