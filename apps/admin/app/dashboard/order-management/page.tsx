@@ -1,9 +1,15 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Card } from "@/app/components/ui/card"
-import { Input } from "@/app/components/ui/input"
-import { Button } from "@/app/components/ui/button"
+import { Button } from '@/app/components/ui/button';
+import { Card } from '@/app/components/ui/card';
+import { Input } from '@/app/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/components/ui/select';
 import {
   Table,
   TableBody,
@@ -11,116 +17,110 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/app/components/ui/table"
+} from '@/app/components/ui/table';
+import { DollarSign, Package, Search, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select"
-import { Search, Package, ArrowUpDown, TrendingUp, DollarSign } from "lucide-react"
-import {
-  LineChart,
+  CartesianGrid,
+  Cell,
+  Legend,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts"
+} from 'recharts';
 
 // Sample data - replace with actual API call
 const orders = [
   {
-    id: "1",
-    customer: "Nguyễn Văn A",
+    id: '1',
+    customer: 'Nguyễn Văn A',
     total: 299.99,
-    status: "completed",
-    paymentMethod: "Thẻ tín dụng",
-    createdAt: "2024-03-15",
+    status: 'completed',
+    paymentMethod: 'Thẻ tín dụng',
+    createdAt: '2024-03-15',
   },
   {
-    id: "2",
-    customer: "Trần Thị B",
+    id: '2',
+    customer: 'Trần Thị B',
     total: 149.99,
-    status: "cancelled",
-    paymentMethod: "PayPal",
-    createdAt: "2024-03-14",
+    status: 'cancelled',
+    paymentMethod: 'PayPal',
+    createdAt: '2024-03-14',
   },
   {
-    id: "3",
-    customer: "Lê Văn C",
+    id: '3',
+    customer: 'Lê Văn C',
     total: 499.99,
-    status: "refunded",
-    paymentMethod: "Thẻ tín dụng",
-    createdAt: "2024-03-13",
+    status: 'refunded',
+    paymentMethod: 'Thẻ tín dụng',
+    createdAt: '2024-03-13',
   },
-]
+];
 
 // Sample chart data
 const revenueData = [
-  { name: "T1", revenue: 4000 },
-  { name: "T2", revenue: 3000 },
-  { name: "T3", revenue: 5000 },
-  { name: "T4", revenue: 2780 },
-  { name: "T5", revenue: 1890 },
-  { name: "T6", revenue: 2390 },
-]
+  { name: 'T1', revenue: 4000 },
+  { name: 'T2', revenue: 3000 },
+  { name: 'T3', revenue: 5000 },
+  { name: 'T4', revenue: 2780 },
+  { name: 'T5', revenue: 1890 },
+  { name: 'T6', revenue: 2390 },
+];
 
 const orderStatusData = [
-  { name: "Hoàn thành", value: 400 },
-  { name: "Đã hủy", value: 100 },
-  { name: "Hoàn tiền", value: 50 },
-]
+  { name: 'Hoàn thành', value: 400 },
+  { name: 'Đã hủy', value: 100 },
+  { name: 'Hoàn tiền', value: 50 },
+];
 
-const COLORS = ["#4CAF50", "#F44336", "#FFC107"]
+const COLORS = ['#4CAF50', '#F44336', '#FFC107'];
 
-const statuses = ["Tất cả", "completed", "cancelled", "refunded"]
-const timeRanges = ["Hôm nay", "Tuần này", "Tháng này", "Năm nay"]
+const statuses = ['Tất cả', 'completed', 'cancelled', 'refunded'];
+const timeRanges = ['Hôm nay', 'Tuần này', 'Tháng này', 'Năm nay'];
 
 const statusLabels = {
-  completed: "Hoàn thành",
-  cancelled: "Đã hủy",
-  refunded: "Hoàn tiền",
-}
+  completed: 'Hoàn thành',
+  cancelled: 'Đã hủy',
+  refunded: 'Hoàn tiền',
+};
 
 const paymentMethods = {
-  "Credit Card": "Thẻ tín dụng",
-  "PayPal": "PayPal",
-  "Bank Transfer": "Chuyển khoản",
-}
+  'Credit Card': 'Thẻ tín dụng',
+  PayPal: 'PayPal',
+  'Bank Transfer': 'Chuyển khoản',
+};
 
 export default function OrderManagementPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedStatus, setSelectedStatus] = useState("Tất cả")
-  const [selectedTimeRange, setSelectedTimeRange] = useState("Hôm nay")
-  const itemsPerPage = 10
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState('Tất cả');
+  const [selectedTimeRange, setSelectedTimeRange] = useState('Hôm nay');
+  const itemsPerPage = 10;
 
   // Filter orders based on search query and filters
   const filteredOrders = orders.filter((order) => {
-    const matchesSearch = order.customer.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = selectedStatus === "Tất cả" || order.status === selectedStatus
-    return matchesSearch && matchesStatus
-  })
+    const matchesSearch = order.customer.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = selectedStatus === 'Tất cả' || order.status === selectedStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentOrders = filteredOrders.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentOrders = filteredOrders.slice(startIndex, endIndex);
 
   // Calculate statistics
-  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0)
-  const totalOrders = orders.length
-  const completedOrders = orders.filter((order) => order.status === "completed").length
-  const cancelledOrders = orders.filter((order) => order.status === "cancelled").length
-  const refundedOrders = orders.filter((order) => order.status === "refunded").length
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalOrders = orders.length;
+  const completedOrders = orders.filter((order) => order.status === 'completed').length;
+  const cancelledOrders = orders.filter((order) => order.status === 'cancelled').length;
+  const refundedOrders = orders.filter((order) => order.status === 'refunded').length;
 
   return (
     <div className="space-y-6">
@@ -180,7 +180,9 @@ export default function OrderManagementPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`${value.toLocaleString('vi-VN')}đ`, 'Doanh thu']} />
+                <Tooltip
+                  formatter={(value) => [`${value.toLocaleString('vi-VN')}đ`, 'Doanh thu']}
+                />
                 <Legend />
                 <Line
                   type="monotone"
@@ -206,9 +208,7 @@ export default function OrderManagementPage() {
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
                   {orderStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -241,7 +241,9 @@ export default function OrderManagementPage() {
               <SelectContent>
                 {statuses.map((status) => (
                   <SelectItem key={status} value={status}>
-                    {status === "Tất cả" ? status : statusLabels[status as keyof typeof statusLabels]}
+                    {status === 'Tất cả'
+                      ? status
+                      : statusLabels[status as keyof typeof statusLabels]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -283,18 +285,19 @@ export default function OrderManagementPage() {
                   <TableCell>
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        order.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : order.status === "cancelled"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-yellow-100 text-yellow-800"
+                        order.status === 'completed'
+                          ? 'bg-green-100 text-green-800'
+                          : order.status === 'cancelled'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
                       }`}
                     >
                       {statusLabels[order.status as keyof typeof statusLabels]}
                     </span>
                   </TableCell>
                   <TableCell>
-                    {paymentMethods[order.paymentMethod as keyof typeof paymentMethods] || order.paymentMethod}
+                    {paymentMethods[order.paymentMethod as keyof typeof paymentMethods] ||
+                      order.paymentMethod}
                   </TableCell>
                   <TableCell>{order.createdAt}</TableCell>
                   <TableCell className="text-right">
@@ -312,7 +315,7 @@ export default function OrderManagementPage() {
 
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Hiển thị {startIndex + 1} đến {Math.min(endIndex, filteredOrders.length)} trong tổng số{" "}
+            Hiển thị {startIndex + 1} đến {Math.min(endIndex, filteredOrders.length)} trong tổng số{' '}
             {filteredOrders.length} đơn hàng
           </div>
           <div className="flex items-center space-x-2">
@@ -336,5 +339,5 @@ export default function OrderManagementPage() {
         </div>
       </Card>
     </div>
-  )
-} 
+  );
+}

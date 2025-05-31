@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/app/components/ui/select';
-import { Edit, Eye, Plus, Ban, Shield, User } from 'lucide-react';
+import { Ban, Edit, Eye, Plus, Shield, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface User {
@@ -69,7 +69,7 @@ export function ViewUserDialog({ user, onToggleBan }: ViewUserDialogProps) {
             <div className="font-medium">Role</div>
             <div className="col-span-3">
               <div className="flex items-center gap-2">
-                {user.role === "admin" ? (
+                {user.role === 'admin' ? (
                   <Shield className="h-4 w-4 text-red-500" />
                 ) : (
                   <User className="h-4 w-4 text-blue-500" />
@@ -83,9 +83,9 @@ export function ViewUserDialog({ user, onToggleBan }: ViewUserDialogProps) {
             <div className="col-span-3">
               <span
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  user.status === "active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                  user.status === 'active'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
                 }`}
               >
                 {user.status}
@@ -94,7 +94,7 @@ export function ViewUserDialog({ user, onToggleBan }: ViewUserDialogProps) {
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <div className="font-medium">Shop</div>
-            <div className="col-span-3">{user.shop || "-"}</div>
+            <div className="col-span-3">{user.shop || '-'}</div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <div className="font-medium">Created At</div>
@@ -103,12 +103,12 @@ export function ViewUserDialog({ user, onToggleBan }: ViewUserDialogProps) {
         </div>
         <DialogFooter>
           <Button
-            variant={user.status === "banned" ? "default" : "destructive"}
+            variant={user.status === 'banned' ? 'default' : 'destructive'}
             onClick={() => onToggleBan(user.id, user.status)}
             className="flex items-center gap-2"
           >
             <Ban className="h-4 w-4" />
-            {user.status === "banned" ? "Unban User" : "Ban User"}
+            {user.status === 'banned' ? 'Unban User' : 'Ban User'}
           </Button>
         </DialogFooter>
       </DialogContent>

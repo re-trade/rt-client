@@ -1,9 +1,8 @@
- 'use client';
+'use client';
 
-import { useState } from 'react';
+import { Button } from '@/app/components/ui/button';
 import { Card } from '@/app/components/ui/card';
 import { Input } from '@/app/components/ui/input';
-import { Button } from '@/app/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -11,17 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/app/components/ui/select';
+import { Switch } from '@/app/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/app/components/ui/tabs';
-import {
-  Switch,
-} from '@/app/components/ui/switch';
-import {
-  AlertCircle,
   Bell,
   CreditCard,
   Database,
@@ -32,6 +23,7 @@ import {
   ShoppingCart,
   Users,
 } from 'lucide-react';
+import { useState } from 'react';
 
 // Sample data
 const languages = [
@@ -244,10 +236,7 @@ export default function SettingsPage() {
                   Khi bật, hệ thống sẽ hiển thị thông báo bảo trì cho người dùng
                 </p>
               </div>
-              <Switch
-                checked={maintenanceMode}
-                onCheckedChange={setMaintenanceMode}
-              />
+              <Switch checked={maintenanceMode} onCheckedChange={setMaintenanceMode} />
             </div>
           </Card>
         </TabsContent>
@@ -336,9 +325,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">
-                    Gửi thông báo qua email
-                  </p>
+                  <p className="text-sm text-muted-foreground">Gửi thông báo qua email</p>
                 </div>
                 <Switch
                   checked={notifications.email}
@@ -350,9 +337,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">SMS</p>
-                  <p className="text-sm text-muted-foreground">
-                    Gửi thông báo qua tin nhắn SMS
-                  </p>
+                  <p className="text-sm text-muted-foreground">Gửi thông báo qua tin nhắn SMS</p>
                 </div>
                 <Switch
                   checked={notifications.sms}
@@ -364,9 +349,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Push Notification</p>
-                  <p className="text-sm text-muted-foreground">
-                    Gửi thông báo đẩy đến thiết bị
-                  </p>
+                  <p className="text-sm text-muted-foreground">Gửi thông báo đẩy đến thiết bị</p>
                 </div>
                 <Switch
                   checked={notifications.push}
@@ -405,15 +388,11 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Xác thực hai lớp (2FA)</p>
-                  <p className="text-sm text-muted-foreground">
-                    Yêu cầu mã xác thực khi đăng nhập
-                  </p>
+                  <p className="text-sm text-muted-foreground">Yêu cầu mã xác thực khi đăng nhập</p>
                 </div>
                 <Switch
                   checked={security.twoFactor}
-                  onCheckedChange={(checked) =>
-                    setSecurity({ ...security, twoFactor: checked })
-                  }
+                  onCheckedChange={(checked) => setSecurity({ ...security, twoFactor: checked })}
                 />
               </div>
               <div className="grid gap-2">
@@ -568,9 +547,7 @@ export default function SettingsPage() {
                 <label>Vai trò mặc định khi đăng ký</label>
                 <Select
                   value={users.defaultRole}
-                  onValueChange={(value) =>
-                    setUsers({ ...users, defaultRole: value })
-                  }
+                  onValueChange={(value) => setUsers({ ...users, defaultRole: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Chọn vai trò" />
@@ -618,9 +595,7 @@ export default function SettingsPage() {
                 </div>
                 <Switch
                   checked={users.allowEmailChange}
-                  onCheckedChange={(checked) =>
-                    setUsers({ ...users, allowEmailChange: checked })
-                  }
+                  onCheckedChange={(checked) => setUsers({ ...users, allowEmailChange: checked })}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -632,9 +607,7 @@ export default function SettingsPage() {
                 </div>
                 <Switch
                   checked={users.allowPhoneChange}
-                  onCheckedChange={(checked) =>
-                    setUsers({ ...users, allowPhoneChange: checked })
-                  }
+                  onCheckedChange={(checked) => setUsers({ ...users, allowPhoneChange: checked })}
                 />
               </div>
             </div>
@@ -649,24 +622,18 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Tự động sao lưu</p>
-                  <p className="text-sm text-muted-foreground">
-                    Tự động tạo bản sao lưu định kỳ
-                  </p>
+                  <p className="text-sm text-muted-foreground">Tự động tạo bản sao lưu định kỳ</p>
                 </div>
                 <Switch
                   checked={backup.autoBackup}
-                  onCheckedChange={(checked) =>
-                    setBackup({ ...backup, autoBackup: checked })
-                  }
+                  onCheckedChange={(checked) => setBackup({ ...backup, autoBackup: checked })}
                 />
               </div>
               <div className="grid gap-2">
                 <label>Tần suất sao lưu</label>
                 <Select
                   value={backup.backupFrequency}
-                  onValueChange={(value) =>
-                    setBackup({ ...backup, backupFrequency: value })
-                  }
+                  onValueChange={(value) => setBackup({ ...backup, backupFrequency: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Chọn tần suất" />
@@ -683,9 +650,7 @@ export default function SettingsPage() {
                 <label>Đường dẫn lưu trữ</label>
                 <Input
                   value={backup.backupPath}
-                  onChange={(e) =>
-                    setBackup({ ...backup, backupPath: e.target.value })
-                  }
+                  onChange={(e) => setBackup({ ...backup, backupPath: e.target.value })}
                   placeholder="/path/to/backup"
                 />
               </div>
@@ -729,9 +694,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Chính sách đổi/trả hàng</p>
-                  <p className="text-sm text-muted-foreground">
-                    Quy định về việc đổi trả sản phẩm
-                  </p>
+                  <p className="text-sm text-muted-foreground">Quy định về việc đổi trả sản phẩm</p>
                 </div>
                 <Button variant="outline">Chỉnh sửa</Button>
               </div>
@@ -747,7 +710,8 @@ export default function SettingsPage() {
           <div className="border rounded-lg p-4">
             <p className="text-sm font-medium text-muted-foreground">Cổng thanh toán</p>
             <p className="text-2xl font-bold">
-              {paymentGateways.filter((g) => g.status === 'active').length} / {paymentGateways.length}
+              {paymentGateways.filter((g) => g.status === 'active').length} /{' '}
+              {paymentGateways.length}
             </p>
             <p className="text-sm text-muted-foreground">đang hoạt động</p>
           </div>

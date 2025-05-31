@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Package,
   Settings,
-  Shield,
   ShoppingCart,
   Store,
   Users,

@@ -1,9 +1,17 @@
 'use client';
 
-import { useState } from 'react';
-import { Card } from '@/app/components/ui/card';
-import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
+import { Card } from '@/app/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/app/components/ui/dialog';
+import { Input } from '@/app/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -20,21 +28,11 @@ import {
   TableRow,
 } from '@/app/components/ui/table';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/app/components/ui/dialog';
-import {
   AlertCircle,
   Bell,
   CheckCircle2,
   Clock,
   Download,
-  Filter,
   MoreHorizontal,
   Search,
   Settings,
@@ -43,18 +41,19 @@ import {
   User,
   XCircle,
 } from 'lucide-react';
+import { useState } from 'react';
 import {
-  LineChart,
+  CartesianGrid,
+  Cell,
+  Legend,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 
 // Sample data
@@ -150,7 +149,8 @@ export default function AlertsPage() {
 
   // Filter alerts based on search and filters
   const filteredAlerts = alerts.filter((alert) => {
-    const matchesSearch = alert.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      alert.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       alert.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = selectedType === 'all' || alert.type === selectedType;
     const matchesLevel = selectedLevel === 'all' || alert.level === selectedLevel;
@@ -408,21 +408,30 @@ export default function AlertsPage() {
                       </div>
                       <DialogFooter>
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" onClick={() => {
-                            // Handle mark as processing
-                          }}>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              // Handle mark as processing
+                            }}
+                          >
                             <Clock className="mr-2 h-4 w-4" />
                             Đang xử lý
                           </Button>
-                          <Button variant="outline" onClick={() => {
-                            // Handle mark as resolved
-                          }}>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              // Handle mark as resolved
+                            }}
+                          >
                             <CheckCircle2 className="mr-2 h-4 w-4" />
                             Đã xử lý
                           </Button>
-                          <Button variant="outline" onClick={() => {
-                            // Handle ignore
-                          }}>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              // Handle ignore
+                            }}
+                          >
                             <XCircle className="mr-2 h-4 w-4" />
                             Bỏ qua
                           </Button>
@@ -438,4 +447,4 @@ export default function AlertsPage() {
       </Card>
     </div>
   );
-} 
+}

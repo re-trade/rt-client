@@ -1,24 +1,7 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Card } from "@/app/components/ui/card"
-import { Input } from "@/app/components/ui/input"
-import { Button } from "@/app/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/app/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select"
+import { Button } from '@/app/components/ui/button';
+import { Card } from '@/app/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -26,30 +9,56 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/app/components/ui/dialog"
-import { Search, Store, AlertTriangle, Star, TrendingUp, Lock, Unlock, Eye, Edit, AlertCircle } from "lucide-react"
+} from '@/app/components/ui/dialog';
+import { Input } from '@/app/components/ui/input';
 import {
-  LineChart,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/app/components/ui/table';
+import {
+  AlertCircle,
+  AlertTriangle,
+  Eye,
+  Lock,
+  Search,
+  Star,
+  Store,
+  TrendingUp,
+  Unlock,
+} from 'lucide-react';
+import { useState } from 'react';
+import {
+  CartesianGrid,
+  Legend,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts"
+} from 'recharts';
 
 // Sample data - replace with actual API call
 const shops = [
   {
-    id: "1",
-    name: "Shop Thời Trang ABC",
-    owner: "Nguyễn Văn A",
-    phone: "0123456789",
-    email: "shop1@example.com",
-    status: "active",
-    createdAt: "2024-01-15",
+    id: '1',
+    name: 'Shop Thời Trang ABC',
+    owner: 'Nguyễn Văn A',
+    phone: '0123456789',
+    email: 'shop1@example.com',
+    status: 'active',
+    createdAt: '2024-01-15',
     totalProducts: 150,
     totalOrders: 500,
     totalRevenue: 50000000,
@@ -57,13 +66,13 @@ const shops = [
     violations: 0,
   },
   {
-    id: "2",
-    name: "Shop Điện Tử XYZ",
-    owner: "Trần Thị B",
-    phone: "0987654321",
-    email: "shop2@example.com",
-    status: "pending",
-    createdAt: "2024-03-01",
+    id: '2',
+    name: 'Shop Điện Tử XYZ',
+    owner: 'Trần Thị B',
+    phone: '0987654321',
+    email: 'shop2@example.com',
+    status: 'pending',
+    createdAt: '2024-03-01',
     totalProducts: 80,
     totalOrders: 200,
     totalRevenue: 30000000,
@@ -71,83 +80,84 @@ const shops = [
     violations: 1,
   },
   {
-    id: "3",
-    name: "Shop Mỹ Phẩm 123",
-    owner: "Lê Văn C",
-    phone: "0369852147",
-    email: "shop3@example.com",
-    status: "suspended",
-    createdAt: "2023-12-01",
+    id: '3',
+    name: 'Shop Mỹ Phẩm 123',
+    owner: 'Lê Văn C',
+    phone: '0369852147',
+    email: 'shop3@example.com',
+    status: 'suspended',
+    createdAt: '2023-12-01',
     totalProducts: 200,
     totalOrders: 1000,
     totalRevenue: 100000000,
     rating: 4.2,
     violations: 3,
   },
-]
+];
 
 // Sample chart data
 const performanceData = {
-  "1": [
-    { name: "T1", revenue: 10000000, orders: 100, rating: 4.5 },
-    { name: "T2", revenue: 15000000, orders: 150, rating: 4.6 },
-    { name: "T3", revenue: 25000000, orders: 200, rating: 4.8 },
+  '1': [
+    { name: 'T1', revenue: 10000000, orders: 100, rating: 4.5 },
+    { name: 'T2', revenue: 15000000, orders: 150, rating: 4.6 },
+    { name: 'T3', revenue: 25000000, orders: 200, rating: 4.8 },
   ],
-}
+};
 
 const statusLabels = {
-  active: "Đang hoạt động",
-  pending: "Chờ duyệt",
-  suspended: "Đã khóa",
-}
+  active: 'Đang hoạt động',
+  pending: 'Chờ duyệt',
+  suspended: 'Đã khóa',
+};
 
 const statusColors = {
-  active: "bg-green-100 text-green-800",
-  pending: "bg-yellow-100 text-yellow-800",
-  suspended: "bg-red-100 text-red-800",
-}
+  active: 'bg-green-100 text-green-800',
+  pending: 'bg-yellow-100 text-yellow-800',
+  suspended: 'bg-red-100 text-red-800',
+};
 
-const statuses = ["Tất cả", "active", "pending", "suspended"]
-const timeRanges = ["Hôm nay", "Tuần này", "Tháng này", "Năm nay"]
+const statuses = ['Tất cả', 'active', 'pending', 'suspended'];
+const timeRanges = ['Hôm nay', 'Tuần này', 'Tháng này', 'Năm nay'];
 
 export default function ShopManagementPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedStatus, setSelectedStatus] = useState("Tất cả")
-  const [selectedTimeRange, setSelectedTimeRange] = useState("Hôm nay")
-  const [selectedShop, setSelectedShop] = useState<string | null>(null)
-  const itemsPerPage = 10
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedStatus, setSelectedStatus] = useState('Tất cả');
+  const [selectedTimeRange, setSelectedTimeRange] = useState('Hôm nay');
+  const [selectedShop, setSelectedShop] = useState<string | null>(null);
+  const itemsPerPage = 10;
 
   // Filter shops based on search query and filters
   const filteredShops = shops.filter((shop) => {
-    const matchesSearch = shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       shop.owner.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      shop.email.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = selectedStatus === "Tất cả" || shop.status === selectedStatus
-    return matchesSearch && matchesStatus
-  })
+      shop.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = selectedStatus === 'Tất cả' || shop.status === selectedStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredShops.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentShops = filteredShops.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(filteredShops.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentShops = filteredShops.slice(startIndex, endIndex);
 
   // Calculate statistics
-  const totalShops = shops.length
-  const activeShops = shops.filter((shop) => shop.status === "active").length
-  const pendingShops = shops.filter((shop) => shop.status === "pending").length
-  const suspendedShops = shops.filter((shop) => shop.status === "suspended").length
-  const totalRevenue = shops.reduce((sum, shop) => sum + shop.totalRevenue, 0)
+  const totalShops = shops.length;
+  const activeShops = shops.filter((shop) => shop.status === 'active').length;
+  const pendingShops = shops.filter((shop) => shop.status === 'pending').length;
+  const suspendedShops = shops.filter((shop) => shop.status === 'suspended').length;
+  const totalRevenue = shops.reduce((sum, shop) => sum + shop.totalRevenue, 0);
 
   const handleToggleStatus = (shopId: string, currentStatus: string) => {
     // TODO: Implement API call to toggle shop status
-    console.log(`Toggle status for shop ${shopId}, current status: ${currentStatus}`)
-  }
+    console.log(`Toggle status for shop ${shopId}, current status: ${currentStatus}`);
+  };
 
   const handleViewDetails = (shopId: string) => {
-    setSelectedShop(shopId)
-  }
+    setSelectedShop(shopId);
+  };
 
   return (
     <div className="space-y-6">
@@ -215,7 +225,9 @@ export default function ShopManagementPage() {
               <SelectContent>
                 {statuses.map((status) => (
                   <SelectItem key={status} value={status}>
-                    {status === "Tất cả" ? status : statusLabels[status as keyof typeof statusLabels]}
+                    {status === 'Tất cả'
+                      ? status
+                      : statusLabels[status as keyof typeof statusLabels]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -293,7 +305,7 @@ export default function ShopManagementPage() {
                         size="icon"
                         onClick={() => handleToggleStatus(shop.id, shop.status)}
                       >
-                        {shop.status === "suspended" ? (
+                        {shop.status === 'suspended' ? (
                           <Unlock className="h-4 w-4 text-green-600" />
                         ) : (
                           <Lock className="h-4 w-4 text-red-600" />
@@ -314,7 +326,7 @@ export default function ShopManagementPage() {
 
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Hiển thị {startIndex + 1} đến {Math.min(endIndex, filteredShops.length)} trong tổng số{" "}
+            Hiển thị {startIndex + 1} đến {Math.min(endIndex, filteredShops.length)} trong tổng số{' '}
             {filteredShops.length} cửa hàng
           </div>
           <div className="flex items-center space-x-2">
@@ -384,10 +396,11 @@ export default function ShopManagementPage() {
                       <YAxis yAxisId="right" orientation="right" />
                       <Tooltip
                         formatter={(value, name) => {
-                          if (name === "revenue") return [`${value.toLocaleString('vi-VN')}đ`, "Doanh thu"]
-                          if (name === "orders") return [value, "Đơn hàng"]
-                          if (name === "rating") return [value, "Đánh giá"]
-                          return [value, name]
+                          if (name === 'revenue')
+                            return [`${value.toLocaleString('vi-VN')}đ`, 'Doanh thu'];
+                          if (name === 'orders') return [value, 'Đơn hàng'];
+                          if (name === 'rating') return [value, 'Đánh giá'];
+                          return [value, name];
                         }}
                       />
                       <Legend />
@@ -424,7 +437,7 @@ export default function ShopManagementPage() {
                 </Button>
                 <Button
                   variant="destructive"
-                  onClick={() => handleToggleStatus(selectedShop, "active")}
+                  onClick={() => handleToggleStatus(selectedShop, 'active')}
                 >
                   Khóa cửa hàng
                 </Button>
@@ -434,5 +447,5 @@ export default function ShopManagementPage() {
         </Dialog>
       )}
     </div>
-  )
-} 
+  );
+}
