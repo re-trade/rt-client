@@ -3,10 +3,10 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   output: 'standalone',
   typescript: {
-        ignoreBuildErrors: true
+    ignoreBuildErrors: true,
   },
   eslint: {
-        ignoreDuringBuilds: true
+    ignoreDuringBuilds: true,
   },
 };
 
