@@ -26,6 +26,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.admin-ui.rule=PathPrefix(`/admin`)"
+      - "traefik.http.middlewares.strip-admin-prefix.stripprefix.prefixes=/admin"
+      - "traefik.http.routers.admin-ui.middlewares=strip-admin-prefix"
       - "traefik.http.routers.admin-ui.entrypoints=web"
       - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
@@ -44,6 +46,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.seller-ui.rule=PathPrefix(`/seller`)"
+      - "traefik.http.middlewares.strip-seller-prefix.stripprefix.prefixes=/seller"
+      - "traefik.http.routers.seller-ui.middlewares=strip-seller-prefix"
       - "traefik.http.routers.seller-ui.entrypoints=web"
       - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
