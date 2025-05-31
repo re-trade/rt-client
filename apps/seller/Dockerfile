@@ -1,5 +1,4 @@
 FROM node:slim AS base
-RUN apk update && apk add --no-cache libc6-compat
 RUN yarn global add turbo@^2
 
 FROM base AS builder
