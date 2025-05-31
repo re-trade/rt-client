@@ -1,73 +1,59 @@
 services:
   rt-client-customer:
     container_name: rt-client-customer
-    image: rt-client-customer:latest
-    build:
-      context: ..
-      no_cache: true
-      dockerfile: apps/customer/Dockerfile
-      args:
-        - API_BASE_URL=${API_BASE_URL}
+    image: ${REGISTRY}/rt-client-customer:latest
+    restart: always
     networks:
-      - rt-local-networks
+      - retrade-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.customer-ui.rule=PathPrefix(`/`)"
       - "traefik.http.routers.customer-ui.entrypoints=web"
-      - "traefik.docker.network=rt-local-networks"
+      - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
       - "traefik.http.services.customer-ui.loadbalancer.server.port=3000"
     profiles:
       - customer
-      - dev
+      - prod
       - frontend
 
   rt-client-admin:
     container_name: rt-client-admin
-    image: rt-client-admin:latest
-    build:
-      context: ..
-      no_cache: true
-      dockerfile: apps/admin/Dockerfile
-      args:
-        - API_BASE_URL=${API_BASE_URL}
+    image: ${REGISTRY}/rt-client-admin:latest
+    restart: always
     networks:
-      - rt-local-networks
+      - retrade-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.admin-ui.rule=PathPrefix(`/admin`)"
       - "traefik.http.routers.admin-ui.entrypoints=web"
-      - "traefik.docker.network=rt-local-networks"
+      - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
       - "traefik.http.services.admin-ui.loadbalancer.server.port=3000"
     profiles:
       - admin
-      - dev
+      - prod
       - frontend
 
   rt-client-seller:
     container_name: rt-client-seller
-    image: rt-client-seller:latest
-    build:
-      context: ..
-      no_cache: true
-      dockerfile: apps/seller/Dockerfile
-      args:
-        - API_BASE_URL=${API_BASE_URL}
+    image: ${REGISTRY}/rt-client-seller:latest
+    restart: always
     networks:
-      - rt-local-networks
+      - retrade-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.seller-ui.rule=PathPrefix(`/seller`)"
       - "traefik.http.routers.seller-ui.entrypoints=web"
-      - "traefik.docker.network=rt-local-networks"
+      - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
       - "traefik.http.services.seller-ui.loadbalancer.server.port=3000"
     profiles:
       - seller
-      - dev
+      - prod
       - frontend
 
 networks:
-  rt-local-networks:
-    name: rt-local-networks
+  retrade-network:
+    name: retrade-network
+    external: true
