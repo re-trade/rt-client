@@ -1,3 +1,4 @@
+import { CookieConsent } from '@/components/common/CookieConsent';
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
 import { Suspense } from 'react';
@@ -13,6 +14,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
           <Suspense>{children}</Suspense>
         </div>
         <Footer />
+        <CookieConsent />
       </body>
     </html>
   );
