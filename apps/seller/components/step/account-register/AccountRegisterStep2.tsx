@@ -1,20 +1,36 @@
+import { useState } from 'react';
+
 type ShippingMethodKey = 'express' | 'fast' | 'economy' | 'extra';
 
-type Props = {
-  shippingMethods: Record<ShippingMethodKey, boolean>;
-  toggleShippingMethod: (method: ShippingMethodKey) => void;
+const defaultShippingMethods: Record<ShippingMethodKey, boolean> = {
+  express: false,
+  fast: false,
+  economy: false,
+  extra: false,
 };
 
-export default function AccountRegisterStep2({ shippingMethods, toggleShippingMethod }: Props) {
-  const shippingOptions: { label: string; key: ShippingMethodKey; note: string }[] = [
+export default function ShippingMethodPage() {
+  const [shippingMethods, setShippingMethods] = useState(defaultShippingMethods);
+
+  const toggleShippingMethod = (method: ShippingMethodKey) => {
+    setShippingMethods((prev) => ({
+      ...prev,
+      [method]: !prev[method],
+    }));
+  };
+
+  const shippingOptions: {
+    label: string;
+    key: ShippingMethodKey;
+    note: string;
+  }[] = [
     { label: 'Hỏa Tốc', key: 'express', note: '[COD đã được kích hoạt]' },
     { label: 'Nhanh', key: 'fast', note: '[COD đã được kích hoạt]' },
     { label: 'Tiết Kiệm', key: 'economy', note: '[COD đã được kích hoạt]' },
-    { label: 'Thêm Đơn Vị Vận Chuyển', key: 'extra', note: '' },
   ];
 
   return (
-    <>
+    <div className="p-6 max-w-md mx-auto">
       <h2 className="text-lg font-semibold mb-4">Phương thức vận chuyển</h2>
       {shippingOptions.map((method) => (
         <div key={method.key} className="flex items-center justify-between border-b py-3">
@@ -38,6 +54,6 @@ export default function AccountRegisterStep2({ shippingMethods, toggleShippingMe
           </label>
         </div>
       ))}
-    </>
+    </div>
   );
 }

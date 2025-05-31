@@ -51,7 +51,7 @@ export default function Footer() {
               <a
                 key={item}
                 href="#"
-                className="font-['Reddit_Sans'] font-normal text-1.5xl text-[#121212] hover:text-[#525252]"
+                className="font-['Reddit_Sans'] font-normal text-lg text-[#121212] hover:text-[#525252]"
               >
                 {item}
               </a>
@@ -59,7 +59,7 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-base text-[#121212] mb-4">
+          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
             Về chúng tôi
           </h3>
           <div className="flex flex-col gap-3">
@@ -74,7 +74,7 @@ export default function Footer() {
               <a
                 key={item}
                 href="#"
-                className="font-['Reddit_Sans'] font-normal text-1.5xl text-[#121212] hover:text-[#525252]"
+                className="font-['Reddit_Sans'] font-normal text-lg text-[#121212] hover:text-[#525252]"
               >
                 {item}
               </a>
@@ -93,7 +93,7 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-2 mb-4">
             <FaEnvelope className="w-5 h-5 text-[#121212]" />
-            <span className="font-['Reddit_Sans'] font-normal text-1.5xl text-[#121212]">
+            <span className="font-['Reddit_Sans'] font-normal text-lg text-[#121212]">
               retradeshopsupport@gmail.com
             </span>
           </div>
