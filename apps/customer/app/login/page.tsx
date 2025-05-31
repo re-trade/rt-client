@@ -5,18 +5,26 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FaFacebook } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
+import { loginInternal } from '@/services/auth.api';
 
 export default function Login() {
   const [isVisible, setIsVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
+
   const formRef = useRef<HTMLDivElement>(null);
   const [formHeight, setFormHeight] = useState<number | null>(null);
+  const router = useRouter();
 
   const toggleVisibility = () => {
     setIsVisible((prevState) => !prevState);
     setShowPassword((prevState) => !prevState);
   };
-  const router = useRouter();
 
   useLayoutEffect(() => {
     if (formRef.current) {
@@ -24,31 +32,78 @@ export default function Login() {
     }
   }, []);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setError(null); // Clear error when user types
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await loginInternal({
+        username: formData.username,
+        password: formData.password,
+      });
+      router.push('/'); 
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          'Đăng nhập thất bại. Vui lòng thử lại.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section className="flex justify-center min-h-screen bg-gray-100 font-[Open_Sans]">
       <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center">
-        {/* Form */}
-        <div ref={formRef} className="w-full max-w-xl bg-white p-6 rounded-lg shadow-md">
+        <div
+          ref={formRef}
+          className="w-full max-w-xl bg-white p-6 rounded-lg shadow-md"
+        >
           <div className="flex justify-center w-full">
             <div className="w-full max-w-sm">
               <h1 className="text-2xl md:text-3xl font-bold mb-2 text-black text-center">
                 Chào mừng bạn trở lại với Retrade Shop!
               </h1>
               <p className="text-center text-gray-600 mb-6">
-                Nơi tìm món đồ đẹp, dùng món chất lượng – và gặp cơ hội đổi đời trong tích tắc!
+                Nơi tìm món đồ đẹp, dùng món chất lượng – và gặp cơ hội đổi đời trong
+                tích tắc!
               </p>
-              <form className="space-y-4">
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <input
                     type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
                     placeholder="Tên đăng nhập"
                     className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white"
+                    required
                   />
                 </div>
                 <div className="relative">
                   <input
                     id="password"
+                    name="password"
                     type={isVisible ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={handleInputChange}
                     className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black focus:outline-none focus:ring-2 focus:ring-white hover:bg-gray-100"
                     placeholder="Mật khẩu"
                     aria-label="Password"
@@ -74,9 +129,14 @@ export default function Login() {
 
                 <button
                   type="submit"
-                  className="w-full bg-orange-400 text-white p-3 rounded-lg hover:bg-orange-500 transition"
+                  disabled={isLoading}
+                  className={`w-full bg-orange-400 text-white p-3 rounded-lg transition ${
+                    isLoading
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-orange-500'
+                  }`}
                 >
-                  Đăng nhập
+                  {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </button>
                 <div className="text-center text-gray-600">OR</div>
                 <button className="w-full border border-gray-300 py-2 rounded flex items-center text-black justify-center gap-2 hover:bg-gray-100">
@@ -97,15 +157,10 @@ export default function Login() {
               >
                 Đăng ký
               </button>
-              <p className="text-center text-gray-500 text-sm mt-4">
-                Bằng cách nhấn vào đăng nhập hoặc đăng ký, bạn đồng ý với Điều khoản sử dụng và
-                Chính sách bảo mật của chúng tôi.
-              </p>
             </div>
           </div>
         </div>
 
-        {/* Image */}
         <div className="rounded overflow-hidden">
           <Image
             src="/image_login.jpg"
