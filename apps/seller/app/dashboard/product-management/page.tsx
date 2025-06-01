@@ -2,14 +2,28 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Edit } from "lucide-react"
 import Image from "next/image"
+import { CreateProductDialog } from "@/components/ui/dialog/add/create-product-dialog"
+import { EditProductDialog } from "@/components/ui/dialog/view-update/edit-product-dialog"
 
 interface Product {
   id: string
@@ -50,68 +64,29 @@ export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    category: "",
-    description: "",
-    image: "",
-  })
+  const [isEditOpen, setIsEditOpen] = useState(false)
 
-  const handleCreate = () => {
+  const handleCreateProduct = (productData: Omit<Product, "id">) => {
     const newProduct: Product = {
       id: Date.now().toString(),
-      name: formData.name,
-      price: Number(formData.price),
-      stock: Number(formData.stock),
-      category: formData.category,
-      description: formData.description,
-      image: formData.image || "/placeholder.svg?height=100&width=100",
-      status: "active",
+      ...productData,
     }
     setProducts([...products, newProduct])
-    setFormData({ name: "", price: "", stock: "", category: "", description: "", image: "" })
-    setIsCreateOpen(false)
   }
 
-  const handleUpdate = () => {
+  const handleUpdateProduct = (productData: Omit<Product, "id">) => {
     if (!selectedProduct) return
 
     const updatedProducts = products.map((product) =>
-      product.id === selectedProduct.id
-        ? {
-            ...product,
-            name: formData.name,
-            price: Number(formData.price),
-            stock: Number(formData.stock),
-            category: formData.category,
-            description: formData.description,
-            image: formData.image || product.image,
-          }
-        : product,
+      product.id === selectedProduct.id ? { ...product, ...productData } : product,
     )
     setProducts(updatedProducts)
-    setIsDetailOpen(false)
     setSelectedProduct(null)
   }
 
-  const openCreateDialog = () => {
-    setFormData({ name: "", price: "", stock: "", category: "", description: "", image: "" })
-    setIsCreateOpen(true)
-  }
-
-  const openDetailDialog = (product: Product) => {
+  const handleEditProduct = (product: Product) => {
     setSelectedProduct(product)
-    setFormData({
-      name: product.name,
-      price: product.price.toString(),
-      stock: product.stock.toString(),
-      category: product.category,
-      description: product.description,
-      image: product.image,
-    })
-    setIsDetailOpen(true)
+    setIsEditOpen(true)
   }
 
   return (
@@ -121,66 +96,17 @@ export default function ProductManagement() {
           <h2 className="text-xl font-semibold">Danh sách sản phẩm</h2>
           <p className="text-muted-foreground">Quản lý tất cả sản phẩm của bạn</p>
         </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreateDialog}>
-              <Plus className="h-4 w-4 mr-2" />
-              Tạo sản phẩm
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Tạo sản phẩm mới</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Tên sản phẩm</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="price">Giá</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="stock">Số lượng</Label>
-                <Input
-                  id="stock"
-                  type="number"
-                  value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="category">Danh mục</Label>
-                <Input
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Mô tả</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                />
-              </div>
-              <Button onClick={handleCreate} className="w-full">
-                Tạo sản phẩm
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <CreateProductDialog
+          open={isCreateOpen}
+          onOpenChange={setIsCreateOpen}
+          onCreateProduct={handleCreateProduct}
+        />
+        <EditProductDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          product={selectedProduct}
+          onUpdateProduct={handleUpdateProduct}
+        />
       </div>
 
       <Card>
@@ -199,7 +125,10 @@ export default function ProductManagement() {
             </TableHeader>
             <TableBody>
               {products.map((product) => (
-                <TableRow key={product.id} className="cursor-pointer hover:bg-muted/50">
+                <TableRow
+                  key={product.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                >
                   <TableCell>
                     <Image
                       src={product.image || "/placeholder.svg"}
@@ -210,20 +139,30 @@ export default function ProductManagement() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.price.toLocaleString("vi-VN")}đ</TableCell>
+                  <TableCell>
+                    {product.price.toLocaleString("vi-VN")}đ
+                  </TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell>{product.category}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        product.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        product.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {product.status === "active" ? "Hoạt động" : "Không hoạt động"}
+                      {product.status === "active"
+                        ? "Hoạt động"
+                        : "Không hoạt động"}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" onClick={() => openDetailDialog(product)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditProduct(product)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                   </TableCell>
@@ -233,61 +172,6 @@ export default function ProductManagement() {
           </Table>
         </CardContent>
       </Card>
-
-      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Chi tiết sản phẩm</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-name">Tên sản phẩm</Label>
-              <Input
-                id="edit-name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-price">Giá</Label>
-              <Input
-                id="edit-price"
-                type="number"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-stock">Số lượng</Label>
-              <Input
-                id="edit-stock"
-                type="number"
-                value={formData.stock}
-                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-category">Danh mục</Label>
-              <Input
-                id="edit-category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-description">Mô tả</Label>
-              <Textarea
-                id="edit-description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
-            </div>
-            <Button onClick={handleUpdate} className="w-full">
-              Cập nhật sản phẩm
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

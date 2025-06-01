@@ -18,21 +18,28 @@ import {
 import { Package, DollarSign, Ticket, Truck, MapPin, Store, LayoutDashboard } from "lucide-react"
 
 const menuItems = [
-  {
+    {
     title: "Tổng quan",
     icon: LayoutDashboard,
     href: "/dashboard",
-  },
-  {
-    title: "Quản lý sản phẩm",
-    icon: Package,
-    href: "/dashboard/product-management",
   },
   {
     title: "Quản lý doanh thu",
     icon: DollarSign,
     href: "/dashboard/revenue-management",
   },
+   {
+    title: "Thông tin shop",
+    icon: Store,
+    href: "/dashboard/shop-info-management",
+  },
+
+  {
+    title: "Quản lý sản phẩm",
+    icon: Package,
+    href: "/dashboard/product-management",
+  },
+  
   {
     title: "Quản lý voucher",
     icon: Ticket,
@@ -48,11 +55,7 @@ const menuItems = [
     icon: MapPin,
     href: "/dashboard/address-management",
   },
-  {
-    title: "Thông tin shop",
-    icon: Store,
-    href: "/dashboard/shop-info-management",
-  },
+ 
 ]
 
 export default function DashboardLayout({

@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Plus, Edit } from "lucide-react"
+import ShippingMethodCreateDialog from "@/components/ui/dialog/add/create-shipping-dialog"
+import ShippingMethodEditDialog from "@/components/ui/dialog/view-update/edit-shipping-dialog"
 
 interface ShippingMethod {
   id: string
@@ -84,14 +86,14 @@ export default function ShippingManagement() {
     const updatedMethods = shippingMethods.map((method) =>
       method.id === selectedMethod.id
         ? {
-            ...method,
-            name: formData.name,
-            description: formData.description,
-            basePrice: Number(formData.basePrice),
-            freeShippingThreshold: formData.freeShippingThreshold ? Number(formData.freeShippingThreshold) : undefined,
-            estimatedDays: formData.estimatedDays,
-            isActive: formData.isActive,
-          }
+          ...method,
+          name: formData.name,
+          description: formData.description,
+          basePrice: Number(formData.basePrice),
+          freeShippingThreshold: formData.freeShippingThreshold ? Number(formData.freeShippingThreshold) : undefined,
+          estimatedDays: formData.estimatedDays,
+          isActive: formData.isActive,
+        }
         : method,
     )
     setShippingMethods(updatedMethods)
@@ -135,76 +137,12 @@ export default function ShippingManagement() {
           <h2 className="text-xl font-semibold">Phương thức vận chuyển</h2>
           <p className="text-muted-foreground">Quản lý các phương thức giao hàng</p>
         </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreateDialog}>
-              <Plus className="h-4 w-4 mr-2" />
-              Thêm phương thức
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Thêm phương thức vận chuyển</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Tên phương thức</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Mô tả</Label>
-                <Input
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="basePrice">Phí vận chuyển (đ)</Label>
-                <Input
-                  id="basePrice"
-                  type="number"
-                  value={formData.basePrice}
-                  onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="freeShippingThreshold">Miễn phí từ (đ)</Label>
-                <Input
-                  id="freeShippingThreshold"
-                  type="number"
-                  value={formData.freeShippingThreshold}
-                  onChange={(e) => setFormData({ ...formData, freeShippingThreshold: e.target.value })}
-                  placeholder="Để trống nếu không có"
-                />
-              </div>
-              <div>
-                <Label htmlFor="estimatedDays">Thời gian giao hàng</Label>
-                <Input
-                  id="estimatedDays"
-                  value={formData.estimatedDays}
-                  onChange={(e) => setFormData({ ...formData, estimatedDays: e.target.value })}
-                  placeholder="VD: 3-5 ngày"
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isActive"
-                  checked={formData.isActive}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
-                />
-                <Label htmlFor="isActive">Kích hoạt</Label>
-              </div>
-              <Button onClick={handleCreate} className="w-full">
-                Thêm phương thức
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <ShippingMethodCreateDialog
+          onCreate={(newData) => {
+            const newMethod = { ...newData, id: Date.now().toString() }
+            setShippingMethods([...shippingMethods, newMethod])
+          }}
+        />
       </div>
 
       <Card>
@@ -235,9 +173,8 @@ export default function ShippingManagement() {
                   <TableCell>{method.estimatedDays}</TableCell>
                   <TableCell>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        method.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                      }`}
+                      className={`px-2 py-1 rounded-full text-xs ${method.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                        }`}
                     >
                       {method.isActive ? "Hoạt động" : "Không hoạt động"}
                     </span>
