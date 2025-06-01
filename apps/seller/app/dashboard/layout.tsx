@@ -19,14 +19,45 @@ import { usePathname } from 'next/navigation';
 import type React from 'react';
 
 const menuItems = [
-  { title: 'Tổng quan', icon: LayoutDashboard, href: '/dashboard' },
-  { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product-management' },
-  { title: 'Quản lý doanh thu', icon: DollarSign, href: '/dashboard/revenue-management' },
-  { title: 'Quản lý voucher', icon: Ticket, href: '/dashboard/voucher-management' },
-  { title: 'Phương thức vận chuyển', icon: Truck, href: '/dashboard/shipping-management' },
-  { title: 'Quản lý địa chỉ', icon: MapPin, href: '/dashboard/address-management' },
-  { title: 'Thông tin shop', icon: Store, href: '/dashboard/shop-info-management' },
-];
+    {
+    title: "Tổng quan",
+    icon: LayoutDashboard,
+    href: "/dashboard",
+  },
+  {
+    title: "Quản lý doanh thu",
+    icon: DollarSign,
+    href: "/dashboard/revenue-management",
+  },
+   {
+    title: "Thông tin shop",
+    icon: Store,
+    href: "/dashboard/shop-info-management",
+  },
+
+  {
+    title: "Quản lý sản phẩm",
+    icon: Package,
+    href: "/dashboard/product-management",
+  },
+  
+  {
+    title: "Quản lý voucher",
+    icon: Ticket,
+    href: "/dashboard/voucher-management",
+  },
+  {
+    title: "Phương thức vận chuyển",
+    icon: Truck,
+    href: "/dashboard/shipping-management",
+  },
+  {
+    title: "Quản lý địa chỉ",
+    icon: MapPin,
+    href: "/dashboard/address-management",
+  },
+ 
+]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
