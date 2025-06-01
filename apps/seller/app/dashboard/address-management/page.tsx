@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -10,26 +10,26 @@ import EditAddressDialog from "@/components/ui/dialog/view-update/edit-address-d
 
 const mockAddresses: Address[] = [
   {
-    id: "1",
-    name: "Nguyễn Văn A",
-    phone: "0123456789",
-    address: "123 Đường ABC",
-    ward: "Phường 1",
-    district: "Quận 1",
-    city: "TP. Hồ Chí Minh",
+    id: '1',
+    name: 'Nguyễn Văn A',
+    phone: '0123456789',
+    address: '123 Đường ABC',
+    ward: 'Phường 1',
+    district: 'Quận 1',
+    city: 'TP. Hồ Chí Minh',
     isDefault: true,
   },
   {
-    id: "2",
-    name: "Trần Thị B",
-    phone: "0987654321",
-    address: "456 Đường XYZ",
-    ward: "Phường 2",
-    district: "Quận 2",
-    city: "TP. Hồ Chí Minh",
+    id: '2',
+    name: 'Trần Thị B',
+    phone: '0987654321',
+    address: '456 Đường XYZ',
+    ward: 'Phường 2',
+    district: 'Quận 2',
+    city: 'TP. Hồ Chí Minh',
     isDefault: false,
   },
-]
+];
 
 export default function AddressManagement() {
   const [addresses, setAddresses] = useState<Address[]>(mockAddresses)
@@ -97,7 +97,9 @@ export default function AddressManagement() {
                   <TableCell>{address.city}</TableCell>
                   <TableCell>
                     {address.isDefault && (
-                      <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">Mặc định</span>
+                      <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                        Mặc định
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -126,5 +128,5 @@ export default function AddressManagement() {
         onUpdate={handleUpdate}
       />
     </div>
-  )
+  );
 }

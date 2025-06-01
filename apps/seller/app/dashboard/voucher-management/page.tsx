@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -13,66 +13,66 @@ import {CreateVoucherDialog} from"@/components/ui/dialog/add/create-voucher-dial
 
 
 interface Voucher {
-  id: string
-  code: string
-  name: string
-  type: "percentage" | "fixed"
-  value: number
-  minOrder: number
-  maxDiscount?: number
-  startDate: string
-  endDate: string
-  usageLimit: number
-  usedCount: number
-  status: "active" | "inactive" | "expired"
+  id: string;
+  code: string;
+  name: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  minOrder: number;
+  maxDiscount?: number;
+  startDate: string;
+  endDate: string;
+  usageLimit: number;
+  usedCount: number;
+  status: 'active' | 'inactive' | 'expired';
 }
 
 const mockVouchers: Voucher[] = [
   {
-    id: "1",
-    code: "SALE20",
-    name: "Giảm giá 20%",
-    type: "percentage",
+    id: '1',
+    code: 'SALE20',
+    name: 'Giảm giá 20%',
+    type: 'percentage',
     value: 20,
     minOrder: 100000,
     maxDiscount: 50000,
-    startDate: "2024-01-01",
-    endDate: "2024-12-31",
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
     usageLimit: 100,
     usedCount: 25,
-    status: "active",
+    status: 'active',
   },
   {
-    id: "2",
-    code: "FREESHIP",
-    name: "Miễn phí vận chuyển",
-    type: "fixed",
+    id: '2',
+    code: 'FREESHIP',
+    name: 'Miễn phí vận chuyển',
+    type: 'fixed',
     value: 30000,
     minOrder: 200000,
-    startDate: "2024-01-01",
-    endDate: "2024-12-31",
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
     usageLimit: 50,
     usedCount: 10,
-    status: "active",
+    status: 'active',
   },
-]
+];
 
 export default function VoucherManagement() {
-  const [vouchers, setVouchers] = useState<Voucher[]>(mockVouchers)
-  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [vouchers, setVouchers] = useState<Voucher[]>(mockVouchers);
+  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-    type: "percentage" as "percentage" | "fixed",
-    value: "",
-    minOrder: "",
-    maxDiscount: "",
-    startDate: "",
-    endDate: "",
-    usageLimit: "",
-  })
+    code: '',
+    name: '',
+    type: 'percentage' as 'percentage' | 'fixed',
+    value: '',
+    minOrder: '',
+    maxDiscount: '',
+    startDate: '',
+    endDate: '',
+    usageLimit: '',
+  });
 
   const handleCreateVoucher = (voucherData: Omit<Voucher, "id" | "usedCount">) => {
     const newVoucher: Voucher = {
@@ -86,7 +86,7 @@ export default function VoucherManagement() {
 
 
   const handleUpdate = () => {
-    if (!selectedVoucher) return
+    if (!selectedVoucher) return;
 
     const updatedVouchers = vouchers.map((voucher) =>
       voucher.id === selectedVoucher.id
@@ -103,46 +103,46 @@ export default function VoucherManagement() {
             usageLimit: Number(formData.usageLimit),
           }
         : voucher,
-    )
-    setVouchers(updatedVouchers)
-    setIsDetailOpen(false)
-    setSelectedVoucher(null)
-  }
+    );
+    setVouchers(updatedVouchers);
+    setIsDetailOpen(false);
+    setSelectedVoucher(null);
+  };
 
   const resetForm = () => {
     setFormData({
-      code: "",
-      name: "",
-      type: "percentage",
-      value: "",
-      minOrder: "",
-      maxDiscount: "",
-      startDate: "",
-      endDate: "",
-      usageLimit: "",
-    })
-  }
+      code: '',
+      name: '',
+      type: 'percentage',
+      value: '',
+      minOrder: '',
+      maxDiscount: '',
+      startDate: '',
+      endDate: '',
+      usageLimit: '',
+    });
+  };
 
   const openCreateDialog = () => {
-    resetForm()
-    setIsCreateOpen(true)
-  }
+    resetForm();
+    setIsCreateOpen(true);
+  };
 
   const openDetailDialog = (voucher: Voucher) => {
-    setSelectedVoucher(voucher)
+    setSelectedVoucher(voucher);
     setFormData({
       code: voucher.code,
       name: voucher.name,
       type: voucher.type,
       value: voucher.value.toString(),
       minOrder: voucher.minOrder.toString(),
-      maxDiscount: voucher.maxDiscount?.toString() || "",
+      maxDiscount: voucher.maxDiscount?.toString() || '',
       startDate: voucher.startDate,
       endDate: voucher.endDate,
       usageLimit: voucher.usageLimit.toString(),
-    })
-    setIsDetailOpen(true)
-  }
+    });
+    setIsDetailOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -173,9 +173,11 @@ export default function VoucherManagement() {
                 <TableRow key={voucher.id}>
                   <TableCell className="font-mono font-medium">{voucher.code}</TableCell>
                   <TableCell>{voucher.name}</TableCell>
-                  <TableCell>{voucher.type === "percentage" ? "Phần trăm" : "Cố định"}</TableCell>
+                  <TableCell>{voucher.type === 'percentage' ? 'Phần trăm' : 'Cố định'}</TableCell>
                   <TableCell>
-                    {voucher.type === "percentage" ? `${voucher.value}%` : `${voucher.value.toLocaleString("vi-VN")}đ`}
+                    {voucher.type === 'percentage'
+                      ? `${voucher.value}%`
+                      : `${voucher.value.toLocaleString('vi-VN')}đ`}
                   </TableCell>
                   <TableCell>
                     {voucher.usedCount}/{voucher.usageLimit}
@@ -183,18 +185,18 @@ export default function VoucherManagement() {
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        voucher.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : voucher.status === "expired"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
+                        voucher.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : voucher.status === 'expired'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800'
                       }`}
                     >
-                      {voucher.status === "active"
-                        ? "Hoạt động"
-                        : voucher.status === "expired"
-                          ? "Hết hạn"
-                          : "Không hoạt động"}
+                      {voucher.status === 'active'
+                        ? 'Hoạt động'
+                        : voucher.status === 'expired'
+                          ? 'Hết hạn'
+                          : 'Không hoạt động'}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -235,7 +237,9 @@ export default function VoucherManagement() {
               <Label htmlFor="edit-type">Loại giảm giá</Label>
               <Select
                 value={formData.type}
-                onValueChange={(value: "percentage" | "fixed") => setFormData({ ...formData, type: value })}
+                onValueChange={(value: 'percentage' | 'fixed') =>
+                  setFormData({ ...formData, type: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -264,7 +268,7 @@ export default function VoucherManagement() {
                 onChange={(e) => setFormData({ ...formData, minOrder: e.target.value })}
               />
             </div>
-            {formData.type === "percentage" && (
+            {formData.type === 'percentage' && (
               <div>
                 <Label htmlFor="edit-maxDiscount">Giảm tối đa</Label>
                 <Input
@@ -311,5 +315,5 @@ export default function VoucherManagement() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

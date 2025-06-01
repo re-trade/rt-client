@@ -1,6 +1,6 @@
-"use client";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+'use client';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 type UserLayoutProps = {
   children: React.ReactNode;
 };
@@ -10,7 +10,7 @@ type TRouterItem = {
   icon?: string;
   path: string;
   subMenu?: TRouterItem[];
-}
+};
 
 export default function UserLayout({ children }: UserLayoutProps) {
   const router = useRouter();
@@ -36,25 +36,25 @@ export default function UserLayout({ children }: UserLayoutProps) {
   };
 
   const menuItems: TRouterItem[] = [
-    { name: "Thông Báo", icon: "bell", path: "notification" },
+    { name: 'Thông Báo', icon: 'bell', path: 'notification' },
     {
-      name: "Tài Khoản Của Tôi",
-      icon: "user",
-      path: "profile",
+      name: 'Tài Khoản Của Tôi',
+      icon: 'user',
+      path: 'profile',
       subMenu: [
-        { name: "Hồ Sơ", path: "profile" },
-        { name: "Địa Chỉ", path: "address" },
-        { name: "Bảo Mật", path: "security" },
-        { name: "Cài Đặt Thông Báo", path: "notification-settings" },
-        { name: "Những Thiết Lập Riêng Tư", path: "privacy-settings" },
+        { name: 'Hồ Sơ', path: 'profile' },
+        { name: 'Địa Chỉ', path: 'address' },
+        { name: 'Bảo Mật', path: 'security' },
+        { name: 'Cài Đặt Thông Báo', path: 'notification-settings' },
+        { name: 'Những Thiết Lập Riêng Tư', path: 'privacy-settings' },
       ],
     },
-    { name: "Đơn Mua", icon: "shopping-cart", path: "purchase" },
-    { name: "Kho Voucher", icon: "ticket", path: "vouchers" },
+    { name: 'Đơn Mua', icon: 'shopping-cart', path: 'purchase' },
+    { name: 'Kho Voucher', icon: 'ticket', path: 'vouchers' },
   ];
 
   // Derive active tab from the current pathname
-  const activeTab = pathname.split("/user/")[1] || "profile";
+  const activeTab = pathname.split('/user/')[1] || 'profile';
 
   return (
     <div className="min-h-screen bg-gray-100 flex pl-1">
@@ -67,12 +67,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
             <h2 className="text-gray-700 font-semibold">vominhvu2002</h2>
             <p className="text-gray-500 text-sm flex items-center">
               Sửa Hồ Sơ
-              <svg
-                className="w-4 h-4 ml-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -90,14 +85,13 @@ export default function UserLayout({ children }: UserLayoutProps) {
               <div key={item.path}>
                 <div
                   onClick={() =>
-                    item.subMenu
-                      ? toggleMenu(item.path)
-                      : handleNavigation(item.path)
+                    item.subMenu ? toggleMenu(item.path) : handleNavigation(item.path)
                   }
-                  className={`flex items-center justify-between p-2 mb-2 cursor-pointer rounded-lg ${isActive(item)
-                      ? "bg-orange-100 text-orange-500"
-                      : "hover:bg-gray-100 text-black"
-                    }`}
+                  className={`flex items-center justify-between p-2 mb-2 cursor-pointer rounded-lg ${
+                    isActive(item)
+                      ? 'bg-orange-100 text-orange-500'
+                      : 'hover:bg-gray-100 text-black'
+                  }`}
                 >
                   <div className="flex items-center">
                     <svg
@@ -106,7 +100,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      {item.icon === "bell" && (
+                      {item.icon === 'bell' && (
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -114,7 +108,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                           d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                         ></path>
                       )}
-                      {item.icon === "user" && (
+                      {item.icon === 'user' && (
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -122,7 +116,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                         ></path>
                       )}
-                      {item.icon === "shopping-cart" && (
+                      {item.icon === 'shopping-cart' && (
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -130,7 +124,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                           d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                         ></path>
                       )}
-                      {item.icon === "ticket" && (
+                      {item.icon === 'ticket' && (
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -145,9 +139,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     <svg
                       className="w-4 h-4 transform transition-transform duration-200"
                       style={{
-                        transform: isExpanded
-                          ? "rotate(90deg)"
-                          : "rotate(0deg)",
+                        transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
                       }}
                       fill="none"
                       stroke="currentColor"
@@ -168,7 +160,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                       <div
                         key={subItem.path}
                         onClick={() => handleNavigation(subItem.path)}
-                        className={`p-2 mb-2 cursor-pointer rounded-lg ${activeTab === subItem.path ? "bg-orange-100 text-orange-500" : "hover:bg-gray-100 text-black"}`}
+                        className={`p-2 mb-2 cursor-pointer rounded-lg ${activeTab === subItem.path ? 'bg-orange-100 text-orange-500' : 'hover:bg-gray-100 text-black'}`}
                       >
                         {subItem.name}
                       </div>

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 const images = [
   { src: '/image_login.jpg', alt: 'Slide 1' },
@@ -28,7 +28,7 @@ export default function CarouselComponent() {
   };
 
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000); // 
+    const interval = setInterval(nextSlide, 5000); //
   }, []);
 
   return (
@@ -38,15 +38,15 @@ export default function CarouselComponent() {
           <div
             key={index}
             className={`absolute w-full h-full transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
+              index === currentIndex ? 'opacity-100' : 'opacity-0'
             } flex justify-center items-center`}
           >
             <div className="relative w-full overflow-hidden">
               <Image
                 src={image.src}
                 alt={image.alt}
-                width={1920} 
-                height={1080} 
+                width={1920}
+                height={1080}
                 className="w-full h-auto object-cover"
                 priority={index === currentIndex}
               />
@@ -62,7 +62,7 @@ export default function CarouselComponent() {
             type="button"
             onClick={() => goToSlide(index)}
             className={`w-3 h-3 rounded-full ${
-              index === currentIndex ? "bg-white" : "bg-white/50"
+              index === currentIndex ? 'bg-white' : 'bg-white/50'
             }`}
             aria-label={`Slide ${index + 1}`}
           ></button>

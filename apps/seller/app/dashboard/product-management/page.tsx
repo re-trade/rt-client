@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -26,38 +26,38 @@ import { CreateProductDialog } from "@/components/ui/dialog/add/create-product-d
 import { EditProductDialog } from "@/components/ui/dialog/view-update/edit-product-dialog"
 
 interface Product {
-  id: string
-  name: string
-  price: number
-  stock: number
-  category: string
-  description: string
-  image: string
-  status: "active" | "inactive"
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  category: string;
+  description: string;
+  image: string;
+  status: 'active' | 'inactive';
 }
 
 const mockProducts: Product[] = [
   {
-    id: "1",
-    name: "Áo thun nam",
+    id: '1',
+    name: 'Áo thun nam',
     price: 299000,
     stock: 50,
-    category: "Thời trang",
-    description: "Áo thun nam chất liệu cotton cao cấp",
-    image: "/placeholder.svg?height=100&width=100",
-    status: "active",
+    category: 'Thời trang',
+    description: 'Áo thun nam chất liệu cotton cao cấp',
+    image: '/placeholder.svg?height=100&width=100',
+    status: 'active',
   },
   {
-    id: "2",
-    name: "Quần jeans nữ",
+    id: '2',
+    name: 'Quần jeans nữ',
     price: 599000,
     stock: 30,
-    category: "Thời trang",
-    description: "Quần jeans nữ form slim fit",
-    image: "/placeholder.svg?height=100&width=100",
-    status: "active",
+    category: 'Thời trang',
+    description: 'Quần jeans nữ form slim fit',
+    image: '/placeholder.svg?height=100&width=100',
+    status: 'active',
   },
-]
+];
 
 export default function ProductManagement() {
   const [products, setProducts] = useState<Product[]>(mockProducts)
@@ -131,7 +131,7 @@ export default function ProductManagement() {
                 >
                   <TableCell>
                     <Image
-                      src={product.image || "/placeholder.svg"}
+                      src={product.image || '/placeholder.svg'}
                       alt={product.name}
                       width={50}
                       height={50}
@@ -173,5 +173,5 @@ export default function ProductManagement() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

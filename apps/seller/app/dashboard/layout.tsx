@@ -1,8 +1,5 @@
-"use client"
+'use client';
 
-import type React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -14,8 +11,12 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Package, DollarSign, Ticket, Truck, MapPin, Store, LayoutDashboard } from "lucide-react"
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { DollarSign, LayoutDashboard, MapPin, Package, Store, Ticket, Truck } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import type React from 'react';
 
 const menuItems = [
     {
@@ -58,48 +59,55 @@ const menuItems = [
  
 ]
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const pathname = usePathname()
-
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <Sidebar>
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Dashboard Người Bán</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {menuItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton asChild isActive={pathname === item.href}>
-                        <Link href={item.href}>
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-
-        <main className="flex-1 p-6">
-          <div className="flex items-center gap-4 mb-6">
-            <SidebarTrigger />
-            <h1 className="text-2xl font-bold">
-              {menuItems.find((item) => item.href === pathname)?.title || "Dashboard"}
-            </h1>
-          </div>
-          {children}
-        </main>
-      </div>
+      <DashboardContent>{children}</DashboardContent>
     </SidebarProvider>
-  )
+  );
+}
+
+function DashboardContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const { state } = useSidebar();
+
+  return (
+    <div className="flex min-h-screen w-full">
+      {state === 'expanded' && (
+        <div className="w-64 shrink-0 transition-all duration-300">
+          <Sidebar>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Dashboard Người Bán</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {menuItems.map((item) => (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton asChild isActive={pathname === item.href}>
+                          <Link href={item.href}>
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.title}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+        </div>
+      )}
+
+      <main className="flex-grow p-6 transition-all duration-300">
+        <div className="flex items-center gap-4 mb-6">
+          <SidebarTrigger />
+          <h1 className="text-2xl font-bold">
+            {menuItems.find((item) => item.href === pathname)?.title || 'Dashboard'}
+          </h1>
+        </div>
+        {children}
+      </main>
+    </div>
+  );
 }

@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package, DollarSign, ShoppingCart, TrendingUp } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DollarSign, Package, ShoppingCart, TrendingUp } from 'lucide-react';
 
 export default function DashboardOverview() {
   return (
@@ -63,9 +63,9 @@ export default function DashboardOverview() {
           <CardContent>
             <div className="space-y-4">
               {[
-                { name: "Áo thun nam", sales: 45, revenue: "13,455,000đ" },
-                { name: "Quần jeans nữ", sales: 32, revenue: "19,168,000đ" },
-                { name: "Giày sneaker", sales: 28, revenue: "16,800,000đ" },
+                { name: 'Áo thun nam', sales: 45, revenue: '13,455,000đ' },
+                { name: 'Quần jeans nữ', sales: 32, revenue: '19,168,000đ' },
+                { name: 'Giày sneaker', sales: 28, revenue: '16,800,000đ' },
               ].map((product, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div>
@@ -88,9 +88,9 @@ export default function DashboardOverview() {
           <CardContent>
             <div className="space-y-4">
               {[
-                { id: "ORD001", customer: "Nguyễn Văn A", amount: "299,000đ", status: "Đã giao" },
-                { id: "ORD002", customer: "Trần Thị B", amount: "599,000đ", status: "Đang giao" },
-                { id: "ORD003", customer: "Lê Văn C", amount: "199,000đ", status: "Đang xử lý" },
+                { id: 'ORD001', customer: 'Nguyễn Văn A', amount: '299,000đ', status: 'Đã giao' },
+                { id: 'ORD002', customer: 'Trần Thị B', amount: '599,000đ', status: 'Đang giao' },
+                { id: 'ORD003', customer: 'Lê Văn C', amount: '199,000đ', status: 'Đang xử lý' },
               ].map((order, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div>
@@ -108,5 +108,5 @@ export default function DashboardOverview() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
