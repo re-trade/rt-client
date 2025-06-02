@@ -1,5 +1,7 @@
+import { getDeviceInfo } from '@/lib/device-fingerprint';
 import type { AxiosRequestConfig } from 'axios';
 import axios, { AxiosError } from 'axios';
+
 const BASE_API_URL: string = process.env.NEXT_API_BASE_URL ?? 'http://localhost:8080/api/v1';
 
 enum ETokenName {
@@ -24,10 +26,15 @@ const authApi = axios.create({
 });
 
 authApi.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const accessToken = localStorage.getItem(ETokenName.ACCESS_TOKEN);
     if (accessToken && config.headers) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
+      const deviceInfo = await getDeviceInfo();
+      config.headers['device-fingerprint'] = deviceInfo.deviceFingerprint;
+      config.headers['device-name'] = deviceInfo.deviceName;
+      config.headers['ip-address'] = deviceInfo.ipAddress;
+      config.headers['location'] = deviceInfo.location;
     }
     return config;
   },

@@ -1,0 +1,63 @@
+services:
+  rt-client-customer:
+    container_name: rt-client-customer
+    image: ${REGISTRY}/rt-client-customer:latest
+    restart: always
+    networks:
+      - retrade-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.customer-ui.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.customer-ui.entrypoints=web"
+      - "traefik.docker.network=retrade-network"
+      - "traefik.constraint-label=retrade-service"
+      - "traefik.http.services.customer-ui.loadbalancer.server.port=3000"
+    profiles:
+      - customer
+      - prod
+      - frontend
+
+  rt-client-admin:
+    container_name: rt-client-admin
+    image: ${REGISTRY}/rt-client-admin:latest
+    restart: always
+    networks:
+      - retrade-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin-ui.rule=PathPrefix(`/admin`)"
+      - "traefik.http.middlewares.strip-admin-prefix.stripprefix.prefixes=/admin"
+      - "traefik.http.routers.admin-ui.middlewares=strip-admin-prefix"
+      - "traefik.http.routers.admin-ui.entrypoints=web"
+      - "traefik.docker.network=retrade-network"
+      - "traefik.constraint-label=retrade-service"
+      - "traefik.http.services.admin-ui.loadbalancer.server.port=3000"
+    profiles:
+      - admin
+      - prod
+      - frontend
+
+  rt-client-seller:
+    container_name: rt-client-seller
+    image: ${REGISTRY}/rt-client-seller:latest
+    restart: always
+    networks:
+      - retrade-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.seller-ui.rule=PathPrefix(`/seller`)"
+      - "traefik.http.middlewares.strip-seller-prefix.stripprefix.prefixes=/seller"
+      - "traefik.http.routers.seller-ui.middlewares=strip-seller-prefix"
+      - "traefik.http.routers.seller-ui.entrypoints=web"
+      - "traefik.docker.network=retrade-network"
+      - "traefik.constraint-label=retrade-service"
+      - "traefik.http.services.seller-ui.loadbalancer.server.port=3000"
+    profiles:
+      - seller
+      - prod
+      - frontend
+
+networks:
+  retrade-network:
+    name: retrade-network
+    external: true
