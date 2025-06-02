@@ -1,4 +1,6 @@
 'use client';
+
+import React, { useState, useRef } from 'react';
 import { Mail } from 'lucide-react';
 import Image from 'next/image';
 
@@ -25,6 +27,22 @@ const fakeProfile: Profile = {
 };
 
 export default function ProfilePage() {
+  const [avatar, setAvatar] = useState<string>(fakeProfile.avatarUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setAvatar(url);
+      // You can also upload this file to server here or handle further
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const profile = fakeProfile;
 
   return (
@@ -33,14 +51,29 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <div className="w-40 h-40 bg-gray-300 rounded-full mr-4 overflow-hidden">
+            <div className="w-40 h-40 bg-gray-300 rounded-full mr-4 overflow-hidden relative">
               <Image
-                src={profile.avatarUrl}
+                src={avatar}
                 alt={profile.name}
                 width={150}
                 height={150}
                 className="w-full h-full object-cover"
               />
+              {/* Hidden file input */}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+              <button
+                onClick={triggerFileInput}
+                className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white text-sm px-3 py-1 rounded hover:bg-opacity-75 transition"
+                type="button"
+              >
+                Đổi ảnh
+              </button>
             </div>
             <div>
               <h2 className="text-2xl font-semibold text-black">{profile.name}</h2>
