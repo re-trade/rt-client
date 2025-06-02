@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Edit } from "lucide-react"
-import AddAddressDialog, { Address } from "@/components/ui/dialog/add/create-address-dialog"
-import EditAddressDialog from "@/components/ui/dialog/view-update/edit-address-dialog"
+import AddAddressDialog, { Address } from "@/components/dialog/add/create-address-dialog"
+import EditAddressDialog from "@/components/dialog/view-update/edit-address-dialog"
 
 const mockAddresses: Address[] = [
   {

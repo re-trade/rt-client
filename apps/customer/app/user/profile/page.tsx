@@ -1,6 +1,7 @@
 'use client';
 import { Mail } from 'lucide-react';
 import Image from 'next/image';
+import { handlePhoneInput } from '@/components/input/InputHandle';
 
 interface Profile {
   name: string;
@@ -28,8 +29,8 @@ export default function ProfilePage() {
   const profile = fakeProfile;
 
   return (
-    <div className="w-full bg-white flex items-center justify-center p-10">
-      <div className="w-[900px] bg-[#FFF8F3] rounded-lg shadow-lg p-6">
+    <div className="w-full h-full bg-white p-10">
+      <div className="w-full bg-[#FFF8F3] rounded-lg shadow-lg p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
@@ -72,6 +73,7 @@ export default function ProfilePage() {
                 type="text"
                 placeholder="Thêm số điện thoại"
                 defaultValue={profile.phone || ''}
+          
                 className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black"
               />
             </div>

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Edit } from "lucide-react"
-import {CreateVoucherDialog} from"@/components/ui/dialog/add/create-voucher-dialog"
+import {CreateVoucherDialog} from"@/components/dialog/add/create-voucher-dialog"
 
 
 interface Voucher {

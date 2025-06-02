@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { TrendingUp, DollarSign, ShoppingCart, Eye } from "lucide-react"
 import { useState } from "react"
-import { RevenueDetailDialog } from "@/components/ui/dialog/view-update/revenue-detail-dialog"
+import { RevenueDetailDialog } from "@/components/dialog/view-update/revenue-detail-dialog"
 
 interface RevenueData {
   id: string;

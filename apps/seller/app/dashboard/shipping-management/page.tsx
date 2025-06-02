@@ -9,8 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Plus, Edit } from "lucide-react"
-import ShippingMethodCreateDialog from "@/components/ui/dialog/add/create-shipping-dialog"
-import ShippingMethodEditDialog from "@/components/ui/dialog/view-update/edit-shipping-dialog"
+import ShippingMethodCreateDialog from "@/components/dialog/add/create-shipping-dialog"
+import ShippingMethodEditDialog from "@/components/dialog/view-update/edit-shipping-dialog"
 
 interface ShippingMethod {
   id: string;
