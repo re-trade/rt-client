@@ -10,6 +10,7 @@ import {
   Settings,
   ShoppingCart,
   Store,
+  Ticket,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -44,6 +45,7 @@ const menuItems = [
       { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user-management' },
       { title: 'Quản lý đơn hàng', icon: ShoppingCart, href: '/dashboard/order-management' },
       { title: 'Quản lý shop', icon: Store, href: '/dashboard/shop-management' },
+      { title: 'Quản lý voucher', icon: Ticket, href: '/dashboard/voucher-management' },
     ],
   },
   {

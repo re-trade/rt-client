@@ -1,15 +1,8 @@
 'use client';
 
-import { Button } from '@/app/components/ui/button';
+import { useState } from 'react';
 import { Card } from '@/app/components/ui/card';
-import { Input } from '@/app/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/app/components/ui/select';
+import { Button } from '@/app/components/ui/button';
 import {
   Table,
   TableBody,
@@ -18,332 +11,416 @@ import {
   TableHeader,
   TableRow,
 } from '@/app/components/ui/table';
-import { ArrowUpDown, Package, Search } from 'lucide-react';
-import { useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/components/ui/select';
+import { Input } from '@/app/components/ui/input';
+import { Badge } from '@/app/components/ui/badge';
+import { Checkbox } from '@/app/components/ui/checkbox';
+import { Slider } from '@/app/components/ui/slider';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/app/components/ui/breadcrumb';
+import { Plus, Search, Filter, Edit, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 
-// Sample data - replace with actual API call
+// Sample data - replace with actual API calls
 const categories = [
-  {
-    id: '1',
-    name: 'Electronics',
-    description: 'Electronic devices and accessories',
-    productCount: 150,
-  },
-  {
-    id: '2',
-    name: 'Clothing',
-    description: 'Fashion and apparel',
-    productCount: 300,
-  },
-  {
-    id: '3',
-    name: 'Books',
-    description: 'Books and publications',
-    productCount: 200,
-  },
-  {
-    id: '4',
-    name: 'Home & Kitchen',
-    description: 'Home appliances and kitchenware',
-    productCount: 180,
-  },
+  { id: 1, name: 'Electronics', parentId: null },
+  { id: 2, name: 'Clothing', parentId: null },
+  { id: 3, name: 'Smartphones', parentId: 1 },
+  { id: 4, name: 'Laptops', parentId: 1 },
+  { id: 5, name: 'Men', parentId: 2 },
+  { id: 6, name: 'Women', parentId: 2 },
 ];
 
-const products = {
-  '1': [
-    {
-      id: '1',
-      name: 'iPhone 13',
-      price: 999,
-      stock: 50,
-      status: 'active',
-      createdAt: '2024-03-15',
-    },
-    {
-      id: '2',
-      name: 'Samsung Galaxy S21',
-      price: 899,
-      stock: 30,
-      status: 'active',
-      createdAt: '2024-03-14',
-    },
-  ],
-  '2': [
-    {
-      id: '3',
-      name: "Men's T-Shirt",
-      price: 29.99,
-      stock: 100,
-      status: 'active',
-      createdAt: '2024-03-13',
-    },
-    {
-      id: '4',
-      name: "Women's Dress",
-      price: 59.99,
-      stock: 75,
-      status: 'active',
-      createdAt: '2024-03-12',
-    },
-  ],
-  '3': [
-    {
-      id: '5',
-      name: 'The Great Gatsby',
-      price: 14.99,
-      stock: 200,
-      status: 'active',
-      createdAt: '2024-03-11',
-    },
-    {
-      id: '6',
-      name: 'To Kill a Mockingbird',
-      price: 12.99,
-      stock: 150,
-      status: 'active',
-      createdAt: '2024-03-10',
-    },
-  ],
-  '4': [
-    {
-      id: '7',
-      name: 'Coffee Maker',
-      price: 79.99,
-      stock: 40,
-      status: 'active',
-      createdAt: '2024-03-09',
-    },
-    {
-      id: '8',
-      name: 'Blender',
-      price: 49.99,
-      stock: 60,
-      status: 'active',
-      createdAt: '2024-03-08',
-    },
-  ],
+const brands = [
+  { id: 1, name: 'Apple' },
+  { id: 2, name: 'Samsung' },
+  { id: 3, name: 'Nike' },
+  { id: 4, name: 'Adidas' },
+];
+
+const products = [
+  {
+    id: 1,
+    name: 'iPhone 13 Pro',
+    image: '/products/iphone-13-pro.jpg',
+    price: 999.99,
+    stock: 50,
+    status: 'active',
+    category: 'Smartphones',
+    brand: 'Apple',
+    seller: 'Apple Store',
+    createdAt: '2024-01-15',
+  },
+  // Add more sample products...
+];
+
+type Category = {
+  id: number;
+  name: string;
+  parentId: number | null;
 };
 
-type SortField = 'name' | 'price' | 'stock' | 'createdAt';
-type SortOrder = 'asc' | 'desc';
+type Brand = {
+  id: number;
+  name: string;
+};
+
+type Product = {
+  id: number;
+  name: string;
+  image: string;
+  price: number;
+  stock: number;
+  status: 'active' | 'inactive' | 'out_of_stock';
+  category: string;
+  brand: string;
+  seller: string;
+  createdAt: string;
+};
 
 export default function ProductManagementPage() {
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [productStatus, setProductStatus] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<SortField>('name');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const itemsPerPage = 10;
 
-  // Filter and sort products
-  const filteredProducts = selectedCategory
-    ? products[selectedCategory as keyof typeof products]
-        .filter((product) => {
-          const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-          const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
-          return matchesSearch && matchesStatus;
-        })
-        .sort((a, b) => {
-          let comparison = 0;
-          switch (sortField) {
-            case 'name':
-              comparison = a.name.localeCompare(b.name);
-              break;
-            case 'price':
-              comparison = a.price - b.price;
-              break;
-            case 'stock':
-              comparison = a.stock - b.stock;
-              break;
-            case 'createdAt':
-              comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-              break;
-          }
-          return sortOrder === 'asc' ? comparison : -comparison;
-        })
-    : [];
+  // Filter products based on selected criteria
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = !selectedCategory || product.category === categories.find(c => c.id === selectedCategory)?.name;
+    const matchesSubcategory = !selectedSubcategory || product.category === categories.find(c => c.id === selectedSubcategory)?.name;
+    const matchesBrand = !selectedBrand || product.brand === brands.find(b => b.id === selectedBrand)?.name;
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+    const matchesStatus = productStatus.length === 0 || productStatus.includes(product.status);
 
-  // Calculate pagination
+    return matchesCategory && matchesSubcategory && matchesBrand && matchesSearch && matchesPrice && matchesStatus;
+  });
+
+  // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedProducts(paginatedProducts.map((product) => product.id));
     } else {
-      setSortField(field);
-      setSortOrder('asc');
+      setSelectedProducts([]);
     }
   };
+
+  const handleSelectProduct = (productId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedProducts([...selectedProducts, productId]);
+    } else {
+      setSelectedProducts(selectedProducts.filter((id) => id !== productId));
+    }
+  };
+
+  const statusColors = {
+    active: 'bg-green-100 text-green-800',
+    inactive: 'bg-gray-100 text-gray-800',
+    out_of_stock: 'bg-red-100 text-red-800',
+  } as const;
+
+  type ProductStatus = keyof typeof statusColors;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Product Management</h1>
+        <h1 className="text-3xl font-bold">Quản lý sản phẩm</h1>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {categories.map((category) => (
-          <Card
-            key={category.id}
-            className={`cursor-pointer p-6 transition-colors hover:bg-accent ${
-              selectedCategory === category.id ? 'border-primary' : ''
-            }`}
-            onClick={() => {
-              setSelectedCategory(category.id);
-              setCurrentPage(1);
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">{category.name}</h3>
-                <p className="text-sm text-muted-foreground">{category.description}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  {category.productCount} products
-                </span>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard/product-management">Sản phẩm</BreadcrumbLink>
+          </BreadcrumbItem>
+          {selectedCategory && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">{categories.find(c => c.id === selectedCategory)?.name}</BreadcrumbLink>
+              </BreadcrumbItem>
+            </>
+          )}
+          {selectedSubcategory && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{categories.find(c => c.id === selectedSubcategory)?.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </>
+          )}
+        </BreadcrumbList>
+      </Breadcrumb>
 
-      {selectedCategory && (
-        <Card className="p-6">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-1 items-center space-x-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Advanced Filters */}
+      <Card className="p-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Danh mục</label>
+            <Select
+              value={selectedCategory?.toString() || 'all'}
+              onValueChange={(value) => setSelectedCategory(value === 'all' ? null : parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn danh mục" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả</SelectItem>
+                {categories
+                  .filter((category) => !category.parentId)
+                  .map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="mt-6">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('name')}
-                      className="flex items-center gap-1"
-                    >
-                      Name
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('price')}
-                      className="flex items-center gap-1"
-                    >
-                      Price
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('stock')}
-                      className="flex items-center gap-1"
-                    >
-                      Stock
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('createdAt')}
-                      className="flex items-center gap-1"
-                    >
-                      Created At
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentProducts.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>${product.price.toFixed(2)}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          product.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {product.status}
-                      </span>
-                    </TableCell>
-                    <TableCell>{product.createdAt}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button variant="ghost" size="icon">
-                          <Package className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Danh mục con</label>
+            <Select
+              value={selectedSubcategory?.toString() || 'all'}
+              onValueChange={(value) => setSelectedSubcategory(value === 'all' ? null : parseInt(value))}
+              disabled={!selectedCategory}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn danh mục con" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả</SelectItem>
+                {categories
+                  .filter((category) => category.parentId === selectedCategory)
+                  .map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Thương hiệu</label>
+            <Select
+              value={selectedBrand?.toString() || 'all'}
+              onValueChange={(value) => setSelectedBrand(value === 'all' ? null : parseInt(value))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn thương hiệu" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả</SelectItem>
+                {brands.map((brand) => (
+                  <SelectItem key={brand.id} value={brand.id.toString()}>
+                    {brand.name}
+                  </SelectItem>
                 ))}
-              </TableBody>
-            </Table>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredProducts.length)} of{' '}
-              {filteredProducts.length} products
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Trạng thái</label>
+            <div className="space-y-2">
+              {['active', 'inactive', 'out_of_stock'].map((status) => (
+                <div key={status} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={status}
+                    checked={productStatus.includes(status)}
+                    onCheckedChange={(checked: boolean) => {
+                      if (checked) {
+                        setProductStatus([...productStatus, status]);
+                      } else {
+                        setProductStatus(productStatus.filter((s) => s !== status));
+                      }
+                    }}
+                  />
+                  <label
+                    htmlFor={status}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {status.replace('_', ' ').charAt(0).toUpperCase() + status.slice(1)}
+                  </label>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Khoảng giá</label>
+            <div className="flex items-center gap-4">
+              <Input
+                type="number"
+                value={priceRange[0]}
+                onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                className="w-32"
+              />
+              <span>-</span>
+              <Input
+                type="number"
+                value={priceRange[1]}
+                onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                className="w-32"
+              />
+            </div>
+            <Slider
+              value={priceRange}
+              onValueChange={(value) => setPriceRange(value as [number, number])}
+              min={0}
+              max={1000}
+              step={10}
+              className="mt-2"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Tìm kiếm</label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Tìm theo tên hoặc mã sản phẩm..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Button variant="outline">
+                <Search className="h-4 w-4" />
               </Button>
             </div>
           </div>
-        </Card>
-      )}
+        </div>
+      </Card>
+
+      {/* Products Table */}
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectedProducts.length === paginatedProducts.length}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead>Sản phẩm</TableHead>
+              <TableHead>Giá</TableHead>
+              <TableHead>Số lượng</TableHead>
+              <TableHead>Trạng thái</TableHead>
+              <TableHead>Danh mục</TableHead>
+              <TableHead>Thương hiệu</TableHead>
+              <TableHead>Shop</TableHead>
+              <TableHead>Ngày tạo</TableHead>
+              <TableHead>Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedProducts.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedProducts.includes(product.id)}
+                    onCheckedChange={(checked: boolean) => handleSelectProduct(product.id, checked)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <div className="relative h-10 w-10">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="rounded-md object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="font-medium">{product.name}</p>
+                      <p className="text-sm text-muted-foreground">ID: {product.id}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>{product.price.toLocaleString('vi-VN')}đ</TableCell>
+                <TableCell>{product.stock}</TableCell>
+                <TableCell>
+                  <Badge className={statusColors[product.status as ProductStatus]}>
+                    {product.status.replace('_', ' ').charAt(0).toUpperCase() + product.status.slice(1)}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {categories.find((c) => c.id === selectedCategory)?.name}
+                </TableCell>
+                <TableCell>
+                  {brands.find((b) => b.id === selectedBrand)?.name}
+                </TableCell>
+                <TableCell>{product.seller}</TableCell>
+                <TableCell>{new Date(product.createdAt).toLocaleDateString('vi-VN')}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm">
+                      Sửa
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-red-500">
+                      Xóa
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between p-4">
+          <p className="text-sm text-muted-foreground">
+            Hiển thị {paginatedProducts.length} trên tổng số {filteredProducts.length} sản phẩm
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Trước
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Sau
+            </Button>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }
