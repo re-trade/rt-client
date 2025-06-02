@@ -1,9 +1,9 @@
-'use client'
-import { useState } from "react";
+'use client';
+import { useState } from 'react';
 
 const initialMethods = [
-  { id: 1, type: "Visa", last4: "1234", expiry: "12/24" },
-  { id: 2, type: "MasterCard", last4: "5678", expiry: "09/25" },
+  { id: 1, type: 'Visa', last4: '1234', expiry: '12/24' },
+  { id: 2, type: 'MasterCard', last4: '5678', expiry: '09/25' },
 ];
 
 export default function ManagePaymentMethods() {
@@ -11,13 +11,13 @@ export default function ManagePaymentMethods() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingMethod, setEditingMethod] = useState(null);
   const [form, setForm] = useState({
-    type: "",
-    cardNumber: "",
-    expiry: "",
+    type: '',
+    cardNumber: '',
+    expiry: '',
   });
 
   const openAddModal = () => {
-    setForm({ type: "", cardNumber: "", expiry: "" });
+    setForm({ type: '', cardNumber: '', expiry: '' });
     setEditingMethod(null);
     setModalOpen(true);
   };
@@ -25,7 +25,7 @@ export default function ManagePaymentMethods() {
   const openEditModal = (method) => {
     setForm({
       type: method.type,
-      cardNumber: "**** **** **** " + method.last4,
+      cardNumber: '**** **** **** ' + method.last4,
       expiry: method.expiry,
     });
     setEditingMethod(method);
@@ -34,27 +34,27 @@ export default function ManagePaymentMethods() {
 
   const closeModal = () => {
     setModalOpen(false);
-    setForm({ type: "", cardNumber: "", expiry: "" });
+    setForm({ type: '', cardNumber: '', expiry: '' });
     setEditingMethod(null);
   };
 
   const handleDelete = (id) => {
-    if (confirm("Bạn chắc chắn muốn xóa phương thức thanh toán này?")) {
+    if (confirm('Bạn chắc chắn muốn xóa phương thức thanh toán này?')) {
       setMethods((prev) => prev.filter((m) => m.id !== id));
     }
   };
 
   const handleSave = () => {
     if (!form.type || !form.cardNumber || !form.expiry) {
-      alert("Vui lòng điền đầy đủ thông tin");
+      alert('Vui lòng điền đầy đủ thông tin');
       return;
     }
-    let last4 = form.cardNumber.replace(/\D/g, "").slice(-4);
+    let last4 = form.cardNumber.replace(/\D/g, '').slice(-4);
     if (editingMethod) {
       setMethods((prev) =>
         prev.map((m) =>
-          m.id === editingMethod.id ? { ...m, type: form.type, last4, expiry: form.expiry } : m
-        )
+          m.id === editingMethod.id ? { ...m, type: form.type, last4, expiry: form.expiry } : m,
+        ),
       );
     } else {
       setMethods((prev) => [
@@ -69,9 +69,7 @@ export default function ManagePaymentMethods() {
     <div className="min-h-screen bg-gray-50 p-6 md:p-12">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-3">Quản lý phương thức thanh toán</h1>
-        <p className="text-gray-600 mb-6">
-          Thêm, sửa hoặc xóa các phương thức thanh toán của bạn.
-        </p>
+        <p className="text-gray-600 mb-6">Thêm, sửa hoặc xóa các phương thức thanh toán của bạn.</p>
 
         <div className="space-y-4">
           {methods.map((method) => (
@@ -117,17 +115,14 @@ export default function ManagePaymentMethods() {
       {/* Modal */}
       {modalOpen && (
         <>
-          <div
-            className="fixed inset-0 bg-black bg-opacity-40 z-40"
-            onClick={closeModal}
-          />
+          <div className="fixed inset-0 bg-black bg-opacity-40 z-40" onClick={closeModal} />
           <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
             <div
               className="bg-white rounded-lg shadow-xl max-w-md w-full p-8 relative"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-bold mb-6">
-                {editingMethod ? "Sửa phương thức thanh toán" : "Thêm phương thức thanh toán"}
+                {editingMethod ? 'Sửa phương thức thanh toán' : 'Thêm phương thức thanh toán'}
               </h2>
 
               <label className="block mb-4">
@@ -149,7 +144,7 @@ export default function ManagePaymentMethods() {
                   maxLength={19}
                   value={form.cardNumber}
                   onChange={(e) => {
-                    let val = e.target.value.replace(/[^\d ]/g, "");
+                    let val = e.target.value.replace(/[^\d ]/g, '');
                     setForm({ ...form, cardNumber: val });
                   }}
                   className="mt-1 block w-full rounded-md border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -179,7 +174,7 @@ export default function ManagePaymentMethods() {
                   onClick={handleSave}
                   className="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
                 >
-                  {editingMethod ? "Lưu thay đổi" : "Thêm thẻ"}
+                  {editingMethod ? 'Lưu thay đổi' : 'Thêm thẻ'}
                 </button>
               </div>
             </div>

@@ -1,23 +1,11 @@
-import React from 'react';
-
 export default function OrderList() {
   function ProductItem({ product }) {
-    const {
-      productImage,
-      productName,
-      productVariant,
-      quantity,
-      originalPrice,
-      salePrice,
-    } = product;
+    const { productImage, productName, productVariant, quantity, originalPrice, salePrice } =
+      product;
 
     return (
       <a href="/product" className="flex space-x-4 items-center mb-4 last:mb-0">
-        <img
-          src={productImage}
-          alt={productName}
-          className="w-20 h-20 object-cover rounded"
-        />
+        <img src={productImage} alt={productName} className="w-20 h-20 object-cover rounded" />
         <div>
           <h3 className="font-semibold">{productName}</h3>
           <p className="text-sm text-gray-500">{productVariant}</p>
@@ -26,9 +14,7 @@ export default function OrderList() {
             <span className="line-through text-gray-400 mr-2">
               ₫{originalPrice.toLocaleString()}
             </span>
-            <span className="text-red-600 font-bold">
-              ₫{salePrice.toLocaleString()}
-            </span>
+            <span className="text-red-600 font-bold">₫{salePrice.toLocaleString()}</span>
           </p>
         </div>
       </a>
@@ -36,12 +22,7 @@ export default function OrderList() {
   }
 
   function OrderItem({ order }) {
-    const {
-      shopName,
-      shopInitial,
-      products,
-      cancelLink,
-    } = order;
+    const { shopName, shopInitial, products, cancelLink } = order;
 
     return (
       <div className="max-w-md mx-auto bg-white shadow rounded-lg p-4 space-y-6 mb-6">
@@ -52,12 +33,7 @@ export default function OrderList() {
           </div>
           <div className="font-semibold text-lg">{shopName}</div>
           <button className="ml-auto bg-blue-600 text-white px-3 py-1 rounded flex items-center space-x-1 hover:bg-blue-700 transition">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -79,11 +55,7 @@ export default function OrderList() {
         {/* Chỉ hiển thị nút Mua lại và link xem chi tiết hủy đơn */}
         <div className="mt-4 space-y-4">
           <div>
-            <span
-              aria-label="Đã hủy bởi bạn"
-              tabIndex={0}
-              className="text-red-600 font-semibold"
-            >
+            <span aria-label="Đã hủy bởi bạn" tabIndex={0} className="text-red-600 font-semibold">
               Đã hủy bởi bạn
             </span>
           </div>
@@ -192,14 +164,12 @@ export default function OrderList() {
     },
   ];
 
-  const cancelledOrders = orders.filter(order => order.status === 'cancelled');
+  const cancelledOrders = orders.filter((order) => order.status === 'cancelled');
 
   return (
     <div>
       {cancelledOrders.length > 0 ? (
-        cancelledOrders.map((order, idx) => (
-          <OrderItem key={idx} order={order} />
-        ))
+        cancelledOrders.map((order, idx) => <OrderItem key={idx} order={order} />)
       ) : (
         <p className="text-center text-gray-500 mt-10">Không có đơn hàng mua lại</p>
       )}

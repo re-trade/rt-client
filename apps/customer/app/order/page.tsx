@@ -1,11 +1,11 @@
 // SummaryPage.tsx
 'use client';
-import React, { useState } from 'react';
 import AwaitingPayment from '@/components/order-product/AwaitingPayment';
-import Shipping from '@/components/order-product/Shipping';
-import Completed from '@/components/order-product/Completed';
 import Cancelled from '@/components/order-product/Cancelled';
+import Completed from '@/components/order-product/Completed';
 import Returned from '@/components/order-product/Returned';
+import Shipping from '@/components/order-product/Shipping';
+import { useState } from 'react';
 
 const tabs = [
   { key: 'awaiting', label: 'Chờ thanh toán' },
@@ -23,7 +23,7 @@ export default function SummaryPage() {
       <h1 className="text-2xl font-bold mb-4">Tổng quan đơn hàng</h1>
 
       <div className="flex space-x-4 mb-6 border-b">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}

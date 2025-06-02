@@ -1,11 +1,7 @@
 function OrderItemProduct({ product }) {
   return (
     <a href={product.link} className="flex space-x-4 items-center">
-      <img
-        src={product.img}
-        alt={product.name}
-        className="w-20 h-20 object-cover rounded"
-      />
+      <img src={product.img} alt={product.name} className="w-20 h-20 object-cover rounded" />
       <div>
         <h3 className="font-semibold">{product.name}</h3>
         <p className="text-sm text-gray-500">{product.variant}</p>
@@ -29,12 +25,7 @@ function OrderItem({ order }) {
         </div>
         <div className="font-semibold text-lg">{order.shopName}</div>
         <button className="ml-auto bg-blue-600 text-white px-3 py-1 rounded flex items-center space-x-1">
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

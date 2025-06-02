@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from 'react';
 
 function ProductItem({ product }) {
   return (
@@ -16,22 +16,14 @@ function ProductItem({ product }) {
           <span className="line-through text-gray-400 mr-2">
             ₫{product.originalPrice.toLocaleString()}
           </span>
-          <span className="text-red-600 font-bold">
-            ₫{product.salePrice.toLocaleString()}
-          </span>
+          <span className="text-red-600 font-bold">₫{product.salePrice.toLocaleString()}</span>
         </p>
       </div>
     </a>
   );
 }
 
-function OrderItem({
-  shopInitial,
-  shopName,
-  products,
-  refundAmount,
-  cancelLink,
-}) {
+function OrderItem({ shopInitial, shopName, products, refundAmount, cancelLink }) {
   return (
     <div className="max-w-md mx-auto bg-white shadow rounded-lg p-4 space-y-6 mb-8">
       {/* Shop info */}
@@ -41,12 +33,7 @@ function OrderItem({
         </div>
         <div className="font-semibold text-lg">{shopName}</div>
         <button className="ml-auto bg-blue-600 text-white px-3 py-1 rounded flex items-center space-x-1 hover:bg-blue-700 transition">
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -82,11 +69,7 @@ function OrderItem({
       <div className="yyqgYp mt-4 space-y-4">
         <div className="iwUeSD">
           <div>
-            <span
-              aria-label="Đã hủy bởi bạn"
-              tabIndex={0}
-              className="text-red-600 font-semibold"
-            >
+            <span aria-label="Đã hủy bởi bạn" tabIndex={0} className="text-red-600 font-semibold">
               Đã hủy bởi bạn
             </span>
           </div>
@@ -140,25 +123,25 @@ export default function OrderListPage() {
 
   const orders = [
     {
-      shopInitial: "P",
-      shopName: "Poermax Tech",
+      shopInitial: 'P',
+      shopName: 'Poermax Tech',
       refundAmount: 56221,
-      cancelLink: "/user/purchase/cancellation/200657080280946",
+      cancelLink: '/user/purchase/cancellation/200657080280946',
       products: [
         {
           productImage:
-            "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn",
-          productName: "Túi đựng phụ kiện cáp sạc đa năng Poermax-SM03",
-          productVariant: "Phân loại hàng: SM03 Cao Cấp-Xanh",
+            'https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn',
+          productName: 'Túi đựng phụ kiện cáp sạc đa năng Poermax-SM03',
+          productVariant: 'Phân loại hàng: SM03 Cao Cấp-Xanh',
           quantity: 1,
           originalPrice: 75000,
           salePrice: 59000,
         },
         {
           productImage:
-            "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn",
-          productName: "Sạc nhanh USB-C 65W",
-          productVariant: "Màu trắng",
+            'https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn',
+          productName: 'Sạc nhanh USB-C 65W',
+          productVariant: 'Màu trắng',
           quantity: 2,
           originalPrice: 300000,
           salePrice: 250000,
@@ -166,16 +149,16 @@ export default function OrderListPage() {
       ],
     },
     {
-      shopInitial: "T",
-      shopName: "TechShop",
+      shopInitial: 'T',
+      shopName: 'TechShop',
       refundAmount: 120000,
-      cancelLink: "/user/purchase/cancellation/200657080280947",
+      cancelLink: '/user/purchase/cancellation/200657080280947',
       products: [
         {
           productImage:
-            "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn",
-          productName: "Tai nghe Bluetooth không dây",
-          productVariant: "Màu sắc: Đen",
+            'https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn',
+          productName: 'Tai nghe Bluetooth không dây',
+          productVariant: 'Màu sắc: Đen',
           quantity: 1,
           originalPrice: 500000,
           salePrice: 450000,
@@ -186,8 +169,6 @@ export default function OrderListPage() {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
-      
-
       {orders.map((order, idx) => (
         <OrderItem key={idx} {...order} />
       ))}

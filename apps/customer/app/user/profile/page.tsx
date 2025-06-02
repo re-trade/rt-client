@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
 import { Mail } from 'lucide-react';
 import Image from 'next/image';
+import React, { useRef, useState } from 'react';
 
 interface Profile {
   name: string;

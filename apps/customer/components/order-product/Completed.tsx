@@ -8,12 +8,7 @@ function OrderItem({ shopInitial, shopName, product, onPrimaryClick, onSecondary
         </div>
         <div className="font-semibold text-lg">{shopName}</div>
         <button className="ml-auto bg-blue-600 text-white px-3 py-1 rounded flex items-center space-x-1 hover:bg-blue-700 transition">
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -27,11 +22,7 @@ function OrderItem({ shopInitial, shopName, product, onPrimaryClick, onSecondary
 
       {/* Product info */}
       <a href={product.link} className="flex space-x-4 items-center">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-20 h-20 object-cover rounded"
-        />
+        <img src={product.image} alt={product.name} className="w-20 h-20 object-cover rounded" />
         <div>
           <h3 className="font-semibold">{product.name}</h3>
           <p className="text-sm text-gray-500">Phân loại hàng: {product.variant}</p>
@@ -77,29 +68,29 @@ function OrderItem({ shopInitial, shopName, product, onPrimaryClick, onSecondary
 export default function OrderList() {
   const orders = [
     {
-      shopInitial: "P",
-      shopName: "Poermax Tech",
+      shopInitial: 'P',
+      shopName: 'Poermax Tech',
       product: {
-        name: "Túi đựng phụ kiện cáp sạc đa năng Poermax-SM03",
-        variant: "SM03 Cao Cấp-Xanh",
+        name: 'Túi đựng phụ kiện cáp sạc đa năng Poermax-SM03',
+        variant: 'SM03 Cao Cấp-Xanh',
         quantity: 1,
-        oldPrice: "75.000",
-        price: "59.000",
-        image: "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn",
-        link: "/product",
+        oldPrice: '75.000',
+        price: '59.000',
+        image: 'https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8wwljzi6ts4ec_tn',
+        link: '/product',
       },
     },
     {
-      shopInitial: "S",
-      shopName: "Shopee Official",
+      shopInitial: 'S',
+      shopName: 'Shopee Official',
       product: {
-        name: "Tai nghe Bluetooth ShopeeX S200",
-        variant: "Màu Đen",
+        name: 'Tai nghe Bluetooth ShopeeX S200',
+        variant: 'Màu Đen',
         quantity: 2,
-        oldPrice: "500.000",
-        price: "450.000",
-        image: "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-xxxxxxx_tn",
-        link: "/product/2",
+        oldPrice: '500.000',
+        price: '450.000',
+        image: 'https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-xxxxxxx_tn',
+        link: '/product/2',
       },
     },
   ];
