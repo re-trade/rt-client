@@ -1,38 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Edit, Plus } from 'lucide-react';
-import { useState } from 'react';
-
-interface Address {
-  id: string;
-  name: string;
-  phone: string;
-  address: string;
-  ward: string;
-  district: string;
-  city: string;
-  isDefault: boolean;
-}
+import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Edit } from "lucide-react"
+import AddAddressDialog, { Address } from "@/components/ui/dialog/add/create-address-dialog"
+import EditAddressDialog from "@/components/ui/dialog/view-update/edit-address-dialog"
 
 const mockAddresses: Address[] = [
   {
@@ -58,103 +32,31 @@ const mockAddresses: Address[] = [
 ];
 
 export default function AddressManagement() {
-  const [addresses, setAddresses] = useState<Address[]>(mockAddresses);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    address: '',
-    ward: '',
-    district: '',
-    city: '',
-    isDefault: false,
-  });
+  const [addresses, setAddresses] = useState<Address[]>(mockAddresses)
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
+  const [isEditOpen, setIsEditOpen] = useState(false)
 
-  const handleCreate = () => {
-    const newAddress: Address = {
-      id: Date.now().toString(),
-      name: formData.name,
-      phone: formData.phone,
-      address: formData.address,
-      ward: formData.ward,
-      district: formData.district,
-      city: formData.city,
-      isDefault: formData.isDefault,
-    };
+  const handleAdd = (newAddress: Address) => {
+    let updated = addresses
+    if (newAddress.isDefault) {
+      updated = addresses.map((a) => ({ ...a, isDefault: false }))
+    }
+    setAddresses([...updated, newAddress])
+  }
 
-    // If this is set as default, remove default from others
-    let updatedAddresses = addresses;
-    if (formData.isDefault) {
-      updatedAddresses = addresses.map((addr) => ({ ...addr, isDefault: false }));
+  const handleUpdate = (updatedAddress: Address) => {
+    let updated = addresses.map((a) =>
+      a.id === updatedAddress.id ? updatedAddress : a,
+    )
+
+    if (updatedAddress.isDefault) {
+      updated = updated.map((a) =>
+        a.id === updatedAddress.id ? a : { ...a, isDefault: false },
+      )
     }
 
-    setAddresses([...updatedAddresses, newAddress]);
-    resetForm();
-    setIsCreateOpen(false);
-  };
-
-  const handleUpdate = () => {
-    if (!selectedAddress) return;
-
-    let updatedAddresses = addresses.map((address) =>
-      address.id === selectedAddress.id
-        ? {
-            ...address,
-            name: formData.name,
-            phone: formData.phone,
-            address: formData.address,
-            ward: formData.ward,
-            district: formData.district,
-            city: formData.city,
-            isDefault: formData.isDefault,
-          }
-        : address,
-    );
-
-    // If this is set as default, remove default from others
-    if (formData.isDefault) {
-      updatedAddresses = updatedAddresses.map((addr) =>
-        addr.id === selectedAddress.id ? addr : { ...addr, isDefault: false },
-      );
-    }
-
-    setAddresses(updatedAddresses);
-    setIsDetailOpen(false);
-    setSelectedAddress(null);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      phone: '',
-      address: '',
-      ward: '',
-      district: '',
-      city: '',
-      isDefault: false,
-    });
-  };
-
-  const openCreateDialog = () => {
-    resetForm();
-    setIsCreateOpen(true);
-  };
-
-  const openDetailDialog = (address: Address) => {
-    setSelectedAddress(address);
-    setFormData({
-      name: address.name,
-      phone: address.phone,
-      address: address.address,
-      ward: address.ward,
-      district: address.district,
-      city: address.city,
-      isDefault: address.isDefault,
-    });
-    setIsDetailOpen(true);
-  };
+    setAddresses(updated)
+  }
 
   return (
     <div className="space-y-6">
@@ -163,83 +65,7 @@ export default function AddressManagement() {
           <h2 className="text-xl font-semibold">Quản lý địa chỉ</h2>
           <p className="text-muted-foreground">Quản lý địa chỉ lấy hàng và giao hàng</p>
         </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreateDialog}>
-              <Plus className="h-4 w-4 mr-2" />
-              Thêm địa chỉ
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Thêm địa chỉ mới</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Họ và tên</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">Số điện thoại</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="address">Địa chỉ cụ thể</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="Số nhà, tên đường"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label htmlFor="ward">Phường/Xã</Label>
-                  <Input
-                    id="ward"
-                    value={formData.ward}
-                    onChange={(e) => setFormData({ ...formData, ward: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="district">Quận/Huyện</Label>
-                  <Input
-                    id="district"
-                    value={formData.district}
-                    onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="city">Tỉnh/Thành phố</Label>
-                <Input
-                  id="city"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isDefault"
-                  checked={formData.isDefault}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isDefault: checked })}
-                />
-                <Label htmlFor="isDefault">Đặt làm địa chỉ mặc định</Label>
-              </div>
-              <Button onClick={handleCreate} className="w-full">
-                Thêm địa chỉ
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <AddAddressDialog onAdd={handleAdd} />
       </div>
 
       <Card>
@@ -277,7 +103,14 @@ export default function AddressManagement() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" onClick={() => openDetailDialog(address)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedAddress(address)
+                        setIsEditOpen(true)
+                      }}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                   </TableCell>
@@ -288,76 +121,12 @@ export default function AddressManagement() {
         </CardContent>
       </Card>
 
-      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Chi tiết địa chỉ</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-name">Họ và tên</Label>
-              <Input
-                id="edit-name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-phone">Số điện thoại</Label>
-              <Input
-                id="edit-phone"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-address">Địa chỉ cụ thể</Label>
-              <Input
-                id="edit-address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="edit-ward">Phường/Xã</Label>
-                <Input
-                  id="edit-ward"
-                  value={formData.ward}
-                  onChange={(e) => setFormData({ ...formData, ward: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-district">Quận/Huyện</Label>
-                <Input
-                  id="edit-district"
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="edit-city">Tỉnh/Thành phố</Label>
-              <Input
-                id="edit-city"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="edit-isDefault"
-                checked={formData.isDefault}
-                onCheckedChange={(checked) => setFormData({ ...formData, isDefault: checked })}
-              />
-              <Label htmlFor="edit-isDefault">Đặt làm địa chỉ mặc định</Label>
-            </div>
-            <Button onClick={handleUpdate} className="w-full">
-              Cập nhật địa chỉ
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EditAddressDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        address={selectedAddress}
+        onUpdate={handleUpdate}
+      />
     </div>
   );
 }
