@@ -1,8 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { Card } from '@/app/components/ui/card';
+import { Badge } from '@/app/components/ui/badge';
 import { Button } from '@/app/components/ui/button';
+import { Card } from '@/app/components/ui/card';
+import { Input } from '@/app/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/components/ui/select';
 import {
   Table,
   TableBody,
@@ -11,16 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/app/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/app/components/ui/select';
-import { Input } from '@/app/components/ui/input';
-import { Badge } from '@/app/components/ui/badge';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
 import { VoucherDialog } from '../../components/voucher-dialog';
 
 // Sample data - replace with actual API call
@@ -165,7 +165,9 @@ export default function VoucherManagementPage() {
                 <TableCell className="font-medium">{voucher.code}</TableCell>
                 <TableCell>{voucher.name}</TableCell>
                 <TableCell>
-                  {voucher.type === 'percentage' ? `${voucher.value}%` : `${voucher.value.toLocaleString('vi-VN')}đ`}
+                  {voucher.type === 'percentage'
+                    ? `${voucher.value}%`
+                    : `${voucher.value.toLocaleString('vi-VN')}đ`}
                   {voucher.maxDiscount && (
                     <span className="text-sm text-muted-foreground">
                       {' '}
@@ -215,4 +217,4 @@ export default function VoucherManagementPage() {
       <VoucherDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
     </div>
   );
-} 
+}

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/app/components/ui/button';
 import {
   Dialog,
@@ -11,6 +10,7 @@ import {
   DialogTitle,
 } from '@/app/components/ui/dialog';
 import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -18,9 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/app/components/ui/select';
-import { Label } from '@/app/components/ui/label';
 import { Switch } from '@/app/components/ui/switch';
-import { Textarea } from '@/app/components/ui/textarea';
+import { useState } from 'react';
 
 interface VoucherDialogProps {
   open: boolean;
@@ -166,7 +165,9 @@ export function VoucherDialog({ open, onOpenChange, voucher }: VoucherDialogProp
                 <div className="flex items-center space-x-2">
                   <Switch
                     checked={formData.isActive}
-                    onCheckedChange={(checked) => setFormData({ ...formData, isActive: Boolean(checked) })}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, isActive: Boolean(checked) })
+                    }
                   />
                   <Label>{formData.isActive ? 'Đang hoạt động' : 'Tạm dừng'}</Label>
                 </div>
@@ -238,4 +239,4 @@ export function VoucherDialog({ open, onOpenChange, voucher }: VoucherDialogProp
       </DialogContent>
     </Dialog>
   );
-} 
+}

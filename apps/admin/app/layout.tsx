@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Open_Sans } from 'next/font/google';
 import './globals.css';
-import { Open_Sans } from 'next/font/google';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,13 +23,12 @@ export const metadata: Metadata = {
   description: 'Admin dashboard for ReTrade',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable} ${openSans.className} antialiased`}>
+    <html
+      lang="vi"
+      className={`${geistSans.variable} ${geistMono.variable} ${openSans.className} antialiased`}
+    >
       <body className="font-sans antialiased">{children}</body>
     </html>
   );

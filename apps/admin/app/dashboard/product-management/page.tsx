@@ -1,27 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { Card } from '@/app/components/ui/card';
-import { Button } from '@/app/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/app/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/app/components/ui/select';
-import { Input } from '@/app/components/ui/input';
 import { Badge } from '@/app/components/ui/badge';
-import { Checkbox } from '@/app/components/ui/checkbox';
-import { Slider } from '@/app/components/ui/slider';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -30,8 +9,29 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/app/components/ui/breadcrumb';
-import { Plus, Search, Filter, Edit, Trash2 } from 'lucide-react';
+import { Button } from '@/app/components/ui/button';
+import { Card } from '@/app/components/ui/card';
+import { Checkbox } from '@/app/components/ui/checkbox';
+import { Input } from '@/app/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/components/ui/select';
+import { Slider } from '@/app/components/ui/slider';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/app/components/ui/table';
+import { Search } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 // Sample data - replace with actual API calls
 const categories = [
@@ -103,21 +103,33 @@ export default function ProductManagementPage() {
 
   // Filter products based on selected criteria
   const filteredProducts = products.filter((product) => {
-    const matchesCategory = !selectedCategory || product.category === categories.find(c => c.id === selectedCategory)?.name;
-    const matchesSubcategory = !selectedSubcategory || product.category === categories.find(c => c.id === selectedSubcategory)?.name;
-    const matchesBrand = !selectedBrand || product.brand === brands.find(b => b.id === selectedBrand)?.name;
+    const matchesCategory =
+      !selectedCategory ||
+      product.category === categories.find((c) => c.id === selectedCategory)?.name;
+    const matchesSubcategory =
+      !selectedSubcategory ||
+      product.category === categories.find((c) => c.id === selectedSubcategory)?.name;
+    const matchesBrand =
+      !selectedBrand || product.brand === brands.find((b) => b.id === selectedBrand)?.name;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
     const matchesStatus = productStatus.length === 0 || productStatus.includes(product.status);
 
-    return matchesCategory && matchesSubcategory && matchesBrand && matchesSearch && matchesPrice && matchesStatus;
+    return (
+      matchesCategory &&
+      matchesSubcategory &&
+      matchesBrand &&
+      matchesSearch &&
+      matchesPrice &&
+      matchesStatus
+    );
   });
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const handleSelectAll = (checked: boolean) => {
@@ -164,7 +176,9 @@ export default function ProductManagementPage() {
             <>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href="#">{categories.find(c => c.id === selectedCategory)?.name}</BreadcrumbLink>
+                <BreadcrumbLink href="#">
+                  {categories.find((c) => c.id === selectedCategory)?.name}
+                </BreadcrumbLink>
               </BreadcrumbItem>
             </>
           )}
@@ -172,7 +186,9 @@ export default function ProductManagementPage() {
             <>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{categories.find(c => c.id === selectedSubcategory)?.name}</BreadcrumbPage>
+                <BreadcrumbPage>
+                  {categories.find((c) => c.id === selectedSubcategory)?.name}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </>
           )}
@@ -186,7 +202,9 @@ export default function ProductManagementPage() {
             <label className="text-sm font-medium">Danh mục</label>
             <Select
               value={selectedCategory?.toString() || 'all'}
-              onValueChange={(value) => setSelectedCategory(value === 'all' ? null : parseInt(value))}
+              onValueChange={(value) =>
+                setSelectedCategory(value === 'all' ? null : parseInt(value))
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Chọn danh mục" />
@@ -208,7 +226,9 @@ export default function ProductManagementPage() {
             <label className="text-sm font-medium">Danh mục con</label>
             <Select
               value={selectedSubcategory?.toString() || 'all'}
-              onValueChange={(value) => setSelectedSubcategory(value === 'all' ? null : parseInt(value))}
+              onValueChange={(value) =>
+                setSelectedSubcategory(value === 'all' ? null : parseInt(value))
+              }
               disabled={!selectedCategory}
             >
               <SelectTrigger>
@@ -370,15 +390,12 @@ export default function ProductManagementPage() {
                 <TableCell>{product.stock}</TableCell>
                 <TableCell>
                   <Badge className={statusColors[product.status as ProductStatus]}>
-                    {product.status.replace('_', ' ').charAt(0).toUpperCase() + product.status.slice(1)}
+                    {product.status.replace('_', ' ').charAt(0).toUpperCase() +
+                      product.status.slice(1)}
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  {categories.find((c) => c.id === selectedCategory)?.name}
-                </TableCell>
-                <TableCell>
-                  {brands.find((b) => b.id === selectedBrand)?.name}
-                </TableCell>
+                <TableCell>{categories.find((c) => c.id === selectedCategory)?.name}</TableCell>
+                <TableCell>{brands.find((b) => b.id === selectedBrand)?.name}</TableCell>
                 <TableCell>{product.seller}</TableCell>
                 <TableCell>{new Date(product.createdAt).toLocaleDateString('vi-VN')}</TableCell>
                 <TableCell>
