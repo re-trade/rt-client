@@ -1,16 +1,28 @@
 'use client';
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Edit } from "lucide-react"
-import {CreateVoucherDialog} from"@/components/ui/dialog/add/create-voucher-dialog"
-
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CreateVoucherDialog } from '@/components/ui/dialog/add/create-voucher-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Edit } from 'lucide-react';
+import { useState } from 'react';
 
 interface Voucher {
   id: string;
@@ -74,16 +86,14 @@ export default function VoucherManagement() {
     usageLimit: '',
   });
 
-  const handleCreateVoucher = (voucherData: Omit<Voucher, "id" | "usedCount">) => {
+  const handleCreateVoucher = (voucherData: Omit<Voucher, 'id' | 'usedCount'>) => {
     const newVoucher: Voucher = {
       id: Date.now().toString(),
       usedCount: 0,
       ...voucherData,
-    }
-    setVouchers([...vouchers, newVoucher])
-  }
-    
-
+    };
+    setVouchers([...vouchers, newVoucher]);
+  };
 
   const handleUpdate = () => {
     if (!selectedVoucher) return;
@@ -151,7 +161,11 @@ export default function VoucherManagement() {
           <h2 className="text-xl font-semibold">Danh sách voucher</h2>
           <p className="text-muted-foreground">Quản lý tất cả voucher của bạn</p>
         </div>
-       <CreateVoucherDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} onCreateVoucher={handleCreateVoucher} />
+        <CreateVoucherDialog
+          open={isCreateOpen}
+          onOpenChange={setIsCreateOpen}
+          onCreateVoucher={handleCreateVoucher}
+        />
       </div>
 
       <Card>
