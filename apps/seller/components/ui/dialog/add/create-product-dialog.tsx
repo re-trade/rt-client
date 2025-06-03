@@ -1,54 +1,57 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react';
 interface Product {
-  id: string
-  name: string
-  price: number
-  stock: number
-  category: string
-  description: string
-  image: string
-  status: "active" | "inactive"
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  category: string;
+  description: string;
+  image: string;
+  status: 'active' | 'inactive';
 }
-
 
 interface CreateProductDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onCreateProduct: (product: Omit<Product, "id">) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCreateProduct: (product: Omit<Product, 'id'>) => void;
 }
 
-export function CreateProductDialog({ open, onOpenChange, onCreateProduct }: CreateProductDialogProps) {
+export function CreateProductDialog({
+  open,
+  onOpenChange,
+  onCreateProduct,
+}: CreateProductDialogProps) {
   const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    category: "",
-    description: "",
-    image: "",
-  })
+    name: '',
+    price: '',
+    stock: '',
+    category: '',
+    description: '',
+    image: '',
+  });
 
   const handleSubmit = () => {
-    const productData: Omit<Product, "id"> = {
+    const productData: Omit<Product, 'id'> = {
       name: formData.name,
       price: Number(formData.price),
       stock: Number(formData.stock),
       category: formData.category,
       description: formData.description,
-      image: formData.image || "/placeholder.svg?height=100&width=100",
-      status: "active",
-    }
+      image: formData.image || '/placeholder.svg?height=100&width=100',
+      status: 'active',
+    };
 
-    onCreateProduct(productData)
-    setFormData({ name: "", price: "", stock: "", category: "", description: "", image: "" })
-    onOpenChange(false)
-  }
+    onCreateProduct(productData);
+    setFormData({ name: '', price: '', stock: '', category: '', description: '', image: '' });
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -105,5 +108,5 @@ export function CreateProductDialog({ open, onOpenChange, onCreateProduct }: Cre
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,50 +1,64 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useState } from 'react';
 
 interface Props {
-  onAdd: (data: Voucher) => void
+  onAdd: (data: Voucher) => void;
 }
 
 export interface Voucher {
-  id: string
-  code: string
-  name: string
-  type: "percentage" | "fixed"
-  value: number
-  minOrder: number
-  maxDiscount?: number
-  startDate: string
-  endDate: string
-  usageLimit: number
-  status: "active" | "inactive"
-  usedCount: number
+  id: string;
+  code: string;
+  name: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  minOrder: number;
+  maxDiscount?: number;
+  startDate: string;
+  endDate: string;
+  usageLimit: number;
+  status: 'active' | 'inactive';
+  usedCount: number;
 }
 
 export function CreateVoucherDialog({ onAdd }: Props) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-    type: "percentage" as "percentage" | "fixed",
-    value: "",
-    minOrder: "",
-    maxDiscount: "",
-    startDate: "",
-    endDate: "",
-    usageLimit: "",
-  })
+    code: '',
+    name: '',
+    type: 'percentage' as 'percentage' | 'fixed',
+    value: '',
+    minOrder: '',
+    maxDiscount: '',
+    startDate: '',
+    endDate: '',
+    usageLimit: '',
+  });
 
   const handleSubmit = () => {
     // validate đơn giản (bạn có thể mở rộng)
-    if (!formData.code || !formData.name || !formData.value || !formData.minOrder || !formData.startDate || !formData.endDate || !formData.usageLimit) {
-      alert("Vui lòng điền đầy đủ thông tin!")
-      return
+    if (
+      !formData.code ||
+      !formData.name ||
+      !formData.value ||
+      !formData.minOrder ||
+      !formData.startDate ||
+      !formData.endDate ||
+      !formData.usageLimit
+    ) {
+      alert('Vui lòng điền đầy đủ thông tin!');
+      return;
     }
 
     const voucherData: Voucher = {
@@ -58,24 +72,24 @@ export function CreateVoucherDialog({ onAdd }: Props) {
       startDate: formData.startDate,
       endDate: formData.endDate,
       usageLimit: Number(formData.usageLimit),
-      status: "active",
+      status: 'active',
       usedCount: 0,
-    }
+    };
 
-    onAdd(voucherData)
+    onAdd(voucherData);
     setFormData({
-      code: "",
-      name: "",
-      type: "percentage",
-      value: "",
-      minOrder: "",
-      maxDiscount: "",
-      startDate: "",
-      endDate: "",
-      usageLimit: "",
-    })
-    setOpen(false)
-  }
+      code: '',
+      name: '',
+      type: 'percentage',
+      value: '',
+      minOrder: '',
+      maxDiscount: '',
+      startDate: '',
+      endDate: '',
+      usageLimit: '',
+    });
+    setOpen(false);
+  };
 
   return (
     <>
@@ -107,7 +121,9 @@ export function CreateVoucherDialog({ onAdd }: Props) {
               <Label htmlFor="type">Loại giảm giá</Label>
               <Select
                 value={formData.type}
-                onValueChange={(value: "percentage" | "fixed") => setFormData({ ...formData, type: value })}
+                onValueChange={(value: 'percentage' | 'fixed') =>
+                  setFormData({ ...formData, type: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -125,7 +141,7 @@ export function CreateVoucherDialog({ onAdd }: Props) {
                 type="number"
                 value={formData.value}
                 onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                placeholder={formData.type === "percentage" ? "20" : "50000"}
+                placeholder={formData.type === 'percentage' ? '20' : '50000'}
               />
             </div>
             <div>
@@ -137,7 +153,7 @@ export function CreateVoucherDialog({ onAdd }: Props) {
                 onChange={(e) => setFormData({ ...formData, minOrder: e.target.value })}
               />
             </div>
-            {formData.type === "percentage" && (
+            {formData.type === 'percentage' && (
               <div>
                 <Label htmlFor="maxDiscount">Giảm tối đa</Label>
                 <Input
@@ -184,5 +200,5 @@ export function CreateVoucherDialog({ onAdd }: Props) {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

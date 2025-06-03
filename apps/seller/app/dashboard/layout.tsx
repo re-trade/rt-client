@@ -19,45 +19,44 @@ import { usePathname } from 'next/navigation';
 import type React from 'react';
 
 const menuItems = [
-    {
-    title: "Tổng quan",
+  {
+    title: 'Tổng quan',
     icon: LayoutDashboard,
-    href: "/dashboard",
+    href: '/dashboard',
   },
   {
-    title: "Quản lý doanh thu",
+    title: 'Quản lý doanh thu',
     icon: DollarSign,
-    href: "/dashboard/revenue-management",
+    href: '/dashboard/revenue-management',
   },
-   {
-    title: "Thông tin shop",
+  {
+    title: 'Thông tin shop',
     icon: Store,
-    href: "/dashboard/shop-info-management",
+    href: '/dashboard/shop-info-management',
   },
 
   {
-    title: "Quản lý sản phẩm",
+    title: 'Quản lý sản phẩm',
     icon: Package,
-    href: "/dashboard/product-management",
+    href: '/dashboard/product-management',
   },
-  
+
   {
-    title: "Quản lý voucher",
+    title: 'Quản lý voucher',
     icon: Ticket,
-    href: "/dashboard/voucher-management",
+    href: '/dashboard/voucher-management',
   },
   {
-    title: "Phương thức vận chuyển",
+    title: 'Phương thức vận chuyển',
     icon: Truck,
-    href: "/dashboard/shipping-management",
+    href: '/dashboard/shipping-management',
   },
   {
-    title: "Quản lý địa chỉ",
+    title: 'Quản lý địa chỉ',
     icon: MapPin,
-    href: "/dashboard/address-management",
+    href: '/dashboard/address-management',
   },
- 
-]
+];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
