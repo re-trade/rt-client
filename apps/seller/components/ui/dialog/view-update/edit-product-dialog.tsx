@@ -1,40 +1,44 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useEffect, useState } from 'react';
 
 interface Product {
-  id: string
-  name: string
-  price: number
-  stock: number
-  category: string
-  description: string
-  image: string
-  status: "active" | "inactive"
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  category: string;
+  description: string;
+  image: string;
+  status: 'active' | 'inactive';
 }
-
 
 interface EditProductDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  product: Product | null
-  onUpdateProduct: (product: Omit<Product, "id">) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  product: Product | null;
+  onUpdateProduct: (product: Omit<Product, 'id'>) => void;
 }
 
-export function EditProductDialog({ open, onOpenChange, product, onUpdateProduct }: EditProductDialogProps) {
+export function EditProductDialog({
+  open,
+  onOpenChange,
+  product,
+  onUpdateProduct,
+}: EditProductDialogProps) {
   const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    category: "",
-    description: "",
-    image: "",
-  })
+    name: '',
+    price: '',
+    stock: '',
+    category: '',
+    description: '',
+    image: '',
+  });
 
   useEffect(() => {
     if (product) {
@@ -45,24 +49,24 @@ export function EditProductDialog({ open, onOpenChange, product, onUpdateProduct
         category: product.category,
         description: product.description,
         image: product.image,
-      })
+      });
     }
-  }, [product])
+  }, [product]);
 
   const handleSubmit = () => {
-    const productData: Omit<Product, "id"> = {
+    const productData: Omit<Product, 'id'> = {
       name: formData.name,
       price: Number(formData.price),
       stock: Number(formData.stock),
       category: formData.category,
       description: formData.description,
-      image: formData.image || "/placeholder.svg?height=100&width=100",
-      status: "active",
-    }
+      image: formData.image || '/placeholder.svg?height=100&width=100',
+      status: 'active',
+    };
 
-    onUpdateProduct(productData)
-    onOpenChange(false)
-  }
+    onUpdateProduct(productData);
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -119,5 +123,5 @@ export function EditProductDialog({ open, onOpenChange, product, onUpdateProduct
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
