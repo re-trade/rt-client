@@ -1,46 +1,57 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useEffect, useState } from 'react';
 
 interface Voucher {
-  id: string
-  code: string
-  name: string
-  type: "percentage" | "fixed"
-  value: number
-  minOrder: number
-  maxDiscount?: number
-  startDate: string
-  endDate: string
-  usageLimit: number
-  usedCount: number
-  status: "active" | "inactive" | "expired"
+  id: string;
+  code: string;
+  name: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  minOrder: number;
+  maxDiscount?: number;
+  startDate: string;
+  endDate: string;
+  usageLimit: number;
+  usedCount: number;
+  status: 'active' | 'inactive' | 'expired';
 }
 
 interface EditVoucherDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  voucher: Voucher | null
-  onUpdateVoucher: (voucher: Omit<Voucher, "id" | "usedCount">) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  voucher: Voucher | null;
+  onUpdateVoucher: (voucher: Omit<Voucher, 'id' | 'usedCount'>) => void;
 }
 
-export function EditVoucherDialog({ open, onOpenChange, voucher, onUpdateVoucher }: EditVoucherDialogProps) {
+export function EditVoucherDialog({
+  open,
+  onOpenChange,
+  voucher,
+  onUpdateVoucher,
+}: EditVoucherDialogProps) {
   const [formData, setFormData] = useState({
-    code: "",
-    name: "",
-    type: "percentage" as "percentage" | "fixed",
-    value: "",
-    minOrder: "",
-    maxDiscount: "",
-    startDate: "",
-    endDate: "",
-    usageLimit: "",
-  })
+    code: '',
+    name: '',
+    type: 'percentage' as 'percentage' | 'fixed',
+    value: '',
+    minOrder: '',
+    maxDiscount: '',
+    startDate: '',
+    endDate: '',
+    usageLimit: '',
+  });
 
   useEffect(() => {
     if (voucher) {
@@ -50,16 +61,16 @@ export function EditVoucherDialog({ open, onOpenChange, voucher, onUpdateVoucher
         type: voucher.type,
         value: voucher.value.toString(),
         minOrder: voucher.minOrder.toString(),
-        maxDiscount: voucher.maxDiscount?.toString() || "",
+        maxDiscount: voucher.maxDiscount?.toString() || '',
         startDate: voucher.startDate,
         endDate: voucher.endDate,
         usageLimit: voucher.usageLimit.toString(),
-      })
+      });
     }
-  }, [voucher])
+  }, [voucher]);
 
   const handleSubmit = () => {
-    const voucherData: Omit<Voucher, "id" | "usedCount"> = {
+    const voucherData: Omit<Voucher, 'id' | 'usedCount'> = {
       code: formData.code,
       name: formData.name,
       type: formData.type,
@@ -69,12 +80,12 @@ export function EditVoucherDialog({ open, onOpenChange, voucher, onUpdateVoucher
       startDate: formData.startDate,
       endDate: formData.endDate,
       usageLimit: Number(formData.usageLimit),
-      status: "active",
-    }
+      status: 'active',
+    };
 
-    onUpdateVoucher(voucherData)
-    onOpenChange(false)
-  }
+    onUpdateVoucher(voucherData);
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -103,7 +114,9 @@ export function EditVoucherDialog({ open, onOpenChange, voucher, onUpdateVoucher
             <Label htmlFor="edit-type">Loại giảm giá</Label>
             <Select
               value={formData.type}
-              onValueChange={(value: "percentage" | "fixed") => setFormData({ ...formData, type: value })}
+              onValueChange={(value: 'percentage' | 'fixed') =>
+                setFormData({ ...formData, type: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -132,7 +145,7 @@ export function EditVoucherDialog({ open, onOpenChange, voucher, onUpdateVoucher
               onChange={(e) => setFormData({ ...formData, minOrder: e.target.value })}
             />
           </div>
-          {formData.type === "percentage" && (
+          {formData.type === 'percentage' && (
             <div>
               <Label htmlFor="edit-maxDiscount">Giảm tối đa</Label>
               <Input
@@ -178,5 +191,5 @@ export function EditVoucherDialog({ open, onOpenChange, voucher, onUpdateVoucher
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
