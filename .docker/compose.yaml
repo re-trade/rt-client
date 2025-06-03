@@ -1,7 +1,7 @@
 services:
   rt-client-customer:
     container_name: rt-client-customer
-    image: ${REGISTRY}/rt-client-customer:latest
+    image: ${REGISTRY}/rt-client-customer:${TAG:-latest}
     restart: always
     networks:
       - retrade-network
@@ -19,7 +19,7 @@ services:
 
   rt-client-admin:
     container_name: rt-client-admin
-    image: ${REGISTRY}/rt-client-admin:latest
+    image: ${REGISTRY}/rt-client-admin:${TAG:-latest}
     restart: always
     networks:
       - retrade-network
@@ -39,7 +39,7 @@ services:
 
   rt-client-seller:
     container_name: rt-client-seller
-    image: ${REGISTRY}/rt-client-seller:latest
+    image: ${REGISTRY}/rt-client-seller:${TAG:-latest}
     restart: always
     networks:
       - retrade-network
