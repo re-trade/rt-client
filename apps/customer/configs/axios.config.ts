@@ -20,12 +20,12 @@ type CustomAxiosRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;
 };
 
-const createBaseURL = (service: EApiService) => {
+const createBaseURL = (service: EApiService = EApiService.MAIN) => {
   const path = NODE_ENV === 'development' ? '/api/v1' : `/api/${service}/v1`;
   return new URL(path, BASE_API_URL).toString();
 };
 
-const unAuthApi = (service: EApiService): AxiosInstance =>
+const createUnAuthApi = (service: EApiService = EApiService.MAIN): AxiosInstance =>
   axios.create({
     baseURL: createBaseURL(service),
     headers: {
@@ -35,7 +35,7 @@ const unAuthApi = (service: EApiService): AxiosInstance =>
     maxRedirects: 5,
   });
 
-const authApi = (service: EApiService): AxiosInstance => {
+const createAuthApi = (service: EApiService = EApiService.MAIN): AxiosInstance => {
   const instance = axios.create({
     baseURL: createBaseURL(service),
     withCredentials: true,
@@ -71,7 +71,7 @@ const authApi = (service: EApiService): AxiosInstance => {
         originalRequest._retry = true;
         try {
           const refreshToken = localStorage.getItem(ETokenName.REFRESH_TOKEN);
-          const response = await unAuthApi(EApiService.MAIN).post('/auth/refresh-token', {
+          const response = await unAuthApi.default.post('/auth/refresh-token', {
             refreshToken,
           });
 
@@ -99,5 +99,45 @@ const authApi = (service: EApiService): AxiosInstance => {
   return instance;
 };
 
-export { authApi, EApiService, ETokenName, unAuthApi };
+const authApi: Record<string, AxiosInstance> & {
+  default: AxiosInstance;
+  voucher: AxiosInstance;
+  catalog: AxiosInstance;
+  storage: AxiosInstance;
+} = {
+  get default() {
+    return createAuthApi();
+  },
+  get voucher() {
+    return createAuthApi(EApiService.VOUCHER);
+  },
+  get catalog() {
+    return createAuthApi(EApiService.CATALOG);
+  },
+  get storage() {
+    return createAuthApi(EApiService.STORAGE);
+  },
+};
+
+const unAuthApi: Record<string, AxiosInstance> & {
+  default: AxiosInstance;
+  voucher: AxiosInstance;
+  catalog: AxiosInstance;
+  storage: AxiosInstance;
+} = {
+  get default() {
+    return createUnAuthApi();
+  },
+  get voucher() {
+    return createUnAuthApi(EApiService.VOUCHER);
+  },
+  get catalog() {
+    return createUnAuthApi(EApiService.CATALOG);
+  },
+  get storage() {
+    return createUnAuthApi(EApiService.STORAGE);
+  },
+};
+
+export { authApi, createAuthApi, createUnAuthApi, EApiService, ETokenName, unAuthApi };
 export type { CustomAxiosRequestConfig };
