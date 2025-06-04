@@ -55,7 +55,6 @@ export const createAuthApi = (
     maxRedirects: 5,
   });
 
-  // Only add interceptors if we're in a browser environment
   if (typeof window !== 'undefined') {
     instance.interceptors.request.use(
       async (config) => {

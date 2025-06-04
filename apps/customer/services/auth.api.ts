@@ -1,6 +1,5 @@
 import { getDeviceInfo } from '@/lib/device-fingerprint';
-import { IResponseObject } from '@/services/base.api';
-import { ETokenName, unAuthApi } from '@retrade/util';
+import { ETokenName, IResponseObject, unAuthApi } from '@retrade/util';
 
 type TLocalLogin = {
   username: string;
