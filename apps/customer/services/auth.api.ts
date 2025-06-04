@@ -1,6 +1,6 @@
-import { ETokenName, unAuthApi } from '@/configs/axios.config';
 import { getDeviceInfo } from '@/lib/device-fingerprint';
 import { IResponseObject } from '@/services/base.api';
+import { ETokenName, unAuthApi } from '@retrade/util';
 
 type TLocalLogin = {
   username: string;
@@ -16,7 +16,7 @@ type TTokenResponse = {
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
 
-  const result = await unAuthApi.post<IResponseObject<TTokenResponse>>(
+  const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
     '/auth/local',
     { ...loginForm },
     {

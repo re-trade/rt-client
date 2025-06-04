@@ -35,7 +35,6 @@ export default function ProfilePage() {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
       setAvatar(url);
-      // You can also upload this file to server here or handle further
     }
   };
 

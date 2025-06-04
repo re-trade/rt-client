@@ -53,7 +53,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
     { name: 'Kho Voucher', icon: 'ticket', path: 'vouchers' },
   ];
 
-  // Derive active tab from the current pathname
   const activeTab = pathname.split('/user/')[1] || 'profile';
 
   return (

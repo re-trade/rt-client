@@ -4,5 +4,25 @@
   "description": "Utils for retrade client",
   "author": "@Retrade",
   "license": "MIT",
-  "private": false
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "eslint": "^9.27.0",
+    "typescript": "^5.5.4",
+    "@retrade/typescript-config": "*"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  }
 }
