@@ -41,7 +41,10 @@ export const createUnAuthApi = (service: EApiService = EApiService.MAIN): AxiosI
     maxRedirects: 5,
   });
 
-export const createAuthApi = (service: EApiService = EApiService.MAIN, getDeviceInfo?: () => Promise<DeviceInfo>): AxiosInstance => {
+export const createAuthApi = (
+  service: EApiService = EApiService.MAIN,
+  getDeviceInfo?: () => Promise<DeviceInfo>,
+): AxiosInstance => {
   const instance = axios.create({
     baseURL: createBaseURL(service),
     withCredentials: true,
