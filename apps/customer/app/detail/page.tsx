@@ -34,13 +34,10 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div
-      className="container mx-auto px-4 sm:px-6 md:px-12 py-8 font-[Open_Sans]
-"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 font-['Reddit_Sans'] bg-white">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-2xl p-6 shadow-sm border border-amber-100">
         <div className="space-y-4">
-          <div className="relative w-full h-72 sm:h-96 bg-gray-100 rounded-lg overflow-hidden">
+          <div className="relative w-full h-[480px] rounded-xl overflow-hidden border border-amber-100">
             <Image
               src={product.images[selectedImage]}
               alt={product.name}
@@ -49,14 +46,13 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               priority
             />
           </div>
-          <div className="flex gap-2 overflow-x-auto">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-orange-100">
             {product.images.map((img, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
-                className={`relative min-w-[80px] h-20 rounded-md overflow-hidden border-2 ${
-                  selectedImage === index ? 'border-blue-500' : 'border-gray-200'
-                }`}
+                className={`relative min-w-[80px] h-20 rounded-lg overflow-hidden border-2 transition-all duration-200
+                  ${selectedImage === index ? 'border-amber-500 shadow-sm' : 'border-amber-200'}`}
               >
                 <Image src={img} alt={`Thumbnail ${index + 1}`} fill className="object-cover" />
               </button>
@@ -65,38 +61,63 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         </div>
 
         <div className="space-y-6">
-          <h1 className="text-xl sm:text-2xl font-bold">{product.name}</h1>
-          <div className="flex flex-wrap items-center gap-4">
-            <span className="text-2xl sm:text-3xl font-semibold text-red-500">
-              ${product.discountPrice.toFixed(2)}
-            </span>
-            <span className="text-lg text-gray-500 line-through">${product.price.toFixed(2)}</span>
-            <span className="bg-red-100 text-red-600 px-2 py-1 rounded-md text-sm">
-              {Math.round(((product.price - product.discountPrice) / product.price) * 100)}% OFF
-            </span>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button className="w-full sm:w-auto bg-orange-500 text-white px-8 py-3 rounded-md hover:bg-orange-600 transition flex items-center justify-center gap-2">
-              <MdAddShoppingCart />
-              Thêm vào giỏ hàng
-            </button>
-            <button className="w-full sm:w-auto bg-red-500 text-white px-8 py-3 rounded-md hover:bg-red-600 transition">
-              Buy Now
-            </button>
-          </div>
-          `
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold mb-2">Product Description</h2>
-            <p className="text-gray-600">{product.description}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-amber-900 mb-2">{product.name}</h1>
+            <p className="text-amber-700">Cửa hàng: {product.shopName}</p>
+          </div>
+
+          <div className="bg-[#FFD2B2]/20 p-6 rounded-xl space-y-4">
+            <div className="flex items-baseline gap-4">
+              <span className="text-3xl font-bold text-amber-900">
+                {product.discountPrice.toLocaleString()}đ
+              </span>
+              {product.price > product.discountPrice && (
+                <>
+                  <span className="text-lg text-amber-900/60 line-through">
+                    {product.price.toLocaleString()}đ
+                  </span>
+                  <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm">
+                    -{Math.round(((product.price - product.discountPrice) / product.price) * 100)}%
+                  </span>
+                </>
+              )}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                className="flex-1 bg-[#FFD2B2] text-amber-900 px-6 py-3 rounded-full
+                hover:bg-amber-300 transition-colors flex items-center justify-center gap-2"
+              >
+                <MdAddShoppingCart className="text-2xl" />
+                Thêm vào giỏ hàng
+              </button>
+              <button
+                className="flex-1 bg-amber-500 text-white px-6 py-3 rounded-full
+                hover:bg-amber-600 transition-colors"
+              >
+                Mua ngay
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-amber-900">Mô tả sản phẩm</h2>
+            <p className="text-amber-800/80 leading-relaxed whitespace-pre-line">
+              {product.description}
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="mt-12">
-        <Chart />
+      <div className="mt-8 bg-white rounded-2xl p-6 shadow-sm border border-amber-100">
+        <h2 className="text-xl font-semibold text-amber-900 mb-6">Lịch sử giá</h2>
+        <div className="h-[300px]">
+          <Chart />
+        </div>
       </div>
 
-      <div className="mt-12">
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold text-amber-900 mb-6">Sản phẩm tương tự</h2>
         <RelatedProducts />
       </div>
     </div>
