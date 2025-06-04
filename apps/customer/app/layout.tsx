@@ -6,7 +6,7 @@ import './globals.css';
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <html lang="en">
-      <body className="bg-white">
+      <body>
         <Suspense>
           <Header />
         </Suspense>
