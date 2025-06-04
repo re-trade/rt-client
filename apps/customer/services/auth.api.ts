@@ -14,7 +14,6 @@ type TTokenResponse = {
 
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
-
   const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
     '/auth/local',
     { ...loginForm },
