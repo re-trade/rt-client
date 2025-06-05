@@ -106,48 +106,50 @@ export default function AddressPage() {
   };
 
   return (
- <div className="w-full h-full bg-white p-10">
-      <div className="w-full bg-[#FFF8F3] rounded-lg shadow-lg p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-black">Address Management</h1>
-          <button
-            onClick={() => setIsCreateOpen(true)}
-            className="bg-[#FFD2B2] text-black px-4 py-2 rounded-lg hover:bg-[#FFBB99] transition"
-          >
-            Add Address
-          </button>
+    <div className="w-full h-full bg-white p-10">
+      <div className="w-full rounded-lg shadow-lg p-6">
+        <div className="max-w-3xl mx-auto p-6 shadow-lg rounded-lg">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-semibold text-black">Quản lý địa chỉ</h1>
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="bg-[#FFD2B2] text-black px-4 py-2 rounded-lg hover:bg-[#FFBB99] transition"
+            >
+              Add Address
+            </button>
+          </div>
+
+          <div className="max-h-[60vh] overflow-y-auto grid grid-cols-1 gap-4">
+            {addresses.map((addr, idx) => (
+              <AddressCard
+                key={addr.id}
+                index={idx}
+                address={addr}
+                onEdit={(a) => {
+                  setSelectedAddress(addr);
+                  setIsUpdateOpen(true);
+                }}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto grid grid-cols-1 gap-4">
-          {addresses.map((addr, idx) => (
-            <AddressCard
-              key={addr.id}
-              index={idx}
-              address={addr}
-              onEdit={(a) => {
-                setSelectedAddress(addr);
-                setIsUpdateOpen(true);
-              }}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-      </div>
-
-      <AddressCreateDialog
-        open={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        onCreate={handleCreate}
-      />
-
-      {selectedAddress && (
-        <AddressUpdateDialog
-          open={isUpdateOpen}
-          onClose={() => setIsUpdateOpen(false)}
-          onUpdate={handleUpdate}
-          initialData={selectedAddress}
+        <AddressCreateDialog
+          open={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+          onCreate={handleCreate}
         />
-      )}
+
+        {selectedAddress && (
+          <AddressUpdateDialog
+            open={isUpdateOpen}
+            onClose={() => setIsUpdateOpen(false)}
+            onUpdate={handleUpdate}
+            initialData={selectedAddress}
+          />
+        )}
+      </div>
     </div>
   );
 }
