@@ -1,4 +1,5 @@
 'use client';
+
 import { Mail } from 'lucide-react';
 import Image from 'next/image';
 import { handlePhoneInput } from '@/components/input/InputHandle';
@@ -26,6 +27,21 @@ const fakeProfile: Profile = {
 };
 
 export default function ProfilePage() {
+  const [avatar, setAvatar] = useState<string>(fakeProfile.avatarUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setAvatar(url);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const profile = fakeProfile;
 
   return (

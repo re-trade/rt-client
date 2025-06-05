@@ -9,35 +9,35 @@ import { Switch } from "@/components/ui/switch"
 import { Address } from "@/components/dialog/add/create-address-dialog"
 
 interface Props {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  address: Address | null
-  onUpdate: (data: Address) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  address: Address | null;
+  onUpdate: (data: Address) => void;
 }
 
 export default function EditAddressDialog({ open, onOpenChange, address, onUpdate }: Props) {
-  const [formData, setFormData] = useState<Omit<Address, "id">>({
-    name: "",
-    phone: "",
-    address: "",
-    ward: "",
-    district: "",
-    city: "",
+  const [formData, setFormData] = useState<Omit<Address, 'id'>>({
+    name: '',
+    phone: '',
+    address: '',
+    ward: '',
+    district: '',
+    city: '',
     isDefault: false,
-  })
+  });
 
   useEffect(() => {
     if (address) {
-      const { id, ...rest } = address
-      setFormData(rest)
+      const { id, ...rest } = address;
+      setFormData(rest);
     }
-  }, [address])
+  }, [address]);
 
   const handleUpdate = () => {
-    if (!address) return
-    onUpdate({ ...address, ...formData })
-    onOpenChange(false)
-  }
+    if (!address) return;
+    onUpdate({ ...address, ...formData });
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -46,14 +46,17 @@ export default function EditAddressDialog({ open, onOpenChange, address, onUpdat
           <DialogTitle>Chi tiết địa chỉ</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {["name", "phone", "address", "ward", "district", "city"].map((field) => (
+          {['name', 'phone', 'address', 'ward', 'district', 'city'].map((field) => (
             <div key={field}>
-              <Label htmlFor={field}>{
-                field === "name" ? "Họ và tên" :
-                field === "phone" ? "Số điện thoại" :
-                field === "city" ? "Tỉnh/Thành phố" :
-                field
-              }</Label>
+              <Label htmlFor={field}>
+                {field === 'name'
+                  ? 'Họ và tên'
+                  : field === 'phone'
+                    ? 'Số điện thoại'
+                    : field === 'city'
+                      ? 'Tỉnh/Thành phố'
+                      : field}
+              </Label>
               <Input
                 id={field}
                 value={(formData as any)[field]}
@@ -75,5 +78,5 @@ export default function EditAddressDialog({ open, onOpenChange, address, onUpdat
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

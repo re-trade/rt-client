@@ -32,31 +32,27 @@ const mockAddresses: Address[] = [
 ];
 
 export default function AddressManagement() {
-  const [addresses, setAddresses] = useState<Address[]>(mockAddresses)
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
-  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [addresses, setAddresses] = useState<Address[]>(mockAddresses);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handleAdd = (newAddress: Address) => {
-    let updated = addresses
+    let updated = addresses;
     if (newAddress.isDefault) {
-      updated = addresses.map((a) => ({ ...a, isDefault: false }))
+      updated = addresses.map((a) => ({ ...a, isDefault: false }));
     }
-    setAddresses([...updated, newAddress])
-  }
+    setAddresses([...updated, newAddress]);
+  };
 
   const handleUpdate = (updatedAddress: Address) => {
-    let updated = addresses.map((a) =>
-      a.id === updatedAddress.id ? updatedAddress : a,
-    )
+    let updated = addresses.map((a) => (a.id === updatedAddress.id ? updatedAddress : a));
 
     if (updatedAddress.isDefault) {
-      updated = updated.map((a) =>
-        a.id === updatedAddress.id ? a : { ...a, isDefault: false },
-      )
+      updated = updated.map((a) => (a.id === updatedAddress.id ? a : { ...a, isDefault: false }));
     }
 
-    setAddresses(updated)
-  }
+    setAddresses(updated);
+  };
 
   return (
     <div className="space-y-6">
@@ -107,8 +103,8 @@ export default function AddressManagement() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        setSelectedAddress(address)
-                        setIsEditOpen(true)
+                        setSelectedAddress(address);
+                        setIsEditOpen(true);
                       }}
                     >
                       <Edit className="h-4 w-4" />

@@ -74,16 +74,14 @@ export default function VoucherManagement() {
     usageLimit: '',
   });
 
-  const handleCreateVoucher = (voucherData: Omit<Voucher, "id" | "usedCount">) => {
+  const handleCreateVoucher = (voucherData: Omit<Voucher, 'id' | 'usedCount'>) => {
     const newVoucher: Voucher = {
       id: Date.now().toString(),
       usedCount: 0,
       ...voucherData,
-    }
-    setVouchers([...vouchers, newVoucher])
-  }
-    
-
+    };
+    setVouchers([...vouchers, newVoucher]);
+  };
 
   const handleUpdate = () => {
     if (!selectedVoucher) return;
@@ -151,7 +149,11 @@ export default function VoucherManagement() {
           <h2 className="text-xl font-semibold">Danh sách voucher</h2>
           <p className="text-muted-foreground">Quản lý tất cả voucher của bạn</p>
         </div>
-       <CreateVoucherDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} onCreateVoucher={handleCreateVoucher} />
+        <CreateVoucherDialog
+          open={isCreateOpen}
+          onOpenChange={setIsCreateOpen}
+          onCreateVoucher={handleCreateVoucher}
+        />
       </div>
 
       <Card>

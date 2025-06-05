@@ -88,14 +88,16 @@ export default function ShippingManagement() {
     const updatedMethods = shippingMethods.map((method) =>
       method.id === selectedMethod.id
         ? {
-          ...method,
-          name: formData.name,
-          description: formData.description,
-          basePrice: Number(formData.basePrice),
-          freeShippingThreshold: formData.freeShippingThreshold ? Number(formData.freeShippingThreshold) : undefined,
-          estimatedDays: formData.estimatedDays,
-          isActive: formData.isActive,
-        }
+            ...method,
+            name: formData.name,
+            description: formData.description,
+            basePrice: Number(formData.basePrice),
+            freeShippingThreshold: formData.freeShippingThreshold
+              ? Number(formData.freeShippingThreshold)
+              : undefined,
+            estimatedDays: formData.estimatedDays,
+            isActive: formData.isActive,
+          }
         : method,
     );
     setShippingMethods(updatedMethods);
@@ -141,8 +143,8 @@ export default function ShippingManagement() {
         </div>
         <ShippingMethodCreateDialog
           onCreate={(newData) => {
-            const newMethod = { ...newData, id: Date.now().toString() }
-            setShippingMethods([...shippingMethods, newMethod])
+            const newMethod = { ...newData, id: Date.now().toString() };
+            setShippingMethods([...shippingMethods, newMethod]);
           }}
         />
       </div>
@@ -175,8 +177,11 @@ export default function ShippingManagement() {
                   <TableCell>{method.estimatedDays}</TableCell>
                   <TableCell>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${method.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                        }`}
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        method.isActive
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
                     >
                       {method.isActive ? 'Hoạt động' : 'Không hoạt động'}
                     </span>

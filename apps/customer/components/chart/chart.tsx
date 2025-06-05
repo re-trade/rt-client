@@ -19,9 +19,12 @@ const PriceHistoryChart: React.FC = () => {
 
   const chartOptions: Highcharts.Options = {
     chart: {
-      type: 'spline',
+      type: 'areaspline',
       height: 300,
-      width: 822,
+      style: {
+        fontFamily: 'Reddit_Sans, sans-serif',
+      },
+      backgroundColor: 'transparent',
     },
     title: {
       text: '',
@@ -54,22 +57,40 @@ const PriceHistoryChart: React.FC = () => {
       min: 0,
       max: 50000,
       tickInterval: 10000,
+      gridLineDashStyle: 'Dot',
+      gridLineColor: 'rgba(251, 191, 36, 0.2)',
     },
     series: [
       {
         name: 'Price',
         type: 'spline',
         data: [
-          { y: 39000, marker: { fillColor: '#EB5757' } },
-          { y: 37500, marker: { fillColor: '#27AE60' } },
-          { y: 39000, marker: { fillColor: '#BDBDBD' } },
-          { y: 39000, marker: { fillColor: '#BDBDBD' } },
+          { y: 39000, marker: { fillColor: '#f59e0b' } },
+          { y: 37500, marker: { fillColor: '#f59e0b' } },
+          { y: 39000, marker: { fillColor: '#f59e0b' } },
+          { y: 39000, marker: { fillColor: '#f59e0b' } },
         ],
-        color: '#BDBDBD',
-        lineWidth: 2,
+        color: {
+          linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+          stops: [
+            [0, 'rgba(251, 191, 36, 0.6)'],
+            [1, 'rgba(251, 191, 36, 0.1)'],
+          ],
+        },
+        fillColor: {
+          linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+          stops: [
+            [0, 'rgba(251, 191, 36, 0.3)'],
+            [1, 'rgba(251, 191, 36, 0.0)'],
+          ],
+        },
+        lineWidth: 3,
         marker: {
           enabled: true,
-          radius: 4,
+          radius: 6,
+          symbol: 'circle',
+          lineWidth: 2,
+          lineColor: '#ffffff',
         },
       },
     ],
@@ -98,8 +119,12 @@ const PriceHistoryChart: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl pt-4">
-      <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+    <div className="w-full h-full">
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={chartOptions}
+        containerProps={{ style: { width: '100%', height: '100%' } }}
+      />
     </div>
   );
 };
