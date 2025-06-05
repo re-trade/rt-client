@@ -15,7 +15,7 @@ const tabs = [
   { key: 'returned', label: 'Trả hàng/Hoàn tiền' },
 ];
 
-export default function SummaryPage() {
+export default function OrderPage() {
   const [activeTab, setActiveTab] = useState<string>('awaiting');
 
   return (

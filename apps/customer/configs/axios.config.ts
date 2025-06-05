@@ -2,7 +2,7 @@ import { getDeviceInfo } from '@/lib/device-fingerprint';
 import type { AxiosRequestConfig } from 'axios';
 import axios, { AxiosError } from 'axios';
 
-const BASE_API_URL: string = process.env.NEXT_API_BASE_URL ?? 'http://localhost:8080/api/v1';
+const BASE_API_URL: string = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080/api/v1';
 
 enum ETokenName {
   ACCESS_TOKEN = 'access-token',
@@ -14,7 +14,7 @@ const unAuthApi = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 1000,
+  timeout: 5000,
   maxRedirects: 5,
 });
 
