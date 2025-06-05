@@ -56,7 +56,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const activeTab = pathname.split('/user/')[1] || 'profile';
 
   return (
-    <div className="min-h-screen bg-gray-100 flex pl-1">
+    <div className="min-h-screen h-auto bg-gray-100 flex pl-1">
       <aside className="w-64 bg-white shadow-md p-4">
         <div className="flex items-center mb-6">
           <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4">
