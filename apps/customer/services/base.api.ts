@@ -14,6 +14,7 @@ export interface IPaginationWrapper<T extends any[]> {
 }
 
 export interface IResponseObject<T> {
+  message: string;
   content: T;
   messages: string[];
   code: string;

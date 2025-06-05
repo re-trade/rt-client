@@ -1,7 +1,7 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { getAccountInfo, IUserAccount } from '@/services/auth.api';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 interface CartItem {
   id: number;
@@ -112,35 +112,35 @@ const ShoppingCart: React.FC = () => {
   });
 
   useEffect(() => {
-  const checkCustomerStatus = async () => {
-    setIsLoading(true);
-    const token = localStorage.getItem('accessToken');
-    console.log('ShoppingCart - Token:', token); // Debug: Log token
-    if (!token) {
-      console.log('No token found, redirecting to /login');
-      router.push('/login');
-      setIsLoading(false);
-      return;
-    }
-    try {
-      const userData = await getAccountInfo();
-      console.log('getAccountInfo Response:', userData); // Debug: Log response
-      if (userData === null) {
-        console.log('getAccountInfo returned null, redirecting to /login');
+    const checkCustomerStatus = async () => {
+      setIsLoading(true);
+      const token = localStorage.getItem('accessToken');
+      console.log('ShoppingCart - Token:', token); // Debug: Log token
+      if (!token) {
+        console.log('No token found, redirecting to /login');
         router.push('/login');
-      } else {
-        setUser(userData);
-        setIsCustomerChecked(true);
-        setIsModalOpen(true);
+        setIsLoading(false);
+        return;
       }
-    } catch (err) {
-      console.error('getAccountInfo Error:', err); // Debug: Log error
-      router.push('/login');
-    }
-    setIsLoading(false);
-  };
-  checkCustomerStatus();
-}, [router]);
+      try {
+        const userData = await getAccountInfo();
+        console.log('getAccountInfo Response:', userData); // Debug: Log response
+        if (userData === null) {
+          console.log('getAccountInfo returned null, redirecting to /login');
+          router.push('/login');
+        } else {
+          setUser(userData);
+          setIsCustomerChecked(true);
+          setIsModalOpen(true);
+        }
+      } catch (err) {
+        console.error('getAccountInfo Error:', err); // Debug: Log error
+        router.push('/login');
+      }
+      setIsLoading(false);
+    };
+    checkCustomerStatus();
+  }, [router]);
 
   useEffect(() => {
     const selectedProducts = cartItems.filter((item) => selectedItems.includes(item.id));
@@ -214,21 +214,38 @@ const ShoppingCart: React.FC = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">User Information</h2>
             <div className="space-y-2">
-              <p><strong>ID:</strong> {user.id}</p>
-              <p><strong>Username:</strong> {user.username}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Enabled:</strong> {user.enabled ? 'Yes' : 'No'}</p>
-              <p><strong>Locked:</strong> {user.locked ? 'Yes' : 'No'}</p>
-              <p><strong>Using 2FA:</strong> {user.using2FA ? 'Yes' : 'No'}</p>
-              <p><strong>Join Date:</strong> {new Date(user.joinInDate).toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-              })}</p>
-              <p><strong>Roles:</strong> {user.roles.join(', ')}</p>
+              <p>
+                <strong>ID:</strong> {user.id}
+              </p>
+              <p>
+                <strong>Username:</strong> {user.username}
+              </p>
+              <p>
+                <strong>Email:</strong> {user.email}
+              </p>
+              <p>
+                <strong>Enabled:</strong> {user.enabled ? 'Yes' : 'No'}
+              </p>
+              <p>
+                <strong>Locked:</strong> {user.locked ? 'Yes' : 'No'}
+              </p>
+              <p>
+                <strong>Using 2FA:</strong> {user.using2FA ? 'Yes' : 'No'}
+              </p>
+              <p>
+                <strong>Join Date:</strong>{' '}
+                {new Date(user.joinInDate).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                })}
+              </p>
+              <p>
+                <strong>Roles:</strong> {user.roles.join(', ')}
+              </p>
             </div>
             <button
               type="button"
@@ -271,7 +288,11 @@ const ShoppingCart: React.FC = () => {
                             </label>
                           </div>
                           <a href="#" className="shrink-0 md:order-2">
-                            <img className="h-20 w-20" src={item.image} alt={`${item.name} image`} />
+                            <img
+                              className="h-20 w-20"
+                              src={item.image}
+                              alt={`${item.name} image`}
+                            />
                           </a>
 
                           <div className="flex items-center justify-between md:order-4 md:justify-end">

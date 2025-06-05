@@ -59,10 +59,9 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
 };
 
 const registerInternal = async (registerForm: TRegister): Promise<void> => {
-  await unAuthApi.post<IResponseObject<TTokenResponse>>(
-    '/registers/customers/account',
-    { ...registerForm },
-  );
+  await unAuthApi.post<IResponseObject<TTokenResponse>>('/registers/customers/account', {
+    ...registerForm,
+  });
 };
 
 const getAccountInfo = async (): Promise<IUserAccount | null> => {
@@ -91,4 +90,4 @@ const getAccountInfo = async (): Promise<IUserAccount | null> => {
   }
 };
 
-export { loginInternal, registerInternal, getAccountInfo, type IUserAccount };
+export { getAccountInfo, loginInternal, registerInternal, type IUserAccount };

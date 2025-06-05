@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
-
 export default function Register() {
   const [formData, setFormData] = useState({
     username: '',
@@ -77,10 +76,9 @@ export default function Register() {
       setSuccess('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
       setTimeout(() => router.push('/login'), 2000);
     } catch (err: unknown) {
-  const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra. Vui lòng thử lại.';
-  setError(errorMessage);
-}
-
+      const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra. Vui lòng thử lại.';
+      setError(errorMessage);
+    }
   };
 
   return (
