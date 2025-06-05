@@ -37,7 +37,6 @@ export default function OrderPage() {
           </button>
         ))}
       </div>
-
       <div>
         {activeTab === 'awaiting' && <AwaitingPayment />}
         {activeTab === 'shipping' && <Shipping />}

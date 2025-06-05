@@ -21,6 +21,11 @@ interface RecommendedItem {
   image: string;
 }
 
+interface ShopSection {
+  isOpen: boolean;
+  items: CartItem[];
+}
+
 const ShoppingCart: React.FC = () => {
   const router = useRouter();
   const [isCustomerChecked, setIsCustomerChecked] = useState(false);
@@ -75,33 +80,31 @@ const ShoppingCart: React.FC = () => {
   const recommendedItems: RecommendedItem[] = [
     {
       id: 6,
-      name: 'iMac 27”',
-      originalPrice: 399.99,
-      discountedPrice: 299,
-      description:
-        'This generation has some improvements, including a longer continuous battery life.',
+      name: 'iMac 27"',
+      originalPrice: 9990000,
+      discountedPrice: 6990000,
+      description: 'Thế hệ này có một số cải tiến, bao gồm thời lượng pin liên tục lâu hơn.',
       image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front.svg',
     },
     {
       id: 7,
       name: 'Playstation 5',
-      originalPrice: 799.99,
-      discountedPrice: 499,
-      description:
-        'This generation has some improvements, including a longer continuous battery life.',
+      originalPrice: 18990000,
+      discountedPrice: 11990000,
+      description: 'Thế hệ này có một số cải tiến, bao gồm thời lượng pin liên tục lâu hơn.',
       image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/ps5-light.svg',
     },
     {
       id: 8,
       name: 'Apple Watch Series 8',
-      originalPrice: 1799.99,
-      discountedPrice: 1199,
-      description:
-        'This generation has some improvements, including a longer continuous battery life.',
+      originalPrice: 42990000,
+      discountedPrice: 28990000,
+      description: 'Thế hệ này có một số cải tiến, bao gồm thời lượng pin liên tục lâu hơn.',
       image: 'https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg',
     },
   ];
 
+  const [shopSections, setShopSections] = useState<Record<number, ShopSection>>({});
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [orderSummary, setOrderSummary] = useState({
     originalPrice: 0,
@@ -145,9 +148,9 @@ const ShoppingCart: React.FC = () => {
   useEffect(() => {
     const selectedProducts = cartItems.filter((item) => selectedItems.includes(item.id));
     const originalPrice = selectedProducts.reduce((sum, item) => sum + item.price, 0);
-    const savings = selectedProducts.length > 0 ? 299 : 0;
-    const storePickup = selectedProducts.length > 0 ? 99 : 0;
-    const tax = selectedProducts.length > 0 ? 799 : 0;
+    const savings = selectedProducts.length > 0 ? 299000 : 0;
+    const storePickup = selectedProducts.length > 0 ? 99000 : 0;
+    const tax = selectedProducts.length > 0 ? 799000 : 0;
     const total = originalPrice - savings + storePickup + tax;
 
     setOrderSummary({
@@ -157,7 +160,7 @@ const ShoppingCart: React.FC = () => {
       tax,
       total,
     });
-  }, [selectedItems]);
+  }, [selectedItems, cartItems]);
 
   const handleCheckboxChange = (id: number) => {
     const item = cartItems.find((i) => i.id === id);
@@ -174,17 +177,17 @@ const ShoppingCart: React.FC = () => {
         prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
       );
     } else {
-      alert('You can only select products from the same shop at once.');
+      alert('Bạn chỉ có thể chọn sản phẩm từ cùng một cửa hàng.');
     }
   };
 
   const handleRemove = (id: number) => {
     setSelectedItems((prev) => prev.filter((itemId) => itemId !== id));
-    alert(`Item ${id} removed from cart.`);
+    alert(`Sản phẩm ${id} đã được xóa khỏi giỏ hàng.`);
   };
 
   const handleAddToFavorites = (id: number) => {
-    alert(`Item ${id} added to favorites.`);
+    alert(`Sản phẩm ${id} đã được thêm vào danh sách yêu thích.`);
   };
 
   const groupedItems = cartItems.reduce((acc: Record<number, CartItem[]>, item) => {

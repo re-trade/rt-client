@@ -1,11 +1,24 @@
 'use client';
 import { loginInternal } from '@/services/auth.api';
+import Joi from 'joi';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FaFacebook } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
+
+const loginSchema = Joi.object({
+  username: Joi.string().required().min(3).max(30).messages({
+    'string.empty': 'Tên đăng nhập không được để trống',
+    'string.min': 'Tên đăng nhập phải có ít nhất 3 ký tự',
+    'string.max': 'Tên đăng nhập không được vượt quá 30 ký tự',
+  }),
+  password: Joi.string().required().min(6).messages({
+    'string.empty': 'Mật khẩu không được để trống',
+    'string.min': 'Mật khẩu phải có ít nhất 6 ký tự',
+  }),
+});
 
 export default function Login() {
   const [isVisible, setIsVisible] = useState(false);
@@ -38,7 +51,7 @@ export default function Login() {
       ...prev,
       [name]: value,
     }));
-    setError(null); // Clear error when user types
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -47,13 +60,22 @@ export default function Login() {
     setError(null);
 
     try {
+      const validation = loginSchema.validate(formData);
+      if (validation.error) {
+        throw new Error(validation.error.details[0].message);
+      }
+
       await loginInternal({
         username: formData.username,
         password: formData.password,
       });
       router.push('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Đăng nhập thất bại. Vui lòng thử lại.');
+      }
     } finally {
       setIsLoading(false);
     }
