@@ -7,7 +7,7 @@ type TLocalLogin = {
 };
 
 type TTokenResponse = {
-  tokens: { accessToken: string; refreshToken: string };
+  tokens: { ACCESS_TOKEN: string; REFRESH_TOKEN: string };
   roles: string[];
   twoFA: boolean;
 };
@@ -27,9 +27,9 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
     },
   );
 
-  if (result.data.success) {
-    const { accessToken } = result.data.content.tokens;
-    localStorage.setItem(ETokenName.ACCESS_TOKEN, accessToken);
+  if (result.data.success && result.status === 200) {
+    const { ACCESS_TOKEN } = result.data.content.tokens;
+    localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
   }
 };
 
