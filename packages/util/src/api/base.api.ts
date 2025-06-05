@@ -5,7 +5,7 @@ export interface IPaginationResponse {
   totalElements: number;
 }
 
-export interface IPaginationWrapper<T extends any[]> {
+export interface IPaginationWrapper<T extends []> {
   data: T;
   page: number;
   size: number;
@@ -38,7 +38,7 @@ export const createResponseObject = <T>(params: {
   };
 };
 
-export const unwrapPaginationWrapper = <T extends any[]>(
+export const unwrapPaginationWrapper = <T extends []>(
   wrapper: IPaginationWrapper<T>,
   options?: {
     code?: string;

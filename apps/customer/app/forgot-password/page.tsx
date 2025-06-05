@@ -25,9 +25,9 @@ const ForgotPasswordPage = () => {
           <h1 className="text-xl font-semibold text-orange-500">ReTrade</h1>
         </div>
 
-        <h2 className="text-gray-800 font-semibold mb-1">Reset your password</h2>
+        <h2 className="text-gray-800 font-semibold mb-1">Khôi phục mật khẩu của bạn</h2>
         <p className="text-sm text-gray-600 mb-6">
-          Enter your email and we'll send you a link to reset your password.
+          Hãy nhập email vào đây và chúng tôi sẽ gửi cho bạn một liên kết để khôi phục mật khẩu.
         </p>
         {message && (
           <div
@@ -59,16 +59,16 @@ const ForgotPasswordPage = () => {
             type="submit"
             className="w-full py-2 px-4 bg-orange-500 text-white rounded-full font-medium hover:bg-orange-900 transition"
           >
-            Reset your password
+            Khôi phục mật khẩu
           </button>
         </form>
         <p className="text-sm text-center text-gray-600 mt-6">
-          Don't have an account?{' '}
+          Chưa có tài khoản{' '}
           <a
-            href="#"
+            href="/register"
             className="font-semibold text-orange-500 inline-flex items-center hover:underline"
           >
-            Get access <ArrowRight className="w-4 h-4 ml-1" />
+            Tạo Tài Khoản <ArrowRight className="w-4 h-4 ml-1" />
           </a>
         </p>
       </div>

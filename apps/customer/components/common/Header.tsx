@@ -47,11 +47,11 @@ const Header: React.FC = () => {
           </details>
           <div className="hidden md:flex items-center space-x-3">
             <a href="/login" className="hover:text-orange-500 flex items-center">
-              <FaUser className="mr-1" /> Login
+              <FaUser className="mr-1" /> Đăng Nhập
             </a>
             <span>|</span>
             <Link href="/register" className="hover:text-orange-500">
-              Sign Up
+              Đăng Kí
             </Link>
           </div>
         </div>
@@ -101,12 +101,12 @@ const Header: React.FC = () => {
           <ul className="space-y-3 text-gray-700 text-sm">
             <li>
               <Link href="/login" className="block hover:text-orange-500">
-                Login
+                Đăng Nhập
               </Link>
             </li>
             <li>
               <Link href="/register" className="block hover:text-orange-500">
-                Sign Up
+                Đăng Kí
               </Link>
             </li>
             <li>
