@@ -1,4 +1,4 @@
-import { unAuthApi } from '@/configs/axios.config';
+import { ETokenName, unAuthApi } from '@/configs/axios.config';
 import { getDeviceInfo } from '@/lib/device-fingerprint';
 import { IResponseObject } from '@/services/base.api';
 
@@ -54,7 +54,7 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
 
   if (result.data.success) {
     const { accessToken } = result.data.content.tokens;
-    localStorage.setItem('accessToken', accessToken); // Use string literal instead of ETokenName
+    localStorage.setItem(ETokenName.ACCESS_TOKEN, accessToken);
   }
 };
 
