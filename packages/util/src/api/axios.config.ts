@@ -50,7 +50,7 @@ export const createAuthApi = (
     headers: {
       'Content-Type': 'application/json',
     },
-    timeout: 50000,
+    timeout: 5000,
     maxRedirects: 5,
   });
 
