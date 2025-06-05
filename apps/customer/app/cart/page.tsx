@@ -32,8 +32,8 @@ const ShoppingCart: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<IUserAccount | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cartItems: CartItem[] = [
     {
       id: 1,
