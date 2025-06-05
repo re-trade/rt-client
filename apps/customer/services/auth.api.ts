@@ -1,5 +1,5 @@
 import { getDeviceInfo } from '@/lib/device-fingerprint';
-import { ETokenName, IResponseObject, unAuthApi } from '@retrade/util';
+import { authAPi, ETokenName, IResponseObject, unAuthApi } from '@retrade/util';
 
 type TLocalLogin = {
   username: string;
@@ -69,7 +69,7 @@ const getAccountInfo = async (): Promise<IUserAccount | null> => {
       return null;
     }
     const deviceInfo = await getDeviceInfo(); // Add device info for headers
-    const result = await unAuthApi.get<IResponseObject<IUserAccount | null>>('/account/me', {
+    const result = await authAPi.get<IResponseObject<IUserAccount | null>>('/account/me', {
       headers: {
         Authorization: `Bearer ${token}`,
         'x-device-fingerprint': deviceInfo.deviceFingerprint,
