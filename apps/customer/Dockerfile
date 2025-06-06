@@ -1,5 +1,5 @@
 FROM node:slim AS base
-RUN yarn global add turbo@^2
+RUN yarn global add turbo@^2 @types/node@^20
 
 FROM base AS builder
 WORKDIR /build

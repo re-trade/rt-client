@@ -1,5 +1,5 @@
 FROM node:slim AS base
-RUN yarn global add turbo@^2
+RUN yarn global add turbo@^2 @types/node@^20
 
 FROM base AS builder
 WORKDIR /build
@@ -13,7 +13,7 @@ ARG NODE_ENV
 ENV NEXT_API_BASE_URL=${API_BASE_URL}
 ENV NEXT_PUBLIC_NODE_ENV=${NODE_ENV}
 COPY --from=builder /build/out/json/ ./
-RUN yarn install
+RUN yarn install --frozen-lockfile
 COPY --from=builder /build/out/full/ ./
 RUN turbo run build
 
