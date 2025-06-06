@@ -71,7 +71,7 @@ export default function SecurityPage() {
 
   return (
     <div className="w-full h-full bg-white">
-      <div className="w-full bg-[#FFF8F3] rounded-lg shadow-lg">
+      <div className="w-full bg-white rounded-lg shadow-lg">
         <div className="max-w-3xl mx-auto p-6 bg-[#fff2e6] shadow-lg rounded-lg">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Bảo mật tài khoản</h1>
 
