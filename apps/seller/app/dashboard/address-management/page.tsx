@@ -1,12 +1,19 @@
 'use client';
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Edit } from "lucide-react"
-import AddAddressDialog, { Address } from "@/components/dialog/add/create-address-dialog"
-import EditAddressDialog from "@/components/dialog/view-update/edit-address-dialog"
+import AddAddressDialog, { Address } from '@/components/dialog/add/create-address-dialog';
+import EditAddressDialog from '@/components/dialog/view-update/edit-address-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Edit } from 'lucide-react';
+import { useState } from 'react';
 
 const mockAddresses: Address[] = [
   {

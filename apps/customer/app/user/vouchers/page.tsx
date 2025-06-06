@@ -1,31 +1,29 @@
-"use client";
-import React from "react";
-import VoucherCard from "@/components/common/VoucherCard";
-import { useState } from "react";
+'use client';
+import VoucherCard from '@/components/common/VoucherCard';
+import { useState } from 'react';
 const categories = [
-  { name: "HÀNG TIÊU DÙNG", icon: "🧴" },
-  { name: "THỜI TRANG", icon: "👕" },
-  { name: "ĐIỆN TỬ", icon: "📷" },
-  { name: "PHONG CÁCH SỐNG", icon: "🏍️" },
-  { name: "ƯU ĐÃI ĐỐI TÁC", icon: "🤝" },
+  { name: 'HÀNG TIÊU DÙNG', icon: '🧴' },
+  { name: 'THỜI TRANG', icon: '👕' },
+  { name: 'ĐIỆN TỬ', icon: '📷' },
+  { name: 'PHONG CÁCH SỐNG', icon: '🏍️' },
+  { name: 'ƯU ĐÃI ĐỐI TÁC', icon: '🤝' },
 ];
-
 
 const vouchers = Array.from({ length: 10 }, (_, i) => {
   const category = categories[i % categories.length]!; // dùng non-null assertion
 
-  const day = String(i + 1).padStart(2, "0");
+  const day = String(i + 1).padStart(2, '0');
 
   return {
     id: i + 1,
-    title: "Hoàn 100% xu Đơn Tối Thiểu 0₫ Tối đa 88k Xu",
+    title: 'Hoàn 100% xu Đơn Tối Thiểu 0₫ Tối đa 88k Xu',
     date: `Có Hiệu Lực Từ: ${day}.01.2021 09:00`,
-    decription: "Giảm giá 100% cho đơn hàng tối thiểu 0₫, tối đa 88k xu. Chỉ áp dụng cho khách hàng mới.",
+    decription:
+      'Giảm giá 100% cho đơn hàng tối thiểu 0₫, tối đa 88k xu. Chỉ áp dụng cho khách hàng mới.',
     categoryName: category.name,
     categoryIcon: category.icon,
   };
 });
-
 
 export default function VoucherPage() {
   const ITEMS_PER_PAGE = 9;
@@ -36,7 +34,7 @@ export default function VoucherPage() {
 
   const currentVouchers = vouchers.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
   return (
     <div className="w-full h-full bg-white p-10">
@@ -60,7 +58,6 @@ export default function VoucherPage() {
           ))}
         </div>
 
-
         <div className="flex justify-center gap-4 mt-6">
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -70,7 +67,9 @@ export default function VoucherPage() {
             Trang trước
           </button>
 
-          <span className="px-4 py-2">Trang {currentPage} / {totalPages}</span>
+          <span className="px-4 py-2">
+            Trang {currentPage} / {totalPages}
+          </span>
 
           <button
             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
@@ -80,8 +79,7 @@ export default function VoucherPage() {
             Trang sau
           </button>
         </div>
-
       </div>
-    </div >
+    </div>
   );
 }

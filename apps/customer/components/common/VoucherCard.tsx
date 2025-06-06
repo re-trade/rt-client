@@ -1,6 +1,3 @@
-import React from "react";
-import { BiCategory } from "react-icons/bi";
-
 interface Voucher {
   id: number;
   title: string;
@@ -29,7 +26,6 @@ export default function VoucherCard({ vouchers, index }: Props) {
           <div className="font-bold text-orange-600 mt-2 text-lg">{vouchers.title}</div>
           <div className="text-sm text-gray-500">{vouchers.date}</div>
         </div>
-
       </div>
       <div>
         <a href="#" className="text-blue-500 text-sm underline">

@@ -1,8 +1,8 @@
-"use client";
-import { useState } from "react";
-import AddressCard from "@/components/common/AddressCard";
-import AddressCreateDialog from "@/components/common/AddressCreateDialog";
-import AddressUpdateDialog from "@/components/common/AddressUpdateDialog";
+'use client';
+import AddressCard from '@/components/common/AddressCard';
+import AddressCreateDialog from '@/components/common/AddressCreateDialog';
+import AddressUpdateDialog from '@/components/common/AddressUpdateDialog';
+import { useState } from 'react';
 interface Address {
   id: string;
   customer_id: string;
@@ -18,74 +18,72 @@ interface Address {
 }
 
 const initialAddress: Address = {
-  id: "",
-  customer_id: "",
-  name: "",
-  customerName: "",
-  phoneNumber: "",
-  state: "",
-  country: "",
-  district: "",
-  ward: "",
-  type: "",
+  id: '',
+  customer_id: '',
+  name: '',
+  customerName: '',
+  phoneNumber: '',
+  state: '',
+  country: '',
+  district: '',
+  ward: '',
+  type: '',
   isDefault: false,
 };
 const fakeAddress: Address[] = [
   {
-    id: "1",
-    customer_id: "C001",
-    name: "John Doe",
-    customerName: "John Doe",
-    phoneNumber: "+1234567890",
-    state: "California",
-    country: "USA",
-    district: "Downtown",
-    ward: "Ward 1放到",
-    type: "Home",
+    id: '1',
+    customer_id: 'C001',
+    name: 'John Doe',
+    customerName: 'John Doe',
+    phoneNumber: '+1234567890',
+    state: 'California',
+    country: 'USA',
+    district: 'Downtown',
+    ward: 'Ward 1放到',
+    type: 'Home',
     isDefault: true,
   },
   {
-    id: "2",
-    customer_id: "C002",
-    name: "Jane Smith",
-    customerName: "Jane Smith",
-    phoneNumber: "+0987654321",
-    state: "New York",
-    country: "USA",
-    district: "Uptown",
-    ward: "Ward 2",
-    type: "Office",
+    id: '2',
+    customer_id: 'C002',
+    name: 'Jane Smith',
+    customerName: 'Jane Smith',
+    phoneNumber: '+0987654321',
+    state: 'New York',
+    country: 'USA',
+    district: 'Uptown',
+    ward: 'Ward 2',
+    type: 'Office',
     isDefault: false,
   },
   {
-    id: "3",
-    customer_id: "C003",
-    name: "Bob Johnson",
-    customerName: "Bob Johnson",
-    phoneNumber: "+1122334455",
-    state: "Texas",
-    country: "USA",
-    district: "Midtown",
-    ward: "Ward 3",
-    type: "Home",
+    id: '3',
+    customer_id: 'C003',
+    name: 'Bob Johnson',
+    customerName: 'Bob Johnson',
+    phoneNumber: '+1122334455',
+    state: 'Texas',
+    country: 'USA',
+    district: 'Midtown',
+    ward: 'Ward 3',
+    type: 'Home',
     isDefault: false,
   },
   {
-    id: "4",
-    customer_id: "C004",
-    name: "Alice Brown",
-    customerName: "Alice Brown",
-    phoneNumber: "+5566778899",
-    state: "Florida",
-    country: "USA",
-    district: "Southside",
-    ward: "Ward 4",
-    type: "Office",
+    id: '4',
+    customer_id: 'C004',
+    name: 'Alice Brown',
+    customerName: 'Alice Brown',
+    phoneNumber: '+5566778899',
+    state: 'Florida',
+    country: 'USA',
+    district: 'Southside',
+    ward: 'Ward 4',
+    type: 'Office',
     isDefault: false,
   },
 ];
-
-
 
 export default function AddressPage() {
   const [addresses, setAddresses] = useState<Address[]>(fakeAddress);
