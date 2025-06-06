@@ -1,11 +1,12 @@
 'use client';
+
+import { useToast } from '@/hooks/use-toast';
 import { loginInternal } from '@/services/auth.api';
 import Joi from 'joi';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import { FaFacebook } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 
 const loginSchema = Joi.object({
@@ -24,19 +25,16 @@ export default function Login() {
   const [isVisible, setIsVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ username: '', password: '' });
 
   const formRef = useRef<HTMLDivElement>(null);
   const [formHeight, setFormHeight] = useState<number | null>(null);
   const router = useRouter();
+  const { showToast } = useToast();
 
   const toggleVisibility = () => {
-    setIsVisible((prevState) => !prevState);
-    setShowPassword((prevState) => !prevState);
+    setIsVisible((prev) => !prev);
+    setShowPassword((prev) => !prev);
   };
 
   useLayoutEffect(() => {
@@ -47,17 +45,12 @@ export default function Login() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setError(null);
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
 
     try {
       const validation = loginSchema.validate(formData);
@@ -65,17 +58,14 @@ export default function Login() {
         throw new Error(validation.error.details[0].message);
       }
 
-      await loginInternal({
-        username: formData.username,
-        password: formData.password,
-      });
+      await loginInternal(formData);
+
+      showToast('Đăng nhập thành công!', 'success');
+
       router.push('/');
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Đăng nhập thất bại. Vui lòng thử lại.');
-      }
+      const message = err instanceof Error ? err.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
+      showToast(`${message}`, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -93,12 +83,6 @@ export default function Login() {
               <p className="text-center text-gray-600 mb-6">
                 Nơi tìm món đồ đẹp, dùng món chất lượng – và gặp cơ hội đổi đời trong tích tắc!
               </p>
-
-              {error && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                  {error}
-                </div>
-              )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -147,20 +131,23 @@ export default function Login() {
                   disabled={isLoading}
                   className={`w-full bg-orange-400 text-white p-3 rounded-lg transition ${
                     isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-500'
-                  }`}
+                  } flex items-center justify-center gap-2`}
                 >
+                  {isLoading && <span className="loading loading-spinner loading-sm text-white" />}
                   {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </button>
+
                 <div className="text-center text-gray-600">OR</div>
-                <button className="w-full border border-gray-300 py-2 rounded flex items-center text-black justify-center gap-2 hover:bg-gray-100">
+
+                <button
+                  type="button"
+                  className="w-full border border-gray-300 py-2 rounded flex items-center text-black justify-center gap-2 hover:bg-gray-100"
+                >
                   <FcGoogle className="w-5 h-5 text-red-500" />
                   Đăng nhập với Google
                 </button>
-                <button className="w-full border border-gray-300 py-2 rounded flex items-center text-black justify-center gap-2 hover:bg-gray-100">
-                  <FaFacebook className="w-5 h-5 text-blue-600" />
-                  Đăng nhập với Facebook
-                </button>
               </form>
+
               <p className="text-center text-gray-600 mt-4">
                 Bạn chưa có tài khoản Retrade Shop, đăng ký ngay!
               </p>

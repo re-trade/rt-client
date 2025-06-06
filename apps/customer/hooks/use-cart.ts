@@ -49,7 +49,7 @@ function useCart() {
     setLoading(true);
     setError(null);
     try {
-      const data = await productApi.getProducts();
+      const data = await productApi.getProducts(0, 3);
       setProducts(data);
     } catch {
       setError('Không thể tải giỏ hàng');

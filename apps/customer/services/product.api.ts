@@ -22,12 +22,15 @@ export type TProduct = {
 };
 
 export const productApi = {
-  async getProducts(): Promise<TProduct[]> {
-    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>(`/products`);
-    if (response.data.success) {
-      return response.data.content;
-    }
-    return [];
+  async getProducts(page: number = 0, size: number = 10, query?: string): Promise<TProduct[]> {
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products', {
+      params: {
+        page,
+        size,
+        ...(query ? { query } : {}),
+      },
+    });
+    return response.data.success ? response.data.content : [];
   },
   async getProduct(id: string): Promise<TProduct> {
     try {
