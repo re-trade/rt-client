@@ -1,9 +1,9 @@
 'use client';
 
+import { CreateProductDialog } from '@/components/dialog/add/create-product-dialog';
+import { EditProductDialog } from '@/components/dialog/view-update/edit-product-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CreateProductDialog } from '@/components/ui/dialog/add/create-product-dialog';
-import { EditProductDialog } from '@/components/ui/dialog/view-update/edit-product-dialog';
 import {
   Table,
   TableBody,
