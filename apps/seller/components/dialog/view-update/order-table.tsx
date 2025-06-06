@@ -1,103 +1,110 @@
-"use client"
+'use client';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Eye, Edit, Package, Truck, CheckCircle } from "lucide-react"
-import type { Order } from "@/app/dashboard/orders-management/page" 
+import type { Order } from '@/app/dashboard/orders-management/page';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { CheckCircle, Edit, Eye, Package, Truck } from 'lucide-react';
 
 interface OrderTableProps {
-  orders: Order[]
-  onViewDetail: (order: Order) => void
-  onUpdateStatus: (order: Order) => void
+  orders: Order[];
+  onViewDetail: (order: Order) => void;
+  onUpdateStatus: (order: Order) => void;
 }
 
 export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableProps) {
-  const getStatusColor = (status: Order["orderStatus"]) => {
+  const getStatusColor = (status: Order['orderStatus']) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800"
-      case "confirmed":
-        return "bg-blue-100 text-blue-800"
-      case "preparing":
-        return "bg-purple-100 text-purple-800"
-      case "ready_to_ship":
-        return "bg-orange-100 text-orange-800"
-      case "shipped":
-        return "bg-indigo-100 text-indigo-800"
-      case "delivered":
-        return "bg-green-100 text-green-800"
-      case "cancelled":
-        return "bg-red-100 text-red-800"
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800';
+      case 'preparing':
+        return 'bg-purple-100 text-purple-800';
+      case 'ready_to_ship':
+        return 'bg-orange-100 text-orange-800';
+      case 'shipped':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
       default:
-        return "bg-gray-100 text-gray-800"
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
-  const getStatusText = (status: Order["orderStatus"]) => {
+  const getStatusText = (status: Order['orderStatus']) => {
     switch (status) {
-      case "pending":
-        return "Chờ xác nhận"
-      case "confirmed":
-        return "Đã xác nhận"
-      case "preparing":
-        return "Đang chuẩn bị"
-      case "ready_to_ship":
-        return "Sẵn sàng giao"
-      case "shipped":
-        return "Đã giao shipper"
-      case "delivered":
-        return "Đã giao hàng"
-      case "cancelled":
-        return "Đã hủy"
+      case 'pending':
+        return 'Chờ xác nhận';
+      case 'confirmed':
+        return 'Đã xác nhận';
+      case 'preparing':
+        return 'Đang chuẩn bị';
+      case 'ready_to_ship':
+        return 'Sẵn sàng giao';
+      case 'shipped':
+        return 'Đã giao shipper';
+      case 'delivered':
+        return 'Đã giao hàng';
+      case 'cancelled':
+        return 'Đã hủy';
       default:
-        return "Không xác định"
+        return 'Không xác định';
     }
-  }
+  };
 
-  const getPaymentStatusColor = (status: Order["paymentStatus"]) => {
+  const getPaymentStatusColor = (status: Order['paymentStatus']) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800"
-      case "paid":
-        return "bg-green-100 text-green-800"
-      case "failed":
-        return "bg-red-100 text-red-800"
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'paid':
+        return 'bg-green-100 text-green-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
       default:
-        return "bg-gray-100 text-gray-800"
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
-  const getPaymentStatusText = (status: Order["paymentStatus"]) => {
+  const getPaymentStatusText = (status: Order['paymentStatus']) => {
     switch (status) {
-      case "pending":
-        return "Chờ thanh toán"
-      case "paid":
-        return "Đã thanh toán"
-      case "failed":
-        return "Thất bại"
+      case 'pending':
+        return 'Chờ thanh toán';
+      case 'paid':
+        return 'Đã thanh toán';
+      case 'failed':
+        return 'Thất bại';
       default:
-        return "Không xác định"
+        return 'Không xác định';
     }
-  }
+  };
 
-  const getStatusIcon = (status: Order["orderStatus"]) => {
+  const getStatusIcon = (status: Order['orderStatus']) => {
     switch (status) {
-      case "preparing":
-        return <Package className="h-4 w-4" />
-      case "shipped":
-        return <Truck className="h-4 w-4" />
-      case "delivered":
-        return <CheckCircle className="h-4 w-4" />
+      case 'preparing':
+        return <Package className="h-4 w-4" />;
+      case 'shipped':
+        return <Truck className="h-4 w-4" />;
+      case 'delivered':
+        return <CheckCircle className="h-4 w-4" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
-  const canUpdateStatus = (status: Order["orderStatus"]) => {
-    return !["delivered", "cancelled"].includes(status)
-  }
+  const canUpdateStatus = (status: Order['orderStatus']) => {
+    return !['delivered', 'cancelled'].includes(status);
+  };
 
   return (
     <Card>
@@ -122,7 +129,9 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
                   <div>
                     <div>{order.orderNumber}</div>
                     {order.trackingNumber && (
-                      <div className="text-xs text-muted-foreground">Mã vận đơn: {order.trackingNumber}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Mã vận đơn: {order.trackingNumber}
+                      </div>
                     )}
                   </div>
                 </TableCell>
@@ -141,7 +150,9 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">{order.finalAmount.toLocaleString("vi-VN")}đ</TableCell>
+                <TableCell className="font-medium">
+                  {order.finalAmount.toLocaleString('vi-VN')}đ
+                </TableCell>
                 <TableCell>
                   <Badge className={getPaymentStatusColor(order.paymentStatus)}>
                     {getPaymentStatusText(order.paymentStatus)}
@@ -150,10 +161,12 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {getStatusIcon(order.orderStatus)}
-                    <Badge className={getStatusColor(order.orderStatus)}>{getStatusText(order.orderStatus)}</Badge>
+                    <Badge className={getStatusColor(order.orderStatus)}>
+                      {getStatusText(order.orderStatus)}
+                    </Badge>
                   </div>
                 </TableCell>
-                <TableCell>{new Date(order.createdAt).toLocaleDateString("vi-VN")}</TableCell>
+                <TableCell>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => onViewDetail(order)}>
@@ -172,5 +185,5 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

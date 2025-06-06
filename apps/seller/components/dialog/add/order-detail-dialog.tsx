@@ -1,73 +1,73 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import Image from "next/image"
-import type { Order } from "@/app/dashboard/orders-management/page" 
+import type { Order } from '@/app/dashboard/orders-management/page';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 interface OrderDetailDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  order: Order | null
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  order: Order | null;
 }
 
 export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDialogProps) {
-  if (!order) return null
+  if (!order) return null;
 
-  const getStatusColor = (status: Order["orderStatus"]) => {
+  const getStatusColor = (status: Order['orderStatus']) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800"
-      case "confirmed":
-        return "bg-blue-100 text-blue-800"
-      case "preparing":
-        return "bg-purple-100 text-purple-800"
-      case "ready_to_ship":
-        return "bg-orange-100 text-orange-800"
-      case "shipped":
-        return "bg-indigo-100 text-indigo-800"
-      case "delivered":
-        return "bg-green-100 text-green-800"
-      case "cancelled":
-        return "bg-red-100 text-red-800"
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800';
+      case 'preparing':
+        return 'bg-purple-100 text-purple-800';
+      case 'ready_to_ship':
+        return 'bg-orange-100 text-orange-800';
+      case 'shipped':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
       default:
-        return "bg-gray-100 text-gray-800"
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
-  const getStatusText = (status: Order["orderStatus"]) => {
+  const getStatusText = (status: Order['orderStatus']) => {
     switch (status) {
-      case "pending":
-        return "Chờ xác nhận"
-      case "confirmed":
-        return "Đã xác nhận"
-      case "preparing":
-        return "Đang chuẩn bị"
-      case "ready_to_ship":
-        return "Sẵn sàng giao"
-      case "shipped":
-        return "Đã giao shipper"
-      case "delivered":
-        return "Đã giao hàng"
-      case "cancelled":
-        return "Đã hủy"
+      case 'pending':
+        return 'Chờ xác nhận';
+      case 'confirmed':
+        return 'Đã xác nhận';
+      case 'preparing':
+        return 'Đang chuẩn bị';
+      case 'ready_to_ship':
+        return 'Sẵn sàng giao';
+      case 'shipped':
+        return 'Đã giao shipper';
+      case 'delivered':
+        return 'Đã giao hàng';
+      case 'cancelled':
+        return 'Đã hủy';
       default:
-        return "Không xác định"
+        return 'Không xác định';
     }
-  }
+  };
 
-  const getPaymentMethodText = (method: Order["paymentMethod"]) => {
+  const getPaymentMethodText = (method: Order['paymentMethod']) => {
     switch (method) {
-      case "cod":
-        return "Thanh toán khi nhận hàng"
-      case "bank_transfer":
-        return "Chuyển khoản ngân hàng"
-      case "e_wallet":
-        return "Ví điện tử"
+      case 'cod':
+        return 'Thanh toán khi nhận hàng';
+      case 'bank_transfer':
+        return 'Chuyển khoản ngân hàng';
+      case 'e_wallet':
+        return 'Ví điện tử';
       default:
-        return "Không xác định"
+        return 'Không xác định';
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -89,15 +89,17 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Trạng thái:</span>
-                <Badge className={getStatusColor(order.orderStatus)}>{getStatusText(order.orderStatus)}</Badge>
+                <Badge className={getStatusColor(order.orderStatus)}>
+                  {getStatusText(order.orderStatus)}
+                </Badge>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Ngày tạo:</span>
-                <span>{new Date(order.createdAt).toLocaleString("vi-VN")}</span>
+                <span>{new Date(order.createdAt).toLocaleString('vi-VN')}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Cập nhật lần cuối:</span>
-                <span>{new Date(order.updatedAt).toLocaleString("vi-VN")}</span>
+                <span>{new Date(order.updatedAt).toLocaleString('vi-VN')}</span>
               </div>
               {order.trackingNumber && (
                 <div className="flex justify-between">
@@ -154,7 +156,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
               {order.items.map((item) => (
                 <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
                   <Image
-                    src={item.image || "/placeholder.svg"}
+                    src={item.image || '/placeholder.svg'}
                     alt={item.productName}
                     width={60}
                     height={60}
@@ -163,11 +165,13 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
                   <div className="flex-1">
                     <h4 className="font-medium">{item.productName}</h4>
                     <p className="text-sm text-muted-foreground">
-                      Số lượng: {item.quantity} × {item.price.toLocaleString("vi-VN")}đ
+                      Số lượng: {item.quantity} × {item.price.toLocaleString('vi-VN')}đ
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{(item.quantity * item.price).toLocaleString("vi-VN")}đ</p>
+                    <p className="font-medium">
+                      {(item.quantity * item.price).toLocaleString('vi-VN')}đ
+                    </p>
                   </div>
                 </div>
               ))}
@@ -189,37 +193,39 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
               <span className="text-muted-foreground">Trạng thái thanh toán:</span>
               <Badge
                 className={
-                  order.paymentStatus === "paid" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                  order.paymentStatus === 'paid'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
                 }
               >
-                {order.paymentStatus === "paid" ? "Đã thanh toán" : "Chờ thanh toán"}
+                {order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán'}
               </Badge>
             </div>
             <Separator />
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Tạm tính:</span>
-                <span>{order.totalAmount.toLocaleString("vi-VN")}đ</span>
+                <span>{order.totalAmount.toLocaleString('vi-VN')}đ</span>
               </div>
               <div className="flex justify-between">
                 <span>Phí vận chuyển:</span>
-                <span>{order.shippingFee.toLocaleString("vi-VN")}đ</span>
+                <span>{order.shippingFee.toLocaleString('vi-VN')}đ</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-red-600">
                   <span>Giảm giá:</span>
-                  <span>-{order.discount.toLocaleString("vi-VN")}đ</span>
+                  <span>-{order.discount.toLocaleString('vi-VN')}đ</span>
                 </div>
               )}
               <Separator />
               <div className="flex justify-between text-lg font-semibold">
                 <span>Tổng cộng:</span>
-                <span>{order.finalAmount.toLocaleString("vi-VN")}đ</span>
+                <span>{order.finalAmount.toLocaleString('vi-VN')}đ</span>
               </div>
             </div>
           </CardContent>
         </Card>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
