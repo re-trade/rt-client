@@ -23,7 +23,6 @@ type TAccountMeResponse = {
   roles: string[];
 };
 
-
 type TRegister = {
   username: string;
   password: string;
@@ -55,7 +54,6 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
   }
 };
-
 
 const registerInternal = async (registerForm: TRegister): Promise<void> => {
   await unAuthApi.default.post<IResponseObject<TTokenResponse>>('/registers/customers/account', {
