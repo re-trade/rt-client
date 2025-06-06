@@ -1,13 +1,26 @@
 'use client';
 
 import { cartApi, CartGroupResponse, CartResponse } from '@/services/cart.api';
+import { productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
-
+type TCartSummary = {
+  originalPrice: number;
+  savings: number;
+  tax: number;
+  total: number;
+};
 function useCart() {
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [cartGroups, setCartGroups] = useState<
     Record<string, CartGroupResponse & { isOpen: boolean }>
   >({});
+  const [cartSummary, setCartSummary] = useState<TCartSummary>({
+    originalPrice: 0,
+    savings: 0,
+    tax: 0,
+    total: 0,
+  });
+  const [products, setProducts] = useState<TProduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +38,19 @@ function useCart() {
         };
       });
       setCartGroups(groupsMap);
+    } catch {
+      setError('Không thể tải giỏ hàng');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchRecommendProduct = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await productApi.getProducts(0, 3);
+      setProducts(data);
     } catch {
       setError('Không thể tải giỏ hàng');
     } finally {
@@ -50,6 +76,10 @@ function useCart() {
     fetchCart();
   }, [fetchCart]);
 
+  useEffect(() => {
+    fetchRecommendProduct();
+  }, [fetchRecommendProduct]);
+
   return {
     cart,
     cartGroups,
@@ -57,6 +87,8 @@ function useCart() {
     error,
     refresh: fetchCart,
     toggleShopSection,
+    products,
+    cartSummary,
   };
 }
 

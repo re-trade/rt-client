@@ -1,4 +1,5 @@
 'use client';
+import CartSkeleton from '@/components/cart/CartSkeleton';
 import { useCart } from '@/hooks/use-cart';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -21,14 +22,12 @@ export default function CartSection() {
 
   const handleRemove = (itemId: string) => {};
 
-  if (loading) return <div>Đang tải giỏ hàng...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!cartGroups || Object.keys(cartGroups).length === 0) {
-    return <div>Giỏ hàng trống</div>;
+  if (loading || error || !cartGroups || Object.keys(cartGroups).length === 0) {
+    return <CartSkeleton />;
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {Object.entries(cartGroups).map(([sellerId, shopSection]) => (
         <div key={sellerId} className="rounded-lg border border-gray-200 bg-white shadow-sm">
           <button
@@ -155,6 +154,6 @@ export default function CartSection() {
           )}
         </div>
       ))}
-    </div>
+    </>
   );
 }

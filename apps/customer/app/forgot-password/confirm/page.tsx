@@ -43,9 +43,8 @@ const ResetPasswordPage = () => {
 
       setStatus('success');
       setMessage('Your password has been successfully reset.');
-    } catch (error: any) {
+    } catch {
       setStatus('error');
-      setMessage(error.message || 'Something went wrong.');
     }
   };
 
@@ -53,9 +52,10 @@ const ResetPasswordPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-sm border rounded-lg shadow-sm px-6 py-8">
         <h1 className="text-xl font-semibold text-orange-500 text-center mb-4">ReTrade</h1>
-
-        <h2 className="text-gray-800 font-semibold mb-1 text-center">Set a new password</h2>
-        <p className="text-sm text-gray-600 mb-6 text-center">Enter your new password below.</p>
+        <h2 className="text-gray-800 font-semibold mb-1 text-center">Thiết lập mật khẩu mới</h2>
+        <p className="text-sm text-gray-600 mb-6 text-center">
+          Mời bạn nhập mật khẩu mới dưới đây.
+        </p>
 
         {message && (
           <div
