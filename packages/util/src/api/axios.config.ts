@@ -36,7 +36,6 @@ export const createUnAuthApi = (service: EApiService = EApiService.MAIN): AxiosI
     headers: {
       'Content-Type': 'application/json',
     },
-    timeout: 5000,
     maxRedirects: 5,
   });
 
@@ -50,7 +49,6 @@ export const createAuthApi = (
     headers: {
       'Content-Type': 'application/json',
     },
-    timeout: 5000,
     maxRedirects: 5,
   });
 
