@@ -2,8 +2,7 @@
 
 import { Mail } from 'lucide-react';
 import Image from 'next/image';
-import { handlePhoneInput } from '@/components/input/InputHandle';
-
+import React, { useRef, useState } from 'react';
 interface Profile {
   name: string;
   username: string;
@@ -90,7 +89,6 @@ export default function ProfilePage() {
                   type="text"
                   placeholder="Thêm số điện thoại"
                   defaultValue={profile.phone || ''}
-
                   className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black"
                 />
               </div>

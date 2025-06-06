@@ -1,9 +1,9 @@
 'use client';
 
+import { CreateProductDialog } from '@/components/dialog/add/create-product-dialog';
+import { EditProductDialog } from '@/components/dialog/view-update/edit-product-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CreateProductDialog } from '@/components/ui/dialog/add/create-product-dialog';
-import { EditProductDialog } from '@/components/ui/dialog/view-update/edit-product-dialog';
 import {
   Table,
   TableBody,
@@ -11,15 +11,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Edit } from "lucide-react"
-import Image from "next/image"
-import { CreateProductDialog } from "@/components/dialog/add/create-product-dialog"
-import { EditProductDialog } from "@/components/dialog/view-update/edit-product-dialog"
+} from '@/components/ui/table';
+import { Edit } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface Product {
   id: string;

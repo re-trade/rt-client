@@ -11,8 +11,6 @@ interface Address {
   district: string;
   ward: string;
   type: string;
-  created_date: Date;
-  updated_date: Date;
 }
 
 interface Props {
@@ -29,7 +27,12 @@ export default function AddressCard({ address, index, onEdit, onDelete }: Props)
         <h2 className="text-lg font-medium text-black">Địa chỉ {index + 1}</h2>
         <div className="flex items-start space-x-2">
           <span className="mt-1">
-            <svg className="w-5 h-5 text-[#FF9999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5 text-[#FF9999]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
