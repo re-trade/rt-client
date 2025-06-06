@@ -31,7 +31,6 @@ export const cartApi = {
       const response = await authApi.default.get<CartResponse>('/carts');
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch cart:', error);
       throw error;
     }
   },
@@ -44,7 +43,6 @@ export const cartApi = {
       });
       return response.data;
     } catch (error) {
-      console.error('Failed to add item to cart:', error);
       throw error;
     }
   },
@@ -54,7 +52,6 @@ export const cartApi = {
       const response = await authApi.default.delete<CartResponse>(`/carts/items/${productId}`);
       return response.data;
     } catch (error) {
-      console.error('Failed to remove item from cart:', error);
       throw error;
     }
   },
@@ -66,7 +63,6 @@ export const cartApi = {
       });
       return response.data;
     } catch (error) {
-      console.error('Failed to update cart item quantity:', error);
       throw error;
     }
   },
@@ -75,7 +71,6 @@ export const cartApi = {
     try {
       await authApi.default.delete('/carts');
     } catch (error) {
-      console.error('Failed to clear cart:', error);
       throw error;
     }
   },
