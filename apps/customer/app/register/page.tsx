@@ -92,7 +92,7 @@ export default function Register() {
         {/* Right Form */}
         <div className="flex justify-center  w-full md:w-1/2 px-6 py-16">
           <div className="w-full max-w-xl">
-            <h1 className="text-3xl font-bold text-black text-center mb-4">Tạo tài khoản</h1>
+            <h1 className="text-3xl font-bold text-black text-center mb-4">Đăng ký tài khoản</h1>
             <p className="text-center text-gray-600 mb-6">
               Bắt đầu hành trình &quot;săn đồ&quot; thông minh!
             </p>

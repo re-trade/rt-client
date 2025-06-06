@@ -23,6 +23,18 @@ type TAccountMeResponse = {
   roles: string[];
 };
 
+
+type TRegister = {
+  username: string;
+  password: string;
+  rePassword: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  avatarUrl: string;
+};
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
   const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
@@ -44,6 +56,13 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   }
 };
 
+
+const registerInternal = async (registerForm: TRegister): Promise<void> => {
+  await unAuthApi.default.post<IResponseObject<TTokenResponse>>('/registers/customers/account', {
+    ...registerForm,
+  });
+};
+
 const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   try {
     const result = await authApi.default.get<IResponseObject<TAccountMeResponse>>('/accounts/me');
@@ -57,4 +76,4 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
-export { accountMe, loginInternal };
+export { accountMe, loginInternal, registerInternal };
