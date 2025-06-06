@@ -28,7 +28,7 @@ export default function CartSection() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
       {Object.entries(cartGroups).map(([sellerId, shopSection]) => (
         <div key={sellerId} className="rounded-lg border border-gray-200 bg-white shadow-sm">
           <button
@@ -155,6 +155,6 @@ export default function CartSection() {
           )}
         </div>
       ))}
-    </div>
+    </>
   );
 }
