@@ -3,7 +3,7 @@
 import { Mail } from 'lucide-react';
 import Image from 'next/image';
 import { handlePhoneInput } from '@/components/input/InputHandle';
-
+import React, { useState, useRef } from 'react';
 interface Profile {
   name: string;
   username: string;

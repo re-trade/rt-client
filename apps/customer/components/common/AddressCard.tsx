@@ -11,8 +11,6 @@ interface Address {
   district: string;
   ward: string;
   type: string;
-  created_date: Date;
-  updated_date: Date;
 }
 
 interface Props {
