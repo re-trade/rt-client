@@ -1,9 +1,9 @@
 'use client';
 
+import AddAddressDialog, { Address } from '@/components/dialog/add/create-address-dialog';
+import EditAddressDialog from '@/components/dialog/view-update/edit-address-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import AddAddressDialog, { Address } from '@/components/ui/dialog/add/create-address-dialog';
-import EditAddressDialog from '@/components/ui/dialog/view-update/edit-address-dialog';
 import {
   Table,
   TableBody,
