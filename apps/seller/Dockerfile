@@ -15,7 +15,7 @@ ENV NEXT_PUBLIC_NODE_ENV=${NODE_ENV}
 COPY --from=builder /build/out/json/ ./
 RUN yarn install --frozen-lockfile
 COPY --from=builder /build/out/full/ ./
-RUN yarn turbo run build
+RUN turbo run build
 
 FROM base AS runner
 WORKDIR /app
