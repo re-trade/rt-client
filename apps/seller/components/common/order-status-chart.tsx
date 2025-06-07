@@ -1,25 +1,25 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 
 const orderStatusData = [
-  { name: "Đã giao hàng", value: 450, color: "#22c55e" },
-  { name: "Đang giao", value: 120, color: "#3b82f6" },
-  { name: "Đang chuẩn bị", value: 80, color: "#f59e0b" },
-  { name: "Chờ xác nhận", value: 45, color: "#ef4444" },
-  { name: "Đã hủy", value: 25, color: "#6b7280" },
-]
+  { name: 'Đã giao hàng', value: 450, color: '#22c55e' },
+  { name: 'Đang giao', value: 120, color: '#3b82f6' },
+  { name: 'Đang chuẩn bị', value: 80, color: '#f59e0b' },
+  { name: 'Chờ xác nhận', value: 45, color: '#ef4444' },
+  { name: 'Đã hủy', value: 25, color: '#6b7280' },
+];
 
 const chartConfig = {
   orders: {
-    label: "Đơn hàng",
+    label: 'Đơn hàng',
   },
-}
+};
 
 export function OrderStatusChart() {
-  const total = orderStatusData.reduce((sum, item) => sum + item.value, 0)
+  const total = orderStatusData.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <Card>
@@ -77,5 +77,5 @@ export function OrderStatusChart() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

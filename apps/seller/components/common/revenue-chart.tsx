@@ -1,30 +1,30 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
 const revenueData = [
-  { month: "T1", revenue: 25000000, orders: 180 },
-  { month: "T2", revenue: 28000000, orders: 210 },
-  { month: "T3", revenue: 32000000, orders: 245 },
-  { month: "T4", revenue: 29000000, orders: 220 },
-  { month: "T5", revenue: 35000000, orders: 280 },
-  { month: "T6", revenue: 38000000, orders: 310 },
-  { month: "T7", revenue: 42000000, orders: 350 },
-  { month: "T8", revenue: 39000000, orders: 320 },
-  { month: "T9", revenue: 45000000, orders: 380 },
-  { month: "T10", revenue: 48000000, orders: 410 },
-  { month: "T11", revenue: 52000000, orders: 450 },
-  { month: "T12", revenue: 55000000, orders: 480 },
-]
+  { month: 'T1', revenue: 25000000, orders: 180 },
+  { month: 'T2', revenue: 28000000, orders: 210 },
+  { month: 'T3', revenue: 32000000, orders: 245 },
+  { month: 'T4', revenue: 29000000, orders: 220 },
+  { month: 'T5', revenue: 35000000, orders: 280 },
+  { month: 'T6', revenue: 38000000, orders: 310 },
+  { month: 'T7', revenue: 42000000, orders: 350 },
+  { month: 'T8', revenue: 39000000, orders: 320 },
+  { month: 'T9', revenue: 45000000, orders: 380 },
+  { month: 'T10', revenue: 48000000, orders: 410 },
+  { month: 'T11', revenue: 52000000, orders: 450 },
+  { month: 'T12', revenue: 55000000, orders: 480 },
+];
 
 const chartConfig = {
   revenue: {
-    label: "Doanh thu",
-    color: "hsl(var(--chart-1))",
+    label: 'Doanh thu',
+    color: 'hsl(var(--chart-1))',
   },
-}
+};
 
 export function RevenueChart() {
   return (
@@ -52,7 +52,10 @@ export function RevenueChart() {
               <ChartTooltip
                 content={
                   <ChartTooltipContent
-                    formatter={(value, name) => [`${(Number(value) / 1000000).toFixed(1)}M đ`, "Doanh thu"]}
+                    formatter={(value, name) => [
+                      `${(Number(value) / 1000000).toFixed(1)}M đ`,
+                      'Doanh thu',
+                    ]}
                   />
                 }
               />
@@ -69,5 +72,5 @@ export function RevenueChart() {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
