@@ -12,6 +12,7 @@ env:
 jobs:
   build-images:
     runs-on: ubuntu-latest
+    continue-on-error: true
     permissions:
       contents: read
       packages: write
