@@ -5,18 +5,14 @@ on:
     branches:
       - main
 
-env:
-  REGISTRY: ghcr.io/${{ github.repository }}
-  API_BASE_URL: ${{ secrets.API_BASE_URL }}
-
 jobs:
   build-dev-images:
     name: Build Dev Images
     runs-on: ubuntu-latest
     env:
-      REGISTRY: ${{ env.REGISTRY }}
+      REGISTRY: ghcr.io/${{ github.repository }}
       TAG: nightly
-      API_BASE_URL: ${{ env.API_BASE_URL }}
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
     continue-on-error: true
     permissions:
       contents: read
@@ -43,10 +39,9 @@ jobs:
     name: Build Prod Images
     runs-on: ubuntu-latest
     env:
-      REGISTRY: ${{ env.REGISTRY }}
+      REGISTRY: ghcr.io/${{ github.repository }}
       TAG: prod
-      API_BASE_URL: ${{ env.API_BASE_URL }}
-    continue-on-error: true
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
     permissions:
       contents: read
       packages: write
@@ -67,6 +62,7 @@ jobs:
         run: |
           docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} build
           docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} push
+        continue-on-error: true
 
   deploy-dev:
     runs-on: retrade-dev
@@ -89,10 +85,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull nightly images
-        run: |
-          docker pull $REGISTRY/rt-client-customer:${TAG}
-          docker pull $REGISTRY/rt-client-admin:${TAG}
-          docker pull $REGISTRY/rt-client-seller:${TAG}
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod pull
 
       - name: Clean Container, Image And Prepare For Deploy
         run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod up -d
