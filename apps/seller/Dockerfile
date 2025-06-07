@@ -1,4 +1,6 @@
-FROM node:slim AS base
+FROM node:alpine AS base
+RUN apk update
+RUN apk add --no-cache libc6-compat
 RUN yarn global add turbo@^2 @types/node@^20
 
 FROM base AS builder

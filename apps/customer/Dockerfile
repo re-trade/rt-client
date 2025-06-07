@@ -1,10 +1,13 @@
-FROM node:slim AS base
+FROM node:alpine AS base
+RUN apk update
+RUN apk add --no-cache libc6-compat
 RUN yarn global add turbo@^2 @types/node@^20
 
 FROM base AS builder
 WORKDIR /build
 COPY . .
 RUN turbo prune @retrade/rt-client-customer --docker
+
 FROM base AS installer
 WORKDIR /installer
 ARG API_BASE_URL
