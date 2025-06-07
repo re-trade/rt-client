@@ -13,6 +13,10 @@ jobs:
   build-dev-images:
     name: Build Dev Images
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ${{ env.REGISTRY }}
+      TAG: nightly
+      API_BASE_URL: ${{ env.API_BASE_URL }}
     continue-on-error: true
     permissions:
       contents: read
@@ -30,20 +34,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/${{ matrix.service }}/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/rt-client-${{ matrix.service }}:nightly
-          build-args: |
-            API_BASE_URL=${{ env.API_BASE_URL }}
-            NODE_ENV=production
+        run: |
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} build
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} push
+
   build-prod-images:
-    name: Build Dev Images
+    name: Build Prod Images
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ${{ env.REGISTRY }}
+      TAG: prod
+      API_BASE_URL: ${{ env.API_BASE_URL }}
     continue-on-error: true
     permissions:
       contents: read
@@ -61,21 +63,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: apps/${{ matrix.service }}/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/rt-client-${{ matrix.service }}:prod
-          build-args: |
-            API_BASE_URL=${{ env.API_BASE_URL }}
-            NODE_ENV=production
+        run: |
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} build
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} push
 
   deploy-dev:
     runs-on: retrade-dev
-    needs: build-images
+    needs: [build-dev-images]
     permissions:
       contents: read
       packages: write
