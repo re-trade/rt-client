@@ -10,7 +10,8 @@ env:
   API_BASE_URL: ${{ secrets.API_BASE_URL }}
 
 jobs:
-  build-images:
+  build-dev-images:
+    name: Build Dev Images
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
@@ -19,7 +20,6 @@ jobs:
     strategy:
       matrix:
         service: [customer, admin, seller]
-        tag: [nightly, prod]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -37,7 +37,38 @@ jobs:
           context: .
           file: apps/${{ matrix.service }}/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/rt-client-${{ matrix.service }}:${{ matrix.tag }}
+          tags: ${{ env.REGISTRY }}/rt-client-${{ matrix.service }}:nightly
+          build-args: |
+            API_BASE_URL=${{ env.API_BASE_URL }}
+            NODE_ENV=production
+  build-prod-images:
+    name: Build Dev Images
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        service: [customer, admin, seller]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/rt-client-${{ matrix.service }}:prod
           build-args: |
             API_BASE_URL=${{ env.API_BASE_URL }}
             NODE_ENV=production
