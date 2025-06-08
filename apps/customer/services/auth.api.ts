@@ -23,17 +23,29 @@ type TAccountMeResponse = {
   roles: string[];
 };
 
+type TRegister = {
+  username: string;
+  password: string;
+  rePassword: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  avatarUrl: string;
+};
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
+  
   const deviceInfo = await getDeviceInfo();
   const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
     '/auth/local',
     { ...loginForm },
     {
       headers: {
-        'x-device-fingerprint': deviceInfo.deviceFingerprint,
-        'x-device-name': deviceInfo.deviceName,
-        'x-ip-address': deviceInfo.ipAddress,
-        'x-location': deviceInfo.location,
+        'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
+  'x-device-name': encodeURIComponent(deviceInfo.deviceName),
+  'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
+  'x-location': encodeURIComponent(deviceInfo.location),
       },
     },
   );
@@ -42,6 +54,12 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
     const { ACCESS_TOKEN } = result.data.content.tokens;
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
   }
+};
+
+const registerInternal = async (registerForm: TRegister): Promise<void> => {
+  await unAuthApi.default.post<IResponseObject<TTokenResponse>>('/registers/customers/account', {
+    ...registerForm,
+  });
 };
 
 const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
@@ -57,4 +75,21 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
-export { accountMe, loginInternal };
+const register2FAInternal = async (
+  width: number = 300,
+  height: number = 300
+): Promise<Blob> => {
+  const response = await authApi.default.post<Blob>(
+    `/auth/register/2fa?width=${width}&height=${height}`,
+    null,
+    {
+      responseType: 'blob',
+      headers: {
+        Accept: 'image/png',
+      },
+    }
+  );
+
+  return response.data;
+};
+export { accountMe, loginInternal, registerInternal, register2FAInternal };

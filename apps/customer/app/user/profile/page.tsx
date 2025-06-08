@@ -1,39 +1,43 @@
 'use client';
 
-import { Mail } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import React, { useRef, useState } from 'react';
-interface Profile {
-  name: string;
+import { Mail } from 'lucide-react';
+import { getCustomerProfile } from '@services/account.api'; 
+
+type TCustomerProfile = {
+  id: string;
+  firstName: string;
+  lastName: string;
   username: string;
   email: string;
   phone?: string;
-  gender: string;
-  country: string;
+  address: string;
   avatarUrl: string;
-  lastUpdated: string;
-}
-
-const fakeProfile: Profile = {
-  name: 'Hien Nguyen',
-  username: 'Hiennguyen123',
-  email: 'Hiennguyen25@gmail.com',
-  phone: '',
-  gender: 'Nữ',
-  country: 'Việt Nam',
-  avatarUrl: '/Facebook_icon.svg.png',
-  lastUpdated: '1 month ago',
 };
 
 export default function ProfilePage() {
-  const [avatar, setAvatar] = useState<string>(fakeProfile.avatarUrl);
+  const [profile, setProfile] = useState<TCustomerProfile | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const data = await getCustomerProfile();
+      if (data) {
+        setProfile(data);
+        setAvatarPreview(data.avatarUrl);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
-      setAvatar(url);
+      setAvatarPreview(url);
     }
   };
 
@@ -41,7 +45,7 @@ export default function ProfilePage() {
     fileInputRef.current?.click();
   };
 
-  const profile = fakeProfile;
+  if (!profile) return <div className="p-10 text-center">Đang tải hồ sơ...</div>;
 
   return (
     <div className="w-full h-full bg-white p-10">
@@ -50,17 +54,24 @@ export default function ProfilePage() {
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
-              <div className="w-40 h-40 bg-gray-300 rounded-full mr-4 overflow-hidden">
+              <div className="w-40 h-40 bg-gray-300 rounded-full mr-4 overflow-hidden relative cursor-pointer" onClick={triggerFileInput}>
                 <Image
-                  src={profile.avatarUrl}
-                  alt={profile.name}
+                  src={avatarPreview || '/default-avatar.png'}
+                  alt="avatar"
                   width={150}
                   height={150}
                   className="w-full h-full object-cover"
                 />
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
               </div>
               <div>
-                <h2 className="text-2xl font-semibold text-black">{profile.name}</h2>
+                <h2 className="text-2xl font-semibold text-black">{`${profile.firstName} ${profile.lastName}`}</h2>
                 <p className="text-lg text-gray-600">{profile.email}</p>
               </div>
             </div>
@@ -87,7 +98,6 @@ export default function ProfilePage() {
                 <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
                 <input
                   type="text"
-                  placeholder="Thêm số điện thoại"
                   defaultValue={profile.phone || ''}
                   className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black"
                 />
@@ -100,16 +110,13 @@ export default function ProfilePage() {
                 <label className="block text-sm font-medium text-gray-700">Họ và tên</label>
                 <input
                   type="text"
-                  defaultValue={profile.name}
+                  defaultValue={`${profile.firstName} ${profile.lastName}`}
                   className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Giới tính</label>
-                <select
-                  defaultValue={profile.gender}
-                  className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black"
-                >
+                <select className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black">
                   <option value="Nam">Nam</option>
                   <option value="Nữ">Nữ</option>
                   <option value="Khác">Khác</option>
@@ -121,10 +128,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Quốc gia</label>
-                <select
-                  defaultValue={profile.country}
-                  className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black"
-                >
+                <select className="w-full p-3 border border-gray-300 rounded-lg bg-white text-black">
                   <option value="Việt Nam">Việt Nam</option>
                   <option value="Mỹ">Mỹ</option>
                   <option value="Khác">Khác</option>
