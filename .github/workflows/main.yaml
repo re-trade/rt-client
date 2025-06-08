@@ -1,60 +1,72 @@
 name: Deploy to Dev Server
+
 on:
   push:
     branches:
       - main
+
 jobs:
-  build-image-dev:
+  build-dev-images:
+    name: Build Dev Images
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     env:
       REGISTRY: ghcr.io/${{ github.repository }}
-      API_BASE_URL: ${{ secrets.API_BASE_URL }}
       TAG: nightly
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor}}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push image
-        run: |
-          docker compose -f .docker/compose.build.yaml --profile build build --parallel
-          docker compose -f .docker/compose.build.yaml --profile build push
-  build-image-prod:
-    runs-on: ubuntu-latest
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
+    continue-on-error: true
     permissions:
       contents: read
       packages: write
-    env:
-      REGISTRY: ghcr.io/${{ github.repository }}
-      API_BASE_URL: ${{ secrets.API_BASE_URL }}
-      TAG: prod
+    strategy:
+      matrix:
+        service: [customer, admin, seller]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
+
+      - name: Login to GHCR
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor}}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push image
         run: |
-          docker compose -f .docker/compose.build.yaml --profile build build --parallel
-          docker compose -f .docker/compose.build.yaml --profile build push
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} build
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} push
+
+  build-prod-images:
+    name: Build Prod Images
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io/${{ github.repository }}
+      TAG: prod
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        service: [customer, admin, seller]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        run: |
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} build
+          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} push
+        continue-on-error: true
+
   deploy-dev:
     runs-on: retrade-dev
-    needs: [build-image-dev]
+    needs: [build-dev-images]
     permissions:
       contents: read
       packages: write
@@ -64,19 +76,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
+
+      - name: Login to GHCR
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor}}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull Image
-        run: docker compose -f .docker/compose.yaml --profile prod pull
+
+      - name: Pull nightly images
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod pull
+
       - name: Clean Container, Image And Prepare For Deploy
         run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod up -d
         continue-on-error: true
-      - name: Clean Old Image
+
+      - name: Clean Old Images
         run: docker image prune -a -f
         continue-on-error: true

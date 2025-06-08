@@ -8,6 +8,9 @@ services:
       args:
         - API_BASE_URL=${API_BASE_URL}
         - NODE_ENV=production
+    profiles:
+      - customer
+      - build
   rt-client-admin:
     image: ${REGISTRY}/rt-client-admin:${TAG:-latest}
     build:
@@ -17,6 +20,9 @@ services:
       args:
         - API_BASE_URL=${API_BASE_URL}
         - NODE_ENV=production
+    profiles:
+      - admin
+      - build
   rt-client-seller:
     image: ${REGISTRY}/rt-client-seller:${TAG:-latest}
     build:
@@ -26,3 +32,6 @@ services:
       args:
         - API_BASE_URL=${API_BASE_URL}
         - NODE_ENV=production
+    profiles:
+      - seller
+      - build

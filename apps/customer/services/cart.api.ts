@@ -1,4 +1,4 @@
-import { authApi } from '@retrade/util';
+import { authApi, IResponseObject } from '@retrade/util';
 
 export interface CartItemResponse {
   productId: string;
@@ -28,8 +28,11 @@ export interface CartResponse {
 export const cartApi = {
   async getCart(): Promise<CartResponse> {
     try {
-      const response = await authApi.default.get<CartResponse>('/carts');
-      return response.data;
+      const response = await authApi.default.get<IResponseObject<CartResponse>>('/carts');
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to fetch cart');
     } catch (error) {
       throw error;
     }
