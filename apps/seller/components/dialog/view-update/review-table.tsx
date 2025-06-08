@@ -1,18 +1,25 @@
-"use client"
+'use client';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Eye, MessageSquare, Star, CheckCircle, AlertTriangle } from "lucide-react"
-import Image from "next/image"
-import type { Review } from "@/app/dashboard/review-management/page" 
+import type { Review } from '@/app/dashboard/review-management/page';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { AlertTriangle, CheckCircle, Eye, MessageSquare, Star } from 'lucide-react';
+import Image from 'next/image';
 
 interface ReviewTableProps {
-  reviews: Review[]
-  onViewDetail: (review: Review) => void
-  onReply: (review: Review) => void
+  reviews: Review[];
+  onViewDetail: (review: Review) => void;
+  onReply: (review: Review) => void;
 }
 
 export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps) {
@@ -22,23 +29,23 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`h-4 w-4 ${star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+            className={`h-4 w-4 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
           />
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 4) return "bg-green-100 text-green-800"
-    if (rating >= 3) return "bg-yellow-100 text-yellow-800"
-    return "bg-red-100 text-red-800"
-  }
+    if (rating >= 4) return 'bg-green-100 text-green-800';
+    if (rating >= 3) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-red-100 text-red-800';
+  };
 
   const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + "..."
-  }
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
 
   return (
     <Card>
@@ -61,7 +68,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={review.customerAvatar || "/placeholder.svg"} />
+                      <AvatarImage src={review.customerAvatar || '/placeholder.svg'} />
                       <AvatarFallback>{review.customerName.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
@@ -80,14 +87,16 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Image
-                      src={review.productImage || "/placeholder.svg"}
+                      src={review.productImage || '/placeholder.svg'}
                       alt={review.productName}
                       width={40}
                       height={40}
                       className="rounded-md object-cover"
                     />
                     <div>
-                      <div className="font-medium text-sm">{truncateText(review.productName, 30)}</div>
+                      <div className="font-medium text-sm">
+                        {truncateText(review.productName, 30)}
+                      </div>
                       <div className="text-xs text-muted-foreground">#{review.orderId}</div>
                     </div>
                   </div>
@@ -101,18 +110,24 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                 <TableCell className="max-w-xs">
                   <div>
                     <div className="font-medium text-sm">{truncateText(review.title, 40)}</div>
-                    <div className="text-sm text-muted-foreground">{truncateText(review.content, 60)}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {truncateText(review.content, 60)}
+                    </div>
                     {review.images && review.images.length > 0 && (
-                      <div className="text-xs text-blue-600 mt-1">+{review.images.length} hình ảnh</div>
+                      <div className="text-xs text-blue-600 mt-1">
+                        +{review.images.length} hình ảnh
+                      </div>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm">{new Date(review.createdAt).toLocaleDateString("vi-VN")}</div>
+                  <div className="text-sm">
+                    {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                  </div>
                   <div className="text-xs text-muted-foreground">
-                    {new Date(review.createdAt).toLocaleTimeString("vi-VN", {
-                      hour: "2-digit",
-                      minute: "2-digit",
+                    {new Date(review.createdAt).toLocaleTimeString('vi-VN', {
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </div>
                 </TableCell>
@@ -149,5 +164,5 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

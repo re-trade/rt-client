@@ -19,10 +19,10 @@ import {
   MapPin,
   Package,
   ShoppingCart,
+  Star,
   Store,
   Ticket,
   Truck,
-  Star,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -45,9 +45,9 @@ const menuItems = [
     href: '/dashboard/shop-info-management',
   },
   {
-    title: "Quản lý đánh giá",
+    title: 'Quản lý đánh giá',
     icon: Star,
-    href: "/dashboard/review-management",
+    href: '/dashboard/review-management',
   },
   {
     title: 'Quản lý sản phẩm',
