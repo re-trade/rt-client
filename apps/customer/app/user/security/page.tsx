@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import TwoFactor from '@/components/auth/2FA';
 import { ChangePasswordDialog } from '@/components/common/ChangePasswordDialog';
+import { useEffect, useRef, useState } from 'react';
 
 export default function SecurityPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
