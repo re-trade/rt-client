@@ -105,7 +105,7 @@ export default function AddressUpdateDialog({ open, onClose, onUpdate, initialDa
               <input
                 type="text"
                 className={`input input-bordered w-full border-gray-600 text-black bg-white ${touched[key] && errors[key] ? 'border-red-500' : ''}`}
-                value={String(formData[key as keyof typeof formData] ?? "")}
+                value={String(formData[key as keyof typeof formData] ?? '')}
                 onChange={(e) => handleChange(key, e.target.value)}
                 onBlur={() => handleBlur(key)}
               />

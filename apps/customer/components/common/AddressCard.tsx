@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import type { Address } from '@/app/user/address/page';
 
 interface Props {
