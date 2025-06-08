@@ -111,22 +111,23 @@ export default function SecurityPage() {
 
           {/* 2FA Modal */}
           <dialog ref={dialog2FARef} className="rounded-lg w-[90%] max-w-md">
-            <div className="p-4">
-              <h2 className="text-xl font-semibold mb-2">Kích hoạt Xác thực Hai Yếu Tố</h2>
-              <TwoFactor />
-              <div className="text-right mt-4">
-                <button
-                  onClick={() => {
-                    dialog2FARef.current?.close();
-                    setIs2FAModalOpen(false);
-                  }}
-                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
-                >
-                  Đóng
-                </button>
-              </div>
-            </div>
-          </dialog>
+  <div className="p-4">
+    <h2 className="text-xl font-semibold mb-2">Kích hoạt Xác thực Hai Yếu Tố</h2>
+    {is2FAModalOpen && <TwoFactor />}
+    <div className="text-right mt-4">
+      <button
+        onClick={() => {
+          dialog2FARef.current?.close();
+          setIs2FAModalOpen(false);
+        }}
+        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+      >
+        Đóng
+      </button>
+    </div>
+  </div>
+</dialog>
+
         </div>
       </div>
     </div>
