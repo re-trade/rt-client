@@ -1,21 +1,25 @@
-FROM node:slim AS base
-RUN yarn global add turbo@^2
+FROM node:alpine AS base
+RUN apk update
+RUN apk add --no-cache libc6-compat
+RUN yarn global add turbo
 
 FROM base AS builder
 WORKDIR /build
 COPY . .
+RUN yarn install
 RUN turbo prune @retrade/rt-client-customer --docker
+
 FROM base AS installer
 WORKDIR /installer
 ARG API_BASE_URL
 ARG NODE_ENV
-ENV NEXT_API_BASE_URL=${API_BASE_URL}
+ENV NEXT_PUBLIC_API_BASE_URL=${API_BASE_URL}
 ENV NEXT_PUBLIC_NODE_ENV=${NODE_ENV}
 COPY --from=builder /build/out/json/ ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --production=false
 
 COPY --from=builder /build/out/full/ ./
-RUN yarn turbo run build
+RUN yarn turbo build
 
 FROM base AS runner
 WORKDIR /app
