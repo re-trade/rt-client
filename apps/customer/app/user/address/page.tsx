@@ -3,7 +3,7 @@ import AddressCard from '@/components/common/AddressCard';
 import AddressCreateDialog from '@/components/common/AddressCreateDialog';
 import AddressUpdateDialog from '@/components/common/AddressUpdateDialog';
 import { useState } from 'react';
-interface Address {
+export interface Address {
   id: string;
   customer_id: string;
   name: string;

@@ -1,22 +1,9 @@
 'use client';
 
+import type { Address } from '@/app/user/address/page';
 import { useState } from 'react';
 import { getInputHandler } from '../input/getInputHandle';
 const now = new Date().toISOString();
-export interface Address {
-  id: string;
-  customer_id?: string;
-  name?: string;
-  customerName?: string;
-  phoneNumber?: string;
-  state?: string;
-  country?: string;
-  district?: string;
-  ward?: string;
-  type: string;
-  isDefault: boolean;
-}
-
 interface Props {
   open: boolean;
   onCreate: (data: Address) => void;
@@ -123,8 +110,10 @@ export default function AddressCreateDialog({ open, onCreate, onClose }: Props) 
               <label className="text-sm font-medium text-black mb-1">{label}</label>
               <input
                 type="text"
-                className={`input input-bordered w-full border-gray-600 text-black bg-white ${touched[key] && errors[key] ? 'border-red-500' : ''}`}
-                value={formData[key as keyof typeof formData]}
+                className={`input input-bordered w-full border-gray-600 text-black bg-white ${
+                  touched[key] && errors[key] ? 'border-red-500' : ''
+                }`}
+                value={String(formData[key as keyof typeof formData] ?? '')}
                 onChange={(e) => handleChange(key, e.target.value)}
                 onBlur={() => handleBlur(key)}
               />
