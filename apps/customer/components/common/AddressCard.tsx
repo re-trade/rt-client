@@ -1,17 +1,7 @@
 'use client';
 
-interface Address {
-  id: string;
-  customer_id: string;
-  name: string;
-  customerName: string;
-  phoneNumber: string;
-  state: string;
-  country: string;
-  district: string;
-  ward: string;
-  type: string;
-}
+import React from 'react';
+import type { Address } from '@/app/user/address/page';
 
 interface Props {
   address: Address;
