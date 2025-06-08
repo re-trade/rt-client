@@ -1,18 +1,5 @@
 'use client';
-
-interface Address {
-  id: string;
-  customer_id: string;
-  name: string;
-  customerName: string;
-  phoneNumber: string;
-  state: string;
-  country: string;
-  district: string;
-  ward: string;
-  type: string;
-}
-
+import { Address } from '@/hooks/use-address-manager';
 interface Props {
   address: Address;
   index: number;
