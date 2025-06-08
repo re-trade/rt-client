@@ -1,18 +1,33 @@
 'use client';
-import { ChangePasswordDialog } from '@/components/common/ChangePasswordDialog';
+
 import { useEffect, useRef, useState } from 'react';
+import TwoFactor from '@/components/auth/2FA';
+import { ChangePasswordDialog } from '@/components/common/ChangePasswordDialog';
 
 export default function SecurityPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [is2FAModalOpen, setIs2FAModalOpen] = useState(false);
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const dialog2FARef = useRef<HTMLDialogElement | null>(null);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleOpen2FAModal = () => setIs2FAModalOpen(true);
+  const handleClose2FAModal = () => setIs2FAModalOpen(false);
+
   useEffect(() => {
     if (isModalOpen) {
       dialogRef.current?.showModal();
     }
   }, [isModalOpen]);
+
+  useEffect(() => {
+    if (is2FAModalOpen) {
+      dialog2FARef.current?.showModal();
+    }
+  }, [is2FAModalOpen]);
 
   const handleChoseAction = (action: string) => {
     switch (action) {
@@ -20,15 +35,12 @@ export default function SecurityPage() {
         handleOpenModal();
         break;
       case 'Cập nhật':
-        // Handle update email or phone logic here
         alert('Cập nhật email hoặc số điện thoại');
         break;
       case 'Đăng ký':
-        // Handle 2FA registration logic here
-        alert('Đăng ký xác thực hai yếu tố');
+        handleOpen2FAModal();
         break;
       case 'Liên kết':
-        // Handle linking accounts logic here
         alert('Liên kết tài khoản');
         break;
       default:
@@ -86,7 +98,7 @@ export default function SecurityPage() {
                   <p className="text-sm text-gray-600">{item.description}</p>
                 </div>
                 <button
-                  className="px-4 py-2  bg-[#ffd2b2] text-black rounded-md text-sm"
+                  className="px-4 py-2 bg-[#ffd2b2] text-black rounded-md text-sm"
                   onClick={() => handleChoseAction(item.action)}
                 >
                   {item.action}
@@ -94,7 +106,27 @@ export default function SecurityPage() {
               </div>
             ))}
           </div>
+
           <ChangePasswordDialog open={isModalOpen} onClose={handleCloseModal} />
+
+          {/* 2FA Modal */}
+          <dialog ref={dialog2FARef} className="rounded-lg w-[90%] max-w-md">
+            <div className="p-4">
+              <h2 className="text-xl font-semibold mb-2">Kích hoạt Xác thực Hai Yếu Tố</h2>
+              <TwoFactor />
+              <div className="text-right mt-4">
+                <button
+                  onClick={() => {
+                    dialog2FARef.current?.close();
+                    setIs2FAModalOpen(false);
+                  }}
+                  className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </dialog>
         </div>
       </div>
     </div>
