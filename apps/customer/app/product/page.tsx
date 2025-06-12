@@ -1,11 +1,13 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import React, { useState, useEffect, useMemo } from 'react';
-import { productApi, TProduct } from '@/services/product.api';
 import ProductFilter from '@/components/common/FillterProduct';
-import { StoreIcon, SparklesIcon, TagIcon, BadgeCheckIcon } from 'lucide-react';
+import { productApi, TProduct } from '@/services/product.api';
+import { motion } from 'framer-motion';
+import { BadgeCheckIcon, StoreIcon } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+
 export default function ProductListPage() {
   const [filter, setFilter] = useState({
     name: '',
@@ -13,6 +15,7 @@ export default function ProductListPage() {
     brands: [],
   });
 
+  const router = useRouter();
   const [products, setProducts] = useState<TProduct[]>([]);
 
   useEffect(() => {
@@ -31,11 +34,8 @@ export default function ProductListPage() {
   // Lọc sản phẩm theo filter
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const matchesName = product.name
-        ?.toLowerCase()
-        .includes(filter.name.toLowerCase());
-      const matchesBrand =
-        filter.brands.length === 0 || filter.brands.includes(product.brand);
+      const matchesName = product.name?.toLowerCase().includes(filter.name.toLowerCase());
+      const matchesBrand = filter.brands.length === 0 || filter.brands.includes(product.brand);
       // Nếu bạn có categories trong TProduct, hãy lọc theo nó ở đây
       return matchesName && matchesBrand;
     });
@@ -58,6 +58,7 @@ export default function ProductListPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
               <motion.div
+                onClick={() => router.push(`/product/${product.id}`)}
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -82,7 +83,9 @@ export default function ProductListPage() {
                 </div>
 
                 <div className="p-4 space-y-1">
-                  <h3 className="font-semibold text-gray-900 text-base line-clamp-1">{product.name}</h3>
+                  <h3 className="font-semibold text-gray-900 text-base line-clamp-1">
+                    {product.name}
+                  </h3>
                   <div className="flex items-center text-sm text-gray-600 gap-1">
                     <BadgeCheckIcon className="w-4 h-4 text-blue-500" />
                     <span>Thương hiệu: {product.brand}</span>
@@ -105,7 +108,6 @@ export default function ProductListPage() {
               </motion.div>
             ))}
           </div>
-
         </main>
       </div>
     </div>
