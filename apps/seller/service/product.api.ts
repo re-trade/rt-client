@@ -51,4 +51,29 @@ export const productApi = {
       throw error;
     }
   },
+  async createProdut(product: TProduct): Promise<TProduct> {
+    const response = await authApi.default.post<IResponseObject<TProduct>>('/products', product);
+    if (response.data.success) {
+      return response.data.content;
+    }
+    throw new Error('Failed to create product');
+  },
+  async updateProduct(id: string, product: Partial<TProduct>): Promise<TProduct> {
+    const response = await authApi.default.put<IResponseObject<TProduct>>(
+      `/products/${id}`,
+      product,
+    );
+    if (response.data.success) {
+      return response.data.content;
+    }
+    throw new Error('Failed to update product');
+  },
+
+  async deleteProduct(id: string): Promise<TProduct> {
+    const response = await authApi.default.delete<IResponseObject<TProduct>>(`/product/${id}`);
+    if (response.data.success) {
+      return response.data.content;
+    }
+    throw new Error('Failed to delete product');
+  },
 };
