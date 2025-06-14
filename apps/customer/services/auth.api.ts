@@ -37,7 +37,7 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
       },
     },
   );
-
+  console.log('Login result:', result);
   if (result.data.success && result.status === 200) {
     const { ACCESS_TOKEN } = result.data.content.tokens;
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);

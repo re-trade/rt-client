@@ -22,14 +22,9 @@ export type TProduct = {
 };
 
 export const productApi = {
-  async getProducts(
-    page: number = 0,
-    size: number = 10,
-    query?: string,
-    id?: string,
-  ): Promise<TProduct[]> {
+  async getProducts(page: number = 0, size: number = 10, query?: string): Promise<TProduct[]> {
     const response = await authApi.default.get<IResponseObject<TProduct[]>>(
-      `/products/seller/${id}`,
+      `/products/my-products`,
       {
         params: {
           page,
