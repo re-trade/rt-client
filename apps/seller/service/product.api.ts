@@ -23,13 +23,12 @@ export type TProduct = {
 
 export const productApi = {
   async getProducts(
-    page: number = 0,
+    page: number = 1,
     size: number = 10,
     query?: string,
-    id?: string,
   ): Promise<TProduct[]> {
     const response = await authApi.default.get<IResponseObject<TProduct[]>>(
-      `/products/seller/${id}`,
+      `/products/my-products`,
       {
         params: {
           page,
