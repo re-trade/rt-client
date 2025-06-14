@@ -4,7 +4,6 @@ import { CreateProductDialog } from '@/components/dialog/add/create-product-dial
 import { EditProductDialog } from '@/components/dialog/view-update/edit-product-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { productApi,TProduct } from '@/service/product.api';
 import {
   Table,
   TableBody,
@@ -13,9 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { productApi, TProduct } from '@/service/product.api';
 import { Edit } from 'lucide-react';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Product {
   id: string;
@@ -67,7 +67,7 @@ export default function ProductManagement() {
     };
     setProducts([...products, newProduct]);
   };
-  const id: string ="1"; // Replace with actual product ID from route params or context
+  const id: string = '1'; // Replace with actual product ID from route params or context
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -76,7 +76,7 @@ export default function ProductManagement() {
       } catch (error) {
         console.error('Error fetching products:', error);
       }
-    }
+    };
     fetchProduct();
   }, []);
   useEffect(() => {
@@ -124,7 +124,7 @@ export default function ProductManagement() {
             <TableHeader>
               <TableRow>
                 <TableHead>Hình ảnh</TableHead>
-                <TableHead>Tên sản phẩm</TableHead> 
+                <TableHead>Tên sản phẩm</TableHead>
                 <TableHead>Giá</TableHead>
                 <TableHead>Tồn kho</TableHead>
                 <TableHead>Danh mục</TableHead>
