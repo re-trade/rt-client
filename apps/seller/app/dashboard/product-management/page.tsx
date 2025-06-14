@@ -4,6 +4,7 @@ import { CreateProductDialog } from '@/components/dialog/add/create-product-dial
 import { EditProductDialog } from '@/components/dialog/view-update/edit-product-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { productApi,TProduct } from '@/service/product.api';
 import {
   Table,
   TableBody,
@@ -14,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Edit } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Product {
   id: string;
@@ -57,6 +58,8 @@ export default function ProductManagement() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
+  const [productList, setProductList] = useState<TProduct[]>([]);
+
   const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       id: Date.now().toString(),
@@ -64,6 +67,21 @@ export default function ProductManagement() {
     };
     setProducts([...products, newProduct]);
   };
+  const id: string ="1"; // Replace with actual product ID from route params or context
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const productList = await productApi.getProducts();
+        setProductList(productList);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    }
+    fetchProduct();
+  }, []);
+  useEffect(() => {
+    console.log('Product list:', productList);
+  });
 
   const handleUpdateProduct = (productData: Omit<Product, 'id'>) => {
     if (!selectedProduct) return;
@@ -106,7 +124,7 @@ export default function ProductManagement() {
             <TableHeader>
               <TableRow>
                 <TableHead>Hình ảnh</TableHead>
-                <TableHead>Tên sản phẩm</TableHead>
+                <TableHead>Tên sản phẩm</TableHead> 
                 <TableHead>Giá</TableHead>
                 <TableHead>Tồn kho</TableHead>
                 <TableHead>Danh mục</TableHead>

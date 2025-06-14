@@ -1,11 +1,11 @@
 'use client';
 
 import RelatedProducts from '@/components/related-product/page';
+import { productApi, TProduct } from '@/services/product.api';
 import Chart from '@components/chart/chart';
 import Image from 'next/image';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { MdAddShoppingCart } from 'react-icons/md';
-
 interface Product {
   name: string;
   price: number;
@@ -15,44 +15,63 @@ interface Product {
   shopName: string;
 }
 
-export default function ProductDetail({ params }: { params: { id: string } }) {
+export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const product: Product = {
-    name: 'Sample Product Name',
-    price: 299.99,
-    discountPrice: 249.99,
-    description:
-      'This is a high-quality product with amazing features. Perfect for everyday use with durable materials and modern design.',
-    images: [
-      '/images/product1.jpg',
-      '/images/product2.jpg',
-      '/images/product3.jpg',
-      '/images/product4.jpg',
-    ],
-    shopName: 'HAHAHA',
-  };
+  const [productDetail, setProductDetail] = useState<TProduct | null>(null);
 
+  const { id } = use(params);
+  let discountNumber: number = 0;
+
+  const [listImg, setListImg] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchProductDetail = async () => {
+      try {
+        const product = await productApi.getProduct(id);
+        setProductDetail(product);
+        setListImg([
+          ...(product.thumbnail ? [product.thumbnail] : []),
+          ...(product.productImages || []),
+        ]);
+        let discountNumber = 0;
+        if (typeof product.discount === 'string') {
+          const numberPart = product.discount.replace('%', '');
+          discountNumber = Number(numberPart);
+        } else if (typeof product.discount === 'number') {
+          discountNumber = product.discount;
+        }
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+      }
+    };
+    fetchProductDetail();
+  }, []);
+  useEffect(() => {
+    console.log('Updated listImg:', listImg);
+  }, [listImg]);
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 font-['Reddit_Sans'] bg-white">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-2xl p-6 shadow-sm border border-amber-100">
         <div className="space-y-4">
+          {/* Ảnh chính */}
           <div className="relative w-full h-[480px] rounded-xl overflow-hidden border border-amber-100">
             <Image
-              src={product.images[selectedImage]}
-              alt={product.name}
+              src={listImg[selectedImage] || '/image_login.jpg'}
+              alt={productDetail?.name || 'Product image'}
               fill
               className="object-cover"
               priority
             />
           </div>
+
+          {/* Danh sách thumbnail */}
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-orange-100">
-            {product.images.map((img, index) => (
+            {listImg.map((img, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
                 className={`relative min-w-[80px] h-20 rounded-lg overflow-hidden border-2 transition-all duration-200
-                  ${selectedImage === index ? 'border-amber-500 shadow-sm' : 'border-amber-200'}`}
+          ${selectedImage === index ? 'border-amber-500 shadow-sm' : 'border-amber-200'}`}
               >
                 <Image src={img} alt={`Thumbnail ${index + 1}`} fill className="object-cover" />
               </button>
@@ -62,22 +81,29 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-amber-900 mb-2">{product.name}</h1>
-            <p className="text-amber-700">Cửa hàng: {product.shopName}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-amber-900 mb-2">
+              {productDetail?.name}
+            </h1>
+            <p className="text-amber-700">Cửa hàng: {productDetail?.sellerShopName}</p>
           </div>
 
           <div className="bg-[#FFD2B2]/20 p-6 rounded-xl space-y-4">
             <div className="flex items-baseline gap-4">
               <span className="text-3xl font-bold text-amber-900">
-                {product.discountPrice.toLocaleString()}đ
+                {productDetail?.discount.toLocaleString()}đ
               </span>
-              {product.price > product.discountPrice && (
+              {productDetail?.currentPrice && (
                 <>
                   <span className="text-lg text-amber-900/60 line-through">
-                    {product.price.toLocaleString()}đ
+                    {productDetail.currentPrice.toLocaleString()}đ
                   </span>
                   <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm">
-                    -{Math.round(((product.price - product.discountPrice) / product.price) * 100)}%
+                    -
+                    {Math.round(
+                      ((productDetail.currentPrice - discountNumber) / productDetail.currentPrice) *
+                        100,
+                    )}
+                    %
                   </span>
                 </>
               )}
@@ -103,7 +129,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-amber-900">Mô tả sản phẩm</h2>
             <p className="text-amber-800/80 leading-relaxed whitespace-pre-line">
-              {product.description}
+              {productDetail?.description}
             </p>
           </div>
         </div>
