@@ -1,144 +1,166 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getInputHandler } from '../input/getInputHandle';
-
-import type { Address } from '@/app/user/address/page';
+import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  onUpdate: (data: Address) => void;
-  initialData: Address;
+  onUpdate: () => Promise<boolean>;
+  formData: AddressFormData;
+  errors: Record<string, string>;
+  touched: Record<string, boolean>;
+  provinces: Province[];
+  districts: District[];
+  wards: Ward[];
+  loading: boolean;
+  submitting: boolean;
+  onFieldChange: (key: keyof AddressFormData, value: string | boolean) => void;
+  onFieldBlur: (key: keyof AddressFormData) => void;
 }
 
 const fields = [
-  { key: 'name', label: 'Họ và tên' },
-  { key: 'phone', label: 'Số điện thoại' },
-  { key: 'address', label: 'Địa chỉ' },
-  { key: 'ward', label: 'Phường/Xã' },
-  { key: 'district', label: 'Quận/Huyện' },
-  { key: 'city', label: 'Tỉnh/Thành phố' },
-];
+  { key: 'name', label: 'Tên địa chỉ', type: 'input' },
+  { key: 'customerName', label: 'Họ và tên', type: 'input' },
+  { key: 'phoneNumber', label: 'Số điện thoại', type: 'input' },
+  { key: 'addressLine', label: 'Địa chỉ', type: 'input' },
+  { key: 'country', label: 'Tỉnh/Thành phố', type: 'dropdown' },
+  { key: 'district', label: 'Quận/Huyện', type: 'dropdown' },
+  { key: 'ward', label: 'Phường/Xã', type: 'dropdown' },
+] as const;
 
-export default function AddressUpdateDialog({ open, onClose, onUpdate, initialData }: Props) {
-  const [formData, setFormData] = useState<Omit<Address, 'id'>>({
-    customer_id: '',
-    name: '',
-    customerName: '',
-    phoneNumber: '',
-    state: '',
-    country: '',
-    district: '',
-    ward: '',
-    type: '',
-    isDefault: false,
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+export default function AddressUpdateDialog({
+  open,
+  onClose,
+  onUpdate,
+  formData,
+  errors,
+  touched,
+  provinces,
+  districts,
+  wards,
+  loading,
+  submitting,
+  onFieldChange,
+  onFieldBlur,
+}: Props) {
+  const handleUpdate = async () => {
+    const success = await onUpdate();
+  };
 
-  useEffect(() => {
-    if (initialData) {
-      const { id, ...rest } = initialData;
-      setFormData(rest);
-      setErrors({});
-      setTouched({});
+  const renderField = (field: (typeof fields)[0]) => {
+    const { key, label, type } = field;
+    const value = formData[key as keyof AddressFormData];
+    const hasError = touched[key] && errors[key];
+
+    if (type === 'dropdown') {
+      let options: { value: string; label: string }[] = [];
+      let isDisabled = false;
+
+      if (key === 'country') {
+        options = provinces.map((p) => ({ value: p.code.toString(), label: p.name }));
+      } else if (key === 'district') {
+        options = districts.map((d) => ({ value: d.code.toString(), label: d.name }));
+        isDisabled = !formData.country;
+      } else if (key === 'ward') {
+        options = wards.map((w) => ({ value: w.code.toString(), label: w.name }));
+        isDisabled = !formData.district;
+      }
+
+      return (
+        <div className="form-control w-full items-start" key={key}>
+          <label className="label">
+            <span className="label-text text-black">{label}</span>
+          </label>
+          <select
+            className={`select select-bordered w-full border-gray-600 text-black bg-white ${hasError ? 'border-red-500' : ''}`}
+            value={value as string}
+            onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
+            onBlur={() => onFieldBlur(key as keyof AddressFormData)}
+            disabled={isDisabled || loading || submitting}
+          >
+            <option value="">Chọn {label}</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div style={{ minHeight: 22 }}>
+            {hasError && <span className="text-red-500 text-sm">{errors[key]}</span>}
+          </div>
+        </div>
+      );
     }
-  }, [initialData]);
 
-  const validateField = (key: string, value: string) => {
-    if (!value.trim()) return 'Trường này không được để trống';
-    if (key === 'phone' && !/^\d{9,15}$/.test(value)) return 'Số điện thoại không hợp lệ';
-    return '';
-  };
-
-  const handleChange = (key: string, value: string) => {
-    const handler = getInputHandler(key);
-    const sanitized = handler(value);
-    setFormData((prev) => ({ ...prev, [key]: sanitized }));
-    if (touched[key]) {
-      setErrors((prev) => ({ ...prev, [key]: validateField(key, sanitized) }));
-    }
-  };
-
-  const handleBlur = (key: string) => {
-    setTouched((prev) => ({ ...prev, [key]: true }));
-    setErrors((prev) => ({
-      ...prev,
-      [key]: validateField(key, formData[key as keyof typeof formData] as string),
-    }));
-  };
-
-  const handleUpdate = () => {
-    let valid = true;
-    const newErrors: Record<string, string> = {};
-    fields.forEach(({ key }) => {
-      const err = validateField(key, formData[key as keyof typeof formData] as string);
-      if (err) valid = false;
-      newErrors[key] = err;
-    });
-    setErrors(newErrors);
-    setTouched(fields.reduce((acc, { key }) => ({ ...acc, [key]: true }), {}));
-    if (!valid) return;
-
-    onUpdate({ ...initialData, ...formData });
-    onClose();
+    return (
+      <div className="form-control w-full items-start" key={key}>
+        <label className="label">
+          <span className="label-text text-black">{label}</span>
+        </label>
+        <input
+          type="text"
+          className={`input input-bordered w-full border-gray-600 text-black bg-white ${hasError ? 'border-red-500' : ''}`}
+          value={value as string}
+          onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
+          onBlur={() => onFieldBlur(key as keyof AddressFormData)}
+          disabled={submitting}
+        />
+        <div style={{ minHeight: 22 }}>
+          {hasError && <span className="text-red-500 text-sm">{errors[key]}</span>}
+        </div>
+      </div>
+    );
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-wite bg-opacity-50">
-      <div className="bg-[#FFF8F3]  text-black rounded-lg shadow-lg w-11/12 max-w-3xl p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-[#FFF8F3] text-black rounded-lg shadow-lg w-11/12 max-w-3xl p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold">Cập nhật địa chỉ</h3>
-          <button className="btn btn-sm btn-circle btn-ghost" onClick={onClose}>
+          <button
+            className="btn btn-sm btn-circle btn-ghost"
+            onClick={onClose}
+            disabled={submitting}
+          >
             ✕
           </button>
         </div>
         <div className="space-y-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 justify-items-center">
-          {fields.map(({ key, label }) => (
-            <div className="form-control w-full items-start" key={key}>
-              <label className="label">
-                <span className="label-text text-black">{label}</span>
-              </label>
-              <input
-                type="text"
-                className={`input input-bordered w-full border-gray-600 text-black bg-white ${touched[key] && errors[key] ? 'border-red-500' : ''}`}
-                value={String(formData[key as keyof typeof formData] ?? '')}
-                onChange={(e) => handleChange(key, e.target.value)}
-                onBlur={() => handleBlur(key)}
-              />
-              <div style={{ minHeight: 22 }}>
-                {touched[key] && errors[key] && (
-                  <span className="text-red-500 text-sm">{errors[key]}</span>
-                )}
-              </div>
-            </div>
-          ))}
+          {fields.map(renderField)}
 
           <div className="form-control flex-row items-center gap-2 mt-2">
             <input
               type="checkbox"
               className="toggle toggle-primary"
               checked={formData.isDefault}
-              onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+              onChange={(e) => onFieldChange('isDefault', e.target.checked)}
+              disabled={submitting}
             />
             <span className="text-black">Đặt làm địa chỉ mặc định</span>
           </div>
+
+          {errors.general && (
+            <div className="col-span-full">
+              <span className="text-red-500 text-sm">{errors.general}</span>
+            </div>
+          )}
+
           <div className="mt-6 flex justify-end space-x-2">
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition"
+              disabled={submitting}
             >
-              Cancel
+              Hủy
             </button>
             <button
               onClick={handleUpdate}
-              className="px-4 py-2 bg-[#FFD2B2] text-black rounded-lg hover:bg-[#FFBB99] transition"
-              disabled={Object.values(errors).some((error) => error)}
+              className="px-4 py-2 bg-[#FFD2B2] text-black rounded-lg hover:bg-[#FFBB99] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || submitting}
             >
-              Save
+              {submitting ? 'Đang cập nhật...' : loading ? 'Loading...' : 'Lưu'}
             </button>
           </div>
         </div>

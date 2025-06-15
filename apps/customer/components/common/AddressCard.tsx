@@ -1,7 +1,5 @@
 'use client';
-
-import type { Address } from '@/app/user/address/page';
-
+import { Address } from '@/hooks/use-address-manager';
 interface Props {
   address: Address;
   index: number;
