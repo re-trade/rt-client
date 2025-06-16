@@ -8,7 +8,6 @@ import {
   Settings,
   Shield,
   ShoppingBag,
-  Star,
   Ticket,
   User,
 } from 'lucide-react';
@@ -86,24 +85,24 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const activeTab = pathname.split('/user/')[1] || 'profile';
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[#FDFEF9]">
       <div className="flex max-w-7xl mx-auto">
         {/* Enhanced Sidebar */}
-        <aside className="w-80 bg-white shadow-xl border-r border-amber-100">
+        <aside className="w-80 bg-white shadow-md border-r border-[#525252]/20">
           {/* User Profile Header */}
-          <div className="p-6 bg-gradient-to-r from-amber-400 to-orange-500 text-white">
+          <div className="p-6 bg-[#FFD2B2] text-[#121212]">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-[#121212] text-xl font-bold shadow-md">
                   Vu
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-300 rounded-full border-2 border-white flex items-center justify-center">
-                  <Star className="w-3 h-3" />
                 </div>
               </div>
               <div className="flex-1">
                 <h2 className="text-lg font-semibold">vominhvu2002</h2>
-                <button className="flex items-center text-orange-100 hover:text-white transition-colors text-sm mt-1 group">
+                <button
+                  onClick={() => router.push('/user/profile')}
+                  className="flex items-center text-[#121212] hover:underline transition-colors text-sm mt-1 group"
+                >
                   <Edit3 className="w-3 h-3 mr-1" />
                   <span>Sửa Hồ Sơ</span>
                   <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
@@ -126,13 +125,13 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     }
                     className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                       isItemActive
-                        ? 'bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 shadow-md border border-amber-200'
-                        : 'hover:bg-gray-50 text-gray-700 hover:text-amber-600'
+                        ? 'bg-[#FFD2B2] text-[#121212] shadow-sm border border-[#525252]/20'
+                        : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div
-                        className={`transition-colors ${isItemActive ? 'text-amber-600' : 'text-gray-500 group-hover:text-amber-500'}`}
+                        className={`transition-colors ${isItemActive ? 'text-[#121212]' : 'text-[#525252] group-hover:text-[#121212]'}`}
                       >
                         {item.icon}
                       </div>
@@ -142,7 +141,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                       <ChevronRight
                         className={`w-4 h-4 transition-transform duration-200 ${
                           isExpanded ? 'rotate-90' : ''
-                        } ${isItemActive ? 'text-amber-600' : 'text-gray-400'}`}
+                        } ${isItemActive ? 'text-[#121212]' : 'text-[#525252]'}`}
                       />
                     )}
                   </div>
@@ -154,15 +153,15 @@ export default function UserLayout({ children }: UserLayoutProps) {
                         isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                       }`}
                     >
-                      <div className="ml-6 space-y-1 border-l-2 border-amber-100 pl-4">
+                      <div className="ml-6 space-y-1 border-l-2 border-[#525252]/20 pl-4">
                         {item.subMenu.map((subItem) => (
                           <div
                             key={subItem.path}
                             onClick={() => handleNavigation(subItem.path)}
                             className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ${
                               activeTab === subItem.path
-                                ? 'bg-amber-50 text-amber-700 border-l-2 border-amber-500'
-                                : 'hover:bg-gray-50 text-gray-600 hover:text-amber-600'
+                                ? 'bg-[#FFD2B2]/30 text-[#121212] border-l-2 border-[#FFD2B2]'
+                                : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
                             }`}
                           >
                             {subItem.icon}
@@ -176,22 +175,11 @@ export default function UserLayout({ children }: UserLayoutProps) {
               );
             })}
           </nav>
-
-          {/* Feature Badge */}
-          <div className="mx-4 mb-4 p-4 bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl border border-amber-200">
-            <div className="flex items-center space-x-2 text-amber-700">
-              <Star className="w-5 h-5" />
-              <div>
-                <p className="text-sm font-semibold">Thành viên VIP</p>
-                <p className="text-xs text-amber-600">Chia sẻ và trao đổi thông minh</p>
-              </div>
-            </div>
-          </div>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 min-h-screen">
-          <div className="h-full bg-white">{children}</div>
+          <div className="h-full">{children}</div>
         </main>
       </div>
     </div>

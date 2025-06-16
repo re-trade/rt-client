@@ -1,4 +1,5 @@
 'use client';
+import { Bell } from 'lucide-react';
 import { useState } from 'react';
 
 const categories = [
@@ -35,35 +36,56 @@ export default function NotificationPage() {
   const [activeTab, setActiveTab] = useState('system');
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Thông Báo</h1>
-
-      <div className="flex gap-4 mb-6 border-b">
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveTab(cat.id)}
-            className={`py-2 px-4 border-b-2 transition-all duration-200 ${
-              activeTab === cat.id
-                ? 'border-blue-500 text-blue-600 font-semibold'
-                : 'border-transparent text-gray-600 hover:text-blue-500'
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        {fakeData[activeTab].map((item) => (
-          <div
-            key={item.id}
-            className="border p-4 rounded-lg shadow-sm bg-[#FFF2E6] hover:shadow-md transition"
-          >
-            <h2 className="font-semibold text-lg text-red-500">{item.title}</h2>
-            <p className="text-black mt-1">{item.content}</p>
+    <div className="min-h-screen bg-[#FDFEF9] p-6">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/20 rounded-lg">
+                  <Bell className="w-6 h-6" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">Thông Báo</h1>
+                  <p className="text-[#121212] mt-1">
+                    Thông báo từ hệ thống và các cập nhật mới nhất
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        ))}
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="flex gap-4 mb-6 border-b">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveTab(cat.id)}
+                className={`py-2 px-4 border-b-2 transition-all duration-200 ${
+                  activeTab === cat.id
+                    ? 'border-[#FFD2B2] text-[#121212] font-semibold'
+                    : 'border-transparent text-[#525252] hover:text-[#121212]'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-4">
+            {fakeData[activeTab].map((item) => (
+              <div
+                key={item.id}
+                className="border p-4 rounded-lg shadow-sm bg-white hover:shadow-md transition border-[#525252]/20"
+              >
+                <h2 className="font-semibold text-lg text-[#121212]">{item.title}</h2>
+                <p className="text-[#525252] mt-1">{item.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

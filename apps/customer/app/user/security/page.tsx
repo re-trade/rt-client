@@ -4,11 +4,9 @@ import {
   AlertTriangle,
   Calendar,
   Check,
-  Chrome,
   Clock,
   Eye,
   EyeOff,
-  Facebook,
   Key,
   Lock,
   Mail,
@@ -73,25 +71,6 @@ const securityActions: SecurityAction[] = [
     icon: <Smartphone className="w-5 h-5" />,
     category: 'auth',
   },
-  {
-    id: 'facebook',
-    title: 'Liên kết Facebook',
-    description: 'Liên kết tài khoản Facebook để đăng nhập nhanh hơn.',
-    status: 'active',
-    lastUpdated: '3 tháng trước',
-    action: 'Quản lý',
-    icon: <Facebook className="w-5 h-5" />,
-    category: 'social',
-  },
-  {
-    id: 'google',
-    title: 'Liên kết Google',
-    description: 'Liên kết tài khoản Google để đăng nhập nhanh hơn.',
-    status: 'inactive',
-    action: 'Liên kết',
-    icon: <Chrome className="w-5 h-5" />,
-    category: 'social',
-  },
 ];
 
 const recentActivity = [
@@ -135,11 +114,6 @@ const categories = {
     color: 'bg-blue-100 text-blue-700',
     icon: <Settings className="w-4 h-4" />,
   },
-  social: {
-    name: 'Liên kết',
-    color: 'bg-green-100 text-green-700',
-    icon: <Chrome className="w-4 h-4" />,
-  },
 };
 
 export default function SecurityPage() {
@@ -157,7 +131,6 @@ export default function SecurityPage() {
       setSelectedAction(action);
       setIsModalOpen(true);
     } else {
-      // Handle other actions
       alert(`${action.action}: ${action.title}`);
     }
   };
@@ -212,19 +185,19 @@ export default function SecurityPage() {
   const activeSecurityCount = securityActions.filter((action) => action.status === 'active').length;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-[#FDFEF9] p-6">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-xl">
+                <div className="p-3 bg-white/20 rounded-lg">
                   <Shield className="w-6 h-6" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Bảo mật tài khoản</h1>
-                  <p className="text-orange-100 mt-1">
+                  <p className="text-[#121212] mt-1">
                     Quản lý bảo mật và quyền riêng tư của tài khoản
                   </p>
                 </div>
@@ -291,7 +264,6 @@ export default function SecurityPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Security Settings */}
           <div className="lg:col-span-2 space-y-6">
             {Object.entries(categories).map(([categoryKey, categoryInfo]) => {
               const categoryActions = securityActions.filter(
@@ -412,22 +384,6 @@ export default function SecurityPage() {
                 <button className="w-full mt-4 text-sm text-amber-600 hover:text-amber-700 font-medium">
                   Xem tất cả hoạt động
                 </button>
-              </div>
-            </div>
-
-            {/* Security Tip */}
-            <div className="mt-6 bg-gradient-to-r from-amber-100 to-orange-100 rounded-2xl shadow-lg p-6 border border-amber-200">
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-amber-500 rounded-xl">
-                  <Shield className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-amber-800 mb-2">💡 Mẹo bảo mật</h3>
-                  <p className="text-amber-700 text-sm leading-relaxed">
-                    Kích hoạt xác thực hai yếu tố để tăng cường bảo mật tài khoản. Thay đổi mật khẩu
-                    định kỳ và không sử dụng mật khẩu đơn giản.
-                  </p>
-                </div>
               </div>
             </div>
           </div>

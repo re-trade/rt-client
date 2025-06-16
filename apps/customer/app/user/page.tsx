@@ -112,10 +112,8 @@ const UserDashboard = () => {
         <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-[#121212] font-['Reddit_Sans']">
-                {greeting}, Vu! 👋
-              </h1>
-              <p className="text-[#525252] mt-2 text-lg font-['Reddit_Sans']">
+              <h1 className="text-3xl font-bold text-[#121212]">{greeting}, Vu! 👋</h1>
+              <p className="text-[#525252] mt-2 text-lg">
                 Chào mừng bạn quay trở lại với cộng đồng trao đổi đồ cũ
               </p>
             </div>
@@ -140,15 +138,9 @@ const UserDashboard = () => {
                 </div>
                 <TrendingUp className="w-5 h-5 text-[#121212] opacity-60" />
               </div>
-              <h3 className="text-2xl font-bold text-[#121212] mb-1 font-['Reddit_Sans']">
-                {stat.value}
-              </h3>
-              <p className="text-[#525252] text-sm font-medium font-['Reddit_Sans']">
-                {stat.label}
-              </p>
-              {stat.subtitle && (
-                <p className="text-xs text-[#121212] mt-1 font-['Reddit_Sans']">{stat.subtitle}</p>
-              )}
+              <h3 className="text-2xl font-bold text-[#121212] mb-1">{stat.value}</h3>
+              <p className="text-[#525252] text-sm font-medium">{stat.label}</p>
+              {stat.subtitle && <p className="text-xs text-[#121212] mt-1">{stat.subtitle}</p>}
             </div>
           ))}
         </div>
@@ -158,7 +150,7 @@ const UserDashboard = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#121212] flex items-center font-['Reddit_Sans']">
+                <h2 className="text-xl font-bold text-[#121212] flex items-center">
                   <Activity className="w-6 h-6 mr-2 text-[#121212]" />
                   Thao tác nhanh
                 </h2>
@@ -174,16 +166,12 @@ const UserDashboard = () => {
                         {action.icon}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-[#121212] group-hover:text-[#121212] transition-colors font-['Reddit_Sans']">
+                        <h3 className="font-semibold text-[#121212] group-hover:text-[#121212] transition-colors">
                           {action.title}
                         </h3>
-                        <p className="text-sm text-[#525252] mt-1 font-['Reddit_Sans']">
-                          {action.description}
-                        </p>
+                        <p className="text-sm text-[#525252] mt-1">{action.description}</p>
                         <div className="flex items-center mt-2 text-[#121212] opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span className="text-sm font-medium font-['Reddit_Sans']">
-                            Xem chi tiết
-                          </span>
+                          <span className="text-sm font-medium">Xem chi tiết</span>
                           <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
@@ -198,7 +186,7 @@ const UserDashboard = () => {
           <div className="space-y-6">
             {/* Recent Activities */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
-              <h2 className="text-xl font-bold text-[#121212] mb-4 flex items-center font-['Reddit_Sans']">
+              <h2 className="text-xl font-bold text-[#121212] mb-4 flex items-center">
                 <Calendar className="w-6 h-6 mr-2 text-[#121212]" />
                 Hoạt động gần đây
               </h2>
@@ -210,12 +198,8 @@ const UserDashboard = () => {
                   >
                     <div className="mt-1">{activity.icon}</div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-[#121212] font-['Reddit_Sans']">
-                        {activity.title}
-                      </p>
-                      <p className="text-xs text-[#525252] mt-1 font-['Reddit_Sans']">
-                        {activity.time}
-                      </p>
+                      <p className="text-sm font-medium text-[#121212]">{activity.title}</p>
+                      <p className="text-xs text-[#525252] mt-1">{activity.time}</p>
                     </div>
                   </div>
                 ))}
@@ -226,33 +210,22 @@ const UserDashboard = () => {
             <div className="bg-[#FFD2B2] rounded-xl shadow-md p-6 border border-[#525252]/20">
               <div className="flex items-center mb-4">
                 <Bell className="w-6 h-6 text-[#121212] mr-2" />
-                <h2 className="text-lg font-bold text-[#121212] font-['Reddit_Sans']">
-                  Thông báo gần đây
-                </h2>
+                <h2 className="text-lg font-bold text-[#121212]">Thông báo gần đây</h2>
               </div>
               <div className="space-y-3">
                 <div className="p-3 bg-white rounded-lg">
-                  <p className="text-sm text-[#121212] font-medium font-['Reddit_Sans']">
+                  <p className="text-sm text-[#121212] font-medium">
                     Cập nhật đơn hàng #RT20240415
                   </p>
-                  <p className="text-xs text-[#525252] mt-1 font-['Reddit_Sans']">
-                    Đơn hàng đã được xác nhận
-                  </p>
+                  <p className="text-xs text-[#525252] mt-1">Đơn hàng đã được xác nhận</p>
                 </div>
                 <div className="p-3 bg-white rounded-lg">
-                  <p className="text-sm text-[#121212] font-medium font-['Reddit_Sans']">
-                    Khuyến mãi mới
-                  </p>
-                  <p className="text-xs text-[#525252] mt-1 font-['Reddit_Sans']">
-                    Giảm 15% cho đơn hàng trên 500k
-                  </p>
+                  <p className="text-sm text-[#121212] font-medium">Khuyến mãi mới</p>
+                  <p className="text-xs text-[#525252] mt-1">Giảm 15% cho đơn hàng trên 500k</p>
                 </div>
               </div>
               <div className="mt-4 text-center">
-                <a
-                  href="#"
-                  className="text-xs text-[#121212] font-medium hover:underline font-['Reddit_Sans']"
-                >
+                <a href="#" className="text-xs text-[#121212] font-medium hover:underline">
                   Xem tất cả thông báo
                 </a>
               </div>

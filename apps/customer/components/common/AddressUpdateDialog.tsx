@@ -106,9 +106,7 @@ export default function AddressUpdateDialog({
 
       return (
         <div className="form-control w-full items-start" key={key}>
-          <label className="text-sm font-semibold text-[#121212] mb-1 font-['Reddit_Sans']">
-            {label}
-          </label>
+          <label className="text-sm font-semibold text-[#121212] mb-1">{label}</label>
           <div className="relative w-full">
             <select
               className={`select w-full px-4 py-2.5 border ${
@@ -143,11 +141,7 @@ export default function AddressUpdateDialog({
             </div>
           </div>
           <div className="min-h-[22px] mt-1">
-            {hasError && (
-              <span className="text-red-500 text-xs font-medium font-['Reddit_Sans']">
-                {errors[key]}
-              </span>
-            )}
+            {hasError && <span className="text-red-500 text-xs font-medium">{errors[key]}</span>}
           </div>
         </div>
       );
@@ -155,9 +149,7 @@ export default function AddressUpdateDialog({
 
     return (
       <div className="form-control w-full items-start" key={key}>
-        <label className="text-sm font-semibold text-[#121212] mb-1 font-['Reddit_Sans']">
-          {label}
-        </label>
+        <label className="text-sm font-semibold text-[#121212] mb-1">{label}</label>
         <input
           type="text"
           className={`input w-full px-4 py-2.5 border ${
@@ -169,11 +161,7 @@ export default function AddressUpdateDialog({
           disabled={submitting}
         />
         <div className="min-h-[22px] mt-1">
-          {hasError && (
-            <span className="text-red-500 text-xs font-medium font-['Reddit_Sans']">
-              {errors[key]}
-            </span>
-          )}
+          {hasError && <span className="text-red-500 text-xs font-medium">{errors[key]}</span>}
         </div>
       </div>
     );
@@ -187,9 +175,7 @@ export default function AddressUpdateDialog({
         <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <MapPin className="w-5 h-5 mr-2 text-[#121212]" />
-            <h3 className="text-xl font-bold text-[#121212] font-['Reddit_Sans']">
-              Cập nhật địa chỉ
-            </h3>
+            <h3 className="text-xl font-bold text-[#121212]">Cập nhật địa chỉ</h3>
           </div>
           <button
             className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-[#121212] hover:bg-white/40 transition-colors"
@@ -213,16 +199,13 @@ export default function AddressUpdateDialog({
                   onChange={(e) => onFieldChange('isDefault', e.target.checked)}
                   disabled={submitting}
                 />
-                <label
-                  htmlFor="isDefaultUpdate"
-                  className="ml-2 text-[#121212] font-medium font-['Reddit_Sans']"
-                >
+                <label htmlFor="isDefaultUpdate" className="ml-2 text-[#121212] font-medium">
                   Đặt làm địa chỉ mặc định
                 </label>
               </div>
 
               {errors.general && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm w-full font-['Reddit_Sans']">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm w-full">
                   {errors.general}
                 </div>
               )}
@@ -230,14 +213,14 @@ export default function AddressUpdateDialog({
               <div className="mt-4 flex justify-end space-x-3 w-full">
                 <button
                   onClick={onClose}
-                  className="px-5 py-2.5 bg-[#FDFEF9] border border-[#525252]/20 text-[#121212] rounded-lg hover:bg-gray-100 transition font-medium font-['Reddit_Sans']"
+                  className="px-5 py-2.5 bg-[#FDFEF9] border border-[#525252]/20 text-[#121212] rounded-lg hover:bg-gray-100 transition font-medium"
                   disabled={submitting}
                 >
                   Hủy bỏ
                 </button>
                 <button
                   onClick={handleUpdate}
-                  className="px-5 py-2.5 bg-[#FFD2B2] text-[#121212] rounded-lg hover:bg-[#FFBB99] transition font-medium flex items-center font-['Reddit_Sans']"
+                  className="px-5 py-2.5 bg-[#FFD2B2] text-[#121212] rounded-lg hover:bg-[#FFBB99] transition font-medium flex items-center"
                   disabled={loading || submitting}
                 >
                   {submitting ? (
