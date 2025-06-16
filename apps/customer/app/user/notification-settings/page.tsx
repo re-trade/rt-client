@@ -135,7 +135,6 @@ export default function NotificationSettingsPage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSaving(false);
     setSavedMessage(true);
@@ -147,7 +146,6 @@ export default function NotificationSettingsPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
           <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
             <div className="flex items-center justify-between">
@@ -171,8 +169,6 @@ export default function NotificationSettingsPage() {
             </div>
           </div>
         </div>
-
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
             <div className="flex items-center space-x-3">
@@ -216,8 +212,6 @@ export default function NotificationSettingsPage() {
             </div>
           </div>
         </div>
-
-        {/* Settings Groups */}
         <div className="space-y-6">
           {Object.entries(categories).map(([categoryKey, categoryInfo]) => {
             const categorySettings = settings.filter((s) => s.category === categoryKey);
@@ -248,7 +242,6 @@ export default function NotificationSettingsPage() {
                       key={setting.id}
                       className="border border-gray-200 rounded-xl p-4 hover:border-amber-300 transition-all duration-200"
                     >
-                      {/* Setting Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
                           <div

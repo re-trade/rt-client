@@ -1,5 +1,7 @@
 'use client';
 import { Address } from '@/hooks/use-address-manager';
+import { Edit, MapPin, Phone, Trash2, User } from 'lucide-react';
+
 interface Props {
   address: Address;
   index: number;
@@ -9,49 +11,57 @@ interface Props {
 
 export default function AddressCard({ address, index, onEdit, onDelete }: Props) {
   return (
-    <div className="bg-[#FFF2E6] p-4 rounded-lg border border-gray-200">
-      <div className="flex flex-col space-y-2">
-        <h2 className="text-lg font-medium text-black">Địa chỉ {index + 1}</h2>
-        <div className="flex items-start space-x-2">
-          <span className="mt-1">
-            <svg
-              className="w-5 h-5 text-[#FF9999]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-          </span>
-          <div>
-            <p className="text-sm font-medium text-black">{address.name}</p>
-            <p className="text-sm text-gray-600">
-              {address.ward}, {address.district}, {address.state}, {address.country}
-            </p>
+    <div className="bg-white p-5 rounded-xl border border-[#525252]/20 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex flex-col space-y-3">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-[#121212] flex items-center">
+            <span className="inline-flex items-center justify-center bg-[#FFD2B2] w-6 h-6 rounded-full text-sm mr-2 text-[#121212]">
+              {index + 1}
+            </span>
+            {address.name}
+          </h2>
+          {address.isDefault && (
+            <span className="bg-[#FFD2B2] text-[#121212] text-xs font-medium px-2.5 py-1 rounded">
+              Mặc định
+            </span>
+          )}
+        </div>
+
+        <div className="space-y-2 pl-2 border-l-2 border-[#FFD2B2]">
+          <div className="flex items-start space-x-2">
+            <User className="w-4 h-4 text-[#121212] mt-0.5" />
+            <p className="text-sm font-medium text-[#121212]">{address.customerName}</p>
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <Phone className="w-4 h-4 text-[#121212] mt-0.5" />
+            <p className="text-sm text-[#525252]">{address.phoneNumber}</p>
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <MapPin className="w-4 h-4 text-[#121212] mt-0.5" />
+            <div>
+              <p className="text-sm text-[#525252]">{address.addressLine}</p>
+              <p className="text-sm text-[#525252]">
+                {address.ward}, {address.district}, {address.state}, {address.country}
+              </p>
+            </div>
           </div>
         </div>
-        <div className="flex space-x-2 mt-2">
+
+        <div className="flex space-x-2 pt-2 mt-2 border-t border-[#525252]/20">
           <button
             onClick={() => onEdit(address)}
-            className="bg-[#FFE4D6] text-black px-3 py-1 rounded-lg text-sm hover:bg-[#FFDAB9] transition"
+            className="flex items-center bg-[#FFD2B2] text-[#121212] px-3 py-1.5 rounded-lg text-sm hover:bg-[#FFBB99] transition font-medium"
           >
-            Cập nhật địa chỉ
+            <Edit className="w-4 h-4 mr-1" />
+            Cập nhật
           </button>
           <button
             onClick={() => onDelete(address.id)}
-            className="bg-[#FFE4D6] text-black px-3 py-1 rounded-lg text-sm hover:bg-[#FFDAB9] transition"
+            className="flex items-center bg-white border border-[#525252]/20 text-[#121212] px-3 py-1.5 rounded-lg text-sm hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition font-medium"
           >
+            <Trash2 className="w-4 h-4 mr-1" />
             Xóa
           </button>
         </div>

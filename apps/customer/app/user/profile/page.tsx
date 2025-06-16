@@ -71,31 +71,36 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-[#FDFEF9] p-6">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold">Hồ Sơ Cá Nhân</h1>
-                <p className="text-orange-100 mt-1">
-                  Quản lý thông tin và tùy chỉnh tài khoản của bạn
-                </p>
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/20 rounded-lg">
+                  <User className="w-6 h-6" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">Hồ Sơ Cá Nhân</h1>
+                  <p className="text-[#121212] mt-1">
+                    Quản lý thông tin và tùy chỉnh tài khoản của bạn
+                  </p>
+                </div>
               </div>
               <div className="flex space-x-3">
                 {isEditing ? (
                   <>
                     <button
                       onClick={handleSave}
-                      className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                      className="bg-white/20 hover:bg-white/30 text-[#121212] px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
                     >
                       <Check className="w-4 h-4" />
                       <span>Lưu</span>
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                      className="bg-white/10 hover:bg-white/20 text-[#121212] px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
                     >
                       <X className="w-4 h-4" />
                       <span>Hủy</span>
@@ -104,7 +109,7 @@ export default function ProfilePage() {
                 ) : (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                    className="bg-white text-[#121212] hover:bg-[#FDFEF9] px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 font-medium"
                   >
                     <Edit3 className="w-4 h-4" />
                     <span>Chỉnh sửa</span>
@@ -120,7 +125,7 @@ export default function ProfilePage() {
           {/* Left Column - Avatar & Basic Info */}
           <div className="lg:col-span-1 space-y-6">
             {/* Avatar Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+            <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
               <div className="text-center">
                 <div className="relative inline-block">
                   <div className="w-32 h-32 mx-auto rounded-2xl overflow-hidden shadow-xl border-4 border-white">
@@ -156,9 +161,9 @@ export default function ProfilePage() {
             </div>
 
             {/* Stats Card */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <Shield className="w-5 h-5 mr-2 text-amber-600" />
+            <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+              <h3 className="text-lg font-semibold text-[#121212] mb-4 flex items-center">
+                <Shield className="w-5 h-5 mr-2 text-[#121212]" />
                 Thông tin tài khoản
               </h3>
               <div className="space-y-3">
@@ -185,7 +190,7 @@ export default function ProfilePage() {
 
           {/* Right Column - Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-amber-100">
+            <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
               {/* Personal Information */}
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
