@@ -82,6 +82,8 @@ const addressSchema = Joi.object({
     'string.empty': 'Tên địa chỉ không được để trống',
     'any.required': 'Tên địa chỉ là bắt buộc',
   }),
+  isDefault: Joi.boolean().default(false),
+  type: Joi.number().default(0),
 });
 
 const initialFormData: AddressFormData = {
@@ -211,52 +213,6 @@ export function useAddressManager() {
     }
   }, [formData.district, fetchWards]);
 
-  useEffect(() => {
-    const fetchProvinceCode = async () => {
-      if (isUpdateOpen && selectedAddress) {
-        try {
-          const response = await axios.get(PROVINCES_API_URL);
-          const allProvinces = response.data;
-          const province = allProvinces.find((p: Province) => p.name === selectedAddress.country);
-          if (province) {
-            setFormData((prev) => ({ ...prev, country: province.code.toString() }));
-            // Fetch districts after setting province
-            const districtResponse = await axios.get(
-              `${PROVINCES_API_URL}${province.code}?depth=2`,
-            );
-            setDistricts(districtResponse.data.districts || []);
-          }
-        } catch (error) {
-          console.error('Error fetching province code:', error);
-        }
-      }
-    };
-
-    if (isUpdateOpen && selectedAddress) {
-      fetchProvinceCode();
-    }
-  }, [isUpdateOpen, selectedAddress]);
-
-  useEffect(() => {
-    if (isUpdateOpen && selectedAddress && districts.length > 0) {
-      const district = districts.find((d) => d.name === selectedAddress.district);
-      if (district) {
-        setFormData((prev) => ({ ...prev, district: district.code.toString() }));
-        // Fetch wards after setting district
-        fetchWards(district.code.toString());
-      }
-    }
-  }, [isUpdateOpen, selectedAddress, districts, fetchWards]);
-
-  useEffect(() => {
-    if (isUpdateOpen && selectedAddress && wards.length > 0) {
-      const ward = wards.find((w) => w.name === selectedAddress.ward);
-      if (ward) {
-        setFormData((prev) => ({ ...prev, ward: ward.code.toString() }));
-      }
-    }
-  }, [isUpdateOpen, selectedAddress, wards]);
-
   const validateField = useCallback((key: string, value: string) => {
     const { error } = addressSchema.extract(key).validate(value);
     return error ? error.details[0].message : '';
@@ -312,31 +268,67 @@ export function useAddressManager() {
     setIsCreateOpen(true);
   }, [resetForm]);
 
-  const openUpdateDialog = useCallback(
-    async (address: Address) => {
-      setSelectedAddress(address);
+  const openUpdateDialog = useCallback(async (address: Address) => {
+    console.log('Opening update dialog with address:', address);
+    setSelectedAddress(address);
+    setFormData({
+      customerName: address.customerName,
+      phoneNumber: address.phoneNumber,
+      name: address.name,
+      addressLine: address.addressLine,
+      country: '',
+      district: '',
+      ward: '',
+      isDefault: address.isDefault,
+      type: address.type,
+    });
 
-      // Always fetch fresh provinces when opening update dialog
-      await fetchProvinces();
+    setErrors({});
+    setTouched({});
 
-      setFormData({
-        customerName: address.customerName,
-        phoneNumber: address.phoneNumber,
-        name: address.name,
-        addressLine: address.addressLine,
-        country: '',
-        district: '',
-        ward: '',
-        isDefault: address.isDefault,
-        type: address.type,
-      });
+    try {
+      setLoading(true);
+      const provinceResponse = await axios.get(PROVINCES_API_URL);
+      const allProvinces = provinceResponse.data;
+      setProvinces(allProvinces);
+      const province = allProvinces.find((p: Province) => p.name === address.country);
+      if (province) {
+        console.log('Found matching province:', province.name, province.code);
 
-      setErrors({});
-      setTouched({});
+        const districtResponse = await axios.get(`${PROVINCES_API_URL}${province.code}?depth=2`);
+        const provinceDistricts = districtResponse.data.districts || [];
+        setDistricts(provinceDistricts);
+        const district = provinceDistricts.find((d: District) => d.name === address.district);
+        if (district) {
+          console.log('Found matching district:', district.name, district.code);
+          const wardResponse = await axios.get(
+            `https://provinces.open-api.vn/api/d/${district.code}?depth=2`,
+          );
+          const districtWards = wardResponse.data.wards || [];
+          setWards(districtWards);
+          const ward = districtWards.find((w: Ward) => w.name === address.ward);
+          setFormData((prev) => ({
+            ...prev,
+            country: province.code.toString(),
+            district: district.code.toString(),
+            ward: ward ? ward.code.toString() : '',
+          }));
+
+          console.log('Updated form data with location codes:', {
+            country: province.code.toString(),
+            district: district.code.toString(),
+            ward: ward ? ward.code.toString() : '',
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading location data:', error);
+      setErrors({ general: 'Không thể tải dữ liệu địa điểm' });
+    } finally {
+      setLoading(false);
       setIsUpdateOpen(true);
-    },
-    [fetchProvinces],
-  );
+    }
+  }, []);
 
   const closeDialogs = useCallback(() => {
     setIsCreateOpen(false);
@@ -346,6 +338,7 @@ export function useAddressManager() {
   }, [resetForm]);
 
   const createAddress = useCallback(async () => {
+    console.log('Creating address with formData:', formData);
     const { error } = addressSchema.validate(formData, { abortEarly: false });
 
     if (error) {
@@ -354,6 +347,7 @@ export function useAddressManager() {
         const key = detail.path[0] as string;
         newErrors[key] = detail.message;
       });
+      console.log('Validation errors:', newErrors);
       setErrors(newErrors);
       setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
       return false;
@@ -407,6 +401,8 @@ export function useAddressManager() {
   const updateAddress = useCallback(async () => {
     if (!selectedAddress) return false;
 
+    console.log('Current form data before validation:', formData);
+
     const { error } = addressSchema.validate(formData, { abortEarly: false });
 
     if (error) {
@@ -415,6 +411,7 @@ export function useAddressManager() {
         const key = detail.path[0] as string;
         newErrors[key] = detail.message;
       });
+      console.log('Validation errors:', newErrors);
       setErrors(newErrors);
       setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
       return false;
@@ -427,10 +424,23 @@ export function useAddressManager() {
       const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
       const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
 
+      console.log('Selected locations:', {
+        province: selectedProvince,
+        district: selectedDistrict,
+        ward: selectedWard,
+      });
+
       if (!selectedProvince || !selectedDistrict || !selectedWard) {
-        setErrors({
-          general: 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã',
+        const errorMsg = 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã';
+        console.error(errorMsg, {
+          provinceCode: formData.country,
+          districtCode: formData.district,
+          wardCode: formData.ward,
+          provinces: provinces.map((p) => ({ code: p.code, name: p.name })),
+          districts: districts.map((d) => ({ code: d.code, name: d.name })),
+          wards: wards.map((w) => ({ code: w.code, name: w.name })),
         });
+        setErrors({ general: errorMsg });
         return false;
       }
 
@@ -447,6 +457,7 @@ export function useAddressManager() {
         defaulted: formData.isDefault,
       };
 
+      console.log('Updating address with final data:', addressData);
       const response = await contactApi.updateContact(selectedAddress.id, addressData);
       if (!response) {
         throw new Error('Không thể cập nhật địa chỉ');

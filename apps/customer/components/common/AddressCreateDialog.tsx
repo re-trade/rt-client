@@ -56,13 +56,10 @@ export default function AddressCreateDialog({
   const handleCreate = async () => {
     try {
       setValidationTriggered(true);
-
-      // Mark all fields as touched to show validation errors
       fields.forEach((field) => {
         onFieldBlur(field.key as keyof AddressFormData);
       });
 
-      // Check if there are any validation errors
       const hasErrors = fields.some((field) => {
         const key = field.key as keyof AddressFormData;
         const value = formData[key];
@@ -75,7 +72,6 @@ export default function AddressCreateDialog({
       if (hasErrors) {
         return;
       }
-
       const success = await onCreate();
       if (success) {
         onClose();
