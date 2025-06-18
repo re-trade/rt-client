@@ -124,10 +124,11 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     onClick={() =>
                       item.subMenu ? toggleMenu(item.path) : handleNavigation(item.path)
                     }
-                    className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${isItemActive
-                      ? 'bg-[#FFD2B2] text-[#121212] shadow-sm border border-[#525252]/20'
-                      : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
-                      }`}
+                    className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+                      isItemActive
+                        ? 'bg-[#FFD2B2] text-[#121212] shadow-sm border border-[#525252]/20'
+                        : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
+                    }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div
@@ -139,8 +140,9 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     </div>
                     {item.subMenu && (
                       <ChevronRight
-                        className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''
-                          } ${isItemActive ? 'text-[#121212]' : 'text-[#525252]'}`}
+                        className={`w-4 h-4 transition-transform duration-200 ${
+                          isExpanded ? 'rotate-90' : ''
+                        } ${isItemActive ? 'text-[#121212]' : 'text-[#525252]'}`}
                       />
                     )}
                   </div>
@@ -148,18 +150,20 @@ export default function UserLayout({ children }: UserLayoutProps) {
                   {/* Submenu */}
                   {item.subMenu && (
                     <div
-                      className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                        }`}
+                      className={`overflow-hidden transition-all duration-300 ${
+                        isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                      }`}
                     >
                       <div className="ml-6 space-y-1 border-l-2 border-[#525252]/20 pl-4">
                         {item.subMenu.map((subItem) => (
                           <div
                             key={subItem.path}
                             onClick={() => handleNavigation(subItem.path)}
-                            className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ${activeTab === subItem.path
-                              ? 'bg-[#FFD2B2]/30 text-[#121212] border-l-2 border-[#FFD2B2]'
-                              : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
-                              }`}
+                            className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                              activeTab === subItem.path
+                                ? 'bg-[#FFD2B2]/30 text-[#121212] border-l-2 border-[#FFD2B2]'
+                                : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
+                            }`}
                           >
                             {subItem.icon}
                             <span className="text-sm font-medium">{subItem.name}</span>
