@@ -23,19 +23,6 @@ type TAccountMeResponse = {
   roles: string[];
 };
 
-type TCustomerProfileResponse = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  address: string;
-  avatarUrl: string;
-  username: string;
-  email: string;
-  gender: number;
-  lastUpdate: string;
-};
-
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
   const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
@@ -69,20 +56,6 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
-const customerProfile = async (): Promise<TCustomerProfileResponse | undefined> => {
-  try {
-    const result =
-      await authApi.default.get<IResponseObject<TCustomerProfileResponse>>('/customers/profile');
-    if (result.data.success && result.status === 200) {
-      const { content } = result.data;
-      return content;
-    }
-  } catch {
-    return undefined;
-  }
-  return undefined;
-};
+export type { TAccountMeResponse };
 
-export type { TAccountMeResponse, TCustomerProfileResponse };
-
-export { accountMe, customerProfile, loginInternal };
+export { accountMe, loginInternal };

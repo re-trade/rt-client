@@ -120,8 +120,22 @@ const UserDashboard = () => {
               </p>
             </div>
             <div>
-              <div className="w-16 h-16 bg-[#FFD2B2] rounded-xl flex items-center justify-center text-[#121212] text-xl font-bold shadow-md">
-                {profile?.avatarUrl}
+              <div className="avatar">
+                <div className="w-16 h-16 rounded-xl">
+                  {profile?.avatarUrl &&
+                  typeof profile.avatarUrl === 'string' &&
+                  (profile.avatarUrl.startsWith('http') || profile.avatarUrl.startsWith('/')) ? (
+                    <img
+                      src={profile.avatarUrl}
+                      alt="User avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#FFD2B2] flex items-center justify-center text-[#121212] text-xl font-bold">
+                      {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
