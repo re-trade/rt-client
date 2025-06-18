@@ -1,4 +1,5 @@
 'use client';
+import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import {
   Bell,
   ChevronRight,
@@ -13,7 +14,6 @@ import {
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 type UserLayoutProps = {
   children: React.ReactNode;
 };
@@ -29,6 +29,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['profile']);
+  const { profile } = useCustomerProfile();
 
   const toggleMenu = (path: string) => {
     setExpandedMenus((prev) =>
@@ -67,7 +68,11 @@ export default function UserLayout({ children }: UserLayoutProps) {
           icon: <Settings className="w-4 h-4" />,
           path: 'notification-settings',
         },
-        { name: 'Payment Methods', icon: <Eye className="w-4 h-4" />, path: 'payment-methods' },
+        {
+          name: 'Phương Thức Thanh Toán',
+          icon: <Eye className="w-4 h-4" />,
+          path: 'payment-methods',
+        },
       ],
     },
     {
@@ -87,18 +92,16 @@ export default function UserLayout({ children }: UserLayoutProps) {
   return (
     <div className="min-h-screen bg-[#FDFEF9]">
       <div className="flex max-w-7xl mx-auto">
-        {/* Enhanced Sidebar */}
         <aside className="w-80 bg-white shadow-md border-r border-[#525252]/20">
-          {/* User Profile Header */}
           <div className="p-6 bg-[#FFD2B2] text-[#121212]">
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-[#121212] text-xl font-bold shadow-md">
-                  Vu
+                  {profile?.email}
                 </div>
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-semibold">vominhvu2002</h2>
+                <h2 className="text-lg font-semibold">{profile?.username ?? 'N/A'}</h2>
                 <button
                   onClick={() => router.push('/user/profile')}
                   className="flex items-center text-[#121212] hover:underline transition-colors text-sm mt-1 group"
@@ -110,8 +113,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
               </div>
             </div>
           </div>
-
-          {/* Navigation Menu */}
           <nav className="p-4 space-y-2">
             {menuItems.map((item) => {
               const isExpanded = expandedMenus.includes(item.path);

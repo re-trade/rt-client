@@ -1,5 +1,6 @@
 'use client';
 
+import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import {
   Activity,
   ArrowRight,
@@ -17,7 +18,7 @@ import { useEffect, useState } from 'react';
 
 const UserDashboard = () => {
   const [greeting, setGreeting] = useState('');
-
+  const { profile } = useCustomerProfile();
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Chào buổi sáng');
@@ -108,24 +109,23 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-[#FDFEF9] p-6">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Welcome Header */}
         <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-[#121212]">{greeting}, Vu! 👋</h1>
+              <h1 className="text-3xl font-bold text-[#121212]">
+                {greeting}, {profile?.firstName + ' ' + profile?.lastName} 👋
+              </h1>
               <p className="text-[#525252] mt-2 text-lg">
-                Chào mừng bạn quay trở lại với cộng đồng trao đổi đồ cũ
+                Chào mừng bạn quay trở lại với nền tảng buôn bán đồ cũ
               </p>
             </div>
             <div>
               <div className="w-16 h-16 bg-[#FFD2B2] rounded-xl flex items-center justify-center text-[#121212] text-xl font-bold shadow-md">
-                Vu
+                {profile?.avatarUrl}
               </div>
             </div>
           </div>
         </div>
-
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <div
@@ -146,7 +146,6 @@ const UserDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Quick Actions */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
               <div className="flex items-center justify-between mb-6">
@@ -181,10 +180,7 @@ const UserDashboard = () => {
               </div>
             </div>
           </div>
-
-          {/* Recent Activities & Notifications */}
           <div className="space-y-6">
-            {/* Recent Activities */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
               <h2 className="text-xl font-bold text-[#121212] mb-4 flex items-center">
                 <Calendar className="w-6 h-6 mr-2 text-[#121212]" />
@@ -205,8 +201,6 @@ const UserDashboard = () => {
                 ))}
               </div>
             </div>
-
-            {/* Notification Card */}
             <div className="bg-[#FFD2B2] rounded-xl shadow-md p-6 border border-[#525252]/20">
               <div className="flex items-center mb-4">
                 <Bell className="w-6 h-6 text-[#121212] mr-2" />
