@@ -24,6 +24,18 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const fetchProfile = async () => {
+      const data = await getCustomerProfile();
+      if (data) {
+        setProfile(data);
+        setAvatarPreview(data.avatarUrl);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  useEffect(() => {
     if (profile?.avatarUrl) {
       try {
         new URL(profile.avatarUrl);
