@@ -23,6 +23,19 @@ type TAccountMeResponse = {
   roles: string[];
 };
 
+type TCustomerProfileResponse = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  avatarUrl: string;
+  username: string;
+  email: string;
+  gender: number;
+  lastUpdate: string;
+};
+
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
   const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
@@ -37,7 +50,6 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
       },
     },
   );
-  console.log('Login result:', result);
   if (result.data.success && result.status === 200) {
     const { ACCESS_TOKEN } = result.data.content.tokens;
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
@@ -57,4 +69,20 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
-export { accountMe, loginInternal };
+const customerProfile = async (): Promise<TCustomerProfileResponse | undefined> => {
+  try {
+    const result =
+      await authApi.default.get<IResponseObject<TCustomerProfileResponse>>('/customers/profile');
+    if (result.data.success && result.status === 200) {
+      const { content } = result.data;
+      return content;
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+};
+
+export type { TAccountMeResponse, TCustomerProfileResponse };
+
+export { accountMe, customerProfile, loginInternal };

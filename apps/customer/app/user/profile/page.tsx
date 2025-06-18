@@ -1,40 +1,17 @@
 'use client';
 
+import { useAuth } from '@/hooks/use-auth';
+import { useCustomerProfile } from '@/hooks/use-customer-profile';
+import { TCustomerProfileResponse } from '@/services/auth.api';
 import { Calendar, Camera, Check, Edit3, Mail, Phone, Shield, User, X } from 'lucide-react';
 import Image from 'next/image';
 import React, { useRef, useState } from 'react';
 
-interface Profile {
-  name: string;
-  username: string;
-  email: string;
-  phone?: string;
-  gender: string;
-  country: string;
-  avatarUrl: string;
-  lastUpdated: string;
-  joinDate: string;
-  bio?: string;
-}
-
-const fakeProfile: Profile = {
-  name: 'Hien Nguyen',
-  username: 'Hiennguyen123',
-  email: 'Hiennguyen25@gmail.com',
-  phone: '+84 987 654 321',
-  gender: 'Nữ',
-  country: 'Việt Nam',
-  avatarUrl: '/Facebook_icon.svg.png',
-  lastUpdated: '1 tháng trước',
-  joinDate: '15/03/2023',
-  bio: 'Yêu thích việc chia sẻ và trao đổi đồ cũ để kết nối với cộng đồng. Tìm kiếm những món đồ độc đáo và có ý nghĩa.',
-};
-
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<Profile>(fakeProfile);
-  const [avatar, setAvatar] = useState<string>(profile.avatarUrl);
+  const { profile, setUpdateProfileForm } = useCustomerProfile();
+  const { account } = useAuth();
+  const [avatar, setAvatar] = useState<string>(profile?.avatarUrl || '');
   const [isEditing, setIsEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState<Profile>(profile);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -44,7 +21,6 @@ export default function ProfilePage() {
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
 
-      // Simulate upload delay
       setTimeout(() => {
         setAvatar(url);
         setIsUploading(false);
@@ -56,17 +32,17 @@ export default function ProfilePage() {
     fileInputRef.current?.click();
   };
 
-  const handleInputChange = (field: keyof Profile, value: string) => {
-    setEditedProfile((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof TCustomerProfileResponse, value: string) => {
+    // setEditedProfile((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
-    setProfile(editedProfile);
+    // setProfile(editedProfile);
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setEditedProfile(profile);
+    // setEditedProfile(profile);
     setIsEditing(false);
   };
 
@@ -119,12 +95,8 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-
-        {/* Profile Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Avatar & Basic Info */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Avatar Section */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
               <div className="text-center">
                 <div className="relative inline-block">
@@ -136,7 +108,7 @@ export default function ProfilePage() {
                     ) : (
                       <Image
                         src={avatar}
-                        alt={profile.name}
+                        alt={profile?.lastName ?? 'N/A'}
                         width={128}
                         height={128}
                         className="w-full h-full object-cover"
@@ -151,16 +123,10 @@ export default function ProfilePage() {
                   </button>
                 </div>
 
-                <h2 className="text-xl font-bold text-gray-800 mt-4">{profile.name}</h2>
-                <p className="text-gray-600">@{profile.username}</p>
-
-                <div className="mt-4 p-3 bg-amber-50 rounded-lg">
-                  <p className="text-sm text-amber-700 italic">"{profile.bio}"</p>
-                </div>
+                <h2 className="text-xl font-bold text-gray-800 mt-4">{profile?.lastName}</h2>
+                <p className="text-gray-600">@{profile?.username}</p>
               </div>
             </div>
-
-            {/* Stats Card */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
               <h3 className="text-lg font-semibold text-[#121212] mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2 text-[#121212]" />
@@ -171,12 +137,12 @@ export default function ProfilePage() {
                   <span className="text-sm text-gray-600">Ngày tham gia</span>
                   <span className="text-sm font-medium text-gray-800 flex items-center">
                     <Calendar className="w-4 h-4 mr-1 text-amber-600" />
-                    {profile.joinDate}
+                    {account?.joinInDate}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Cập nhật cuối</span>
-                  <span className="text-sm font-medium text-gray-800">{profile.lastUpdated}</span>
+                  <span className="text-sm font-medium text-gray-800">{account?.joinInDate}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Trạng thái</span>
@@ -188,26 +154,21 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Right Column - Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
-              {/* Personal Information */}
-              <div className="mb-8">
+              <div className="mb-8 text-gray-900">
                 <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
                   <User className="w-5 h-5 mr-2 text-amber-600" />
                   Thông tin cá nhân
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Full Name */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Họ và tên *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Họ *</label>
                     <input
                       type="text"
-                      value={isEditing ? editedProfile.name : profile.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      value={profile?.lastName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
                       disabled={!isEditing}
                       className={`w-full p-3 border rounded-xl transition-all duration-200 ${
                         isEditing
@@ -216,28 +177,38 @@ export default function ProfilePage() {
                       }`}
                     />
                   </div>
-
-                  {/* Username */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tên *</label>
+                    <input
+                      type="text"
+                      value={profile?.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      disabled={!isEditing}
+                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
+                        isEditing
+                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                      }`}
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Tên đăng nhập
                     </label>
                     <input
                       type="text"
-                      value={profile.username}
+                      value={account?.username}
                       disabled
                       className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 cursor-not-allowed"
                     />
                     <p className="text-xs text-gray-500 mt-1">Không thể thay đổi tên đăng nhập</p>
                   </div>
-
-                  {/* Gender */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Giới tính
                     </label>
                     <select
-                      value={isEditing ? editedProfile.gender : profile.gender}
+                      value={profile?.gender ?? 0}
                       onChange={(e) => handleInputChange('gender', e.target.value)}
                       disabled={!isEditing}
                       className={`w-full p-3 border rounded-xl transition-all duration-200 ${
@@ -246,63 +217,20 @@ export default function ProfilePage() {
                           : 'border-gray-200 bg-gray-50 cursor-not-allowed'
                       }`}
                     >
-                      <option value="Nam">Nam</option>
-                      <option value="Nữ">Nữ</option>
-                      <option value="Khác">Khác</option>
+                      <option value="0">Nam</option>
+                      <option value="1">Nữ</option>
+                      <option value="2">Khác</option>
                     </select>
                   </div>
-
-                  {/* Country */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Quốc gia</label>
-                    <select
-                      value={isEditing ? editedProfile.country : profile.country}
-                      onChange={(e) => handleInputChange('country', e.target.value)}
-                      disabled={!isEditing}
-                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
-                        isEditing
-                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                      }`}
-                    >
-                      <option value="Việt Nam">Việt Nam</option>
-                      <option value="Mỹ">Mỹ</option>
-                      <option value="Nhật Bản">Nhật Bản</option>
-                      <option value="Hàn Quốc">Hàn Quốc</option>
-                      <option value="Khác">Khác</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Bio */}
-                <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Giới thiệu bản thân
-                  </label>
-                  <textarea
-                    value={isEditing ? editedProfile.bio : profile.bio}
-                    onChange={(e) => handleInputChange('bio', e.target.value)}
-                    disabled={!isEditing}
-                    rows={3}
-                    placeholder="Chia sẻ về bản thân và sở thích của bạn..."
-                    className={`w-full p-3 border rounded-xl transition-all duration-200 resize-none ${
-                      isEditing
-                        ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                        : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                    }`}
-                  />
                 </div>
               </div>
-
-              {/* Contact Information */}
-              <div>
+              <div className="mb-8 text-gray-900">
                 <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
                   <Mail className="w-5 h-5 mr-2 text-amber-600" />
                   Thông tin liên hệ
                 </h3>
 
                 <div className="space-y-6">
-                  {/* Email */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Địa chỉ Email *
@@ -313,7 +241,7 @@ export default function ProfilePage() {
                       </div>
                       <input
                         type="email"
-                        value={profile.email}
+                        value={profile?.email}
                         disabled
                         className="w-full pl-10 p-3 border border-gray-200 rounded-xl bg-gray-50 cursor-not-allowed"
                       />
@@ -322,8 +250,6 @@ export default function ProfilePage() {
                       Email đã được xác thực và không thể thay đổi
                     </p>
                   </div>
-
-                  {/* Phone */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Số điện thoại
@@ -334,7 +260,7 @@ export default function ProfilePage() {
                       </div>
                       <input
                         type="tel"
-                        value={isEditing ? editedProfile.phone : profile.phone}
+                        value={profile?.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         disabled={!isEditing}
                         placeholder="Nhập số điện thoại"
@@ -351,8 +277,6 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-
-        {/* Hidden file input */}
         <input
           ref={fileInputRef}
           type="file"

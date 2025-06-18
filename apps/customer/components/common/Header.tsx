@@ -14,7 +14,6 @@ const Header: React.FC = () => {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     const history = localStorage.getItem('searchHistory');
     if (history) {
@@ -165,7 +164,7 @@ const Header: React.FC = () => {
                       Hồ sơ
                     </Link>
                     <Link
-                      href="/orders"
+                      href="/user/purchase"
                       className="block px-4 py-2.5 hover:bg-slate-50 transition-colors duration-150"
                     >
                       Đơn hàng

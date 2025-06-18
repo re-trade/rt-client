@@ -1,4 +1,5 @@
 'use client';
+import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import {
   Bell,
   ChevronRight,
@@ -13,7 +14,6 @@ import {
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-
 type UserLayoutProps = {
   children: React.ReactNode;
 };
@@ -29,6 +29,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['profile']);
+  const { profile } = useCustomerProfile();
 
   const toggleMenu = (path: string) => {
     setExpandedMenus((prev) =>
@@ -67,7 +68,11 @@ export default function UserLayout({ children }: UserLayoutProps) {
           icon: <Settings className="w-4 h-4" />,
           path: 'notification-settings',
         },
-        { name: 'Payment Methods', icon: <Eye className="w-4 h-4" />, path: 'payment-methods' },
+        {
+          name: 'Phương Thức Thanh Toán',
+          icon: <Eye className="w-4 h-4" />,
+          path: 'payment-methods',
+        },
       ],
     },
     {
@@ -87,18 +92,16 @@ export default function UserLayout({ children }: UserLayoutProps) {
   return (
     <div className="min-h-screen bg-[#FDFEF9]">
       <div className="flex max-w-7xl mx-auto">
-        {/* Enhanced Sidebar */}
         <aside className="w-80 bg-white shadow-md border-r border-[#525252]/20">
-          {/* User Profile Header */}
           <div className="p-6 bg-[#FFD2B2] text-[#121212]">
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center text-[#121212] text-xl font-bold shadow-md">
-                  Vu
+                  {profile?.email}
                 </div>
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-semibold">vominhvu2002</h2>
+                <h2 className="text-lg font-semibold">{profile?.username ?? 'N/A'}</h2>
                 <button
                   onClick={() => router.push('/user/profile')}
                   className="flex items-center text-[#121212] hover:underline transition-colors text-sm mt-1 group"
@@ -110,8 +113,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
               </div>
             </div>
           </div>
-
-          {/* Navigation Menu */}
           <nav className="p-4 space-y-2">
             {menuItems.map((item) => {
               const isExpanded = expandedMenus.includes(item.path);
@@ -123,11 +124,10 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     onClick={() =>
                       item.subMenu ? toggleMenu(item.path) : handleNavigation(item.path)
                     }
-                    className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
-                      isItemActive
-                        ? 'bg-[#FFD2B2] text-[#121212] shadow-sm border border-[#525252]/20'
-                        : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
-                    }`}
+                    className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${isItemActive
+                      ? 'bg-[#FFD2B2] text-[#121212] shadow-sm border border-[#525252]/20'
+                      : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
+                      }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div
@@ -139,9 +139,8 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     </div>
                     {item.subMenu && (
                       <ChevronRight
-                        className={`w-4 h-4 transition-transform duration-200 ${
-                          isExpanded ? 'rotate-90' : ''
-                        } ${isItemActive ? 'text-[#121212]' : 'text-[#525252]'}`}
+                        className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''
+                          } ${isItemActive ? 'text-[#121212]' : 'text-[#525252]'}`}
                       />
                     )}
                   </div>
@@ -149,20 +148,18 @@ export default function UserLayout({ children }: UserLayoutProps) {
                   {/* Submenu */}
                   {item.subMenu && (
                     <div
-                      className={`overflow-hidden transition-all duration-300 ${
-                        isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                      }`}
+                      className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                        }`}
                     >
                       <div className="ml-6 space-y-1 border-l-2 border-[#525252]/20 pl-4">
                         {item.subMenu.map((subItem) => (
                           <div
                             key={subItem.path}
                             onClick={() => handleNavigation(subItem.path)}
-                            className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                              activeTab === subItem.path
-                                ? 'bg-[#FFD2B2]/30 text-[#121212] border-l-2 border-[#FFD2B2]'
-                                : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
-                            }`}
+                            className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ${activeTab === subItem.path
+                              ? 'bg-[#FFD2B2]/30 text-[#121212] border-l-2 border-[#FFD2B2]'
+                              : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
+                              }`}
                           >
                             {subItem.icon}
                             <span className="text-sm font-medium">{subItem.name}</span>

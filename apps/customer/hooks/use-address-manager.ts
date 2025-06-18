@@ -183,8 +183,7 @@ export function useAddressManager() {
         `https://provinces.open-api.vn/api/d/${districtCode}?depth=2`,
       );
       setWards(response.data.wards || []);
-    } catch (error) {
-      console.error('Error fetching wards:', error);
+    } catch {
       setErrors({ general: 'Không thể tải danh sách phường/xã' });
     } finally {
       setLoading(false);
@@ -269,7 +268,6 @@ export function useAddressManager() {
   }, [resetForm]);
 
   const openUpdateDialog = useCallback(async (address: Address) => {
-    console.log('Opening update dialog with address:', address);
     setSelectedAddress(address);
     setFormData({
       customerName: address.customerName,
@@ -293,14 +291,11 @@ export function useAddressManager() {
       setProvinces(allProvinces);
       const province = allProvinces.find((p: Province) => p.name === address.country);
       if (province) {
-        console.log('Found matching province:', province.name, province.code);
-
         const districtResponse = await axios.get(`${PROVINCES_API_URL}${province.code}?depth=2`);
         const provinceDistricts = districtResponse.data.districts || [];
         setDistricts(provinceDistricts);
         const district = provinceDistricts.find((d: District) => d.name === address.district);
         if (district) {
-          console.log('Found matching district:', district.name, district.code);
           const wardResponse = await axios.get(
             `https://provinces.open-api.vn/api/d/${district.code}?depth=2`,
           );
@@ -313,16 +308,9 @@ export function useAddressManager() {
             district: district.code.toString(),
             ward: ward ? ward.code.toString() : '',
           }));
-
-          console.log('Updated form data with location codes:', {
-            country: province.code.toString(),
-            district: district.code.toString(),
-            ward: ward ? ward.code.toString() : '',
-          });
         }
       }
-    } catch (error) {
-      console.error('Error loading location data:', error);
+    } catch {
       setErrors({ general: 'Không thể tải dữ liệu địa điểm' });
     } finally {
       setLoading(false);
@@ -338,7 +326,6 @@ export function useAddressManager() {
   }, [resetForm]);
 
   const createAddress = useCallback(async () => {
-    console.log('Creating address with formData:', formData);
     const { error } = addressSchema.validate(formData, { abortEarly: false });
 
     if (error) {
@@ -347,7 +334,6 @@ export function useAddressManager() {
         const key = detail.path[0] as string;
         newErrors[key] = detail.message;
       });
-      console.log('Validation errors:', newErrors);
       setErrors(newErrors);
       setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
       return false;
@@ -389,7 +375,6 @@ export function useAddressManager() {
       closeDialogs();
       return true;
     } catch (error: any) {
-      console.error('Error creating address:', error);
       const errorMessage = error.response?.data?.message || 'Không thể tạo địa chỉ mới';
       setErrors({ general: errorMessage });
       return false;
@@ -400,9 +385,6 @@ export function useAddressManager() {
 
   const updateAddress = useCallback(async () => {
     if (!selectedAddress) return false;
-
-    console.log('Current form data before validation:', formData);
-
     const { error } = addressSchema.validate(formData, { abortEarly: false });
 
     if (error) {
@@ -411,7 +393,6 @@ export function useAddressManager() {
         const key = detail.path[0] as string;
         newErrors[key] = detail.message;
       });
-      console.log('Validation errors:', newErrors);
       setErrors(newErrors);
       setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
       return false;
@@ -423,23 +404,8 @@ export function useAddressManager() {
       const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
       const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
       const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
-
-      console.log('Selected locations:', {
-        province: selectedProvince,
-        district: selectedDistrict,
-        ward: selectedWard,
-      });
-
       if (!selectedProvince || !selectedDistrict || !selectedWard) {
         const errorMsg = 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã';
-        console.error(errorMsg, {
-          provinceCode: formData.country,
-          districtCode: formData.district,
-          wardCode: formData.ward,
-          provinces: provinces.map((p) => ({ code: p.code, name: p.name })),
-          districts: districts.map((d) => ({ code: d.code, name: d.name })),
-          wards: wards.map((w) => ({ code: w.code, name: w.name })),
-        });
         setErrors({ general: errorMsg });
         return false;
       }
@@ -456,18 +422,14 @@ export function useAddressManager() {
         type: formData.type,
         defaulted: formData.isDefault,
       };
-
-      console.log('Updating address with final data:', addressData);
       const response = await contactApi.updateContact(selectedAddress.id, addressData);
       if (!response) {
         throw new Error('Không thể cập nhật địa chỉ');
       }
-
       await fetchAddresses();
       closeDialogs();
       return true;
     } catch (error: any) {
-      console.error('Error updating address:', error);
       const errorMessage = error.response?.data?.message || 'Không thể cập nhật địa chỉ';
       setErrors({ general: errorMessage });
       return false;
@@ -489,7 +451,6 @@ export function useAddressManager() {
       }
       setAddresses((prev) => prev.filter((addr) => addr.id !== id));
     } catch (error: any) {
-      console.error('Error deleting address:', error);
       const errorMessage = error.response?.data?.message || 'Không thể xóa địa chỉ';
       setErrors({ general: errorMessage });
     } finally {
