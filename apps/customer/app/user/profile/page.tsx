@@ -137,7 +137,9 @@ export default function ProfilePage() {
                   <span className="text-sm text-gray-600">Ngày tham gia</span>
                   <span className="text-sm font-medium text-gray-800 flex items-center">
                     <Calendar className="w-4 h-4 mr-1 text-amber-600" />
-                    {account?.joinInDate}
+                    {account?.joinInDate
+                      ? new Date(account?.joinInDate).toLocaleDateString('vi-VN')
+                      : 'N/A'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -170,11 +172,10 @@ export default function ProfilePage() {
                       value={profile?.lastName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
                       disabled={!isEditing}
-                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
-                        isEditing
-                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                      }`}
+                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${isEditing
+                        ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                        : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                        }`}
                     />
                   </div>
                   <div>
@@ -184,11 +185,10 @@ export default function ProfilePage() {
                       value={profile?.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
                       disabled={!isEditing}
-                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
-                        isEditing
-                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                      }`}
+                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${isEditing
+                        ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                        : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                        }`}
                     />
                   </div>
                   <div>
@@ -211,11 +211,10 @@ export default function ProfilePage() {
                       value={profile?.gender ?? 0}
                       onChange={(e) => handleInputChange('gender', e.target.value)}
                       disabled={!isEditing}
-                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
-                        isEditing
-                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                      }`}
+                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${isEditing
+                        ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                        : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                        }`}
                     >
                       <option value="0">Nam</option>
                       <option value="1">Nữ</option>
@@ -264,11 +263,10 @@ export default function ProfilePage() {
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         disabled={!isEditing}
                         placeholder="Nhập số điện thoại"
-                        className={`w-full pl-10 p-3 border rounded-xl transition-all duration-200 ${
-                          isEditing
-                            ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                            : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                        }`}
+                        className={`w-full pl-10 p-3 border rounded-xl transition-all duration-200 ${isEditing
+                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                          }`}
                       />
                     </div>
                   </div>
