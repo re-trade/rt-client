@@ -3,6 +3,7 @@
 import ChangeEmailForm from '@/components/auth/ChangeEmailForm';
 import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
 import ChangePhoneForm from '@/components/auth/ChangePhoneForm';
+import ChangeUsernameForm from '@/components/auth/ChangeUsernameForm';
 import TwoFactorSetup from '@/components/auth/TwoFactorSetup';
 import SecurityModal from '@/components/common/SecurityModal';
 import { useAuth } from '@/hooks/use-auth';
@@ -10,7 +11,10 @@ import {
   changeEmailInternal,
   changePasswordInternal,
   changePhoneInternal,
+  changeUsernameInternal,
 } from '@/services/security.api';
+
+import { checkUsernameAvailability } from '@services/auth.api';
 import {
   AlertTriangle,
   Calendar,
@@ -25,6 +29,7 @@ import {
   Settings,
   Shield,
   Smartphone,
+  User,
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -75,10 +80,19 @@ const securityActions: SecurityAction[] = [
     id: '2fa',
     title: 'Xác thực hai yếu tố (2FA)',
     description: 'Bật xác thực hai yếu tố để bảo vệ tài khoản của bạn.',
-    status: 'dynamic', // Will be determined by account.using2FA
+    status: 'dynamic',
     action: 'Kích hoạt',
     icon: <Smartphone className="w-5 h-5" />,
     category: 'auth',
+  },
+  {
+    id: 'username',
+    title: 'Đổi tên đăng nhập',
+    description: 'Đổi tên đăng nhập 1 lần duy nhất, đảm bảo an toàn cho tài khoản của bạn.',
+    status: 'dynamic',
+    action: 'Cập nhập',
+    icon: <User className="w-5 h-5" />,
+    category: 'account',
   },
 ];
 
@@ -130,13 +144,14 @@ export default function SecurityPage() {
     password: false,
     email: false,
     phone: false,
+    username: false,
   });
   const { isAuth, account } = useAuth();
   const [refreshKey, setRefreshKey] = useState(0);
   const [actionStatus, setActionStatus] = useState<{
     success: boolean;
     message: string | null;
-    type: 'password' | 'email' | 'phone' | null;
+    type: 'password' | 'email' | 'phone' | 'username' | null;
   }>({
     success: false,
     message: null,
@@ -159,7 +174,8 @@ export default function SecurityPage() {
     } else if (action.id === 'phone') {
       setModalState((prev) => ({ ...prev, phone: true }));
     } else if (action.id === '2fa') {
-      // 2FA is handled by the TwoFactorSetup component
+    } else if (action.id === 'username') {
+      setModalState((prev) => ({ ...prev, username: true }));
     }
   };
 
@@ -214,7 +230,7 @@ export default function SecurityPage() {
     try {
       const success = await changeEmailInternal({
         newEmail: values.newEmail,
-        password: values.password,
+        passwordConfirm: values.password,
       });
 
       if (success) {
@@ -253,6 +269,45 @@ export default function SecurityPage() {
     try {
       const success = await changePhoneInternal({
         newPhone: values.newPhone,
+        passwordConfirm: values.password,
+      });
+
+      if (success) {
+        setActionStatus({
+          success: true,
+          message: 'Đã thay đổi số điện thoại thành công!',
+          type: 'phone',
+        });
+
+        setTimeout(() => {
+          setModalState((prev) => ({ ...prev, phone: false }));
+          setActionStatus({ success: false, message: null, type: null });
+          handleRefresh();
+        }, 2000);
+
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error instanceof Error) {
+        setActionStatus({
+          success: false,
+          message: error.message,
+          type: 'phone',
+        });
+      }
+      return false;
+    }
+  };
+
+  const handleUsernameSubmit = async (values: {
+    currentUsername: string;
+    newUsername: string;
+    password: string;
+  }) => {
+    try {
+      const success = await changeUsernameInternal({
+        newUsername: values.newUsername,
         password: values.password,
       });
 
@@ -380,7 +435,29 @@ export default function SecurityPage() {
           />
         </SecurityModal>
 
-        {/* Header */}
+        <SecurityModal
+          isOpen={modalState.username}
+          onClose={() => setModalState((prev) => ({ ...prev, username: false }))}
+          title="Đổi tên đăng nhập"
+          isLoading={actionStatus.type === 'username' && actionStatus.success}
+          status={
+            actionStatus.type === 'username' ? (actionStatus.success ? 'success' : 'error') : null
+          }
+          statusMessage={
+            actionStatus.type === 'username' && actionStatus.message
+              ? actionStatus.message
+              : undefined
+          }
+        >
+          <ChangeUsernameForm
+            currentUsername={account?.username || ''}
+            onSubmit={handleUsernameSubmit}
+            hasChangedUsername={account?.changedUsername}
+            checkUsernameAvailability={checkUsernameAvailability}
+            onCancel={() => setModalState((prev) => ({ ...prev, username: false }))}
+          />
+        </SecurityModal>
+
         <div className="bg-white rounded-xl shadow-lg border border-[#525252]/10 overflow-hidden">
           <div className="bg-gradient-to-r from-[#FFD2B2] to-[#FFBD8D] p-6 text-[#121212]">
             <div className="flex items-center justify-between">
@@ -405,7 +482,6 @@ export default function SecurityPage() {
           </div>
         </div>
 
-        {/* Security Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100 hover:border-amber-300 transition-all duration-300">
             <div className="flex items-center space-x-3">

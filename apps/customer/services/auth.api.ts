@@ -21,6 +21,8 @@ type TAccountMeResponse = {
   locked: boolean;
   using2FA: boolean;
   joinInDate: string;
+  changedUsername: boolean;
+  lastLogin?: string;
   roles: string[];
 };
 
@@ -74,6 +76,21 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
+const checkUsernameAvailability = async (username: string): Promise<boolean> => {
+  try {
+    const result = await authApi.default.get<IResponseObject<{ existed: boolean }>>(
+      `/accounts/check-username?username=${username}`,
+    );
+    if (result.data.success && result.status === 200) {
+      const { content } = result.data;
+      return !content.existed;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+};
+
 export type { TAccountMeResponse };
 
 const register2FAInternal = async (width: number = 300, height: number = 300): Promise<Blob> => {
@@ -90,4 +107,10 @@ const register2FAInternal = async (width: number = 300, height: number = 300): P
 
   return response.data;
 };
-export { accountMe, loginInternal, register2FAInternal, registerInternal };
+export {
+  accountMe,
+  checkUsernameAvailability,
+  loginInternal,
+  register2FAInternal,
+  registerInternal,
+};
