@@ -6,6 +6,7 @@ function useCustomerProfile() {
   const [updateProfileForm, setUpdateProfileForm] = useState<TCustomerProfileResponse>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const getCustomerProfile = useCallback(async () => {
     setIsLoading(true);
@@ -60,6 +61,29 @@ function useCustomerProfile() {
       setIsLoading(false);
     }
   }, [profile?.id, updateProfileForm]);
+
+  const uploadAndUpdateAvatar = useCallback(
+    async (file: File) => {
+      setIsUploadingAvatar(true);
+      setError(null);
+      try {
+        const uploadedUrl = await profileApi.uploadAvatar(file);
+        if (!uploadedUrl) {
+          throw new Error('Failed to upload avatar file');
+        }
+        await profileApi.updateAvatar(uploadedUrl);
+        await getCustomerProfile();
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to update avatar';
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      } finally {
+        setIsUploadingAvatar(false);
+      }
+    },
+    [getCustomerProfile],
+  );
+
   useEffect(() => {
     getCustomerProfile();
   }, []);
@@ -71,6 +95,8 @@ function useCustomerProfile() {
     setUpdateProfileForm,
     getCustomerProfile,
     isLoading,
+    isUploadingAvatar,
+    uploadAndUpdateAvatar,
     error,
   };
 }

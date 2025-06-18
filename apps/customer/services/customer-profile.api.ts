@@ -42,6 +42,34 @@ const profileApi = {
     }
     return undefined;
   },
+  async uploadAvatar(file: File): Promise<string | undefined> {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await authApi.storage.post<IResponseObject<string>>(
+        '/files/upload',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      return response.data.success ? response.data.content : undefined;
+    } catch {
+      return undefined;
+    }
+  },
+  async updateAvatar(avatarUrl: string): Promise<void> {
+    await authApi.default.put<IResponseObject<string>>(
+      '/customers/profile/avatar',
+      {},
+      {
+        params: { avatarUrl },
+      },
+    );
+  },
 };
 export { profileApi };
 export type { TCustomerProfileRequest, TCustomerProfileResponse };

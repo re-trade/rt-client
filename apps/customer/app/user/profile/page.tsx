@@ -8,12 +8,19 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 
 export default function ProfilePage() {
-  const { profile, updateProfile, updateProfileForm, setUpdateProfileForm, isLoading, error } =
-    useCustomerProfile();
+  const {
+    profile,
+    updateProfile,
+    updateProfileForm,
+    setUpdateProfileForm,
+    uploadAndUpdateAvatar,
+    isLoading,
+    isUploadingAvatar,
+    error,
+  } = useCustomerProfile();
   const { account } = useAuth();
   const [avatar, setAvatar] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -28,18 +35,12 @@ export default function ProfilePage() {
       setAvatar('/default-avatar.png');
     }
   }, [profile]);
-  const updateAvatar = async (file: File) => {
+
+  const handleAvatarUpload = async (file: File) => {
     try {
-      setIsUploadingAvatar(true);
-      const formData = new FormData();
-      formData.append('avatar', file);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const url = URL.createObjectURL(file);
-      setAvatar(url);
-    } catch {
-      alert('Failed to update avatar. Please try again.');
-    } finally {
-      setIsUploadingAvatar(false);
+      await uploadAndUpdateAvatar(file);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to update avatar. Please try again.');
     }
   };
 
@@ -54,7 +55,7 @@ export default function ProfilePage() {
         if (file.size > 5 * 1024 * 1024) {
           throw new Error('File size must be less than 5MB');
         }
-        await updateAvatar(file);
+        await handleAvatarUpload(file);
       } catch (error) {
         alert(error instanceof Error ? error.message : 'Failed to upload avatar');
       }
@@ -192,7 +193,6 @@ export default function ProfilePage() {
                       />
                     )}
                   </div>
-                  {/* Avatar upload button - always visible, not tied to profile editing */}
                   <button
                     onClick={triggerFileInput}
                     disabled={isUploadingAvatar}
