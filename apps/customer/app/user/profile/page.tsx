@@ -172,10 +172,11 @@ export default function ProfilePage() {
                       value={profile?.lastName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
                       disabled={!isEditing}
-                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${isEditing
-                        ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                        : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                        }`}
+                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
+                        isEditing
+                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                      }`}
                     />
                   </div>
                   <div>
@@ -185,10 +186,11 @@ export default function ProfilePage() {
                       value={profile?.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
                       disabled={!isEditing}
-                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${isEditing
-                        ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                        : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                        }`}
+                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
+                        isEditing
+                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                      }`}
                     />
                   </div>
                   <div>
@@ -211,10 +213,11 @@ export default function ProfilePage() {
                       value={profile?.gender ?? 0}
                       onChange={(e) => handleInputChange('gender', e.target.value)}
                       disabled={!isEditing}
-                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${isEditing
-                        ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                        : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                        }`}
+                      className={`w-full p-3 border rounded-xl transition-all duration-200 ${
+                        isEditing
+                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                      }`}
                     >
                       <option value="0">Nam</option>
                       <option value="1">Nữ</option>
@@ -263,10 +266,11 @@ export default function ProfilePage() {
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         disabled={!isEditing}
                         placeholder="Nhập số điện thoại"
-                        className={`w-full pl-10 p-3 border rounded-xl transition-all duration-200 ${isEditing
-                          ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
-                          : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                          }`}
+                        className={`w-full pl-10 p-3 border rounded-xl transition-all duration-200 ${
+                          isEditing
+                            ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                            : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                        }`}
                       />
                     </div>
                   </div>
