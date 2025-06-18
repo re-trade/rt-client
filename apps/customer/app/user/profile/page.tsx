@@ -3,28 +3,62 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import { TCustomerProfileResponse } from '@/services/auth.api';
-import { Calendar, Camera, Check, Edit3, Mail, Phone, Shield, User, X } from 'lucide-react';
+import { Calendar, Camera, Check, Edit3, Mail, Map, Phone, Shield, User, X } from 'lucide-react';
 import Image from 'next/image';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function ProfilePage() {
-  const { profile, setUpdateProfileForm } = useCustomerProfile();
+  const {
+    profile,
+    updateProfile,
+    updateProfileForm,
+    setUpdateProfileForm,
+    uploadAndUpdateAvatar,
+    isLoading,
+    isUploadingAvatar,
+    error,
+  } = useCustomerProfile();
   const { account } = useAuth();
-  const [avatar, setAvatar] = useState<string>(profile?.avatarUrl || '');
+  const [avatar, setAvatar] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setIsUploading(true);
-      const file = e.target.files[0];
-      const url = URL.createObjectURL(file);
+  useEffect(() => {
+    if (profile?.avatarUrl) {
+      try {
+        new URL(profile.avatarUrl);
+        setAvatar(profile.avatarUrl);
+      } catch {
+        setAvatar('/default-avatar.png');
+      }
+    } else {
+      setAvatar('/default-avatar.png');
+    }
+  }, [profile]);
 
-      setTimeout(() => {
-        setAvatar(url);
-        setIsUploading(false);
-      }, 1500);
+  const handleAvatarUpload = async (file: File) => {
+    try {
+      await uploadAndUpdateAvatar(file);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to update avatar. Please try again.');
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      try {
+        if (!file.type.startsWith('image/')) {
+          throw new Error('Please select a valid image file');
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('File size must be less than 5MB');
+        }
+        await handleAvatarUpload(file);
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'Failed to upload avatar');
+      }
     }
   };
 
@@ -33,23 +67,51 @@ export default function ProfilePage() {
   };
 
   const handleInputChange = (field: keyof TCustomerProfileResponse, value: string) => {
-    // setEditedProfile((prev) => ({ ...prev, [field]: value }));
+    if (updateProfileForm) {
+      setUpdateProfileForm({
+        ...updateProfileForm,
+        [field]: value,
+      });
+    }
   };
 
-  const handleSave = () => {
-    // setProfile(editedProfile);
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (!updateProfileForm) return;
+
+    try {
+      await updateProfile();
+      setIsEditing(false);
+    } catch {}
   };
 
   const handleCancel = () => {
-    // setEditedProfile(profile);
+    if (profile) {
+      setUpdateProfileForm(profile);
+      try {
+        if (profile.avatarUrl) {
+          new URL(profile.avatarUrl);
+          setAvatar(profile.avatarUrl);
+        } else {
+          setAvatar('/default-avatar.png');
+        }
+      } catch {
+        setAvatar('/default-avatar.png');
+      }
+    }
     setIsEditing(false);
   };
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-[#FDFEF9] p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-amber-500 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFEF9] p-6">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
         <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
           <div className="bg-[#FFD2B2] p-6 text-[#121212]">
             <div className="flex items-center justify-between">
@@ -69,14 +131,20 @@ export default function ProfilePage() {
                   <>
                     <button
                       onClick={handleSave}
-                      className="bg-white/20 hover:bg-white/30 text-[#121212] px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                      disabled={isLoading}
+                      className="bg-white/20 hover:bg-white/30 text-[#121212] px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Check className="w-4 h-4" />
-                      <span>Lưu</span>
+                      {isLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#121212] border-t-transparent"></div>
+                      ) : (
+                        <Check className="w-4 h-4" />
+                      )}
+                      <span>{isLoading ? 'Đang lưu...' : 'Lưu'}</span>
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="bg-white/10 hover:bg-white/20 text-[#121212] px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                      disabled={isLoading}
+                      className="bg-white/10 hover:bg-white/20 text-[#121212] px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <X className="w-4 h-4" />
                       <span>Hủy</span>
@@ -95,36 +163,53 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
               <div className="text-center">
                 <div className="relative inline-block">
                   <div className="w-32 h-32 mx-auto rounded-2xl overflow-hidden shadow-xl border-4 border-white">
-                    {isUploading ? (
+                    {isUploadingAvatar ? (
                       <div className="w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
                       </div>
                     ) : (
                       <Image
-                        src={avatar}
-                        alt={profile?.lastName ?? 'N/A'}
+                        src={avatar || '/default-avatar.png'}
+                        alt={`${profile.firstName} ${profile.lastName}`}
                         width={128}
                         height={128}
                         className="w-full h-full object-cover"
+                        onError={() => {
+                          setAvatar('/default-avatar.png');
+                        }}
                       />
                     )}
                   </div>
                   <button
                     onClick={triggerFileInput}
-                    className="absolute bottom-0 right-0 bg-amber-500 hover:bg-amber-600 text-white p-2 rounded-full shadow-lg transition-colors"
+                    disabled={isUploadingAvatar}
+                    className="absolute bottom-0 right-0 bg-amber-500 hover:bg-amber-600 text-white p-2 rounded-full shadow-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Thay đổi ảnh đại diện"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
                 </div>
 
-                <h2 className="text-xl font-bold text-gray-800 mt-4">{profile?.lastName}</h2>
-                <p className="text-gray-600">@{profile?.username}</p>
+                <h2 className="text-xl font-bold text-gray-800 mt-4">
+                  {profile.firstName} {profile.lastName}
+                </h2>
+                <p className="text-gray-600">@{profile.username}</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Nhấp vào biểu tượng camera để thay đổi ảnh đại diện
+                </p>
               </div>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
@@ -142,7 +227,11 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Cập nhật cuối</span>
-                  <span className="text-sm font-medium text-gray-800">{account?.joinInDate}</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    {profile.lastUpdate
+                      ? new Date(profile.lastUpdate).toLocaleDateString('vi-VN')
+                      : 'N/A'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Trạng thái</span>
@@ -167,7 +256,7 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Họ *</label>
                     <input
                       type="text"
-                      value={profile?.lastName}
+                      value={updateProfileForm?.firstName || ''}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
                       disabled={!isEditing}
                       className={`w-full p-3 border rounded-xl transition-all duration-200 ${
@@ -181,7 +270,7 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Tên *</label>
                     <input
                       type="text"
-                      value={profile?.lastName}
+                      value={updateProfileForm?.lastName || ''}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
                       disabled={!isEditing}
                       className={`w-full p-3 border rounded-xl transition-all duration-200 ${
@@ -197,7 +286,7 @@ export default function ProfilePage() {
                     </label>
                     <input
                       type="text"
-                      value={account?.username}
+                      value={profile.username}
                       disabled
                       className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 cursor-not-allowed"
                     />
@@ -208,7 +297,7 @@ export default function ProfilePage() {
                       Giới tính
                     </label>
                     <select
-                      value={profile?.gender ?? 0}
+                      value={updateProfileForm?.gender ?? 0}
                       onChange={(e) => handleInputChange('gender', e.target.value)}
                       disabled={!isEditing}
                       className={`w-full p-3 border rounded-xl transition-all duration-200 ${
@@ -241,7 +330,7 @@ export default function ProfilePage() {
                       </div>
                       <input
                         type="email"
-                        value={profile?.email}
+                        value={profile.email}
                         disabled
                         className="w-full pl-10 p-3 border border-gray-200 rounded-xl bg-gray-50 cursor-not-allowed"
                       />
@@ -260,10 +349,30 @@ export default function ProfilePage() {
                       </div>
                       <input
                         type="tel"
-                        value={profile?.phone}
+                        value={updateProfileForm?.phone || ''}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         disabled={!isEditing}
                         placeholder="Nhập số điện thoại"
+                        className={`w-full pl-10 p-3 border rounded-xl transition-all duration-200 ${
+                          isEditing
+                            ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
+                            : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Map className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        value={updateProfileForm?.address || ''}
+                        onChange={(e) => handleInputChange('address', e.target.value)}
+                        disabled={!isEditing}
+                        placeholder="Nhập địa chỉ của bạn"
                         className={`w-full pl-10 p-3 border rounded-xl transition-all duration-200 ${
                           isEditing
                             ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 bg-white'
