@@ -146,8 +146,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
                       />
                     )}
                   </div>
-
-                  {/* Submenu */}
                   {item.subMenu && (
                     <div
                       className={`overflow-hidden transition-all duration-300 ${
@@ -177,8 +175,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
             })}
           </nav>
         </aside>
-
-        {/* Main Content */}
         <main className="flex-1 min-h-screen">
           <div className="h-full">{children}</div>
         </main>

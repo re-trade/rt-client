@@ -15,4 +15,19 @@ const register2FAInternal = async (width: number = 300, height: number = 300): P
   return response.data;
 };
 
-export { register2FAInternal };
+const verify2FAInternal = async (code: string): Promise<boolean> => {
+  try {
+    const response = await authApi.default.patch(
+      `/auth/2fa/verify`,
+      { code },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.status === 200;
+  } catch {
+    return false;
+  }
+};
+
+export { register2FAInternal, verify2FAInternal };

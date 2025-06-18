@@ -16,6 +16,7 @@ type TAccountMeResponse = {
   id: string;
   username: string;
   email: string;
+  phone: string;
   enabled: boolean;
   locked: boolean;
   using2FA: boolean;
