@@ -12,9 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { productApi, TProduct } from '@/service/product.api';
 import { Edit } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Product {
   id: string;
@@ -57,6 +58,8 @@ export default function ProductManagement() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
+  const [productList, setProductList] = useState<TProduct[]>([]);
+
   const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       id: Date.now().toString(),
@@ -64,6 +67,21 @@ export default function ProductManagement() {
     };
     setProducts([...products, newProduct]);
   };
+  const id: string = '1'; // Replace with actual product ID from route params or context
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const productList = await productApi.getProducts();
+        setProductList(productList);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProduct();
+  }, []);
+  useEffect(() => {
+    console.log('Product list:', productList);
+  });
 
   const handleUpdateProduct = (productData: Omit<Product, 'id'>) => {
     if (!selectedProduct) return;

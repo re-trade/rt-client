@@ -30,16 +30,15 @@ function DiagonalBackground() {
 
 export default function Footer() {
   return (
-    <footer className="relative w-full py-12 h-[400px] ">
+    <footer className="relative w-full py-12 min-h-[500px]">
       <DiagonalBackground />
 
-      <div className="relative max-w-[1440px] mx-auto px-6 grid grid-cols-4 gap-8 h-full pt-16">
+      <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 h-full pt-16">
         <div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
-            {' '}
+          <h3 className="font-['Reddit_Sans'] font-semibold text-xl sm:text-2xl text-[#121212] mb-4">
             Dịch vụ khách hàng
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 sm:gap-3">
             {[
               'Chính sách hỗ trợ khách hàng',
               'Hướng dẫn Mua hàng/ Đặt hàng',
@@ -51,7 +50,7 @@ export default function Footer() {
               <a
                 key={item}
                 href="#"
-                className="font-['Reddit_Sans'] font-normal text-lg text-[#121212] hover:text-[#525252]"
+                className="font-['Reddit_Sans'] text-base sm:text-lg text-[#121212] hover:text-[#525252]"
               >
                 {item}
               </a>
@@ -59,10 +58,10 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
+          <h3 className="font-['Reddit_Sans'] font-semibold text-xl sm:text-2xl text-[#121212] mb-4">
             Về chúng tôi
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 sm:gap-3">
             {[
               'Về Retrade Shop',
               'Tuyển dụng',
@@ -74,7 +73,7 @@ export default function Footer() {
               <a
                 key={item}
                 href="#"
-                className="font-['Reddit_Sans'] font-normal text-lg text-[#121212] hover:text-[#525252]"
+                className="font-['Reddit_Sans'] text-base sm:text-lg text-[#121212] hover:text-[#525252]"
               >
                 {item}
               </a>
@@ -82,25 +81,25 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
+          <h3 className="font-['Reddit_Sans'] font-semibold text-xl sm:text-2xl text-[#121212] mb-4">
             Liên hệ chúng tôi
           </h3>
-          <div className="flex items-center gap-2 mb-4">
-            <FaMapMarkerAlt className="w-5 h-5 text-[#121212]" />
-            <span className="font-['Reddit_Sans'] font-normal  text-1.5xl text-[#121212]">
+          <div className="flex items-start gap-2 mb-4">
+            <FaMapMarkerAlt className="w-5 h-5 min-w-[20px] text-[#121212]" />
+            <span className="font-['Reddit_Sans'] text-base text-[#121212]">
               Tòa nhà Vietcomreal, 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. HCM
             </span>
           </div>
           <div className="flex items-center gap-2 mb-4">
             <FaEnvelope className="w-5 h-5 text-[#121212]" />
-            <span className="font-['Reddit_Sans'] font-normal text-lg text-[#121212]">
+            <span className="font-['Reddit_Sans'] text-base text-[#121212]">
               retradeshopsupport@gmail.com
             </span>
           </div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-base text-[#121212] mb-4">
+          <h3 className="font-['Reddit_Sans'] font-semibold text-sm sm:text-base text-[#121212] mb-2">
             Theo dõi chúng tôi tại
           </h3>
-          <div className="flex gap-4">
+          <div className="flex gap-3 flex-wrap">
             {[
               { icon: FaFacebookF, href: '#' },
               { icon: FaInstagram, href: '#' },
@@ -118,19 +117,21 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <h3 className="font-['Reddit_Sans'] font-semibold text-2xl text-[#121212] mb-4">
+          <h3 className="font-['Reddit_Sans'] font-semibold text-xl sm:text-2xl text-[#121212] mb-4">
             Liên hệ hỗ trợ
           </h3>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <input
               type="text"
               placeholder="Tên tài khoản"
-              className="w-full h-9 border border-[#121212] rounded-xl opacity-50 font-['Reddit_Sans'] text-sm text-[#121212] px-3"
+              aria-label="Tên tài khoản"
+              className="w-full h-9 border border-[#121212] rounded-xl placeholder-opacity-50 font-['Reddit_Sans'] text-sm text-[#121212] px-3"
             />
             <input
               type="email"
               placeholder="Email"
-              className="w-full h-9 border border-[#121212] rounded-xl opacity-50 font-['Reddit_Sans'] text-sm text-[#121212] px-3"
+              aria-label="Email"
+              className="w-full h-9 border border-[#121212] rounded-xl placeholder-opacity-50 font-['Reddit_Sans'] text-sm text-[#121212] px-3"
             />
             <button className="w-[107px] h-9 bg-[#FFD2B2] rounded-full font-['Reddit_Sans'] font-medium text-xs text-[#121212] flex items-center justify-center">
               Gửi
@@ -138,12 +139,12 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="relative max-w-[1440px] mx-auto px-6 mt-12 pt-6 border-t border-[#525252]/20 flex justify-between items-center text-[#525252] font-['Reddit_Sans'] text-[10px]">
-        <span>© 2021 All Rights Reserved</span>
-        <div className="flex gap-6">
+      <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 mt-12 pt-6 border-t border-[#525252]/20 flex flex-col sm:flex-row justify-between items-center gap-4 text-[#525252] font-['Reddit_Sans'] text-xs">
+        <span className="text-center sm:text-left">© 2021 All Rights Reserved</span>
+        <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
           {['Privacy Policy', 'Terms of Use', 'Sales and Refunds', 'Legal', 'Site Map'].map(
             (item) => (
-              <a key={item} href="#" className="hover:text-[#121212]">
+              <a key={item} href="#" className="hover:text-[#121212] whitespace-nowrap">
                 {item}
               </a>
             ),

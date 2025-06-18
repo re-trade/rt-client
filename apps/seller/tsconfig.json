@@ -1,6 +1,7 @@
 {
   "extends": "@retrade/typescript-config/nextjs.json",
   "compilerOptions": {
+    "jsx": "preserve",
     "plugins": [
       {
         "name": "next"

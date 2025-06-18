@@ -35,7 +35,6 @@ type TRegister = {
   avatarUrl: string;
 };
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
-  
   const deviceInfo = await getDeviceInfo();
   const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
     '/auth/local',
@@ -43,13 +42,12 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
     {
       headers: {
         'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
-  'x-device-name': encodeURIComponent(deviceInfo.deviceName),
-  'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
-  'x-location': encodeURIComponent(deviceInfo.location),
+        'x-device-name': encodeURIComponent(deviceInfo.deviceName),
+        'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
+        'x-location': encodeURIComponent(deviceInfo.location),
       },
     },
   );
-
   if (result.data.success && result.status === 200) {
     const { ACCESS_TOKEN } = result.data.content.tokens;
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
@@ -75,10 +73,9 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
-const register2FAInternal = async (
-  width: number = 300,
-  height: number = 300
-): Promise<Blob> => {
+export type { TAccountMeResponse };
+
+const register2FAInternal = async (width: number = 300, height: number = 300): Promise<Blob> => {
   const response = await authApi.default.post<Blob>(
     `/auth/register/2fa?width=${width}&height=${height}`,
     null,
@@ -87,9 +84,9 @@ const register2FAInternal = async (
       headers: {
         Accept: 'image/png',
       },
-    }
+    },
   );
 
   return response.data;
 };
-export { accountMe, loginInternal, registerInternal, register2FAInternal };
+export { accountMe, loginInternal, register2FAInternal, registerInternal };

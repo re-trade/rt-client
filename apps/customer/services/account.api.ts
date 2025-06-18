@@ -13,7 +13,8 @@ type TCustomerProfile = {
 
 const getCustomerProfile = async (): Promise<TCustomerProfile | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TCustomerProfile>>('/customers/profile');
+    const result =
+      await authApi.default.get<IResponseObject<TCustomerProfile>>('/customers/profile');
     if (result.data.success && result.status === 200) {
       return result.data.content;
     }

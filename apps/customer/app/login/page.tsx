@@ -55,7 +55,8 @@ export default function Login() {
     try {
       const validation = loginSchema.validate(formData);
       if (validation.error) {
-        throw new Error(validation.error.details[0].message);
+        showToast(validation.error.message, 'error');
+        return;
       }
 
       await loginInternal(formData);
