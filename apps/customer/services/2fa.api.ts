@@ -30,4 +30,12 @@ const verify2FAInternal = async (code: string): Promise<boolean> => {
   }
 };
 
-export { register2FAInternal, verify2FAInternal };
+const disable2FAInternal = async (password: string): Promise<boolean> => {
+  try {
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export { disable2FAInternal, register2FAInternal, verify2FAInternal };

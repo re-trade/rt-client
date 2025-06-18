@@ -7,17 +7,19 @@ interface ChangePasswordPayload {
 
 interface ChangeEmailPayload {
   newEmail: string;
-  password: string;
+  passwordConfirm: string;
 }
 
 interface ChangePhonePayload {
   newPhone: string;
-  password: string;
+  passwordConfirm: string;
 }
 
-/**
- * Change user password
- */
+interface ChangeUsernamePayload {
+  username: string;
+  passwordConfirm: string;
+}
+
 const changePasswordInternal = async (payload: ChangePasswordPayload): Promise<boolean> => {
   try {
     const response = await authApi.default.patch('/accounts/password', payload, {
@@ -29,9 +31,6 @@ const changePasswordInternal = async (payload: ChangePasswordPayload): Promise<b
   }
 };
 
-/**
- * Change user email
- */
 const changeEmailInternal = async (payload: ChangeEmailPayload): Promise<boolean> => {
   try {
     const response = await authApi.default.patch('/accounts/email', payload, {
@@ -43,12 +42,20 @@ const changeEmailInternal = async (payload: ChangeEmailPayload): Promise<boolean
   }
 };
 
-/**
- * Change user phone number
- */
 const changePhoneInternal = async (payload: ChangePhonePayload): Promise<boolean> => {
   try {
-    const response = await authApi.default.patch('/accounts/phone', payload, {
+    const response = await authApi.default.patch('/customers/phone', payload, {
+      withCredentials: true,
+    });
+    return response.status === 200;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const changeUsernameInternal = async (payload: ChangeUsernamePayload): Promise<boolean> => {
+  try {
+    const response = await authApi.default.patch('/accounts/username', payload, {
       withCredentials: true,
     });
     return response.status === 200;
@@ -61,7 +68,9 @@ export {
   changeEmailInternal,
   changePasswordInternal,
   changePhoneInternal,
+  changeUsernameInternal,
   type ChangeEmailPayload,
   type ChangePasswordPayload,
   type ChangePhonePayload,
+  type ChangeUsernamePayload,
 };

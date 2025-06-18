@@ -27,10 +27,7 @@ const SecurityModal: React.FC<SecurityModalProps> = ({
 }) => {
   useEffect(() => {
     if (isOpen) {
-      // Lock body scroll when modal is open
       document.body.style.overflow = 'hidden';
-
-      // Restore scroll when modal is closed
       return () => {
         document.body.style.overflow = 'auto';
       };
