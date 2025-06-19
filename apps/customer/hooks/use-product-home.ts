@@ -1,7 +1,7 @@
 'use client';
-import { Category, getCategoriesInternal } from "@/services/category.api";
-import { productApi, TProduct } from "@/services/product.api";
-import { useCallback, useEffect, useState } from "react";
+import { Category, getCategoriesInternal } from '@/services/category.api';
+import { productApi, TProduct } from '@/services/product.api';
+import { useCallback, useEffect, useState } from 'react';
 
 export function useProductHome() {
   const [products, setProducts] = useState<TProduct[]>([]);
@@ -16,7 +16,7 @@ export function useProductHome() {
     try {
       const response = await getCategoriesInternal({
         visible: true,
-        size: 50
+        size: 50,
       });
       setCategories(response.content || []);
     } catch {
@@ -29,7 +29,11 @@ export function useProductHome() {
     setLoading(true);
     setError(null);
     try {
-      const response = await productApi.searchProducts(0, 6, (categoryId ? `categoryId=${categoryId}` : undefined));
+      const response = await productApi.searchProducts(
+        0,
+        6,
+        categoryId ? `categoryId=${categoryId}` : undefined,
+      );
       const products = response || [];
       setProducts(products);
     } catch {
@@ -39,10 +43,13 @@ export function useProductHome() {
     }
   }, []);
 
-  const selectCategory = useCallback((categoryId: string | null) => {
-    setSelectedCategoryId(categoryId);
-    fetchProducts(categoryId);
-  }, [fetchProducts]);
+  const selectCategory = useCallback(
+    (categoryId: string | null) => {
+      setSelectedCategoryId(categoryId);
+      fetchProducts(categoryId);
+    },
+    [fetchProducts],
+  );
 
   const refetch = useCallback(() => {
     fetchProducts(selectedCategoryId);

@@ -60,7 +60,10 @@ const getCategoryByIdInternal = async (id: string): Promise<Category> => {
   }
 };
 
-const getCategoryChildrenInternal = async (parentId: string, params?: GetCategoriesParams): Promise<CategoriesResponse> => {
+const getCategoryChildrenInternal = async (
+  parentId: string,
+  params?: GetCategoriesParams,
+): Promise<CategoriesResponse> => {
   try {
     const response = await authApi.default.get(`/categories/${parentId}/children`, {
       params,
@@ -76,7 +79,7 @@ export {
   getCategoriesInternal,
   getCategoryByIdInternal,
   getCategoryChildrenInternal,
-  type Category,
   type CategoriesResponse,
+  type Category,
   type GetCategoriesParams,
 };
