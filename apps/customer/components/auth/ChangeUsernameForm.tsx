@@ -139,10 +139,10 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
   if (hasChangedUsername) {
     return (
       <div className="space-y-4">
-        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md text-sm">
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 sm:px-4 py-3 rounded-md text-sm">
           <div className="flex items-start">
             <svg
-              className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0"
+              className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -152,9 +152,9 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
                 clipRule="evenodd"
               />
             </svg>
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="font-medium">Thông báo</p>
-              <p className="mt-1">
+              <p className="mt-1 text-xs sm:text-sm leading-relaxed">
                 Bạn đã thay đổi tên đăng nhập một lần rồi. Mỗi tài khoản chỉ được phép thay đổi tên
                 đăng nhập một lần duy nhất để đảm bảo tính bảo mật.
               </p>
@@ -175,13 +175,13 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
               type="text"
               value={currentUsername}
               disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 text-sm sm:text-base"
             />
           </div>
 
           <div className="bg-gray-50 border border-gray-200 rounded-md p-4 text-center">
             <svg
-              className="w-12 h-12 text-gray-400 mx-auto mb-2"
+              className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -217,10 +217,10 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-md text-sm">
+      <div className="bg-amber-50 border border-amber-200 text-amber-700 px-3 sm:px-4 py-3 rounded-md text-sm">
         <div className="flex items-start">
           <svg
-            className="w-5 h-5 text-amber-600 mr-2 mt-0.5 flex-shrink-0"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mr-2 mt-0.5 flex-shrink-0"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -230,9 +230,9 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="font-medium">Lưu ý quan trọng</p>
-            <p className="mt-1">
+            <p className="mt-1 text-xs sm:text-sm leading-relaxed">
               <strong>Bạn chỉ có thể thay đổi tên đăng nhập một lần duy nhất.</strong> Sau khi thay
               đổi thành công, bạn sẽ được chuyển hướng về trang đăng nhập để đăng nhập lại với tên
               đăng nhập mới.
@@ -243,7 +243,7 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {formError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-3 rounded-md text-sm">
             {formError}
           </div>
         )}
@@ -257,7 +257,7 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
             type="text"
             value={values.currentUsername}
             disabled
-            className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+            className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 text-sm sm:text-base"
           />
         </div>
 
@@ -272,7 +272,7 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
               type="text"
               value={values.newUsername}
               onChange={handleUsernameInputChange}
-              className={`w-full px-4 py-2 pr-10 border rounded-md focus:outline-none focus:ring-1 ${
+              className={`w-full px-3 sm:px-4 py-2 pr-10 border rounded-md focus:outline-none focus:ring-1 text-sm sm:text-base ${
                 errors.newUsername
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-600'
                   : usernameAvailable === true
@@ -328,19 +328,27 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
           {!errors.newUsername && values.newUsername && (
             <>
               {isCheckingUsername && (
-                <p className="mt-1 text-sm text-gray-500">Đang kiểm tra tính khả dụng...</p>
+                <p className="mt-1 text-xs sm:text-sm text-gray-500">
+                  Đang kiểm tra tính khả dụng...
+                </p>
               )}
               {usernameAvailable === true && (
-                <p className="mt-1 text-sm text-green-600">✓ Tên đăng nhập có thể sử dụng</p>
+                <p className="mt-1 text-xs sm:text-sm text-green-600">
+                  ✓ Tên đăng nhập có thể sử dụng
+                </p>
               )}
               {usernameAvailable === false && (
-                <p className="mt-1 text-sm text-red-600">✗ Tên đăng nhập này đã được sử dụng</p>
+                <p className="mt-1 text-xs sm:text-sm text-red-600">
+                  ✗ Tên đăng nhập này đã được sử dụng
+                </p>
               )}
             </>
           )}
 
           {errors.newUsername && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.newUsername}</p>
+            <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">
+              {errors.newUsername}
+            </p>
           )}
         </div>
 
@@ -355,7 +363,7 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
               type={showPassword ? 'text' : 'password'}
               value={values.password}
               onChange={handleInputChange}
-              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-1 ${
+              className={`w-full px-3 sm:px-4 py-2 border rounded-md focus:outline-none focus:ring-1 text-sm sm:text-base ${
                 errors.password
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-600'
                   : 'border-gray-300 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white'
@@ -399,17 +407,19 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
+            <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">
+              {errors.password}
+            </p>
           )}
         </div>
 
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
             >
               Hủy bỏ
             </button>
@@ -417,7 +427,7 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
           <button
             type="submit"
             disabled={isSubmitting || isCheckingUsername || usernameAvailable === false}
-            className="px-4 py-2 rounded-md text-sm font-medium bg-[#FFECBC] text-[#976100] hover:bg-[#FFE7A8] transition-colors disabled:opacity-50 flex items-center justify-center"
+            className="w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium bg-[#FFECBC] text-[#976100] hover:bg-[#FFE7A8] transition-colors disabled:opacity-50 flex items-center justify-center"
           >
             {isSubmitting ? (
               <>
@@ -441,10 +451,10 @@ const ChangeUsernameForm: React.FC<ChangeUsernameFormProps> = ({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Đang xử lý...
+                <span className="text-xs sm:text-sm">Đang xử lý...</span>
               </>
             ) : (
-              'Đổi tên đăng nhập'
+              <span className="text-xs sm:text-sm">Đổi tên đăng nhập</span>
             )}
           </button>
         </div>

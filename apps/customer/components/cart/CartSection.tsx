@@ -1,25 +1,20 @@
 'use client';
+
 import CartSkeleton from '@/components/cart/CartSkeleton';
 import { useCart } from '@/hooks/use-cart';
 import Image from 'next/image';
-import { useState } from 'react';
 
-export default function CartSection() {
-  const { cartGroups, loading, error, toggleShopSection } = useCart();
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-
+export default function CartSection({
+  cartGroups,
+  loading,
+  error,
+  toggleShopSection,
+  selectedItems,
+  toggleItemSelection,
+}: ReturnType<typeof useCart>) {
   const handleCheckboxChange = (itemId: string) => {
-    setSelectedItems((prev) => {
-      if (prev.includes(itemId)) {
-        return prev.filter((id) => id !== itemId);
-      } else {
-        return [...prev, itemId];
-      }
-    });
+    toggleItemSelection(itemId);
   };
-
-  const handleAddToFavorites = (itemId: string) => {};
-
   const handleRemove = (itemId: string) => {};
 
   if (loading || error || !cartGroups || Object.keys(cartGroups).length === 0) {
@@ -29,18 +24,17 @@ export default function CartSection() {
   return (
     <>
       {Object.entries(cartGroups).map(([sellerId, shopSection]) => (
-        <div key={sellerId} className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div
+          key={sellerId}
+          className="rounded-xl border border-orange-100 bg-white shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+        >
           <button
             onClick={() => toggleShopSection(sellerId)}
-            className="flex w-full items-center justify-between p-4 text-left"
+            className="flex w-full items-center justify-between p-6 text-left bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-150 transition-all duration-200"
           >
-            <h3 className="text-lg font-medium text-gray-900">
-              Người Bán: {shopSection.sellerName}
-            </h3>
+            <h3 className="text-lg font-bold text-gray-800">Người Bán: {shopSection.sellerName}</h3>
             <svg
-              className={`h-6 w-6 transform transition-transform ${
-                shopSection.isOpen ? 'rotate-180' : ''
-              }`}
+              className={`h-6 w-6 transition-transform duration-300 text-orange-600 ${shopSection.isOpen ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -55,101 +49,78 @@ export default function CartSection() {
           </button>
 
           {shopSection.isOpen && (
-            <div className="space-y-4 p-4">
-              {shopSection.items.map((item) => (
-                <div
-                  key={item.productId}
-                  className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6"
-                >
-                  <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-                    <div className="flex items-center md:order-1">
-                      <input
-                        type="checkbox"
-                        id={`select-item-${item.productId}`}
-                        checked={selectedItems.includes(item.productId)}
-                        onChange={() => handleCheckboxChange(item.productId)}
-                        className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                      />
-                      <label htmlFor={`select-item-${item.productId}`} className="sr-only">
-                        Chọn sản phẩm để đặt hàng
-                      </label>
-                    </div>
-                    <a href="#" className="shrink-0 md:order-2">
-                      <Image
-                        width={80}
-                        height={80}
-                        className="h-20 w-20"
-                        src={item.productThumbnail}
-                        alt={`${item.productName} hình ảnh`}
-                      />
-                    </a>
+            <div className="space-y-4 p-6 bg-orange-25">
+              {shopSection.items.map((item) => {
+                const isSoldOut = !item.productAvailable;
 
-                    <div className="flex items-center justify-between md:order-4 md:justify-end">
-                      <div className="text-end md:w-32">
-                        <p className="text-base font-bold text-gray-900">
+                return (
+                  <div
+                    key={item.productId}
+                    className={`rounded-lg border border-orange-50 p-6 shadow-sm transition-shadow duration-200 ${isSoldOut ? 'bg-gray-100 opacity-70' : 'bg-white hover:shadow-md'}`}
+                  >
+                    <div className="md:flex md:items-center md:justify-between md:gap-6">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item.productId)}
+                          onChange={() => handleCheckboxChange(item.productId)}
+                          disabled={!item.productAvailable}
+                          className="h-5 w-5 rounded border-orange-200 text-orange-500 focus:ring-orange-400 focus:ring-2"
+                        />
+                      </div>
+                      <div className="relative rounded-lg overflow-hidden bg-orange-25 p-2">
+                        <Image
+                          width={80}
+                          height={80}
+                          className="h-20 w-20 object-cover"
+                          src={item.productThumbnail}
+                          alt={`${item.productName} hình ảnh`}
+                        />
+                        {isSoldOut && (
+                          <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded">
+                            Đã bán
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <a
+                          href="#"
+                          className={`block text-base font-semibold transition-colors ${
+                            isSoldOut
+                              ? 'text-gray-500 pointer-events-none'
+                              : 'text-gray-800 hover:text-orange-600 hover:underline'
+                          }`}
+                        >
+                          {item.productName}
+                        </a>
+                        <p className="text-sm text-gray-600">{item.addedAt}</p>
+                        <div className="flex items-center gap-6">
+                          <button
+                            type="button"
+                            onClick={() => handleRemove(item.productId)}
+                            className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 hover:underline transition-colors font-medium"
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path
+                                fillRule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Xóa
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-lg">
                           {item.totalPrice.toLocaleString('vi-VN')}₫
                         </p>
                       </div>
                     </div>
-
-                    <div className="w-full min-w-0 flex-1 space-y-4 md:order-3 md:max-w-md">
-                      <a href="#" className="text-base font-medium text-gray-900 hover:underline">
-                        {item.productName}
-                      </a>
-                      <div className="flex items-center gap-4">
-                        <button
-                          type="button"
-                          onClick={() => handleAddToFavorites(item.productId)}
-                          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 hover:underline"
-                        >
-                          <svg
-                            className="me-1.5 h-5 w-5"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"
-                            />
-                          </svg>
-                          Thêm vào Yêu thích
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(item.productId)}
-                          className="inline-flex items-center text-sm font-medium text-red-600 hover:underline"
-                        >
-                          <svg
-                            className="me-1.5 h-5 w-5"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M6 18 17.94 6M18 18 6.06 6"
-                            />
-                          </svg>
-                          Xóa
-                        </button>
-                      </div>
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

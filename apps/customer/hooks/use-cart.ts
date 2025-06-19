@@ -1,5 +1,4 @@
 'use client';
-
 import { cartApi, CartGroupResponse, CartResponse } from '@/services/cart.api';
 import { productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,6 +13,7 @@ function useCart() {
   const [cartGroups, setCartGroups] = useState<
     Record<string, CartGroupResponse & { isOpen: boolean }>
   >({});
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [cartSummary, setCartSummary] = useState<TCartSummary>({
     originalPrice: 0,
     savings: 0,
@@ -52,7 +52,7 @@ function useCart() {
       const data = await productApi.getProducts(0, 3);
       setProducts(data);
     } catch {
-      setError('Không thể tải giỏ hàng');
+      setError('Không thể tải sản phẩm');
     } finally {
       setLoading(false);
     }
@@ -72,6 +72,49 @@ function useCart() {
     });
   }, []);
 
+  const toggleItemSelection = useCallback((productId: string) => {
+    setSelectedItems((prev) => {
+      if (prev.includes(productId)) {
+        return prev.filter((id) => id !== productId);
+      } else {
+        return [...prev, productId];
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!cart || !selectedItems.length) {
+      setCartSummary({
+        originalPrice: 0,
+        savings: 0,
+        tax: 0,
+        total: 0,
+      });
+      return;
+    }
+
+    let originalPrice = 0;
+    let total = 0;
+
+    cart.cartGroupResponses.forEach((group) => {
+      group.items.forEach((item) => {
+        if (selectedItems.includes(item.productId)) {
+          originalPrice += item.totalPrice;
+          total += item.totalPrice;
+        }
+      });
+    });
+    const savings = originalPrice - total;
+    const tax = Math.round(total * 0.05);
+
+    setCartSummary({
+      originalPrice,
+      savings,
+      tax,
+      total: total + tax,
+    });
+  }, [selectedItems, cart]);
+
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
@@ -87,9 +130,10 @@ function useCart() {
     error,
     refresh: fetchCart,
     toggleShopSection,
+    toggleItemSelection,
+    selectedItems,
     products,
     cartSummary,
   };
 }
-
 export { useCart };
