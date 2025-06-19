@@ -1,5 +1,6 @@
 'use client';
 import { cartApi, CartGroupResponse, CartResponse } from '@/services/cart.api';
+import { contactApi, TAddress } from '@/services/contact.api';
 import { productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
 type TCartSummary = {
@@ -13,7 +14,9 @@ function useCart() {
   const [cartGroups, setCartGroups] = useState<
     Record<string, CartGroupResponse & { isOpen: boolean }>
   >({});
+  const [contacts, setContacts] = useState<TAddress[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [cartSummary, setCartSummary] = useState<TCartSummary>({
     originalPrice: 0,
     savings: 0,
@@ -40,6 +43,22 @@ function useCart() {
       setCartGroups(groupsMap);
     } catch {
       setError('Không thể tải giỏ hàng');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  const selectAddress = useCallback((addressId: string) => {
+    setSelectedAddressId(addressId);
+  }, []);
+
+  const fetchAddresses = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await contactApi.getContacts();
+      setContacts(data);
+    } catch {
+      setError('Không thể tải địa chỉ');
     } finally {
       setLoading(false);
     }
@@ -117,7 +136,8 @@ function useCart() {
 
   useEffect(() => {
     fetchCart();
-  }, [fetchCart]);
+    fetchAddresses();
+  }, [fetchCart, fetchAddresses]);
 
   useEffect(() => {
     fetchRecommendProduct();
@@ -134,6 +154,9 @@ function useCart() {
     selectedItems,
     products,
     cartSummary,
+    contacts,
+    selectedAddressId,
+    selectAddress,
   };
 }
 export { useCart };
