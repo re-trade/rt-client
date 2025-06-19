@@ -81,5 +81,5 @@ export {
   getCategoryChildrenInternal,
   type CategoriesResponse,
   type Category,
-  type GetCategoriesParams
+  type GetCategoriesParams,
 };
