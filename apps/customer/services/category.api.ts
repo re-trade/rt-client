@@ -1,4 +1,4 @@
-import { authApi } from '@retrade/util';
+import { unAuthApi } from '@retrade/util';
 
 interface Category {
   id: string;
@@ -39,7 +39,7 @@ interface GetCategoriesParams {
 
 const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<CategoriesResponse> => {
   try {
-    const response = await authApi.default.get('/categories', {
+    const response = await unAuthApi.default.get('/categories', {
       params,
       withCredentials: true,
     });
@@ -51,7 +51,7 @@ const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<Cate
 
 const getCategoryByIdInternal = async (id: string): Promise<Category> => {
   try {
-    const response = await authApi.default.get(`/categories/${id}`, {
+    const response = await unAuthApi.default.get(`/categories/${id}`, {
       withCredentials: true,
     });
     return response.data;
@@ -65,7 +65,7 @@ const getCategoryChildrenInternal = async (
   params?: GetCategoriesParams,
 ): Promise<CategoriesResponse> => {
   try {
-    const response = await authApi.default.get(`/categories/${parentId}/children`, {
+    const response = await unAuthApi.default.get(`/categories/${parentId}/children`, {
       params,
       withCredentials: true,
     });
@@ -81,5 +81,5 @@ export {
   getCategoryChildrenInternal,
   type CategoriesResponse,
   type Category,
-  type GetCategoriesParams,
+  type GetCategoriesParams
 };
