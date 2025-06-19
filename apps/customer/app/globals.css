@@ -1,3 +1,237 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
 @plugin "tailwindcss-animate";
+
+/* Custom Color Variables */
+:root {
+  /* Primary Colors */
+  --color-primary: #ffd2b2;
+  --color-primary-hover: #ffbb99;
+  --color-primary-light: #fff4e6;
+  --color-primary-dark: #e6b89a;
+
+  /* Text Colors */
+  --color-text-primary: #121212;
+  --color-text-secondary: #525252;
+  --color-text-muted: #6b7280;
+  --color-text-light: #9ca3af;
+
+  /* Background Colors */
+  --color-bg-primary: #fdfef9;
+  --color-bg-secondary: #ffffff;
+  --color-bg-muted: #f3f4f6; /* Changed to a slightly darker gray */
+  --color-bg-accent: #fff7ed;
+  --color-bg-input: #ffffff; /* Added specific input background */
+
+  /* Border Colors */
+  --color-border-primary: rgba(82, 82, 82, 0.2);
+  --color-border-secondary: #e5e7eb;
+  --color-border-accent: #f3f4f6;
+
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #a7f3d0;
+
+  --color-error: #ef4444;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fed7aa;
+
+  --color-info: #3b82f6;
+  --color-info-bg: #eff6ff;
+  --color-info-border: #bfdbfe;
+
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+}
+
+/* Utility Classes */
+.text-primary {
+  color: var(--color-text-primary);
+}
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+.text-muted {
+  color: var(--color-text-muted);
+}
+.text-light {
+  color: var(--color-text-light);
+}
+
+.bg-primary {
+  background-color: var(--color-bg-primary);
+}
+.bg-secondary {
+  background-color: var(--color-bg-secondary);
+}
+.bg-muted {
+  background-color: var(--color-bg-muted);
+}
+.bg-accent {
+  background-color: var(--color-bg-accent);
+}
+.bg-input {
+  background-color: var(--color-bg-input);
+}
+
+.bg-brand {
+  background-color: var(--color-primary);
+}
+.bg-brand-hover {
+  background-color: var(--color-primary-hover);
+}
+.bg-brand-light {
+  background-color: var(--color-primary-light);
+}
+
+.border-primary {
+  border-color: var(--color-border-primary);
+}
+.border-secondary {
+  border-color: var(--color-border-secondary);
+}
+.border-accent {
+  border-color: var(--color-border-accent);
+}
+
+.shadow-custom-sm {
+  box-shadow: var(--shadow-sm);
+}
+.shadow-custom-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-custom-lg {
+  box-shadow: var(--shadow-lg);
+}
+.shadow-custom-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+/* Component Specific Styles */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-bg-muted);
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.input-field {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border-secondary);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 210, 178, 0.1);
+}
+
+.input-field:disabled {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* Quantity Input Specific Styles */
+.quantity-input {
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-border-secondary);
+  border-radius: var(--radius-xl);
+  transition: all 0.2s ease-in-out;
+}
+
+.quantity-input:hover {
+  border-color: var(--color-primary);
+}
+
+.quantity-button {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  padding: 0.75rem;
+  transition: all 0.2s ease-in-out;
+  border-radius: var(--radius-md);
+}
+
+.quantity-button:hover:not(:disabled) {
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-primary);
+}
+
+.quantity-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-display {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 1.125rem;
+  padding: 0.75rem 1.5rem;
+  min-width: 4rem;
+  text-align: center;
+  border-left: 1px solid var(--color-border-secondary);
+  border-right: 1px solid var(--color-border-secondary);
+}

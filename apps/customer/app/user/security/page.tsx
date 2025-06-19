@@ -148,7 +148,6 @@ export default function SecurityPage() {
       alert('Mật khẩu xác nhận không khớp');
       return;
     }
-    // Handle password change logic
     alert('Đã thay đổi mật khẩu thành công');
     setIsModalOpen(false);
     setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -185,26 +184,26 @@ export default function SecurityPage() {
   const activeSecurityCount = securityActions.filter((action) => action.status === 'active').length;
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#FDFEF9] p-3 sm:p-6">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
-          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-lg">
-                  <Shield className="w-6 h-6" />
+          <div className="bg-[#FFD2B2] p-4 sm:p-6 text-[#121212]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="p-2 sm:p-3 bg-white/20 rounded-lg">
+                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Bảo mật tài khoản</h1>
-                  <p className="text-[#121212] mt-1">
+                  <h1 className="text-xl sm:text-2xl font-bold">Bảo mật tài khoản</h1>
+                  <p className="text-[#121212] mt-1 text-sm sm:text-base">
                     Quản lý bảo mật và quyền riêng tư của tài khoản
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-orange-100">Bảo mật</p>
-                <p className="text-2xl font-bold">
+              <div className="text-left sm:text-right">
+                <p className="text-sm text-[#121212]">Bảo mật</p>
+                <p className="text-xl sm:text-2xl font-bold">
                   {activeSecurityCount}/{securityActions.length}
                 </p>
               </div>
@@ -213,57 +212,59 @@ export default function SecurityPage() {
         </div>
 
         {/* Security Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <Shield className="w-6 h-6 text-green-600" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+          <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-6 border border-amber-100">
+            <div className="flex flex-col sm:flex-row items-center sm:space-x-3">
+              <div className="p-2 sm:p-3 bg-green-100 rounded-xl mb-2 sm:mb-0">
+                <Shield className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Mức bảo mật</p>
-                <p className="text-lg font-bold text-gray-800">Cao</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-amber-100 rounded-xl">
-                <Key className="w-6 h-6 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Đã kích hoạt</p>
-                <p className="text-lg font-bold text-gray-800">{activeSecurityCount} tính năng</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-gray-600">Mức bảo mật</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">Cao</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Monitor className="w-6 h-6 text-blue-600" />
+          <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-6 border border-amber-100">
+            <div className="flex flex-col sm:flex-row items-center sm:space-x-3">
+              <div className="p-2 sm:p-3 bg-amber-100 rounded-xl mb-2 sm:mb-0">
+                <Key className="w-4 h-4 sm:w-6 sm:h-6 text-amber-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Thiết bị</p>
-                <p className="text-lg font-bold text-gray-800">3 hoạt động</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-gray-600">Đã kích hoạt</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">
+                  {activeSecurityCount} tính năng
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-red-100 rounded-xl">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+          <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-6 border border-amber-100">
+            <div className="flex flex-col sm:flex-row items-center sm:space-x-3">
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-xl mb-2 sm:mb-0">
+                <Monitor className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Cảnh báo</p>
-                <p className="text-lg font-bold text-gray-800">0 vấn đề</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-gray-600">Thiết bị</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">3 hoạt động</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-6 border border-amber-100">
+            <div className="flex flex-col sm:flex-row items-center sm:space-x-3">
+              <div className="p-2 sm:p-3 bg-red-100 rounded-xl mb-2 sm:mb-0">
+                <AlertTriangle className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
+              </div>
+              <div className="text-center sm:text-left">
+                <p className="text-xs sm:text-sm text-gray-600">Cảnh báo</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">0 vấn đề</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="lg:col-span-2 space-y-6">
             {Object.entries(categories).map(([categoryKey, categoryInfo]) => {
               const categoryActions = securityActions.filter(
@@ -275,13 +276,15 @@ export default function SecurityPage() {
                   key={categoryKey}
                   className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden"
                 >
-                  <div className="p-6 border-b border-gray-100">
+                  <div className="p-4 sm:p-6 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
                       <div className={`p-2 rounded-lg ${categoryInfo.color}`}>
                         {categoryInfo.icon}
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-gray-800">{categoryInfo.name}</h2>
+                        <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+                          {categoryInfo.name}
+                        </h2>
                         <p className="text-sm text-gray-600">
                           {categoryActions.filter((a) => a.status === 'active').length} trên{' '}
                           {categoryActions.length} đã kích hoạt
@@ -290,22 +293,24 @@ export default function SecurityPage() {
                     </div>
                   </div>
 
-                  <div className="p-6 space-y-4">
+                  <div className="p-4 sm:p-6 space-y-4">
                     {categoryActions.map((action) => (
                       <div
                         key={action.id}
                         className="border border-gray-200 rounded-xl p-4 hover:border-amber-300 transition-all duration-200"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
+                          <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
                             <div
-                              className={`p-3 rounded-xl ${action.status === 'active' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'}`}
+                              className={`p-2 sm:p-3 rounded-xl ${action.status === 'active' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'}`}
                             >
                               {action.icon}
                             </div>
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-3 mb-1">
-                                <h3 className="font-semibold text-gray-800">{action.title}</h3>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-1">
+                                <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
+                                  {action.title}
+                                </h3>
                                 {getStatusBadge(action.status)}
                               </div>
                               <p className="text-sm text-gray-600">{action.description}</p>
@@ -318,7 +323,7 @@ export default function SecurityPage() {
                           </div>
                           <button
                             onClick={() => handleActionClick(action)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            className={`w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                               action.status === 'active'
                                 ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -338,37 +343,37 @@ export default function SecurityPage() {
           {/* Recent Activity */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center">
-                  <Clock className="w-5 h-5 mr-2 text-amber-600" />
+              <div className="p-4 sm:p-6 border-b border-gray-100">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-amber-600" />
                   Hoạt động gần đây
                 </h2>
               </div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="space-y-4">
                   {recentActivity.map((activity) => (
                     <div key={activity.id} className="border-l-4 border-amber-200 pl-4 py-2">
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800">{activity.action}</p>
                           <div className="mt-1 space-y-1">
                             <div className="flex items-center text-xs text-gray-600">
-                              <MapPin className="w-3 h-3 mr-1" />
-                              <span>{activity.location}</span>
+                              <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{activity.location}</span>
                             </div>
                             <div className="flex items-center text-xs text-gray-600">
-                              <Monitor className="w-3 h-3 mr-1" />
-                              <span>{activity.device}</span>
+                              <Monitor className="w-3 h-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{activity.device}</span>
                             </div>
                             <div className="flex items-center text-xs text-gray-600">
-                              <Calendar className="w-3 h-3 mr-1" />
+                              <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
                               <span>{activity.time}</span>
                             </div>
                           </div>
                         </div>
                         <div
-                          className={`w-3 h-3 rounded-full ${
+                          className={`w-3 h-3 rounded-full flex-shrink-0 ${
                             activity.status === 'success'
                               ? 'bg-green-400'
                               : activity.status === 'warning'
@@ -397,8 +402,10 @@ export default function SecurityPage() {
               onClick={() => setIsModalOpen(false)}
             />
             <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
-              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">Thay đổi mật khẩu</h2>
+              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+                <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800">
+                  Thay đổi mật khẩu
+                </h2>
 
                 <div className="space-y-4">
                   <div>
@@ -460,7 +467,7 @@ export default function SecurityPage() {
                   </div>
                 </div>
 
-                <div className="flex justify-end space-x-4 mt-8">
+                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-8">
                   <button
                     onClick={() => setIsModalOpen(false)}
                     className="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 transition-colors font-medium"
@@ -469,7 +476,7 @@ export default function SecurityPage() {
                   </button>
                   <button
                     onClick={handlePasswordChange}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white transition-all font-medium shadow-lg hover:shadow-xl"
+                    className="px-6 py-3 rounded-xl bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] transition-all font-medium shadow-lg hover:shadow-xl"
                   >
                     Đổi mật khẩu
                   </button>

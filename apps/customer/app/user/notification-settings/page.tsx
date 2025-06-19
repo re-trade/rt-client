@@ -144,75 +144,77 @@ export default function NotificationSettingsPage() {
   const enabledCount = settings.filter((s) => s.enabled).length;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-100 p-3 sm:p-6">
+      <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
         <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-xl">
-                  <Bell className="w-6 h-6" />
+          <div className="bg-[#FFD2B2] p-4 sm:p-6 text-[#121212]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="p-2 sm:p-3 bg-white/20 rounded-xl">
+                  <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Cài đặt thông báo</h1>
-                  <p className="text-orange-100 mt-1">
+                  <h1 className="text-xl sm:text-2xl font-bold">Cài đặt thông báo</h1>
+                  <p className="text-[#121212] mt-1 text-sm sm:text-base">
                     Quản lý cách bạn nhận thông báo từ chúng tôi
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-orange-100">Đã bật</p>
-                <p className="text-2xl font-bold">
+              <div className="text-left sm:text-right">
+                <p className="text-sm text-[#121212]">Đã bật</p>
+                <p className="text-xl sm:text-2xl font-bold">
                   {enabledCount}/{settings.length}
                 </p>
               </div>
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-amber-100">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-amber-100 rounded-xl">
-                <Mail className="w-6 h-6 text-amber-600" />
+              <div className="p-2 sm:p-3 bg-amber-100 rounded-xl">
+                <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Email</p>
-                <p className="text-2xl font-bold text-gray-800">
+                <p className="text-xl sm:text-2xl font-bold text-gray-800">
                   {settings.filter((s) => s.enabled && s.channels.email).length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-amber-100">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Smartphone className="w-6 h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-xl">
+                <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Push</p>
-                <p className="text-2xl font-bold text-gray-800">
+                <p className="text-xl sm:text-2xl font-bold text-gray-800">
                   {settings.filter((s) => s.enabled && s.channels.push).length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-amber-100">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <MessageCircle className="w-6 h-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-xl">
+                <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">SMS</p>
-                <p className="text-2xl font-bold text-gray-800">
+                <p className="text-xl sm:text-2xl font-bold text-gray-800">
                   {settings.filter((s) => s.enabled && s.channels.sms).length}
                 </p>
               </div>
             </div>
           </div>
         </div>
-        <div className="space-y-6">
+
+        <div className="space-y-4 sm:space-y-6">
           {Object.entries(categories).map(([categoryKey, categoryInfo]) => {
             const categorySettings = settings.filter((s) => s.category === categoryKey);
 
@@ -221,13 +223,15 @@ export default function NotificationSettingsPage() {
                 key={categoryKey}
                 className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden"
               >
-                <div className="p-6 border-b border-gray-100">
+                <div className="p-4 sm:p-6 border-b border-gray-100">
                   <div className="flex items-center space-x-3">
                     <div className={`p-2 rounded-lg ${categoryInfo.color}`}>
                       {categoryInfo.icon}
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-800">{categoryInfo.name}</h2>
+                      <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+                        {categoryInfo.name}
+                      </h2>
                       <p className="text-sm text-gray-600">
                         {categorySettings.filter((s) => s.enabled).length} trên{' '}
                         {categorySettings.length} đã bật
@@ -236,22 +240,26 @@ export default function NotificationSettingsPage() {
                   </div>
                 </div>
 
-                <div className="p-6 space-y-4">
+                <div className="p-4 sm:p-6 space-y-4">
                   {categorySettings.map((setting) => (
                     <div
                       key={setting.id}
                       className="border border-gray-200 rounded-xl p-4 hover:border-amber-300 transition-all duration-200"
                     >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center space-x-3">
+                      <div className="flex flex-col sm:flex-row items-start justify-between mb-4 space-y-3 sm:space-y-0">
+                        <div className="flex items-start space-x-3 flex-1 min-w-0">
                           <div
                             className={`p-2 rounded-lg ${setting.enabled ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'}`}
                           >
                             {setting.icon}
                           </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-800">{setting.title}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{setting.description}</p>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
+                              {setting.title}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                              {setting.description}
+                            </p>
                           </div>
                         </div>
                         <button
@@ -270,16 +278,16 @@ export default function NotificationSettingsPage() {
 
                       {/* Channel Options */}
                       {setting.enabled && (
-                        <div className="pl-11 space-y-3">
+                        <div className="pl-0 sm:pl-11 space-y-3">
                           <p className="text-sm font-medium text-gray-700 mb-2">
                             Nhận thông báo qua:
                           </p>
-                          <div className="grid grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                             {/* Email */}
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => toggleChannel(setting.id, 'email')}
-                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all ${
+                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all w-full justify-center ${
                                   setting.channels.email
                                     ? 'bg-amber-50 border-amber-300 text-amber-700'
                                     : 'bg-gray-50 border-gray-300 text-gray-500'
@@ -299,7 +307,7 @@ export default function NotificationSettingsPage() {
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => toggleChannel(setting.id, 'push')}
-                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all ${
+                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all w-full justify-center ${
                                   setting.channels.push
                                     ? 'bg-blue-50 border-blue-300 text-blue-700'
                                     : 'bg-gray-50 border-gray-300 text-gray-500'
@@ -319,7 +327,7 @@ export default function NotificationSettingsPage() {
                             <div className="flex items-center space-x-2">
                               <button
                                 onClick={() => toggleChannel(setting.id, 'sms')}
-                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all ${
+                                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all w-full justify-center ${
                                   setting.channels.sms
                                     ? 'bg-green-50 border-green-300 text-green-700'
                                     : 'bg-gray-50 border-gray-300 text-gray-500'
@@ -350,11 +358,11 @@ export default function NotificationSettingsPage() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white px-8 py-3 rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center space-x-2"
+            className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-6 sm:px-8 py-2 sm:py-3 rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center space-x-2"
           >
             {isSaving ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#121212] border-t-transparent"></div>
                 <span>Đang lưu...</span>
               </>
             ) : (
@@ -368,9 +376,11 @@ export default function NotificationSettingsPage() {
 
         {/* Success Message */}
         {savedMessage && (
-          <div className="fixed bottom-4 right-4 bg-amber-100 border border-amber-300 text-amber-800 px-6 py-4 rounded-xl shadow-lg flex items-center space-x-3">
+          <div className="fixed bottom-4 right-4 bg-amber-100 border border-amber-300 text-amber-800 px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-lg flex items-center space-x-3 z-50">
             <Check className="w-5 h-5" />
-            <span className="font-medium">Cài đặt đã được lưu thành công!</span>
+            <span className="font-medium text-sm sm:text-base">
+              Cài đặt đã được lưu thành công!
+            </span>
           </div>
         )}
       </div>
