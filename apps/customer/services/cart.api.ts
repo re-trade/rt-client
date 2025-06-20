@@ -8,6 +8,8 @@ export interface CartItemResponse {
   totalPrice: number;
   addedAt: string;
   productAvailable: boolean;
+  description: string;
+  discount: number;
   quantity: number;
 }
 

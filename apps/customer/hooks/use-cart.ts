@@ -1,6 +1,6 @@
 'use client';
-
 import { cartApi, CartGroupResponse, CartResponse } from '@/services/cart.api';
+import { contactApi, TAddress } from '@/services/contact.api';
 import { productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
 type TCartSummary = {
@@ -14,6 +14,9 @@ function useCart() {
   const [cartGroups, setCartGroups] = useState<
     Record<string, CartGroupResponse & { isOpen: boolean }>
   >({});
+  const [contacts, setContacts] = useState<TAddress[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [cartSummary, setCartSummary] = useState<TCartSummary>({
     originalPrice: 0,
     savings: 0,
@@ -44,6 +47,22 @@ function useCart() {
       setLoading(false);
     }
   }, []);
+  const selectAddress = useCallback((addressId: string) => {
+    setSelectedAddressId(addressId);
+  }, []);
+
+  const fetchAddresses = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await contactApi.getContacts();
+      setContacts(data);
+    } catch {
+      setError('Không thể tải địa chỉ');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const fetchRecommendProduct = useCallback(async () => {
     setLoading(true);
@@ -52,7 +71,7 @@ function useCart() {
       const data = await productApi.getProducts(0, 3);
       setProducts(data);
     } catch {
-      setError('Không thể tải giỏ hàng');
+      setError('Không thể tải sản phẩm');
     } finally {
       setLoading(false);
     }
@@ -72,9 +91,53 @@ function useCart() {
     });
   }, []);
 
+  const toggleItemSelection = useCallback((productId: string) => {
+    setSelectedItems((prev) => {
+      if (prev.includes(productId)) {
+        return prev.filter((id) => id !== productId);
+      } else {
+        return [...prev, productId];
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!cart || !selectedItems.length) {
+      setCartSummary({
+        originalPrice: 0,
+        savings: 0,
+        tax: 0,
+        total: 0,
+      });
+      return;
+    }
+
+    let originalPrice = 0;
+    let total = 0;
+
+    cart.cartGroupResponses.forEach((group) => {
+      group.items.forEach((item) => {
+        if (selectedItems.includes(item.productId)) {
+          originalPrice += item.totalPrice;
+          total += item.totalPrice;
+        }
+      });
+    });
+    const savings = originalPrice - total;
+    const tax = Math.round(total * 0.05);
+
+    setCartSummary({
+      originalPrice,
+      savings,
+      tax,
+      total: total + tax,
+    });
+  }, [selectedItems, cart]);
+
   useEffect(() => {
     fetchCart();
-  }, [fetchCart]);
+    fetchAddresses();
+  }, [fetchCart, fetchAddresses]);
 
   useEffect(() => {
     fetchRecommendProduct();
@@ -87,9 +150,13 @@ function useCart() {
     error,
     refresh: fetchCart,
     toggleShopSection,
+    toggleItemSelection,
+    selectedItems,
     products,
     cartSummary,
+    contacts,
+    selectedAddressId,
+    selectAddress,
   };
 }
-
 export { useCart };
