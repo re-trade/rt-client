@@ -1,9 +1,10 @@
 'use client';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/hooks/use-cart';
+import { useOrder } from '@/hooks/use-order';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-// Mock voucher data - replace with your actual data structure
 const mockVouchers = [
   {
     id: '1',
@@ -42,10 +43,17 @@ export default function CartSummary({
   contacts,
   selectedAddressId,
   selectAddress,
+  selectedItems,
 }: ReturnType<typeof useCart>) {
+  const router = useRouter();
+  const { createOrder, isCreating, error: orderError, clearError } = useOrder();
+
   const [selectedVoucher, setSelectedVoucher] = useState<string | null>(null);
   const [showVoucherModal, setShowVoucherModal] = useState(false);
   const [voucherCode, setVoucherCode] = useState('');
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
 
   const calculateVoucherDiscount = () => {
     if (!selectedVoucher) return 0;
@@ -80,6 +88,65 @@ export default function CartSummary({
     setSelectedVoucher(voucherId);
     setShowVoucherModal(false);
   };
+
+  const validateOrder = (): string | null => {
+    if (!selectedAddressId) {
+      return 'Vui lòng chọn địa chỉ giao hàng';
+    }
+
+    if (!selectedItems || selectedItems.length === 0) {
+      return 'Vui lòng chọn ít nhất một sản phẩm';
+    }
+
+    return null;
+  };
+
+  const handleCheckout = async () => {
+    clearError();
+
+    const validationError = validateOrder();
+    if (validationError) {
+      alert(validationError);
+      return;
+    }
+
+    try {
+      const selectedVoucherObj = selectedVoucher
+        ? mockVouchers.find((v) => v.id === selectedVoucher)
+        : null;
+
+      const orderPayload = {
+        productIds: selectedItems,
+        addressId: selectedAddressId!,
+        ...(selectedVoucherObj && { voucherCode: selectedVoucherObj.code }),
+      };
+
+      const createdOrder = await createOrder(orderPayload);
+
+      if (createdOrder) {
+        setCreatedOrderId(createdOrder.orderId);
+        setOrderSuccess(true);
+        setShowOrderModal(true);
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      setShowOrderModal(true);
+    }
+  };
+
+  const handleOrderModalClose = () => {
+    setShowOrderModal(false);
+    if (orderSuccess) {
+      // Redirect to order success page or order details
+      if (createdOrderId) {
+        router.push(`/orders/${createdOrderId}`);
+      } else {
+        router.push('/orders');
+      }
+    }
+  };
+
+  const canCheckout = selectedItems && selectedItems.length > 0 && selectedAddressId && !isCreating;
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -334,29 +401,51 @@ export default function CartSummary({
             </div>
           </div>
 
-          <button className="w-full mt-4 md:mt-6 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-3 md:py-4 px-4 md:px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3 group">
-            <svg
-              className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5L17 18"
-              />
-            </svg>
-            <span className="text-sm md:text-base">Tiến hành thanh toán</span>
-            <svg
-              className="w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform duration-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+          <button
+            onClick={handleCheckout}
+            disabled={!canCheckout}
+            className={`w-full mt-4 md:mt-6 font-semibold py-3 md:py-4 px-4 md:px-6 rounded-lg shadow-lg transition-all duration-200 flex items-center justify-center gap-3 group ${
+              canCheckout
+                ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white hover:shadow-xl transform hover:scale-[1.02]'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            {isCreating ? (
+              <>
+                <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm md:text-base">Đang xử lý...</span>
+              </>
+            ) : (
+              <>
+                <svg
+                  className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5L17 18"
+                  />
+                </svg>
+                <span className="text-sm md:text-base">Tiến hành thanh toán</span>
+                <svg
+                  className="w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </>
+            )}
           </button>
 
           <div className="flex items-center justify-center gap-2 text-xs md:text-sm text-gray-500 mt-4">
@@ -376,7 +465,7 @@ export default function CartSummary({
         </div>
       </div>
 
-      {/* Voucher Modal using the new reusable Modal component */}
+      {/* Voucher Modal */}
       <Modal
         opened={showVoucherModal}
         onClose={() => setShowVoucherModal(false)}
@@ -429,6 +518,85 @@ export default function CartSummary({
               </div>
             );
           })}
+        </div>
+      </Modal>
+
+      {/* Order Status Modal */}
+      <Modal
+        opened={showOrderModal}
+        onClose={handleOrderModalClose}
+        title={orderSuccess ? 'Đặt hàng thành công!' : 'Lỗi đặt hàng'}
+        size="md"
+      >
+        <div className="p-6 text-center">
+          <div
+            className={`mx-auto flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+              orderSuccess ? 'bg-green-100' : 'bg-red-100'
+            }`}
+          >
+            {orderSuccess ? (
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-8 h-8 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            )}
+          </div>
+
+          {orderSuccess ? (
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-gray-900">
+                Đơn hàng đã được tạo thành công!
+              </h3>
+              <p className="mb-4 text-gray-600">
+                Mã đơn hàng:{' '}
+                <span className="font-mono font-bold text-orange-600">{createdOrderId}</span>
+              </p>
+              <p className="mb-6 text-sm text-gray-600">
+                Bạn sẽ được chuyển đến trang chi tiết đơn hàng để theo dõi trạng thái.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-gray-900">Không thể tạo đơn hàng</h3>
+              <p className="mb-6 text-gray-600">
+                {orderError || 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại.'}
+              </p>
+            </div>
+          )}
+
+          <button
+            onClick={handleOrderModalClose}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              orderSuccess
+                ? 'bg-green-600 hover:bg-green-700 text-white'
+                : 'bg-red-600 hover:bg-red-700 text-white'
+            }`}
+          >
+            {orderSuccess ? 'Xem đơn hàng' : 'Đóng'}
+          </button>
         </div>
       </Modal>
     </div>

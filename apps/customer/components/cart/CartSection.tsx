@@ -16,7 +16,7 @@ export default function CartSection({
   toggleShopSection,
   selectedItems,
   toggleItemSelection,
-  refresh, // Add refresh prop
+  refresh,
 }: ReturnType<typeof useCart>) {
   const { removeFromCart } = useCart();
   const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
