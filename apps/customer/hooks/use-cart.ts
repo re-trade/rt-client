@@ -170,7 +170,7 @@ function useCart() {
     contacts,
     selectedAddressId,
     selectAddress,
-    removeCartItem
+    removeCartItem,
   };
 }
 export { useCart };

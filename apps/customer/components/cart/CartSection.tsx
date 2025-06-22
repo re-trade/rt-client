@@ -88,10 +88,11 @@ export default function CartSection({
                       <div className="flex-1 space-y-2">
                         <a
                           href="#"
-                          className={`block text-base font-semibold transition-colors ${isSoldOut
-                            ? 'text-gray-500 pointer-events-none'
-                            : 'text-gray-800 hover:text-orange-600 hover:underline'
-                            }`}
+                          className={`block text-base font-semibold transition-colors ${
+                            isSoldOut
+                              ? 'text-gray-500 pointer-events-none'
+                              : 'text-gray-800 hover:text-orange-600 hover:underline'
+                          }`}
                         >
                           {item.productName}
                         </a>
