@@ -1,11 +1,23 @@
 'use client';
+import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/use-auth';
+import {
+  IconBell,
+  IconClock,
+  IconLogout,
+  IconMenu2,
+  IconPackage,
+  IconSearch,
+  IconShoppingCart,
+  IconUser,
+  IconX,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { FaCartPlus, FaSearch, FaUserCircle } from 'react-icons/fa';
 
 const Header: React.FC = () => {
   const { auth, logout } = useAuth();
+  const { cartGroups, loading: cartLoading } = useCart();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -14,6 +26,20 @@ const Header: React.FC = () => {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Calculate total cart items count
+  const getTotalCartItems = () => {
+    if (!cartGroups || Object.keys(cartGroups).length === 0) {
+      return 0;
+    }
+
+    return Object.values(cartGroups).reduce((total, shop) => {
+      return total + (shop.items?.length || 0);
+    }, 0);
+  };
+
+  const totalCartItems = getTotalCartItems();
+
   useEffect(() => {
     const history = localStorage.getItem('searchHistory');
     if (history) {
@@ -40,96 +66,111 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="bg-slate-50 border-b border-slate-100 hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center text-xs">
-          <div className="flex items-center space-x-4">
-            <button className="text-slate-600 hover:text-blue-600 transition-colors duration-200 flex items-center">
-              🔔 Thông Báo
-            </button>
-          </div>
-          {!auth && (
-            <div className="flex items-center space-x-3 text-slate-600">
+    <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-orange-100">
+      {/* Top Bar */}
+      <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200 hidden lg:block">
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          <div className="flex justify-between items-center text-sm">
+            <div className="flex items-center space-x-6">
+              <button className="text-orange-700 hover:text-orange-800 transition-colors duration-200 flex items-center gap-2 font-medium">
+                <IconBell size={16} />
+                Thông báo khuyến mãi
+              </button>
+              <span className="text-orange-600">|</span>
               <Link
-                href="/login"
-                className="hover:text-orange-500 transition-colors duration-200 flex items-center"
+                href="/help"
+                className="text-orange-700 hover:text-orange-800 transition-colors duration-200 font-medium"
               >
-                <FaUserCircle className="mr-1.5" /> Đăng Nhập
-              </Link>
-              <span className="text-slate-300">|</span>
-              <Link
-                href="/register"
-                className="hover:text-orange-500 transition-colors duration-200"
-              >
-                Đăng Kí
+                Hỗ trợ khách hàng
               </Link>
             </div>
-          )}
+            {!auth && (
+              <div className="flex items-center space-x-4 text-orange-700">
+                <Link
+                  href="/login"
+                  className="hover:text-orange-800 transition-colors duration-200 flex items-center gap-2 font-medium"
+                >
+                  <IconUser size={16} />
+                  Đăng nhập
+                </Link>
+                <span className="text-orange-400">|</span>
+                <Link
+                  href="/register"
+                  className="hover:text-orange-800 transition-colors duration-200 font-medium"
+                >
+                  Đăng ký
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <div className="border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-3 py-3 md:px-4 md:py-4 flex flex-wrap md:flex-nowrap items-center justify-between gap-2 md:gap-4">
-          <div className="flex items-center justify-between w-full md:w-auto">
+
+      {/* Main Header */}
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between gap-4">
+          {/* Logo */}
+          <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="text-xl md:text-2xl font-bold text-orange-500 hover:text-orange-600 transition-colors duration-200"
+              className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent hover:from-orange-600 hover:to-orange-700 transition-all duration-200"
             >
               ReTrade
             </Link>
-            <button
-              className="md:hidden p-2 -mr-1"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Toggle Menu"
-            >
-              <svg
-                className="w-6 h-6 text-slate-600"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
           </div>
-          <div className="flex-grow w-full md:w-auto relative order-3 md:order-2 mt-3 md:mt-0">
-            <div className="relative">
+
+          {/* Desktop Search Bar - Hidden on mobile */}
+          <div className="hidden lg:flex flex-1 max-w-2xl mx-4 relative">
+            <div className="relative w-full">
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Tìm kiếm sản phẩm..."
-                className="w-full text-slate-600 pl-4 pr-10 py-2 md:py-2.5 border border-slate-200 rounded-lg
-                focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent
-                transition-all duration-200 text-sm md:text-base"
+                placeholder="Tìm kiếm sản phẩm, thương hiệu, danh mục..."
+                className="w-full pl-12 pr-4 py-3 border-2 border-orange-200 rounded-xl bg-orange-25
+                  focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400
+                  transition-all duration-200 text-gray-700 placeholder-gray-500
+                  hover:border-orange-300"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={() => setSearchFocus(true)}
-                onBlur={() => setSearchFocus(false)}
+                onBlur={() => setTimeout(() => setSearchFocus(false), 200)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+              <IconSearch
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500"
               />
               <button
                 onClick={handleSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-orange-500 transition-colors duration-200"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-medium"
               >
-                <FaSearch />
+                Tìm
               </button>
             </div>
+
+            {/* Search History Dropdown */}
             {searchFocus && searchHistory.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg">
-                <ul className="py-1">
+              <div className="absolute z-20 mt-2 w-full bg-white border border-orange-200 rounded-xl shadow-xl overflow-hidden top-full">
+                <div className="p-3 bg-orange-50 border-b border-orange-100">
+                  <div className="flex items-center gap-2 text-orange-700 font-medium">
+                    <IconClock size={16} />
+                    <span className="text-sm">Tìm kiếm gần đây</span>
+                  </div>
+                </div>
+                <ul className="max-h-60 overflow-y-auto">
                   {searchHistory.map((item, index) => (
                     <li
                       key={index}
-                      className="px-4 py-3 hover:bg-slate-50 cursor-pointer text-slate-600 text-sm md:text-base border-b last:border-0 border-slate-50"
+                      className="px-4 py-3 hover:bg-orange-50 cursor-pointer text-gray-700 border-b border-orange-50 last:border-0 transition-colors duration-150"
                       onClick={() => {
                         setSearch(item);
                         handleSearch();
                         searchInputRef.current?.blur();
                       }}
                     >
-                      <div className="flex items-center">
-                        <FaSearch className="mr-2 text-slate-400" size={12} />
-                        {item}
+                      <div className="flex items-center gap-3">
+                        <IconSearch size={14} className="text-orange-400" />
+                        <span>{item}</span>
                       </div>
                     </li>
                   ))}
@@ -137,135 +178,231 @@ const Header: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="flex items-center space-x-4 md:space-x-5 relative order-2 md:order-3">
+
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-2">
+            {/* Cart with Badge */}
             <Link
               href="/cart"
-              className="relative hover:bg-slate-100 p-2 md:p-2.5 rounded-full transition-colors duration-200"
+              className="relative p-3 hover:bg-orange-50 rounded-xl transition-all duration-200 group"
+              title={`Giỏ hàng ${totalCartItems > 0 ? `(${totalCartItems} sản phẩm)` : ''}`}
             >
-              <FaCartPlus size={20} className="text-slate-600" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
-                3
-              </span>
+              <IconShoppingCart
+                size={24}
+                className={`transition-colors duration-200 ${
+                  totalCartItems > 0
+                    ? 'text-orange-600 group-hover:text-orange-700'
+                    : 'text-gray-600 group-hover:text-orange-600'
+                }`}
+              />
+
+              {/* Cart Badge */}
+              {totalCartItems > 0 && !cartLoading && (
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold shadow-lg transform scale-100 animate-pulse">
+                  {totalCartItems > 99 ? '99+' : totalCartItems}
+                </span>
+              )}
+
+              {/* Loading indicator for cart */}
+              {cartLoading && (
+                <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                </span>
+              )}
             </Link>
+
+            {/* User Menu */}
             {auth ? (
-              <div ref={dropdownRef} className="relative hidden md:block">
+              <div ref={dropdownRef} className="relative hidden lg:block">
                 <button
-                  className="p-2 rounded-full hover:bg-slate-100 focus:outline-none transition-colors duration-200"
+                  className="p-3 rounded-xl hover:bg-orange-50 focus:outline-none transition-colors duration-200 group"
                   onClick={() => setDropdownOpen((prev) => !prev)}
+                  title="Tài khoản"
                 >
-                  <FaUserCircle size={24} className="text-slate-600" />
+                  <IconUser size={24} className="text-gray-600 group-hover:text-orange-600" />
                 </button>
                 {dropdownOpen && (
-                  <div className="absolute text-slate-600 right-0 mt-2 w-48 bg-white border border-slate-100 rounded-lg shadow-lg z-50 py-1 text-sm overflow-hidden">
-                    <Link
-                      href="/user"
-                      className="block px-4 py-2.5 hover:bg-slate-50 transition-colors duration-150"
-                    >
-                      Hồ sơ
-                    </Link>
-                    <Link
-                      href="/user/purchase"
-                      className="block px-4 py-2.5 hover:bg-slate-50 transition-colors duration-150"
-                    >
-                      Đơn hàng
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="block px-4 py-2.5 hover:bg-slate-50 transition-colors duration-150"
-                    >
-                      Cài đặt
-                    </Link>
-                    <div className="border-t border-slate-100 mt-1"></div>
-                    <button
-                      onClick={logout}
-                      className="w-full text-left px-4 py-2.5 hover:bg-slate-50 text-red-500 transition-colors duration-150"
-                    >
-                      Đăng xuất
-                    </button>
+                  <div className="absolute right-0 mt-2 w-64 bg-white border border-orange-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                          <IconUser size={20} className="text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800">Xin chào!</p>
+                          <p className="text-sm text-gray-600">{auth.email}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="py-2">
+                      <Link
+                        href="/user"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors duration-150 text-gray-700"
+                      >
+                        <IconUser size={18} className="text-orange-500" />
+                        Hồ sơ cá nhân
+                      </Link>
+                      <Link
+                        href="/user/orders"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors duration-150 text-gray-700"
+                      >
+                        <IconPackage size={18} className="text-orange-500" />
+                        Đơn hàng của tôi
+                      </Link>
+
+                      {/* Cart shortcut in dropdown */}
+                      <Link
+                        href="/cart"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors duration-150 text-gray-700"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <IconShoppingCart size={18} className="text-orange-500" />
+                        <span className="flex-1">Giỏ hàng</span>
+                        {totalCartItems > 0 && (
+                          <span className="bg-orange-500 text-white text-xs rounded-full px-2 py-1 font-bold">
+                            {totalCartItems}
+                          </span>
+                        )}
+                      </Link>
+
+                      <div className="border-t border-orange-100 mt-2"></div>
+                      <button
+                        onClick={logout}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 transition-colors duration-150"
+                      >
+                        <IconLogout size={18} />
+                        Đăng xuất
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
-            ) : null}
-            {auth ? (
-              <Link href="/user" className="md:hidden p-2 rounded-full">
-                <FaUserCircle size={20} className="text-slate-600" />
-              </Link>
             ) : (
-              <Link href="/login" className="md:hidden p-2 rounded-full">
-                <FaUserCircle size={20} className="text-slate-600" />
+              <Link
+                href="/login"
+                className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+              >
+                <IconUser size={18} />
+                Đăng nhập
               </Link>
             )}
+
+            {/* Mobile User Icon */}
+            {auth && (
+              <Link
+                href="/user"
+                className="lg:hidden p-3 hover:bg-orange-50 rounded-xl transition-colors duration-200 group"
+                title="Tài khoản"
+              >
+                <IconUser size={24} className="text-gray-600 group-hover:text-orange-600" />
+              </Link>
+            )}
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="lg:hidden p-3 hover:bg-orange-50 rounded-xl transition-colors duration-200"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle Menu"
+            >
+              {menuOpen ? (
+                <IconX size={24} className="text-gray-600" />
+              ) : (
+                <IconMenu2 size={24} className="text-gray-600" />
+              )}
+            </button>
           </div>
         </div>
       </div>
-      {menuOpen && (
-        <div className="md:hidden bg-white px-4 py-4 border-t border-slate-100 shadow-sm">
-          <ul className="grid grid-cols-2 gap-2 text-slate-600 text-base">
-            <li className="col-span-2 mb-2 border-b border-slate-100 pb-2">
-              <Link
-                href="/notifications"
-                className="flex items-center py-2 hover:text-orange-500 transition-colors duration-200"
-              >
-                <span className="mr-2">🔔</span> Thông Báo
-              </Link>
-            </li>
 
-            {!auth ? (
-              <>
-                <li>
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="lg:hidden bg-white border-t border-orange-200 shadow-lg">
+          <div className="px-4 py-6 space-y-4">
+            {/* Mobile Search */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm..."
+                className="w-full pl-10 pr-4 py-3 border-2 border-orange-200 rounded-xl bg-orange-25 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 text-gray-700 placeholder-gray-500"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+              <IconSearch
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
+              />
+            </div>
+
+            {/* Mobile Cart Link */}
+            <Link
+              href="/cart"
+              className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition-colors duration-200"
+              onClick={() => setMenuOpen(false)}
+            >
+              <div className="flex items-center gap-3 text-orange-700">
+                <IconShoppingCart size={20} />
+                <span className="font-medium">Giỏ hàng</span>
+              </div>
+              {totalCartItems > 0 && (
+                <span className="bg-orange-500 text-white text-sm rounded-full px-3 py-1 font-bold">
+                  {totalCartItems}
+                </span>
+              )}
+            </Link>
+
+            {/* Mobile Navigation */}
+            <div className="space-y-2">
+              {!auth ? (
+                <>
                   <Link
                     href="/login"
-                    className="flex justify-center items-center py-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+                    className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200"
+                    onClick={() => setMenuOpen(false)}
                   >
-                    <FaUserCircle className="mr-2" /> Đăng Nhập
+                    <IconUser size={20} />
+                    Đăng nhập
                   </Link>
-                </li>
-                <li>
                   <Link
                     href="/register"
-                    className="flex justify-center items-center py-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+                    className="flex items-center justify-center p-3 border-2 border-orange-500 text-orange-600 rounded-xl hover:bg-orange-50 transition-colors duration-200"
+                    onClick={() => setMenuOpen(false)}
                   >
-                    Đăng Kí
+                    Đăng ký
                   </Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
+                </>
+              ) : (
+                <>
                   <Link
                     href="/user"
-                    className="flex justify-center items-center py-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+                    className="flex items-center gap-3 p-3 hover:bg-orange-50 rounded-xl text-gray-700 transition-colors duration-200"
+                    onClick={() => setMenuOpen(false)}
                   >
-                    Hồ sơ
+                    <IconUser size={20} className="text-orange-500" />
+                    Hồ sơ cá nhân
                   </Link>
-                </li>
-                <li>
                   <Link
-                    href="/orders"
-                    className="flex justify-center items-center py-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+                    href="/user/orders"
+                    className="flex items-center gap-3 p-3 hover:bg-orange-50 rounded-xl text-gray-700 transition-colors duration-200"
+                    onClick={() => setMenuOpen(false)}
                   >
-                    Đơn hàng
+                    <IconPackage size={20} className="text-orange-500" />
+                    Đơn hàng của tôi
                   </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/settings"
-                    className="flex justify-center items-center py-2.5 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors duration-200"
-                  >
-                    Cài đặt
-                  </Link>
-                </li>
-                <li>
                   <button
-                    onClick={logout}
-                    className="w-full flex justify-center items-center py-2.5 bg-red-50 rounded-lg text-red-500 hover:bg-red-100 transition-colors duration-200"
+                    onClick={() => {
+                      logout();
+                      setMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors duration-200"
                   >
+                    <IconLogout size={20} />
                     Đăng xuất
                   </button>
-                </li>
-              </>
-            )}
-          </ul>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </header>
