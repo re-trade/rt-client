@@ -101,6 +101,19 @@ function useCart() {
     });
   }, []);
 
+  const removeCartItem = useCallback((productId: string) => {
+    const result = cartApi.removeFromCart(productId);
+    if (result != null) {
+      setSelectedItems((prev) => {
+        if (prev.includes(productId)) {
+          return prev.filter((id) => id !== productId);
+        } else {
+          return [...prev, productId];
+        }
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (!cart || !selectedItems.length) {
       setCartSummary({
@@ -157,6 +170,7 @@ function useCart() {
     contacts,
     selectedAddressId,
     selectAddress,
+    removeCartItem
   };
 }
 export { useCart };

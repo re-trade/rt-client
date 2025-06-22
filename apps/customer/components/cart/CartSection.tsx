@@ -11,11 +11,14 @@ export default function CartSection({
   toggleShopSection,
   selectedItems,
   toggleItemSelection,
+  removeCartItem,
 }: ReturnType<typeof useCart>) {
   const handleCheckboxChange = (itemId: string) => {
     toggleItemSelection(itemId);
   };
-  const handleRemove = (itemId: string) => {};
+  const handleRemove = async (itemId: string) => {
+    removeCartItem(itemId);
+  };
 
   if (loading || error || !cartGroups || Object.keys(cartGroups).length === 0) {
     return <CartSkeleton />;
@@ -85,11 +88,10 @@ export default function CartSection({
                       <div className="flex-1 space-y-2">
                         <a
                           href="#"
-                          className={`block text-base font-semibold transition-colors ${
-                            isSoldOut
-                              ? 'text-gray-500 pointer-events-none'
-                              : 'text-gray-800 hover:text-orange-600 hover:underline'
-                          }`}
+                          className={`block text-base font-semibold transition-colors ${isSoldOut
+                            ? 'text-gray-500 pointer-events-none'
+                            : 'text-gray-800 hover:text-orange-600 hover:underline'
+                            }`}
                         >
                           {item.productName}
                         </a>
