@@ -99,7 +99,7 @@ export default function Register() {
       }
 
       setAvatarFile(file);
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setAvatarPreview(e.target?.result as string);
@@ -142,7 +142,7 @@ export default function Register() {
       }
       const submitData = {
         ...formData,
-        avatarUrl
+        avatarUrl,
       };
 
       await registerInternal(submitData);
