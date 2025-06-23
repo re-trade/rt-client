@@ -1,9 +1,11 @@
 'use client';
 
+import { sellerApi, SellerProfileRegisterRequest } from '@/service/seller.api';
+import { storageApi } from '@/service/storage.api';
+import { base64ToFile } from '@retrade/util';
 import axios from 'axios';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
-
 export interface Province {
   code: number;
   name: string;
@@ -37,7 +39,6 @@ export type SellerFormData = {
   identityBackImage: File | null;
 };
 export const defaultFormData: SellerFormData = {
-  // Shop information
   shopName: '',
   description: '',
   email: '',
@@ -53,7 +54,6 @@ export const defaultFormData: SellerFormData = {
   identityBackImage: null,
 };
 
-// Validation schema
 const sellerSchema = Joi.object({
   shopName: Joi.string().trim().min(1).required().messages({
     'string.empty': 'Tên cửa hàng không được để trống',
@@ -100,6 +100,16 @@ const sellerSchema = Joi.object({
   }),
 });
 
+const updateImageProfile = async (req: {
+  avatar: File;
+  thumbnail: File;
+}): Promise<{ avatarUrl: string; thumbnailUrl: string }> => {
+  var avatarUrl = await storageApi.fileUpload(req.avatar);
+  var thumbnailUrl = await storageApi.fileUpload(req.thumbnail);
+  console.log(avatarUrl);
+  return { avatarUrl, thumbnailUrl };
+};
+
 export function useSellerRegistration() {
   const [formData, setFormData] = useState<SellerFormData>(defaultFormData);
   const [currentStep, setCurrentStep] = useState(1);
@@ -113,7 +123,6 @@ export function useSellerRegistration() {
 
   const PROVINCES_API_URL = 'https://provinces.open-api.vn/api/p/';
 
-  // Helper to update text/select inputs
   const updateField = (name: keyof SellerFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
@@ -428,11 +437,36 @@ export function useSellerRegistration() {
         });
         return false;
       }
-
-      console.log('Submitting form data:', formData);
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert('Đăng ký thành công!');
+      const { avatarUrl, thumbnailUrl } = await updateImageProfile({
+        avatar: formData.avatarUrl,
+        thumbnail: formData.background,
+      });
+      const requestBody: SellerProfileRegisterRequest = {
+        shopName: formData.shopName,
+        description: formData.description,
+        addressLine: formData.addressLine,
+        district: formData.district,
+        ward: formData.ward,
+        state: formData.state,
+        email: formData.email,
+        avatarUrl,
+        background: thumbnailUrl,
+        phoneNumber: formData.phoneNumber,
+        identityNumber: formData.identityNumber,
+      };
+      const result = await sellerApi.registerSeller(requestBody);
+      if (!result) {
+        alert('Đăng ký không thành công!');
+        return false;
+      }
+      const verifiUpload = await sellerApi.sellerVerification({
+        backIdentity: base64ToFile(formData.identityBackImage),
+        frontIdentity: base64ToFile(formData.identityFrontImage),
+      });
+      if (!verifiUpload) {
+        alert('Đăng ký không thành công!');
+        return false;
+      }
       return true;
     } catch (error) {
       console.error('Error submitting form:', error);

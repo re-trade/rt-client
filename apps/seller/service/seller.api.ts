@@ -87,3 +87,4 @@ export const sellerApi = {
     }
   },
 };
+export type { SellerProfileRegisterRequest, SellerProfileResponse };

@@ -35,8 +35,7 @@ export default function RegisterPage() {
     goToStep,
   } = useSellerRegistration();
 
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const getStepContent = () => {
     const stepTitles = [
@@ -196,7 +195,7 @@ export default function RegisterPage() {
 
                   {currentStep === 4 && (
                     <>
-                      {verificationSuccess ? (
+                      {registerSuccess ? (
                         <div className="text-center py-16">
                           <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
                             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
@@ -237,7 +236,7 @@ export default function RegisterPage() {
                 <Button
                   variant="outline"
                   onClick={prevStep}
-                  disabled={currentStep === 1 || isSubmitting || isVerifying || verificationSuccess}
+                  disabled={currentStep === 1 || isSubmitting || registerSuccess}
                   className="px-8 py-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold rounded-xl disabled:opacity-40 transition-all duration-200"
                 >
                   Quay lại
@@ -261,65 +260,27 @@ export default function RegisterPage() {
                   </Button>
                 ) : (
                   <>
-                    {!verificationSuccess && (
-                      <div className="flex gap-3">
-                        {isVerifying ? (
-                          <Button
-                            onClick={async () => {
-                              await new Promise((resolve) => setTimeout(resolve, 1500));
-                              setIsVerifying(false);
-                              setVerificationSuccess(true);
-                            }}
-                            disabled={true}
-                            size="lg"
-                            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl"
-                          >
-                            <div className="flex items-center">
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                              Đang xác minh...
-                            </div>
-                          </Button>
+                    {!registerSuccess && (
+                      <Button
+                        onClick={async () => {
+                          const success = await submitForm();
+                          if (success) {
+                            setRegisterSuccess(true);
+                          }
+                        }}
+                        disabled={isSubmitting}
+                        size="lg"
+                        className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                      >
+                        {isSubmitting ? (
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                            Đang xử lý...
+                          </div>
                         ) : (
-                          <>
-                            <Button
-                              onClick={async () => {
-                                const success = await submitForm();
-                                if (success) {
-                                  setIsVerifying(true);
-                                }
-                              }}
-                              disabled={isSubmitting}
-                              variant="outline"
-                              size="lg"
-                              className="px-6 py-3 border-2 border-amber-600 text-amber-600 hover:bg-amber-50 font-semibold rounded-xl transition-all duration-200"
-                            >
-                              {isSubmitting ? (
-                                <div className="flex items-center">
-                                  <div className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mr-2" />
-                                  Đang xử lý...
-                                </div>
-                              ) : (
-                                'Gửi đăng ký'
-                              )}
-                            </Button>
-
-                            <Button
-                              onClick={() => {
-                                if (formData.identityFrontImage && formData.identityBackImage) {
-                                  setIsVerifying(true);
-                                } else {
-                                  alert('Vui lòng tải lên đầy đủ ảnh CMND/CCCD để xác minh');
-                                }
-                              }}
-                              disabled={isSubmitting}
-                              size="lg"
-                              className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-                            >
-                              Xác minh ngay
-                            </Button>
-                          </>
+                          'Gửi đăng ký'
                         )}
-                      </div>
+                      </Button>
                     )}
                   </>
                 )}
