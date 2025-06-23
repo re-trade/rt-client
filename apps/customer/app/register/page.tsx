@@ -85,9 +85,7 @@ export default function Register() {
     else setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
@@ -269,13 +267,13 @@ export default function Register() {
                     onChange={handleInputChange}
                     placeholder="Nhập tên đăng nhập"
                     className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
-                      errors.username ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                      errors.username
+                        ? 'border-red-500'
+                        : 'border-orange-200 focus:border-orange-400'
                     }`}
                     required
                   />
-                  {errors.username && (
-                    <div className="text-red-500 text-sm">{errors.username}</div>
-                  )}
+                  {errors.username && <div className="text-red-500 text-sm">{errors.username}</div>}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Email *</label>
@@ -324,13 +322,13 @@ export default function Register() {
                     onChange={handleInputChange}
                     placeholder="Nhập tên"
                     className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
-                      errors.lastName ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                      errors.lastName
+                        ? 'border-red-500'
+                        : 'border-orange-200 focus:border-orange-400'
                     }`}
                     required
                   />
-                  {errors.lastName && (
-                    <div className="text-red-500 text-sm">{errors.lastName}</div>
-                  )}
+                  {errors.lastName && <div className="text-red-500 text-sm">{errors.lastName}</div>}
                 </div>
               </div>
 
@@ -420,9 +418,7 @@ export default function Register() {
                       )}
                     </button>
                   </div>
-                  {errors.password && (
-                    <div className="text-red-500 text-sm">{errors.password}</div>
-                  )}
+                  {errors.password && <div className="text-red-500 text-sm">{errors.password}</div>}
                 </div>
 
                 <div className="space-y-2">
