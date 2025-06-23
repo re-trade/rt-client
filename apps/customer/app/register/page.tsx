@@ -2,6 +2,7 @@
 import { handlePhoneInput } from '@/components/input/InputHandle';
 import { useToast } from '@/hooks/use-toast';
 import { registerInternal } from '@/services/auth.api';
+import { fileApi } from '@/services/file.api';
 import { IconUpload, IconUser, IconX } from '@tabler/icons-react';
 import Joi from 'joi';
 import Image from 'next/image';
@@ -88,21 +89,17 @@ export default function Register() {
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         showToast('Vui lòng chọn file hình ảnh hợp lệ.', 'error');
         return;
       }
-
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         showToast('Kích thước file không được vượt quá 5MB.', 'error');
         return;
       }
 
       setAvatarFile(file);
-
-      // Create preview
+      
       const reader = new FileReader();
       reader.onload = (e) => {
         setAvatarPreview(e.target?.result as string);
@@ -129,26 +126,23 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      // Validate terms acceptance
       if (!termsAccepted) {
         showToast('Bạn phải đồng ý với Điều khoản và Chính sách.', 'error');
         return;
       }
-
-      // Validate form data with Joi
       const validation = registerSchema.validate(formData, { abortEarly: false });
       if (validation.error) {
         const errorMessage = validation.error.details[0].message;
         showToast(errorMessage, 'error');
         return;
       }
-
-      // Here you would typically upload the avatar file first and get the URL
-      // For now, we'll just use the existing avatarUrl field
+      let avatarUrl = formData.avatarUrl;
+      if (avatarFile) {
+        avatarUrl = await fileApi.fileUpload(avatarFile);
+      }
       const submitData = {
         ...formData,
-        // In real implementation, you'd upload avatarFile and get the URL
-        avatarUrl: avatarFile ? 'uploaded-avatar-url' : formData.avatarUrl,
+        avatarUrl
       };
 
       await registerInternal(submitData);
