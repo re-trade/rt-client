@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const images = [
-  { src: '/image_login.jpg', alt: 'Khám phá đồ cũ chất lượng cao' },
-  { src: '/image_login.jpg', alt: 'Mua bán an toàn, tiện lợi' },
+  { src: '/image_4.png', alt: 'Khám phá đồ cũ chất lượng cao' },
+  { src: '/image_2.jpeg', alt: 'Mua bán an toàn, tiện lợi' },
   { src: '/image_login.jpg', alt: 'Cộng đồng yêu thích đồ cũ' },
-  { src: '/image_login.jpg', alt: 'Giá cả hợp lý, chất lượng đảm bảo' },
-  { src: '/image_login.jpg', alt: 'Giao dịch nhanh chóng' },
+  { src: '/image_3.jpeg', alt: 'Giá cả hợp lý, chất lượng đảm bảo' },
+  { src: '/image_4.png', alt: 'Giao dịch nhanh chóng' },
 ];
 
 export default function CarouselComponent() {

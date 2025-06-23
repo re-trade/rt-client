@@ -64,13 +64,13 @@ export default function ConfirmationStep({
         <CardHeader className="bg-amber-50 border-b border-amber-100">
           <CardTitle className="text-lg text-amber-900 flex items-center">
             <Store className="h-5 w-5 mr-2" />
-            Thông tin cửa hàng
+            Thông tin người bán
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <dl className="space-y-0">
-            {displayField('Tên cửa hàng', formData.shopName, true)}
-            {displayField('Mô tả cửa hàng', formData.description)}
+            {displayField('Tên người bán', formData.shopName, true)}
+            {displayField('Mô tả người bán', formData.description)}
             {displayField('Email liên hệ', formData.email, true)}
             {displayField('Số điện thoại', formData.phoneNumber, true)}
           </dl>
@@ -81,7 +81,7 @@ export default function ConfirmationStep({
         <CardHeader className="bg-amber-50 border-b border-amber-100">
           <CardTitle className="text-lg text-amber-900 flex items-center">
             <MapPin className="h-5 w-5 mr-2" />
-            Địa chỉ cửa hàng
+            Địa chỉ người bán
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">

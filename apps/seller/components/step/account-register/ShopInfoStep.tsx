@@ -238,7 +238,7 @@ export default function ShopInfoStep({
                 value={formData.shopName}
                 onChange={handleChange}
                 onBlur={() => handleFieldBlur('shopName')}
-                placeholder="Nhập tên cửa hàng độc đáo và dễ nhớ"
+                placeholder="Bạn muốn chúng tôi gọi bạn là gì?"
                 className={`h-12 text-base border-2 transition-all duration-200 ${
                   errors.shopName
                     ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
@@ -277,7 +277,7 @@ export default function ShopInfoStep({
                 value={formData.description}
                 onChange={handleChange}
                 onBlur={() => handleFieldBlur('description')}
-                placeholder="Chia sẻ câu chuyện của bạn... Bạn bán những gì? Tại sao khách hàng nên chọn cửa hàng của bạn?"
+                placeholder="Chia sẻ câu chuyện của bạn... Bạn bán những gì? Tại sao khách hàng nên mua những món đồ của bạn?"
                 className="border-2 border-amber-200 focus:border-amber-400 focus:ring-amber-100 resize-none text-base min-h-[120px] transition-all duration-200"
                 rows={5}
               />

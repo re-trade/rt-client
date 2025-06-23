@@ -56,8 +56,8 @@ export const defaultFormData: SellerFormData = {
 
 const sellerSchema = Joi.object({
   shopName: Joi.string().trim().min(1).required().messages({
-    'string.empty': 'Tên cửa hàng không được để trống',
-    'any.required': 'Tên cửa hàng là bắt buộc',
+    'string.empty': 'Tên của bạn không được để trống',
+    'any.required': 'Tên của bạn là bắt buộc',
   }),
   description: Joi.string().allow(''),
   email: Joi.string()

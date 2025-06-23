@@ -45,16 +45,8 @@ export default function RegisterPage() {
       'Kiểm tra lại thông tin',
     ];
 
-    const stepSubtitles = [
-      'Tên bạn và những thông tin cơ bản',
-      'Địa chỉ để khách hàng có thể tìm đến bạn',
-      'Tải lên ảnh CMND/CCCD để xác minh tài khoản',
-      'Đảm bảo mọi thông tin đều chính xác',
-    ];
-
     return {
       title: stepTitles[currentStep - 1],
-      subtitle: stepSubtitles[currentStep - 1],
     };
   };
 
@@ -152,13 +144,6 @@ export default function RegisterPage() {
               )}
 
               <div className="mb-8">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    {getStepContent().title}
-                  </h3>
-                  <p className="text-gray-600">{getStepContent().subtitle}</p>
-                </div>
-
                 <div className="bg-white rounded-xl border border-gray-100 p-6 min-h-96">
                   {currentStep === 1 && (
                     <ShopInfoStep

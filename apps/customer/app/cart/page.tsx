@@ -16,19 +16,13 @@ const ShoppingCart: React.FC = () => {
     router.push('/');
   };
 
-  // More detailed check for when to show cart summary
   const shouldShowCartSummary = () => {
-    // Don't show during loading or error states
     if (cartHook.loading || cartHook.error) {
       return false;
     }
-
-    // Don't show if cart is empty
     if (!cartHook.cartGroups || Object.keys(cartHook.cartGroups).length === 0) {
       return false;
     }
-
-    // Check if any shop has items
     const hasAnyItems = Object.values(cartHook.cartGroups).some(
       (shop) => shop.items && shop.items.length > 0,
     );
@@ -41,7 +35,6 @@ const ShoppingCart: React.FC = () => {
   return (
     <section className="bg-gradient-to-br from-orange-25 via-orange-50 to-orange-25 py-6 md:py-12 lg:py-20 min-h-screen">
       <div className="mx-auto max-w-screen-xl px-3 md:px-6 2xl:px-0">
-        {/* Header */}
         <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
             <button
@@ -58,8 +51,6 @@ const ShoppingCart: React.FC = () => {
           </h1>
           <div className="w-16 md:w-20 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
         </div>
-
-        {/* Main Content */}
         <div className={`flex flex-col gap-6 lg:gap-8 ${showSummary ? 'xl:flex-row' : ''}`}>
           {/* Cart Items */}
           <div className={`space-y-6 md:space-y-8 ${showSummary ? 'w-full xl:w-2/3' : 'w-full'}`}>
