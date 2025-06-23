@@ -156,25 +156,25 @@ export default function PaymentMethodsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-[#FDFEF9] p-6">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-xl">
+                <div className="p-3 bg-white/20 rounded-lg">
                   <CreditCard className="w-6 h-6" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Phương thức thanh toán</h1>
-                  <p className="text-orange-100 mt-1">
+                  <p className="text-[#121212] mt-1">
                     Quản lý thẻ tín dụng và phương thức thanh toán
                   </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-orange-100">Tổng số thẻ</p>
+                <p className="text-sm text-[#121212]">Tổng số thẻ</p>
                 <p className="text-2xl font-bold">{methods.length}</p>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function PaymentMethodsPage() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-amber-100 rounded-xl">
                 <Star className="w-6 h-6 text-amber-600" />
@@ -197,7 +197,7 @@ export default function PaymentMethodsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-green-100 rounded-xl">
                 <Shield className="w-6 h-6 text-green-600" />
@@ -209,7 +209,7 @@ export default function PaymentMethodsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-blue-100 rounded-xl">
                 <Wallet className="w-6 h-6 text-blue-600" />
@@ -223,12 +223,12 @@ export default function PaymentMethodsPage() {
         </div>
 
         {/* Payment Methods List */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-amber-100">
+        <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-800">Danh sách thẻ thanh toán</h2>
             <button
               onClick={openAddModal}
-              className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white px-4 py-2 rounded-xl transition-all duration-200 flex items-center space-x-2 font-medium shadow-lg hover:shadow-xl"
+              className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-4 py-2 rounded-xl transition-all duration-200 flex items-center space-x-2 font-medium shadow-md hover:shadow-lg"
             >
               <Plus className="w-4 h-4" />
               <span>Thêm thẻ mới</span>
@@ -246,7 +246,7 @@ export default function PaymentMethodsPage() {
               </p>
               <button
                 onClick={openAddModal}
-                className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white px-6 py-3 rounded-xl transition-all duration-200 flex items-center space-x-2 mx-auto font-medium shadow-lg hover:shadow-xl"
+                className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-6 py-3 rounded-xl transition-all duration-200 flex items-center space-x-2 mx-auto font-medium shadow-md hover:shadow-lg"
               >
                 <Plus className="w-5 h-5" />
                 <span>Thêm thẻ đầu tiên</span>
@@ -257,7 +257,7 @@ export default function PaymentMethodsPage() {
               {methods.map((method) => (
                 <div
                   key={method.id}
-                  className="relative group border border-gray-200 rounded-2xl p-6 hover:border-amber-300 hover:shadow-lg transition-all duration-300"
+                  className="relative group border border-gray-200 rounded-2xl p-6 hover:border-[#FFD2B2] hover:shadow-lg transition-all duration-300"
                 >
                   {/* Card Visual */}
                   <div
@@ -330,7 +330,7 @@ export default function PaymentMethodsPage() {
         </div>
 
         {/* Security Notice */}
-        <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-2xl shadow-lg p-6 border border-amber-200">
+        <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl shadow-md p-6 border border-amber-200">
           <div className="flex items-start space-x-4">
             <div className="p-3 bg-amber-500 rounded-xl">
               <Lock className="w-6 h-6 text-white" />
@@ -368,7 +368,7 @@ export default function PaymentMethodsPage() {
                     onChange={(e) =>
                       setForm({ ...form, type: e.target.value as PaymentMethod['type'] })
                     }
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all"
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all"
                   >
                     <option value="Visa">Visa</option>
                     <option value="MasterCard">MasterCard</option>
@@ -387,7 +387,7 @@ export default function PaymentMethodsPage() {
                     placeholder="NGUYEN VAN A"
                     value={form.holderName}
                     onChange={(e) => setForm({ ...form, holderName: e.target.value.toUpperCase() })}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all"
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all"
                   />
                 </div>
 
@@ -405,7 +405,7 @@ export default function PaymentMethodsPage() {
                         setForm({ ...form, cardNumber: formatted });
                       }
                     }}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all font-mono"
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all font-mono"
                   />
                 </div>
 
@@ -422,7 +422,7 @@ export default function PaymentMethodsPage() {
                         const formatted = formatExpiry(e.target.value);
                         setForm({ ...form, expiry: formatted });
                       }}
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all font-mono"
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all font-mono"
                     />
                   </div>
 
@@ -435,7 +435,7 @@ export default function PaymentMethodsPage() {
                       maxLength={4}
                       value={form.cvv}
                       onChange={(e) => setForm({ ...form, cvv: e.target.value.replace(/\D/g, '') })}
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all font-mono"
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all font-mono"
                     />
                   </div>
                 </div>
@@ -451,11 +451,11 @@ export default function PaymentMethodsPage() {
                 <button
                   onClick={handleSave}
                   disabled={isLoading}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white transition-all font-medium shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center space-x-2"
+                  className="px-6 py-3 rounded-xl bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] transition-all font-medium shadow-md hover:shadow-lg disabled:opacity-50 flex items-center space-x-2"
                 >
                   {isLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#121212] border-t-transparent"></div>
                       <span>Đang lưu...</span>
                     </>
                   ) : (

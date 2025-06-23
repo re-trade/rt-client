@@ -22,7 +22,7 @@ function useAuth() {
     isAuth();
   }, [isAuth]);
   const logout = useCallback(async () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('access-token');
     window.location.reload();
   }, []);
   return {

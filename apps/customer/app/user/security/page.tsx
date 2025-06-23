@@ -461,11 +461,11 @@ export default function SecurityPage() {
           />
         </SecurityModal>
 
-        <div className="bg-white rounded-xl shadow-lg border border-[#525252]/10 overflow-hidden">
-          <div className="bg-gradient-to-r from-[#FFD2B2] to-[#FFBD8D] p-4 sm:p-6 text-[#121212]">
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-4 sm:p-6 text-[#121212]">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="p-2 sm:p-3 bg-white/30 rounded-lg shadow-sm">
+                <div className="p-2 sm:p-3 bg-white/20 rounded-lg shadow-sm">
                   <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
@@ -486,7 +486,7 @@ export default function SecurityPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-amber-100 hover:border-amber-300 transition-all duration-300">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20 hover:border-[#FFD2B2] transition-all duration-300">
             <div className="flex items-center space-x-3">
               <div className="p-2 sm:p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl shadow-sm">
                 <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
@@ -498,7 +498,7 @@ export default function SecurityPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-2 sm:p-3 bg-amber-100 rounded-xl">
                 <Key className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
@@ -512,7 +512,7 @@ export default function SecurityPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-2 sm:p-3 bg-blue-100 rounded-xl">
                 <Monitor className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
@@ -524,7 +524,7 @@ export default function SecurityPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-2 sm:p-3 bg-red-100 rounded-xl">
                 <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
@@ -547,7 +547,7 @@ export default function SecurityPage() {
               return (
                 <div
                   key={categoryKey}
-                  className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden"
+                  className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden"
                 >
                   <div className="p-4 sm:p-6 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
@@ -570,7 +570,7 @@ export default function SecurityPage() {
                     {categoryActions.map((action) => (
                       <div
                         key={action.id}
-                        className="border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-amber-300 hover:shadow-md transition-all duration-200 bg-white"
+                        className="border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-[#FFD2B2] hover:shadow-md transition-all duration-200 bg-white"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                           <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
@@ -626,7 +626,7 @@ export default function SecurityPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
               <div className="p-4 sm:p-6 border-b border-gray-100">
                 <h2 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
                   <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-amber-600" />

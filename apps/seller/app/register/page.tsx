@@ -6,14 +6,13 @@ import ShopInfoStep from '@/components/step/account-register/ShopInfoStep';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSellerRegistration } from '@/hooks/useSellerRegistration';
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 const steps = [
-  { id: 1, title: 'Thông tin shop' },
-  { id: 2, title: 'Địa chỉ shop' },
-  { id: 3, title: 'Thông tin định danh' },
-  { id: 4, title: 'Xác nhận' },
+  { id: 1, title: 'Thông tin shop', description: 'Tên shop và mô tả' },
+  { id: 2, title: 'Địa chỉ', description: 'Vị trí cửa hàng' },
+  { id: 3, title: 'Giấy tờ', description: 'CMND/CCCD' },
+  { id: 4, title: 'Hoàn tất', description: 'Xác nhận thông tin' },
 ];
 
 export default function RegisterPage() {
@@ -39,192 +38,292 @@ export default function RegisterPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
 
+  const getStepContent = () => {
+    const stepTitles = [
+      'Hãy cho chúng tôi biết về bạn',
+      'Bạn đang ở đâu?',
+      'Xác minh danh tính',
+      'Kiểm tra lại thông tin',
+    ];
+
+    const stepSubtitles = [
+      'Tên bạn và những thông tin cơ bản',
+      'Địa chỉ để khách hàng có thể tìm đến bạn',
+      'Tải lên ảnh CMND/CCCD để xác minh tài khoản',
+      'Đảm bảo mọi thông tin đều chính xác',
+    ];
+
+    return {
+      title: stepTitles[currentStep - 1],
+      subtitle: stepSubtitles[currentStep - 1],
+    };
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-50 py-10">
-      <div className="container max-w-4xl mx-auto px-4">
-        <Card className="shadow-lg border-0">
-          <CardContent className="p-6">
-            <h1 className="text-2xl font-bold text-center mb-8">🛍️ Đăng ký trở thành người bán</h1>
-            <div className="relative mb-10">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+      <div className="container max-w-4xl mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-amber-900 mb-4">Trở thành người bán</h1>
+          <p className="text-xl text-amber-700 max-w-2xl mx-auto leading-relaxed">
+            Chia sẻ những món đồ cũ yêu thích và kiếm thêm thu nhập từ những vật dụng không còn sử
+            dụng
+          </p>
+        </div>
+
+        <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden">
+          <CardContent className="p-0">
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-8 py-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-white">
+                  <h2 className="text-2xl font-bold">
+                    Bước {currentStep} / {steps.length}
+                  </h2>
+                  <p className="text-amber-100 text-sm mt-1">{getStepContent().title}</p>
+                </div>
+                <div className="text-white text-right">
+                  <div className="text-3xl font-bold">
+                    {Math.round((currentStep / steps.length) * 100)}%
+                  </div>
+                  <div className="text-amber-100 text-sm">Hoàn thành</div>
+                </div>
               </div>
-              <div className="relative flex justify-between">
+
+              <div className="w-full bg-amber-800/30 rounded-full h-2">
+                <div
+                  className="bg-white rounded-full h-2 transition-all duration-700 ease-out"
+                  style={{ width: `${(currentStep / steps.length) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="px-8 py-6 bg-amber-25 border-b border-amber-100">
+              <div className="flex justify-between">
                 {steps.map((step) => {
                   const isActive = currentStep === step.id;
                   const isCompleted = currentStep > step.id;
+                  const isClickable = currentStep >= step.id;
 
                   return (
                     <div
                       key={step.id}
-                      className="flex flex-col items-center cursor-pointer"
-                      onClick={() => goToStep(step.id)}
+                      className={`flex-1 text-center cursor-pointer transition-all duration-200 ${
+                        isClickable ? 'hover:scale-105' : 'cursor-not-allowed opacity-50'
+                      }`}
+                      onClick={() => isClickable && goToStep(step.id)}
                     >
                       <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-full
-                        ${isCompleted ? 'bg-green-600' : isActive ? 'bg-blue-600' : 'bg-gray-200'}
-                        transition-colors duration-200 z-10`}
+                        className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-sm font-bold mb-2 transition-all duration-300 ${
+                          isCompleted
+                            ? 'bg-green-500 text-white'
+                            : isActive
+                              ? 'bg-amber-600 text-white ring-4 ring-amber-200'
+                              : 'bg-gray-200 text-gray-500'
+                        }`}
                       >
-                        {isCompleted ? (
-                          <CheckCircle className="h-6 w-6 text-white" />
-                        ) : (
-                          <span className="text-white font-medium">{step.id}</span>
-                        )}
+                        {isCompleted ? '✓' : step.id}
                       </div>
-                      <span
-                        className={`mt-2 text-xs sm:text-sm font-medium
-                        ${isActive || isCompleted ? 'text-gray-900' : 'text-gray-500'}`}
-                      >
-                        {step.title}
-                      </span>
+                      <div className="text-xs">
+                        <div
+                          className={`font-semibold ${isActive || isCompleted ? 'text-amber-900' : 'text-gray-500'}`}
+                        >
+                          {step.title}
+                        </div>
+                        <div
+                          className={`${isActive || isCompleted ? 'text-amber-600' : 'text-gray-400'}`}
+                        >
+                          {step.description}
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {errors.general && (
-              <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-start">
-                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-                <p>{errors.general}</p>
-              </div>
-            )}
-
-            <div className="my-8">
-              {currentStep === 1 && (
-                <ShopInfoStep
-                  formData={formData}
-                  handleChange={handleChange}
-                  handleFieldBlur={handleFieldBlur}
-                  errors={errors}
-                  updateField={updateField}
-                />
-              )}
-              {currentStep === 2 && (
-                <AddressStep
-                  formData={formData}
-                  handleChange={handleChange}
-                  handleFieldBlur={handleFieldBlur}
-                  errors={errors}
-                  provinces={provinces}
-                  districts={districts}
-                  wards={wards}
-                  loading={loading}
-                />
-              )}
-              {currentStep === 3 && (
-                <IdentityInfoStep
-                  formData={formData}
-                  handleChange={handleChange}
-                  handleFileChange={handleFileChange}
-                  handleFieldBlur={handleFieldBlur}
-                  errors={errors}
-                />
-              )}
-              {currentStep === 4 && (
-                <>
-                  {verificationSuccess ? (
-                    <div className="text-center py-8">
-                      <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <CheckCircle className="h-10 w-10 text-green-600" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-green-700 mb-2">
-                        Gửi xác minh thành công! ✨
-                      </h2>
-                      <p className="text-gray-600 mb-6">
-                        Chúng tôi đã nhận được thông tin của bạn và đang xem xét. Quá trình xác minh
-                        sẽ mất khoảng 24 giờ. Bạn sẽ nhận được email khi tài khoản bán hàng của bạn
-                        được kích hoạt.
-                      </p>
-                      <Button
-                        className="bg-blue-600 hover:bg-blue-700"
-                        onClick={() => (window.location.href = '/')}
-                      >
-                        Quay về trang chủ
-                      </Button>
+            <div className="p-8">
+              {errors.general && (
+                <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-white text-xs font-bold">!</span>
                     </div>
-                  ) : (
-                    <ConfirmationStep
+                    <p className="text-red-700 font-medium">{errors.general}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-8">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {getStepContent().title}
+                  </h3>
+                  <p className="text-gray-600">{getStepContent().subtitle}</p>
+                </div>
+
+                <div className="bg-white rounded-xl border border-gray-100 p-6 min-h-96">
+                  {currentStep === 1 && (
+                    <ShopInfoStep
                       formData={formData}
+                      handleChange={handleChange}
+                      handleFieldBlur={handleFieldBlur}
+                      errors={errors}
+                      updateField={updateField}
+                    />
+                  )}
+
+                  {currentStep === 2 && (
+                    <AddressStep
+                      formData={formData}
+                      handleChange={handleChange}
+                      handleFieldBlur={handleFieldBlur}
+                      errors={errors}
                       provinces={provinces}
                       districts={districts}
                       wards={wards}
+                      loading={loading}
                     />
                   )}
-                </>
-              )}
-            </div>
 
-            <div className="flex justify-between mt-10">
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 1 || isSubmitting || isVerifying || verificationSuccess}
-                className="px-6"
-              >
-                Quay lại
-              </Button>
+                  {currentStep === 3 && (
+                    <IdentityInfoStep
+                      formData={formData}
+                      handleChange={handleChange}
+                      handleFileChange={handleFileChange}
+                      handleFieldBlur={handleFieldBlur}
+                      errors={errors}
+                    />
+                  )}
 
-              {currentStep < 4 ? (
-                <Button
-                  onClick={nextStep}
-                  disabled={isSubmitting || loading}
-                  className="px-6 bg-blue-600 hover:bg-blue-700"
-                >
-                  {loading ? 'Đang tải...' : 'Tiếp theo'}
-                </Button>
-              ) : (
-                <>
-                  {verificationSuccess ? null : (
-                    <div className="space-x-4">
-                      {isVerifying ? (
-                        <Button
-                          onClick={async () => {
-                            // Simulating identity verification success
-                            await new Promise((resolve) => setTimeout(resolve, 1500));
-                            setIsVerifying(false);
-                            setVerificationSuccess(true);
-                          }}
-                          disabled={isSubmitting}
-                          className="px-6 bg-purple-600 hover:bg-purple-700"
-                        >
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Đang xác minh...
-                        </Button>
+                  {currentStep === 4 && (
+                    <>
+                      {verificationSuccess ? (
+                        <div className="text-center py-16">
+                          <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                              <span className="text-green-500 text-2xl font-bold">✓</span>
+                            </div>
+                          </div>
+                          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                            Chúc mừng! Đăng ký thành công
+                          </h2>
+                          <div className="max-w-md mx-auto mb-8">
+                            <p className="text-gray-600 text-lg leading-relaxed">
+                              Hồ sơ của bạn đang được xem xét. Chúng tôi sẽ gửi email thông báo kết
+                              quả trong vòng 24 giờ.
+                            </p>
+                          </div>
+                          <Button
+                            size="lg"
+                            className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                            onClick={() => (window.location.href = '/')}
+                          >
+                            Về trang chủ
+                          </Button>
+                        </div>
                       ) : (
-                        <>
+                        <ConfirmationStep
+                          formData={formData}
+                          provinces={provinces}
+                          districts={districts}
+                          wards={wards}
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-6 border-t border-gray-100">
+                <Button
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 1 || isSubmitting || isVerifying || verificationSuccess}
+                  className="px-8 py-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold rounded-xl disabled:opacity-40 transition-all duration-200"
+                >
+                  Quay lại
+                </Button>
+
+                {currentStep < 4 ? (
+                  <Button
+                    onClick={nextStep}
+                    disabled={isSubmitting || loading}
+                    size="lg"
+                    className="px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    {loading ? (
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Đang tải...
+                      </div>
+                    ) : (
+                      'Tiếp tục'
+                    )}
+                  </Button>
+                ) : (
+                  <>
+                    {!verificationSuccess && (
+                      <div className="flex gap-3">
+                        {isVerifying ? (
                           <Button
                             onClick={async () => {
-                              const success = await submitForm();
-                              if (success) {
-                                setIsVerifying(true);
-                              }
+                              await new Promise((resolve) => setTimeout(resolve, 1500));
+                              setIsVerifying(false);
+                              setVerificationSuccess(true);
                             }}
-                            disabled={isSubmitting}
-                            className="px-6 bg-blue-600 hover:bg-blue-700"
+                            disabled={true}
+                            size="lg"
+                            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl"
                           >
-                            {isSubmitting ? 'Đang xử lý...' : '1. Đăng ký thông tin'}
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                              Đang xác minh...
+                            </div>
                           </Button>
+                        ) : (
+                          <>
+                            <Button
+                              onClick={async () => {
+                                const success = await submitForm();
+                                if (success) {
+                                  setIsVerifying(true);
+                                }
+                              }}
+                              disabled={isSubmitting}
+                              variant="outline"
+                              size="lg"
+                              className="px-6 py-3 border-2 border-amber-600 text-amber-600 hover:bg-amber-50 font-semibold rounded-xl transition-all duration-200"
+                            >
+                              {isSubmitting ? (
+                                <div className="flex items-center">
+                                  <div className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mr-2" />
+                                  Đang xử lý...
+                                </div>
+                              ) : (
+                                'Gửi đăng ký'
+                              )}
+                            </Button>
 
-                          <Button
-                            onClick={() => {
-                              if (formData.identityFrontImage && formData.identityBackImage) {
-                                setIsVerifying(true);
-                              } else {
-                                alert('Vui lòng tải lên đầy đủ ảnh CMND/CCCD để xác minh');
-                              }
-                            }}
-                            disabled={isSubmitting}
-                            className="px-6 bg-green-600 hover:bg-green-700"
-                          >
-                            2. Xác minh danh tính
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
+                            <Button
+                              onClick={() => {
+                                if (formData.identityFrontImage && formData.identityBackImage) {
+                                  setIsVerifying(true);
+                                } else {
+                                  alert('Vui lòng tải lên đầy đủ ảnh CMND/CCCD để xác minh');
+                                }
+                              }}
+                              disabled={isSubmitting}
+                              size="lg"
+                              className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                            >
+                              Xác minh ngay
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
