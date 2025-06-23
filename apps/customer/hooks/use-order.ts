@@ -1,10 +1,25 @@
 'use client';
 
-import { CreateOrderRequest, orderApi, OrderResponse } from '@/services/order.api';
+import {
+  CreateOrderRequest,
+  GetOrdersParams,
+  orderApi,
+  OrderCombo,
+  OrderResponse,
+  OrdersResponse,
+} from '@/services/order.api';
 import { useCallback, useState } from 'react';
 
 export interface OrderState {
-  currentOrder: OrderResponse | null;
+  currentOrder: OrderCombo | null; // Changed from OrderResponse to OrderCombo
+  orders: OrderCombo[];
+  pagination: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+  } | null;
+  isLoading: boolean;
   isCreating: boolean;
   error: string | null;
   success: boolean;
@@ -13,6 +28,9 @@ export interface OrderState {
 export function useOrder() {
   const [orderState, setOrderState] = useState<OrderState>({
     currentOrder: null,
+    orders: [],
+    pagination: null,
+    isLoading: false,
     isCreating: false,
     error: null,
     success: false,
@@ -32,7 +50,6 @@ export function useOrder() {
 
         setOrderState((prev) => ({
           ...prev,
-          currentOrder: response,
           isCreating: false,
           success: true,
           error: null,
@@ -56,10 +73,10 @@ export function useOrder() {
     [],
   );
 
-  const getOrderById = useCallback(async (orderId: string): Promise<OrderResponse | null> => {
+  const getOrderById = useCallback(async (orderId: string): Promise<OrderCombo | null> => {
     setOrderState((prev) => ({
       ...prev,
-      isCreating: true,
+      isLoading: true,
       error: null,
     }));
 
@@ -69,7 +86,7 @@ export function useOrder() {
       setOrderState((prev) => ({
         ...prev,
         currentOrder: response,
-        isCreating: false,
+        isLoading: false,
         error: null,
       }));
 
@@ -80,7 +97,7 @@ export function useOrder() {
 
       setOrderState((prev) => ({
         ...prev,
-        isCreating: false,
+        isLoading: false,
         error: errorMessage,
       }));
 
@@ -88,40 +105,88 @@ export function useOrder() {
     }
   }, []);
 
-  const getMyOrders = useCallback(async (): Promise<OrderResponse[]> => {
-    setOrderState((prev) => ({
-      ...prev,
-      isCreating: true,
-      error: null,
-    }));
-
-    try {
-      const response = await orderApi.getMyOrders();
-
+  const getMyOrders = useCallback(
+    async (params: GetOrdersParams = {}): Promise<OrdersResponse | null> => {
       setOrderState((prev) => ({
         ...prev,
-        isCreating: false,
+        isLoading: true,
         error: null,
       }));
 
-      return response;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || error.message || 'Không thể tải danh sách đơn hàng';
+      try {
+        const response = await orderApi.getMyOrders(params);
+
+        setOrderState((prev) => ({
+          ...prev,
+          orders: response.content,
+          pagination: response.pagination,
+          isLoading: false,
+          error: null,
+        }));
+
+        return response;
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || 'Không thể tải danh sách đơn hàng';
+
+        setOrderState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+
+        throw error;
+      }
+    },
+    [],
+  );
+
+  const loadMoreOrders = useCallback(
+    async (params: GetOrdersParams = {}): Promise<void> => {
+      if (!orderState.pagination || orderState.isLoading) return;
+
+      const nextPage = orderState.pagination.page + 1;
+      if (nextPage >= orderState.pagination.totalPages) return;
 
       setOrderState((prev) => ({
         ...prev,
-        isCreating: false,
-        error: errorMessage,
+        isLoading: true,
+        error: null,
       }));
 
-      throw error;
-    }
-  }, []);
+      try {
+        const response = await orderApi.getMyOrders({
+          ...params,
+          page: nextPage,
+        });
+
+        setOrderState((prev) => ({
+          ...prev,
+          orders: [...prev.orders, ...response.content],
+          pagination: response.pagination,
+          isLoading: false,
+          error: null,
+        }));
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || 'Không thể tải thêm đơn hàng';
+
+        setOrderState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+      }
+    },
+    [orderState.pagination, orderState.isLoading],
+  );
 
   const resetOrderState = useCallback(() => {
     setOrderState({
       currentOrder: null,
+      orders: [],
+      pagination: null,
+      isLoading: false,
       isCreating: false,
       error: null,
       success: false,
@@ -135,12 +200,22 @@ export function useOrder() {
     }));
   }, []);
 
+  const clearCurrentOrder = useCallback(() => {
+    setOrderState((prev) => ({
+      ...prev,
+      currentOrder: null,
+      error: null,
+    }));
+  }, []);
+
   return {
     ...orderState,
     createOrder,
     getOrderById,
     getMyOrders,
+    loadMoreOrders,
     resetOrderState,
     clearError,
+    clearCurrentOrder,
   };
 }

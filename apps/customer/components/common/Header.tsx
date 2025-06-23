@@ -179,40 +179,42 @@ const Header: React.FC = () => {
             )}
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Only show when user is authenticated */}
           <div className="flex items-center space-x-2">
-            {/* Cart with Badge */}
-            <Link
-              href="/cart"
-              className="relative p-3 hover:bg-orange-50 rounded-xl transition-all duration-200 group"
-              title={`Giỏ hàng ${totalCartItems > 0 ? `(${totalCartItems} sản phẩm)` : ''}`}
-            >
-              <IconShoppingCart
-                size={24}
-                className={`transition-colors duration-200 ${
-                  totalCartItems > 0
-                    ? 'text-orange-600 group-hover:text-orange-700'
-                    : 'text-gray-600 group-hover:text-orange-600'
-                }`}
-              />
+            {/* Cart with Badge - Only show when authenticated */}
+            {auth && (
+              <Link
+                href="/cart"
+                className="relative p-3 hover:bg-orange-50 rounded-xl transition-all duration-200 group"
+                title={`Giỏ hàng ${totalCartItems > 0 ? `(${totalCartItems} sản phẩm)` : ''}`}
+              >
+                <IconShoppingCart
+                  size={24}
+                  className={`transition-colors duration-200 ${
+                    totalCartItems > 0
+                      ? 'text-orange-600 group-hover:text-orange-700'
+                      : 'text-gray-600 group-hover:text-orange-600'
+                  }`}
+                />
 
-              {/* Cart Badge */}
-              {totalCartItems > 0 && !cartLoading && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold shadow-lg transform scale-100 animate-pulse">
-                  {totalCartItems > 99 ? '99+' : totalCartItems}
-                </span>
-              )}
+                {/* Cart Badge */}
+                {totalCartItems > 0 && !cartLoading && (
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold shadow-lg transform scale-100 animate-pulse">
+                    {totalCartItems > 99 ? '99+' : totalCartItems}
+                  </span>
+                )}
 
-              {/* Loading indicator for cart */}
-              {cartLoading && (
-                <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                </span>
-              )}
-            </Link>
+                {/* Loading indicator for cart */}
+                {cartLoading && (
+                  <span className="absolute -top-1 -right-1 bg-gray-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  </span>
+                )}
+              </Link>
+            )}
 
-            {/* User Menu */}
-            {auth ? (
+            {/* User Menu - Only show when authenticated */}
+            {auth && (
               <div ref={dropdownRef} className="relative hidden lg:block">
                 <button
                   className="p-3 rounded-xl hover:bg-orange-50 focus:outline-none transition-colors duration-200 group"
@@ -243,7 +245,7 @@ const Header: React.FC = () => {
                         Hồ sơ cá nhân
                       </Link>
                       <Link
-                        href="/user/orders"
+                        href="/user/purchase"
                         className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors duration-150 text-gray-700"
                       >
                         <IconPackage size={18} className="text-orange-500" />
@@ -277,7 +279,10 @@ const Header: React.FC = () => {
                   </div>
                 )}
               </div>
-            ) : (
+            )}
+
+            {/* Sign in button for desktop - Only show when NOT authenticated */}
+            {!auth && (
               <Link
                 href="/login"
                 className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
@@ -287,7 +292,7 @@ const Header: React.FC = () => {
               </Link>
             )}
 
-            {/* Mobile User Icon */}
+            {/* Mobile User Icon - Only show when authenticated */}
             {auth && (
               <Link
                 href="/user"
@@ -334,22 +339,24 @@ const Header: React.FC = () => {
               />
             </div>
 
-            {/* Mobile Cart Link */}
-            <Link
-              href="/cart"
-              className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition-colors duration-200"
-              onClick={() => setMenuOpen(false)}
-            >
-              <div className="flex items-center gap-3 text-orange-700">
-                <IconShoppingCart size={20} />
-                <span className="font-medium">Giỏ hàng</span>
-              </div>
-              {totalCartItems > 0 && (
-                <span className="bg-orange-500 text-white text-sm rounded-full px-3 py-1 font-bold">
-                  {totalCartItems}
-                </span>
-              )}
-            </Link>
+            {/* Mobile Cart Link - Only show when authenticated */}
+            {auth && (
+              <Link
+                href="/cart"
+                className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition-colors duration-200"
+                onClick={() => setMenuOpen(false)}
+              >
+                <div className="flex items-center gap-3 text-orange-700">
+                  <IconShoppingCart size={20} />
+                  <span className="font-medium">Giỏ hàng</span>
+                </div>
+                {totalCartItems > 0 && (
+                  <span className="bg-orange-500 text-white text-sm rounded-full px-3 py-1 font-bold">
+                    {totalCartItems}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Mobile Navigation */}
             <div className="space-y-2">
@@ -382,7 +389,7 @@ const Header: React.FC = () => {
                     Hồ sơ cá nhân
                   </Link>
                   <Link
-                    href="/user/orders"
+                    href="/user/purchase"
                     className="flex items-center gap-3 p-3 hover:bg-orange-50 rounded-xl text-gray-700 transition-colors duration-200"
                     onClick={() => setMenuOpen(false)}
                   >
