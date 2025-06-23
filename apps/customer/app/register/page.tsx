@@ -1,6 +1,5 @@
 'use client';
 import { handlePhoneInput } from '@/components/input/InputHandle';
-import { useToast } from '@/hooks/use-toast';
 import { registerInternal } from '@/services/auth.api';
 import { fileApi } from '@/services/file.api';
 import { IconUpload, IconUser, IconX } from '@tabler/icons-react';
@@ -42,6 +41,9 @@ const registerSchema = Joi.object({
   address: Joi.string().optional().allow('').max(200).messages({
     'string.max': 'Địa chỉ không được vượt quá 200 ký tự',
   }),
+  gender: Joi.number().valid(0, 1, 2).optional().allow('').messages({
+    'any.only': 'Vui lòng chọn giới tính hợp lệ',
+  }),
   password: Joi.string().required().min(6).max(128).messages({
     'string.empty': 'Mật khẩu không được để trống',
     'string.min': 'Mật khẩu phải có ít nhất 6 ký tự',
@@ -62,39 +64,45 @@ export default function Register() {
     lastName: '',
     phone: '',
     address: '',
+    gender: '',
     avatarUrl: '',
     password: '',
     rePassword: '',
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
+  const [avatarError, setAvatarError] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { showToast } = useToast();
 
   const togglePasswordVisibility = (field: 'password' | 'confirmPassword') => {
     if (field === 'password') setShowPassword(!showPassword);
     else setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setAvatarError('');
     if (file) {
       if (!file.type.startsWith('image/')) {
-        showToast('Vui lòng chọn file hình ảnh hợp lệ.', 'error');
+        setAvatarError('Vui lòng chọn file hình ảnh hợp lệ.');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        showToast('Kích thước file không được vượt quá 5MB.', 'error');
+        setAvatarError('Kích thước file không được vượt quá 5MB.');
         return;
       }
 
@@ -112,6 +120,7 @@ export default function Register() {
     setAvatarFile(null);
     setAvatarPreview('');
     setFormData((prev) => ({ ...prev, avatarUrl: '' }));
+    setAvatarError('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -124,33 +133,47 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrors({});
+    setAvatarError('');
 
     try {
       if (!termsAccepted) {
-        showToast('Bạn phải đồng ý với Điều khoản và Chính sách.', 'error');
+        setErrors((prev) => ({
+          ...prev,
+          terms: 'Bạn phải đồng ý với Điều khoản và Chính sách.',
+        }));
+        setIsLoading(false);
         return;
       }
+
       const validation = registerSchema.validate(formData, { abortEarly: false });
       if (validation.error) {
-        const errorMessage = validation.error.details[0].message;
-        showToast(errorMessage, 'error');
+        const newErrors: Record<string, string> = {};
+        validation.error.details.forEach((error) => {
+          if (error.path[0]) {
+            newErrors[error.path[0].toString()] = error.message;
+          }
+        });
+        setErrors(newErrors);
+        setIsLoading(false);
         return;
       }
+
       let avatarUrl = formData.avatarUrl;
       if (avatarFile) {
         avatarUrl = await fileApi.fileUpload(avatarFile);
       }
       const submitData = {
         ...formData,
+        gender: formData.gender ? Number(formData.gender) : undefined,
         avatarUrl,
       };
 
       await registerInternal(submitData);
-      showToast('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...', 'success');
       setTimeout(() => router.push('/login'), 2000);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra. Vui lòng thử lại.';
-      showToast(errorMessage, 'error');
+      setErrors((prev) => ({ ...prev, general: errorMessage }));
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +182,6 @@ export default function Register() {
   return (
     <section className="flex justify-center min-h-screen bg-gradient-to-br from-orange-50 to-white">
       <div className="w-full max-w-7xl flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden my-8">
-        {/* Left Image */}
         <div className="relative w-full md:w-1/2 h-64 md:h-auto">
           <Image src="/image_register.jpg" alt="Market Scene" fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-transparent"></div>
@@ -169,17 +191,19 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Right Form */}
         <div className="flex justify-center w-full md:w-1/2 px-8 py-12">
           <div className="w-full max-w-xl">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-4">
                 Đăng ký tài khoản
               </h1>
-              <p className="text-gray-600">Bắt đầu hành trình &quot;săn đồ&quot; thông minh!</p>
+              <p className="text-gray-600">Bắt đầu hành trình "săn đồ" thông minh!</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {errors.general && (
+                <div className="text-red-500 text-sm text-center">{errors.general}</div>
+              )}
               {/* Avatar Upload Section */}
               <div className="flex flex-col items-center space-y-4">
                 <div className="relative">
@@ -231,6 +255,7 @@ export default function Register() {
                   <br />
                   Định dạng: JPG, PNG. Kích thước tối đa: 5MB
                 </p>
+                {avatarError && <div className="text-red-500 text-sm">{avatarError}</div>}
               </div>
 
               {/* Username + Email */}
@@ -243,9 +268,14 @@ export default function Register() {
                     value={formData.username}
                     onChange={handleInputChange}
                     placeholder="Nhập tên đăng nhập"
-                    className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors"
+                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                      errors.username ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                    }`}
                     required
                   />
+                  {errors.username && (
+                    <div className="text-red-500 text-sm">{errors.username}</div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Email *</label>
@@ -255,9 +285,12 @@ export default function Register() {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="Nhập email"
-                    className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors"
+                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                      errors.email ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                    }`}
                     required
                   />
+                  {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
                 </div>
               </div>
 
@@ -271,9 +304,16 @@ export default function Register() {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     placeholder="Nhập họ"
-                    className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors"
+                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                      errors.firstName
+                        ? 'border-red-500'
+                        : 'border-orange-200 focus:border-orange-400'
+                    }`}
                     required
                   />
+                  {errors.firstName && (
+                    <div className="text-red-500 text-sm">{errors.firstName}</div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Tên *</label>
@@ -283,13 +323,18 @@ export default function Register() {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     placeholder="Nhập tên"
-                    className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors"
+                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                      errors.lastName ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                    }`}
                     required
                   />
+                  {errors.lastName && (
+                    <div className="text-red-500 text-sm">{errors.lastName}</div>
+                  )}
                 </div>
               </div>
 
-              {/* Phone + Address */}
+              {/* Phone + Gender */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Số điện thoại *</label>
@@ -303,21 +348,46 @@ export default function Register() {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     maxLength={10}
-                    className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors"
+                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                      errors.phone ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                    }`}
                     required
                   />
+                  {errors.phone && <div className="text-red-500 text-sm">{errors.phone}</div>}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Địa chỉ</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
+                  <label className="text-sm font-medium text-gray-700">Giới tính</label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
                     onChange={handleInputChange}
-                    placeholder="Nhập địa chỉ (tùy chọn)"
-                    className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors"
-                  />
+                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                      errors.gender ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                    }`}
+                  >
+                    <option value="">Chọn giới tính</option>
+                    <option value="0">Nam</option>
+                    <option value="1">Nữ</option>
+                    <option value="2">Khác</option>
+                  </select>
+                  {errors.gender && <div className="text-red-500 text-sm">{errors.gender}</div>}
                 </div>
+              </div>
+
+              {/* Address */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Địa chỉ</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  placeholder="Nhập địa chỉ (tùy chọn)"
+                  className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                    errors.address ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
+                  }`}
+                />
+                {errors.address && <div className="text-red-500 text-sm">{errors.address}</div>}
               </div>
 
               {/* Password + Confirm Password */}
@@ -331,7 +401,11 @@ export default function Register() {
                       value={formData.password}
                       onChange={handleInputChange}
                       placeholder="Nhập mật khẩu"
-                      className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors pr-12"
+                      className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors pr-12 ${
+                        errors.password
+                          ? 'border-red-500'
+                          : 'border-orange-200 focus:border-orange-400'
+                      }`}
                       required
                     />
                     <button
@@ -346,6 +420,9 @@ export default function Register() {
                       )}
                     </button>
                   </div>
+                  {errors.password && (
+                    <div className="text-red-500 text-sm">{errors.password}</div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -357,7 +434,11 @@ export default function Register() {
                       value={formData.rePassword}
                       onChange={handleInputChange}
                       placeholder="Nhập lại mật khẩu"
-                      className="w-full p-3 border-2 border-orange-200 rounded-lg bg-white text-black focus:border-orange-400 focus:outline-none transition-colors pr-12"
+                      className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors pr-12 ${
+                        errors.rePassword
+                          ? 'border-red-500'
+                          : 'border-orange-200 focus:border-orange-400'
+                      }`}
                       required
                     />
                     <button
@@ -372,10 +453,12 @@ export default function Register() {
                       )}
                     </button>
                   </div>
+                  {errors.rePassword && (
+                    <div className="text-red-500 text-sm">{errors.rePassword}</div>
+                  )}
                 </div>
               </div>
 
-              {/* Terms */}
               <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
                 <input
                   type="checkbox"
@@ -402,6 +485,7 @@ export default function Register() {
                   của ReTrade.
                 </label>
               </div>
+              {errors.terms && <div className="text-red-500 text-sm">{errors.terms}</div>}
 
               <button
                 type="submit"
