@@ -17,26 +17,109 @@ export interface OrderDestination {
 }
 
 export interface OrderItem {
+  itemId: string;
+  itemName: string;
+  itemThumbnail: string;
   productId: string;
-  productName: string;
-  productThumbnail: string;
-  sellerName: string;
-  sellerId: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  shortDescription: string;
+  basePrice: number;
+  discount: number;
 }
 
 export interface OrderCombo {
   comboId: string;
   sellerId: string;
   sellerName: string;
+  sellerAvatarUrl?: string;
+  orderStatusId: string;
+  orderStatus: string;
   grandPrice: number;
-  status: string;
-  itemIds: string[];
+  items: OrderItem[];
+  destination: OrderDestination;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
+// Response for order detail endpoint
+export interface OrderDetailResponse {
+  content: OrderCombo;
+  messages: string[];
+  code: string;
+  success: boolean;
+  pagination: null;
+}
+
+export interface PaginationInfo {
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+}
+
+export interface OrdersResponse {
+  content: OrderCombo[];
+  messages: string[];
+  code: string;
+  success: boolean;
+  pagination: PaginationInfo;
+}
+
+export interface GetOrdersParams {
+  page?: number;
+  size?: number;
+  status?: string;
+}
+
+export const orderApi = {
+  async createOrder(payload: CreateOrderRequest): Promise<OrderResponse> {
+    try {
+      const response = await authApi.default.post<IResponseObject<OrderResponse>>(
+        '/orders',
+        payload,
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to create order');
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getOrderById(orderId: string): Promise<OrderCombo> {
+    try {
+      const response = await authApi.default.get<OrderDetailResponse>(
+        `/orders/customer/combo/${orderId}`,
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to fetch order');
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getMyOrders(params: GetOrdersParams = {}): Promise<OrdersResponse> {
+    try {
+      const { page = 0, size = 10, status } = params;
+      let url = `/orders/customer/combo?page=${page}&size=${size}`;
+
+      if (status) {
+        url += `&status=${status}`;
+      }
+
+      const response = await authApi.default.get<OrdersResponse>(url);
+      if (response.data.success) {
+        return response.data;
+      }
+      throw new Error('Failed to fetch orders');
+    } catch (error) {
+      throw error;
+    }
+  },
+};
+
+// Legacy interface for backward compatibility
 export interface VoucherApplication {
   voucherId: string;
   voucherCode: string;
@@ -75,46 +158,3 @@ export interface OrderResponse {
   createdAt: string;
   updatedAt: string;
 }
-
-export const orderApi = {
-  async createOrder(payload: CreateOrderRequest): Promise<OrderResponse> {
-    try {
-      const response = await authApi.default.post<IResponseObject<OrderResponse>>(
-        '/orders',
-        payload,
-      );
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Failed to create order');
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  async getOrderById(orderId: string): Promise<OrderResponse> {
-    try {
-      const response = await authApi.default.get<IResponseObject<OrderResponse>>(
-        `/orders/${orderId}`,
-      );
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Failed to fetch order');
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  async getMyOrders(): Promise<OrderResponse[]> {
-    try {
-      const response = await authApi.default.get<IResponseObject<OrderResponse[]>>('/orders');
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Failed to fetch orders');
-    } catch (error) {
-      throw error;
-    }
-  },
-};

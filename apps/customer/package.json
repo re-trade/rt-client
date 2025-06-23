@@ -11,6 +11,7 @@
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@heroicons/react": "^2.2.0",
+    "@tabler/icons-react": "^3.34.0",
     "axios": "^1.9.0",
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",

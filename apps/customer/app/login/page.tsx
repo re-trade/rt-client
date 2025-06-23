@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { loginInternal } from '@/services/auth.api';
 import Joi from 'joi';
@@ -31,6 +32,7 @@ export default function Login() {
   const [formHeight, setFormHeight] = useState<number | null>(null);
   const router = useRouter();
   const { showToast } = useToast();
+  const { isAuth } = useAuth();
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
@@ -59,11 +61,18 @@ export default function Login() {
         return;
       }
 
+      // Perform login
       await loginInternal(formData);
+
+      // Refresh auth state instead of reloading
+      await isAuth();
 
       showToast('Đăng nhập thành công!', 'success');
 
-      router.push('/');
+      // Add a small delay for UX, then redirect
+      setTimeout(() => {
+        router.push('/');
+      }, 500);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Đăng nhập thất bại. Vui lòng thử lại.';
       showToast(`${message}`, 'error');
