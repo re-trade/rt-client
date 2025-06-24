@@ -10,7 +10,7 @@ export type TProduct = {
   thumbnail: string;
   productImages: string[];
   brand: string;
-  discount: string;
+  discount: number;
   model: string;
   currentPrice: number;
   categories: string[];
@@ -19,6 +19,22 @@ export type TProduct = {
   verified: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+export type CreateProductDto = {
+  name: string;
+  shortDescription: string;
+  description: string;
+  thumbnail: string;
+  productImages: string[];
+  brand: string;
+  discount: number;
+  model: string;
+  currentPrice: number;
+  categoryIds: string[];
+  keywords: string[];
+  tags: string[];
+  status: 'DRAFT' | 'ACTIVE' | 'INACTIVE';
 };
 
 export const productApi = {

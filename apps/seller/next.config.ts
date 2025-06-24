@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'retrade.hcm.ss.bfcplatform.vn',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

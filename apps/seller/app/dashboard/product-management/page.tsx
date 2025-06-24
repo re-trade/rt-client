@@ -12,62 +12,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { productApi, TProduct } from '@/service/product.api';
-import { Edit } from 'lucide-react';
+import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
+import { Edit, Trash } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  category: string;
-  description: string;
-  image: string;
-  status: 'active' | 'inactive';
-}
-
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Áo thun nam',
-    price: 299000,
-    stock: 50,
-    category: 'Thời trang',
-    description: 'Áo thun nam chất liệu cotton cao cấp',
-    image: '/placeholder.svg?height=100&width=100',
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Quần jeans nữ',
-    price: 599000,
-    stock: 30,
-    category: 'Thời trang',
-    description: 'Quần jeans nữ form slim fit',
-    image: '/placeholder.svg?height=100&width=100',
-    status: 'active',
-  },
-];
+// ✅ Đảm bảo file tồn tại
 
 export default function ProductManagement() {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-
   const [productList, setProductList] = useState<TProduct[]>([]);
 
-  const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
-    const newProduct: Product = {
-      id: Date.now().toString(),
-      ...productData,
-    };
-    setProducts([...products, newProduct]);
-  };
-  const id: string = '1'; // Replace with actual product ID from route params or context
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -79,23 +35,44 @@ export default function ProductManagement() {
     };
     fetchProduct();
   }, []);
-  useEffect(() => {
-    console.log('Product list:', productList);
-  });
 
-  const handleUpdateProduct = (productData: Omit<Product, 'id'>) => {
+  const handleCreateProduct = (productData: CreateProductDto) => {
+    const newProduct: TProduct = {
+      ...productData,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      sellerId: 'mock-seller-id', // hoặc lấy từ context/token
+      sellerShopName: 'Gian hàng mẫu',
+      verified: false,
+      categories: [], // bạn có thể map từ categoryIds sang categories tên nếu cần
+    };
+    setProductList([...productList, newProduct]);
+  };
+
+  const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
     if (!selectedProduct) return;
 
-    const updatedProducts = products.map((product) =>
-      product.id === selectedProduct.id ? { ...product, ...productData } : product,
+    const updatedProducts = productList.map((product) =>
+      product.id === selectedProduct.id
+        ? {
+            ...product,
+            ...updatedData,
+            updatedAt: new Date().toISOString(),
+          }
+        : product,
     );
-    setProducts(updatedProducts);
+    setProductList(updatedProducts);
     setSelectedProduct(null);
   };
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = (product: TProduct) => {
     setSelectedProduct(product);
     setIsEditOpen(true);
+  };
+  const handleDeletetProduct = (product: TProduct) => {
+    const updatedProducts = productList.filter((p) => p.id !== product.id);
+    setProductList(updatedProducts);
   };
 
   return (
@@ -105,6 +82,7 @@ export default function ProductManagement() {
           <h2 className="text-xl font-semibold">Danh sách sản phẩm</h2>
           <p className="text-muted-foreground">Quản lý tất cả sản phẩm của bạn</p>
         </div>
+        <Button onClick={() => setIsCreateOpen(true)}>Tạo sản phẩm mới</Button>
         <CreateProductDialog
           open={isCreateOpen}
           onOpenChange={setIsCreateOpen}
@@ -126,42 +104,46 @@ export default function ProductManagement() {
                 <TableHead>Hình ảnh</TableHead>
                 <TableHead>Tên sản phẩm</TableHead>
                 <TableHead>Giá</TableHead>
-                <TableHead>Tồn kho</TableHead>
                 <TableHead>Danh mục</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead>Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
+              {productList.map((product) => (
                 <TableRow key={product.id} className="cursor-pointer hover:bg-muted/50">
                   <TableCell>
                     <Image
-                      src={product.image || '/placeholder.svg'}
+                      src={product.thumbnail || '/placeholder.svg'}
                       alt={product.name}
-                      width={50}
-                      height={50}
+                      width={70}
+                      height={70}
                       className="rounded-md object-cover"
                     />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.price.toLocaleString('vi-VN')}đ</TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                  <TableCell>{product.category}</TableCell>
+                  <TableCell>{product.currentPrice.toLocaleString('vi-VN')}đ</TableCell>
+                  <TableCell>{product.categories.join(', ')}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        product.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
+                        product.verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {product.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
+                      {product.verified ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                   </TableCell>
-                  <TableCell>
+
+                  <TableCell className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
                       <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeletetProduct(product)}
+                    >
+                      <Trash className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
