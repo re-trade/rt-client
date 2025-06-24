@@ -32,8 +32,6 @@ export default function ShopInfoStep({
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('Kích thước file không được vượt quá 5MB');
         return;
@@ -43,36 +41,23 @@ export default function ShopInfoStep({
       setAvatarProgress(0);
 
       try {
-        // Create a preview URL for immediate display
         const previewUrl = URL.createObjectURL(file);
-
-        // Save the file object and preview URL for display
         updateField('avatarUrl', file);
-
-        // Start uploading animation
         const uploadProgress = (percent: number) => {
           setAvatarProgress(percent);
         };
-
-        // Upload to server
         uploadProgress(10);
         const uploadInterval = setInterval(() => {
           setAvatarProgress((prev) => Math.min(prev + 5, 90));
         }, 300);
-
-        // Call the API to upload the file
         const fileUrl = await storageApi.fileUpload(file);
         clearInterval(uploadInterval);
 
         if (fileUrl) {
-          // If upload successful, save the URL
           updateField('avatarUrl', fileUrl);
           setAvatarProgress(100);
-
-          // Complete animation
           setTimeout(() => {
             setAvatarLoading(false);
-            // Release the preview URL to free memory
             URL.revokeObjectURL(previewUrl);
           }, 500);
         } else {
@@ -89,8 +74,6 @@ export default function ShopInfoStep({
   const handleBackgroundChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('Kích thước file không được vượt quá 5MB');
         return;
@@ -100,7 +83,6 @@ export default function ShopInfoStep({
       setBackgroundProgress(0);
 
       try {
-        // Create a preview URL for immediate display
         const previewUrl = URL.createObjectURL(file);
 
         // Save the file object for preview

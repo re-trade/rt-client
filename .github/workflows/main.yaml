@@ -73,6 +73,7 @@ jobs:
     env:
       REGISTRY: ghcr.io/${{ github.repository }}
       TAG: nightly
+      DOMAIN: ${{ secrets.DEV_HOST_DOMAIN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
