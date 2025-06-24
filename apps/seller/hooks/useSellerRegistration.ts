@@ -473,7 +473,6 @@ export function useSellerRegistration() {
         phoneNumber: formData.phoneNumber,
         identityNumber: formData.identityNumber,
       };
-      console.log(requestBody);
       const result = await sellerApi.registerSeller(requestBody);
       if (!result) {
         alert('Đăng ký không thành công!');
