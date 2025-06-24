@@ -22,7 +22,7 @@ export default function ShopInfoStep({
   handleChange,
   handleFieldBlur,
   errors,
-  updateField = () => {},
+  updateField = () => { },
 }: ShopInfoStepProps) {
   const [avatarLoading, setAvatarLoading] = useState(false);
   const [avatarProgress, setAvatarProgress] = useState(0);
@@ -32,8 +32,6 @@ export default function ShopInfoStep({
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('Kích thước file không được vượt quá 5MB');
         return;
@@ -43,36 +41,23 @@ export default function ShopInfoStep({
       setAvatarProgress(0);
 
       try {
-        // Create a preview URL for immediate display
         const previewUrl = URL.createObjectURL(file);
-
-        // Save the file object and preview URL for display
         updateField('avatarUrl', file);
-
-        // Start uploading animation
         const uploadProgress = (percent: number) => {
           setAvatarProgress(percent);
         };
-
-        // Upload to server
         uploadProgress(10);
         const uploadInterval = setInterval(() => {
           setAvatarProgress((prev) => Math.min(prev + 5, 90));
         }, 300);
-
-        // Call the API to upload the file
         const fileUrl = await storageApi.fileUpload(file);
         clearInterval(uploadInterval);
 
         if (fileUrl) {
-          // If upload successful, save the URL
           updateField('avatarUrl', fileUrl);
           setAvatarProgress(100);
-
-          // Complete animation
           setTimeout(() => {
             setAvatarLoading(false);
-            // Release the preview URL to free memory
             URL.revokeObjectURL(previewUrl);
           }, 500);
         } else {
@@ -89,8 +74,6 @@ export default function ShopInfoStep({
   const handleBackgroundChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('Kích thước file không được vượt quá 5MB');
         return;
@@ -100,7 +83,6 @@ export default function ShopInfoStep({
       setBackgroundProgress(0);
 
       try {
-        // Create a preview URL for immediate display
         const previewUrl = URL.createObjectURL(file);
 
         // Save the file object for preview
@@ -163,11 +145,10 @@ export default function ShopInfoStep({
                 onClick={() => document.getElementById('avatar-upload')?.click()}
               >
                 <div
-                  className={`w-32 h-32 rounded-full border-4 border-dashed transition-all duration-300 flex items-center justify-center overflow-hidden ${
-                    formData.avatarUrl
-                      ? 'border-amber-500 bg-white shadow-lg'
-                      : 'border-amber-300 hover:border-amber-400 bg-white hover:bg-amber-25'
-                  }`}
+                  className={`w-32 h-32 rounded-full border-4 border-dashed transition-all duration-300 flex items-center justify-center overflow-hidden ${formData.avatarUrl
+                    ? 'border-amber-500 bg-white shadow-lg'
+                    : 'border-amber-300 hover:border-amber-400 bg-white hover:bg-amber-25'
+                    }`}
                 >
                   {avatarLoading ? (
                     <div className="flex flex-col items-center justify-center w-full h-full">
@@ -241,11 +222,10 @@ export default function ShopInfoStep({
                 variant="outline"
                 size="sm"
                 type="button"
-                className={`mt-4 px-6 ${
-                  avatarLoading
-                    ? 'bg-amber-50 text-amber-700 border-amber-300 opacity-70 cursor-wait'
-                    : 'border-amber-300 text-amber-700 hover:bg-amber-50'
-                }`}
+                className={`mt-4 px-6 ${avatarLoading
+                  ? 'bg-amber-50 text-amber-700 border-amber-300 opacity-70 cursor-wait'
+                  : 'border-amber-300 text-amber-700 hover:bg-amber-50'
+                  }`}
                 onClick={() => document.getElementById('avatar-upload')?.click()}
                 disabled={avatarLoading}
               >
@@ -271,11 +251,10 @@ export default function ShopInfoStep({
                 onClick={() => document.getElementById('background-upload')?.click()}
               >
                 <div
-                  className={`w-full h-40 rounded-xl border-4 border-dashed transition-all duration-300 flex items-center justify-center overflow-hidden ${
-                    formData.background
-                      ? 'border-amber-500 bg-white shadow-lg'
-                      : 'border-amber-300 hover:border-amber-400 bg-white hover:bg-amber-25'
-                  }`}
+                  className={`w-full h-40 rounded-xl border-4 border-dashed transition-all duration-300 flex items-center justify-center overflow-hidden ${formData.background
+                    ? 'border-amber-500 bg-white shadow-lg'
+                    : 'border-amber-300 hover:border-amber-400 bg-white hover:bg-amber-25'
+                    }`}
                 >
                   {backgroundLoading ? (
                     <div className="flex flex-col items-center justify-center w-full h-full p-4">
@@ -349,11 +328,10 @@ export default function ShopInfoStep({
                 variant="outline"
                 size="sm"
                 type="button"
-                className={`mt-4 px-6 ${
-                  backgroundLoading
-                    ? 'bg-amber-50 text-amber-700 border-amber-300 opacity-70 cursor-wait'
-                    : 'border-amber-300 text-amber-700 hover:bg-amber-50'
-                }`}
+                className={`mt-4 px-6 ${backgroundLoading
+                  ? 'bg-amber-50 text-amber-700 border-amber-300 opacity-70 cursor-wait'
+                  : 'border-amber-300 text-amber-700 hover:bg-amber-50'
+                  }`}
                 onClick={() => document.getElementById('background-upload')?.click()}
                 disabled={backgroundLoading}
               >
@@ -399,11 +377,10 @@ export default function ShopInfoStep({
                 onChange={handleChange}
                 onBlur={() => handleFieldBlur('shopName')}
                 placeholder="Bạn muốn chúng tôi gọi bạn là gì?"
-                className={`h-12 text-base border-2 transition-all duration-200 ${
-                  errors.shopName
-                    ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-                    : 'border-amber-200 focus:border-amber-400 focus:ring-amber-100'
-                }`}
+                className={`h-12 text-base border-2 transition-all duration-200 ${errors.shopName
+                  ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
+                  : 'border-amber-200 focus:border-amber-400 focus:ring-amber-100'
+                  }`}
                 required
               />
               {errors.shopName && (
@@ -467,11 +444,10 @@ export default function ShopInfoStep({
                   onChange={handleChange}
                   onBlur={() => handleFieldBlur('email')}
                   placeholder="example@gmail.com"
-                  className={`h-12 text-base border-2 transition-all duration-200 ${
-                    errors.email
-                      ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-                      : 'border-amber-200 focus:border-amber-400 focus:ring-amber-100'
-                  }`}
+                  className={`h-12 text-base border-2 transition-all duration-200 ${errors.email
+                    ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
+                    : 'border-amber-200 focus:border-amber-400 focus:ring-amber-100'
+                    }`}
                   required
                 />
                 {errors.email && (
@@ -506,11 +482,10 @@ export default function ShopInfoStep({
                   onChange={handleChange}
                   onBlur={() => handleFieldBlur('phoneNumber')}
                   placeholder="0123 456 789"
-                  className={`h-12 text-base border-2 transition-all duration-200 ${
-                    errors.phoneNumber
-                      ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-                      : 'border-amber-200 focus:border-amber-400 focus:ring-amber-100'
-                  }`}
+                  className={`h-12 text-base border-2 transition-all duration-200 ${errors.phoneNumber
+                    ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
+                    : 'border-amber-200 focus:border-amber-400 focus:ring-amber-100'
+                    }`}
                   required
                 />
                 {errors.phoneNumber && (
