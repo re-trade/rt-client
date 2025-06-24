@@ -32,6 +32,16 @@ export const productApi = {
     });
     return response.data.success ? response.data.content : [];
   },
+  async searchProducts(page: number = 0, size: number = 10, query?: string): Promise<TProduct[]> {
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products/search', {
+      params: {
+        page,
+        size,
+        ...(query ? { q: query } : {}),
+      },
+    });
+    return response.data.success ? response.data.content : [];
+  },
   async getProduct(id: string): Promise<TProduct> {
     try {
       const response = await unAuthApi.default.get<IResponseObject<TProduct>>(`/products/${id}`);

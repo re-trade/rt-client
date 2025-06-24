@@ -31,8 +31,6 @@ export default function login() {
           className="w-full h-full object-cover rounded"
         />
       </div>
-
-      {/* Login Form Section - on the right for md+ */}
       <div className="flex items-center justify-center bg-white p-4 md:p-10 order-1 md:order-2">
         <div className="w-full max-w-md">
           <h1 className="text-2xl md:text-3xl font-bold mb-2 text-black text-center">

@@ -155,23 +155,23 @@ export default function VouchersPage() {
   const expiredCount = vouchers.filter((v) => v.status === 'expired').length;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-[#FDFEF9] p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-xl">
+                <div className="p-3 bg-white/20 rounded-lg">
                   <Gift className="w-6 h-6" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Kho Voucher</h1>
-                  <p className="text-orange-100 mt-1">Khám phá và sử dụng các ưu đãi hấp dẫn</p>
+                  <p className="text-[#121212] mt-1">Khám phá và sử dụng các ưu đãi hấp dẫn</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-orange-100">Tổng số voucher</p>
+                <p className="text-sm text-[#121212]">Tổng số voucher</p>
                 <p className="text-2xl font-bold">{vouchers.length}</p>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function VouchersPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-green-100 rounded-xl">
                 <CheckCircle className="w-6 h-6 text-green-600" />
@@ -192,7 +192,7 @@ export default function VouchersPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-blue-100 rounded-xl">
                 <CheckCircle className="w-6 h-6 text-blue-600" />
@@ -204,7 +204,7 @@ export default function VouchersPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-red-100 rounded-xl">
                 <XCircle className="w-6 h-6 text-red-600" />
@@ -216,7 +216,7 @@ export default function VouchersPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl shadow-lg p-6 border border-amber-200">
+          <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl shadow-md p-6 border border-amber-200">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-amber-500 rounded-xl">
                 <Star className="w-6 h-6 text-white" />
@@ -232,14 +232,14 @@ export default function VouchersPage() {
         </div>
 
         {/* Categories */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+        <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Danh mục voucher</h2>
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => setSelectedCategory('all')}
               className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all ${
                 selectedCategory === 'all'
-                  ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                  ? 'bg-[#FFD2B2] text-[#121212] border border-[#525252]/20'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -252,7 +252,7 @@ export default function VouchersPage() {
                 onClick={() => setSelectedCategory(category.name)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all ${
                   selectedCategory === category.name
-                    ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                    ? 'bg-[#FFD2B2] text-[#121212] border border-[#525252]/20'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -264,7 +264,7 @@ export default function VouchersPage() {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+        <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex flex-col md:flex-row gap-4 flex-1">
               {/* Search */}
@@ -275,7 +275,7 @@ export default function VouchersPage() {
                   placeholder="Tìm kiếm voucher..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export default function VouchersPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-10 pr-8 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all bg-white"
+                  className="pl-10 pr-8 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all bg-white"
                 >
                   <option value="all">Tất cả trạng thái</option>
                   <option value="available">Có thể dùng</option>
@@ -300,7 +300,7 @@ export default function VouchersPage() {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'grid' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-600'
+                  viewMode === 'grid' ? 'bg-white shadow-sm text-[#121212]' : 'text-gray-600'
                 }`}
               >
                 <Grid3X3 className="w-5 h-5" />
@@ -308,7 +308,7 @@ export default function VouchersPage() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'list' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-600'
+                  viewMode === 'list' ? 'bg-white shadow-sm text-[#121212]' : 'text-gray-600'
                 }`}
               >
                 <List className="w-5 h-5" />
@@ -318,7 +318,7 @@ export default function VouchersPage() {
         </div>
 
         {/* Vouchers Grid/List */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-amber-100">
+        <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
           {currentVouchers.length === 0 ? (
             <div className="text-center py-16">
               <div className="mx-auto w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6">
@@ -339,7 +339,7 @@ export default function VouchersPage() {
                 {currentVouchers.map((voucher) => (
                   <div
                     key={voucher.id}
-                    className={`relative group border border-gray-200 rounded-2xl overflow-hidden hover:border-amber-300 hover:shadow-lg transition-all duration-300 ${
+                    className={`relative group border border-gray-200 rounded-2xl overflow-hidden hover:border-[#FFD2B2] hover:shadow-lg transition-all duration-300 ${
                       viewMode === 'list' ? 'flex items-center p-4' : 'p-6'
                     }`}
                   >
@@ -406,7 +406,7 @@ export default function VouchersPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-sm text-gray-600">Mã:</span>
                               <div className="flex items-center space-x-2">
-                                <code className="font-mono font-bold text-amber-600">
+                                <code className="font-mono font-bold text-[#121212]">
                                   {voucher.code}
                                 </code>
                                 <button
@@ -424,7 +424,7 @@ export default function VouchersPage() {
                             disabled={voucher.status !== 'available'}
                             className={`w-full py-3 rounded-xl font-medium transition-all ${
                               voucher.status === 'available'
-                                ? 'bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-lg hover:shadow-xl'
+                                ? 'bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] shadow-md hover:shadow-lg'
                                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                             }`}
                           >
@@ -461,7 +461,7 @@ export default function VouchersPage() {
                               <span>•</span>
                               <span>
                                 Mã:{' '}
-                                <code className="font-mono font-bold text-amber-600">
+                                <code className="font-mono font-bold text-[#121212]">
                                   {voucher.code}
                                 </code>
                               </span>
@@ -479,7 +479,7 @@ export default function VouchersPage() {
                               disabled={voucher.status !== 'available'}
                               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                                 voucher.status === 'available'
-                                  ? 'bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white'
+                                  ? 'bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212]'
                                   : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                               }`}
                             >
@@ -525,7 +525,7 @@ export default function VouchersPage() {
                         onClick={() => setCurrentPage(page)}
                         className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                           currentPage === page
-                            ? 'bg-amber-500 text-white'
+                            ? 'bg-[#FFD2B2] text-[#121212]'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -548,7 +548,7 @@ export default function VouchersPage() {
         </div>
 
         {/* Tips */}
-        <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-2xl shadow-lg p-6 border border-amber-200">
+        <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl shadow-md p-6 border border-amber-200">
           <div className="flex items-start space-x-4">
             <div className="p-3 bg-amber-500 rounded-xl">
               <Zap className="w-6 h-6 text-white" />

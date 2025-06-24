@@ -16,13 +16,27 @@ type TAccountMeResponse = {
   id: string;
   username: string;
   email: string;
+  phone: string;
   enabled: boolean;
   locked: boolean;
   using2FA: boolean;
   joinInDate: string;
+  changedUsername: boolean;
+  lastLogin?: string;
   roles: string[];
 };
 
+type TRegister = {
+  username: string;
+  password: string;
+  rePassword: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  avatarUrl: string;
+};
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
   const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
@@ -30,18 +44,23 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
     { ...loginForm },
     {
       headers: {
-        'x-device-fingerprint': deviceInfo.deviceFingerprint,
-        'x-device-name': deviceInfo.deviceName,
-        'x-ip-address': deviceInfo.ipAddress,
-        'x-location': deviceInfo.location,
+        'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
+        'x-device-name': encodeURIComponent(deviceInfo.deviceName),
+        'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
+        'x-location': encodeURIComponent(deviceInfo.location),
       },
     },
   );
-  console.log('Login result:', result);
   if (result.data.success && result.status === 200) {
     const { ACCESS_TOKEN } = result.data.content.tokens;
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
   }
+};
+
+const registerInternal = async (registerForm: TRegister): Promise<void> => {
+  await unAuthApi.default.post<IResponseObject<TTokenResponse>>('/registers/customers/account', {
+    ...registerForm,
+  });
 };
 
 const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
@@ -57,4 +76,41 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
-export { accountMe, loginInternal };
+const checkUsernameAvailability = async (username: string): Promise<boolean> => {
+  try {
+    const result = await authApi.default.get<IResponseObject<{ existed: boolean }>>(
+      `/accounts/check-username?username=${username}`,
+    );
+    if (result.data.success && result.status === 200) {
+      const { content } = result.data;
+      return !content.existed;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+};
+
+export type { TAccountMeResponse };
+
+const register2FAInternal = async (width: number = 300, height: number = 300): Promise<Blob> => {
+  const response = await authApi.default.post<Blob>(
+    `/auth/register/2fa?width=${width}&height=${height}`,
+    null,
+    {
+      responseType: 'blob',
+      headers: {
+        Accept: 'image/png',
+      },
+    },
+  );
+
+  return response.data;
+};
+export {
+  accountMe,
+  checkUsernameAvailability,
+  loginInternal,
+  register2FAInternal,
+  registerInternal,
+};

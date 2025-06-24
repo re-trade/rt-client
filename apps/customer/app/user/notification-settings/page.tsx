@@ -135,7 +135,6 @@ export default function NotificationSettingsPage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsSaving(false);
     setSavedMessage(true);
@@ -145,25 +144,24 @@ export default function NotificationSettingsPage() {
   const enabledCount = settings.filter((s) => s.enabled).length;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-[#FDFEF9] p-6">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-xl">
+                <div className="p-3 bg-white/20 rounded-lg">
                   <Bell className="w-6 h-6" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Cài đặt thông báo</h1>
-                  <p className="text-orange-100 mt-1">
+                  <p className="text-[#121212] mt-1">
                     Quản lý cách bạn nhận thông báo từ chúng tôi
                   </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-orange-100">Đã bật</p>
+                <p className="text-sm text-[#121212]">Đã bật</p>
                 <p className="text-2xl font-bold">
                   {enabledCount}/{settings.length}
                 </p>
@@ -172,9 +170,8 @@ export default function NotificationSettingsPage() {
           </div>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-amber-100 rounded-xl">
                 <Mail className="w-6 h-6 text-amber-600" />
@@ -188,7 +185,7 @@ export default function NotificationSettingsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-blue-100 rounded-xl">
                 <Smartphone className="w-6 h-6 text-blue-600" />
@@ -202,7 +199,7 @@ export default function NotificationSettingsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-green-100 rounded-xl">
                 <MessageCircle className="w-6 h-6 text-green-600" />
@@ -217,7 +214,6 @@ export default function NotificationSettingsPage() {
           </div>
         </div>
 
-        {/* Settings Groups */}
         <div className="space-y-6">
           {Object.entries(categories).map(([categoryKey, categoryInfo]) => {
             const categorySettings = settings.filter((s) => s.category === categoryKey);
@@ -225,7 +221,7 @@ export default function NotificationSettingsPage() {
             return (
               <div
                 key={categoryKey}
-                className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden"
+                className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden"
               >
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center space-x-3">
@@ -246,13 +242,12 @@ export default function NotificationSettingsPage() {
                   {categorySettings.map((setting) => (
                     <div
                       key={setting.id}
-                      className="border border-gray-200 rounded-xl p-4 hover:border-amber-300 transition-all duration-200"
+                      className="border border-gray-200 rounded-xl p-4 hover:border-[#FFD2B2] transition-all duration-200"
                     >
-                      {/* Setting Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
                           <div
-                            className={`p-2 rounded-lg ${setting.enabled ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'}`}
+                            className={`p-2 rounded-lg ${setting.enabled ? 'bg-[#FFD2B2] text-[#121212]' : 'bg-gray-100 text-gray-400'}`}
                           >
                             {setting.icon}
                           </div>
@@ -263,8 +258,8 @@ export default function NotificationSettingsPage() {
                         </div>
                         <button
                           onClick={() => toggleSetting(setting.id)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
-                            setting.enabled ? 'bg-amber-500' : 'bg-gray-200'
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:ring-offset-2 ${
+                            setting.enabled ? 'bg-[#FFD2B2]' : 'bg-gray-200'
                           }`}
                         >
                           <span
@@ -357,11 +352,11 @@ export default function NotificationSettingsPage() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white px-8 py-3 rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center space-x-2"
+            className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-8 py-3 rounded-xl transition-all duration-200 font-medium shadow-md hover:shadow-lg disabled:opacity-50 flex items-center space-x-2"
           >
             {isSaving ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#121212] border-t-transparent"></div>
                 <span>Đang lưu...</span>
               </>
             ) : (

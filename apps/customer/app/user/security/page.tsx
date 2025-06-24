@@ -1,14 +1,25 @@
 'use client';
 
+import ChangeEmailForm from '@/components/auth/ChangeEmailForm';
+import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
+import ChangePhoneForm from '@/components/auth/ChangePhoneForm';
+import ChangeUsernameForm from '@/components/auth/ChangeUsernameForm';
+import TwoFactorSetup from '@/components/auth/TwoFactorSetup';
+import SecurityModal from '@/components/common/SecurityModal';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  changeEmailInternal,
+  changePasswordInternal,
+  changePhoneInternal,
+  changeUsernameInternal,
+} from '@/services/security.api';
+
+import { checkUsernameAvailability } from '@services/auth.api';
 import {
   AlertTriangle,
   Calendar,
   Check,
-  Chrome,
   Clock,
-  Eye,
-  EyeOff,
-  Facebook,
   Key,
   Lock,
   Mail,
@@ -18,15 +29,16 @@ import {
   Settings,
   Shield,
   Smartphone,
+  User,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SecurityAction {
   id: string;
   title: string;
   description: string;
-  status: 'active' | 'inactive' | 'pending';
+  status: 'active' | 'inactive' | 'pending' | 'dynamic';
   lastUpdated?: string;
   action: string;
   icon: React.ReactNode;
@@ -68,29 +80,19 @@ const securityActions: SecurityAction[] = [
     id: '2fa',
     title: 'Xác thực hai yếu tố (2FA)',
     description: 'Bật xác thực hai yếu tố để bảo vệ tài khoản của bạn.',
-    status: 'inactive',
+    status: 'dynamic',
     action: 'Kích hoạt',
     icon: <Smartphone className="w-5 h-5" />,
     category: 'auth',
   },
   {
-    id: 'facebook',
-    title: 'Liên kết Facebook',
-    description: 'Liên kết tài khoản Facebook để đăng nhập nhanh hơn.',
-    status: 'active',
-    lastUpdated: '3 tháng trước',
-    action: 'Quản lý',
-    icon: <Facebook className="w-5 h-5" />,
-    category: 'social',
-  },
-  {
-    id: 'google',
-    title: 'Liên kết Google',
-    description: 'Liên kết tài khoản Google để đăng nhập nhanh hơn.',
-    status: 'inactive',
-    action: 'Liên kết',
-    icon: <Chrome className="w-5 h-5" />,
-    category: 'social',
+    id: 'username',
+    title: 'Đổi tên đăng nhập',
+    description: 'Đổi tên đăng nhập 1 lần duy nhất, đảm bảo an toàn cho tài khoản của bạn.',
+    status: 'dynamic',
+    action: 'Cập nhập',
+    icon: <User className="w-5 h-5" />,
+    category: 'account',
   },
 ];
 
@@ -135,73 +137,237 @@ const categories = {
     color: 'bg-blue-100 text-blue-700',
     icon: <Settings className="w-4 h-4" />,
   },
-  social: {
-    name: 'Liên kết',
-    color: 'bg-green-100 text-green-700',
-    icon: <Chrome className="w-4 h-4" />,
-  },
 };
 
 export default function SecurityPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAction, setSelectedAction] = useState<SecurityAction | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+  const [modalState, setModalState] = useState({
+    password: false,
+    email: false,
+    phone: false,
+    username: false,
   });
+  const { isAuth, account } = useAuth();
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [actionStatus, setActionStatus] = useState<{
+    success: boolean;
+    message: string | null;
+    type: 'password' | 'email' | 'phone' | 'username' | null;
+  }>({
+    success: false,
+    message: null,
+    type: null,
+  });
+
+  useEffect(() => {
+    isAuth();
+  }, [isAuth, refreshKey]);
+
+  const handleRefresh = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
 
   const handleActionClick = (action: SecurityAction) => {
     if (action.id === 'password') {
-      setSelectedAction(action);
-      setIsModalOpen(true);
-    } else {
-      // Handle other actions
-      alert(`${action.action}: ${action.title}`);
+      setModalState((prev) => ({ ...prev, password: true }));
+    } else if (action.id === 'email') {
+      setModalState((prev) => ({ ...prev, email: true }));
+    } else if (action.id === 'phone') {
+      setModalState((prev) => ({ ...prev, phone: true }));
+    } else if (action.id === '2fa') {
+    } else if (action.id === 'username') {
+      setModalState((prev) => ({ ...prev, username: true }));
     }
   };
 
-  const handlePasswordChange = () => {
-    if (
-      !passwordForm.currentPassword ||
-      !passwordForm.newPassword ||
-      !passwordForm.confirmPassword
-    ) {
-      alert('Vui lòng điền đầy đủ thông tin');
-      return;
-    }
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('Mật khẩu xác nhận không khớp');
-      return;
-    }
-    // Handle password change logic
-    alert('Đã thay đổi mật khẩu thành công');
-    setIsModalOpen(false);
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const handleTwoFactorSuccess = () => {
+    handleRefresh();
   };
 
-  const getStatusBadge = (status: SecurityAction['status']) => {
-    switch (status) {
+  const handlePasswordSubmit = async (values: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) => {
+    try {
+      const success = await changePasswordInternal({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      });
+
+      if (success) {
+        setActionStatus({
+          success: true,
+          message: 'Đã thay đổi mật khẩu thành công!',
+          type: 'password',
+        });
+
+        setTimeout(() => {
+          setModalState((prev) => ({ ...prev, password: false }));
+          setActionStatus({ success: false, message: null, type: null });
+          handleRefresh();
+        }, 2000);
+
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error instanceof Error) {
+        setActionStatus({
+          success: false,
+          message: error.message,
+          type: 'password',
+        });
+      }
+      return false;
+    }
+  };
+
+  const handleEmailSubmit = async (values: {
+    currentEmail: string;
+    newEmail: string;
+    password: string;
+  }) => {
+    try {
+      const success = await changeEmailInternal({
+        newEmail: values.newEmail,
+        passwordConfirm: values.password,
+      });
+
+      if (success) {
+        setActionStatus({
+          success: true,
+          message: 'Đã thay đổi email thành công!',
+          type: 'email',
+        });
+
+        setTimeout(() => {
+          setModalState((prev) => ({ ...prev, email: false }));
+          setActionStatus({ success: false, message: null, type: null });
+          handleRefresh();
+        }, 2000);
+
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error instanceof Error) {
+        setActionStatus({
+          success: false,
+          message: error.message,
+          type: 'email',
+        });
+      }
+      return false;
+    }
+  };
+
+  const handlePhoneSubmit = async (values: {
+    currentPhone: string;
+    newPhone: string;
+    password: string;
+  }) => {
+    try {
+      const success = await changePhoneInternal({
+        newPhone: values.newPhone,
+        passwordConfirm: values.password,
+      });
+
+      if (success) {
+        setActionStatus({
+          success: true,
+          message: 'Đã thay đổi số điện thoại thành công!',
+          type: 'phone',
+        });
+
+        setTimeout(() => {
+          setModalState((prev) => ({ ...prev, phone: false }));
+          setActionStatus({ success: false, message: null, type: null });
+          handleRefresh();
+        }, 2000);
+
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error instanceof Error) {
+        setActionStatus({
+          success: false,
+          message: error.message,
+          type: 'phone',
+        });
+      }
+      return false;
+    }
+  };
+
+  const handleUsernameSubmit = async (values: {
+    currentUsername: string;
+    newUsername: string;
+    password: string;
+  }) => {
+    try {
+      const success = await changeUsernameInternal({
+        newUsername: values.newUsername,
+        password: values.password,
+      });
+
+      if (success) {
+        setActionStatus({
+          success: true,
+          message: 'Đã thay đổi số điện thoại thành công!',
+          type: 'phone',
+        });
+
+        setTimeout(() => {
+          setModalState((prev) => ({ ...prev, phone: false }));
+          setActionStatus({ success: false, message: null, type: null });
+          handleRefresh();
+        }, 2000);
+
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error instanceof Error) {
+        setActionStatus({
+          success: false,
+          message: error.message,
+          type: 'phone',
+        });
+      }
+      return false;
+    }
+  };
+
+  const getStatusBadge = (status: SecurityAction['status'], actionId?: string) => {
+    let effectiveStatus = status;
+    if (actionId === '2fa' && account) {
+      effectiveStatus = account.using2FA ? 'active' : 'inactive';
+    }
+
+    switch (effectiveStatus) {
       case 'active':
         return (
           <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
             <Check className="w-3 h-3 mr-1" />
-            Đã kích hoạt
+            <span className="hidden sm:inline">Đã kích hoạt</span>
+            <span className="sm:hidden">Hoạt động</span>
           </div>
         );
       case 'inactive':
         return (
           <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
             <X className="w-3 h-3 mr-1" />
-            Chưa kích hoạt
+            <span className="hidden sm:inline">Chưa kích hoạt</span>
+            <span className="sm:hidden">Tắt</span>
           </div>
         );
       case 'pending':
         return (
           <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
             <Clock className="w-3 h-3 mr-1" />
-            Đang xử lý
+            <span className="hidden sm:inline">Đang xử lý</span>
+            <span className="sm:hidden">Xử lý</span>
           </div>
         );
       default:
@@ -212,26 +378,106 @@ export default function SecurityPage() {
   const activeSecurityCount = securityActions.filter((action) => action.status === 'active').length;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-6 text-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-xl">
-                  <Shield className="w-6 h-6" />
+    <div className="min-h-screen bg-[#FDFEF9] p-3 sm:p-6">
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-8">
+        <SecurityModal
+          isOpen={modalState.password}
+          onClose={() => setModalState((prev) => ({ ...prev, password: false }))}
+          title="Đổi mật khẩu"
+          isLoading={actionStatus.type === 'password' && actionStatus.success}
+          status={
+            actionStatus.type === 'password' ? (actionStatus.success ? 'success' : 'error') : null
+          }
+          statusMessage={
+            actionStatus.type === 'password' && actionStatus.message
+              ? actionStatus.message
+              : undefined
+          }
+        >
+          <ChangePasswordForm
+            onSubmit={handlePasswordSubmit}
+            onCancel={() => setModalState((prev) => ({ ...prev, password: false }))}
+          />
+        </SecurityModal>
+
+        <SecurityModal
+          isOpen={modalState.email}
+          onClose={() => setModalState((prev) => ({ ...prev, email: false }))}
+          title="Đổi email"
+          isLoading={actionStatus.type === 'email' && actionStatus.success}
+          status={
+            actionStatus.type === 'email' ? (actionStatus.success ? 'success' : 'error') : null
+          }
+          statusMessage={
+            actionStatus.type === 'email' && actionStatus.message ? actionStatus.message : undefined
+          }
+        >
+          <ChangeEmailForm
+            currentEmail={account?.email || ''}
+            onSubmit={handleEmailSubmit}
+            onCancel={() => setModalState((prev) => ({ ...prev, email: false }))}
+          />
+        </SecurityModal>
+
+        <SecurityModal
+          isOpen={modalState.phone}
+          onClose={() => setModalState((prev) => ({ ...prev, phone: false }))}
+          title="Đổi số điện thoại"
+          isLoading={actionStatus.type === 'phone' && actionStatus.success}
+          status={
+            actionStatus.type === 'phone' ? (actionStatus.success ? 'success' : 'error') : null
+          }
+          statusMessage={
+            actionStatus.type === 'phone' && actionStatus.message ? actionStatus.message : undefined
+          }
+        >
+          <ChangePhoneForm
+            currentPhone={account?.phone || ''}
+            onSubmit={handlePhoneSubmit}
+            onCancel={() => setModalState((prev) => ({ ...prev, phone: false }))}
+          />
+        </SecurityModal>
+
+        <SecurityModal
+          isOpen={modalState.username}
+          onClose={() => setModalState((prev) => ({ ...prev, username: false }))}
+          title="Đổi tên đăng nhập"
+          isLoading={actionStatus.type === 'username' && actionStatus.success}
+          status={
+            actionStatus.type === 'username' ? (actionStatus.success ? 'success' : 'error') : null
+          }
+          statusMessage={
+            actionStatus.type === 'username' && actionStatus.message
+              ? actionStatus.message
+              : undefined
+          }
+        >
+          <ChangeUsernameForm
+            currentUsername={account?.username || ''}
+            onSubmit={handleUsernameSubmit}
+            hasChangedUsername={account?.changedUsername}
+            checkUsernameAvailability={checkUsernameAvailability}
+            onCancel={() => setModalState((prev) => ({ ...prev, username: false }))}
+          />
+        </SecurityModal>
+
+        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+          <div className="bg-[#FFD2B2] p-4 sm:p-6 text-[#121212]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="p-2 sm:p-3 bg-white/20 rounded-lg shadow-sm">
+                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Bảo mật tài khoản</h1>
-                  <p className="text-orange-100 mt-1">
+                  <h1 className="text-xl sm:text-2xl font-bold">Bảo mật tài khoản</h1>
+                  <p className="text-[#121212] mt-1 opacity-80 text-sm sm:text-base">
                     Quản lý bảo mật và quyền riêng tư của tài khoản
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-orange-100">Bảo mật</p>
-                <p className="text-2xl font-bold">
+              <div className="text-center sm:text-right bg-white/20 px-3 py-2 sm:px-4 sm:py-3 rounded-lg shadow-sm">
+                <p className="text-xs sm:text-sm text-[#8B4513] font-medium">Bảo mật</p>
+                <p className="text-xl sm:text-2xl font-bold">
                   {activeSecurityCount}/{securityActions.length}
                 </p>
               </div>
@@ -239,60 +485,60 @@ export default function SecurityPage() {
           </div>
         </div>
 
-        {/* Security Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20 hover:border-[#FFD2B2] transition-all duration-300">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <Shield className="w-6 h-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl shadow-sm">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Mức bảo mật</p>
-                <p className="text-lg font-bold text-gray-800">Cao</p>
+                <p className="text-xs sm:text-sm text-gray-600">Mức bảo mật</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">Cao</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-amber-100 rounded-xl">
-                <Key className="w-6 h-6 text-amber-600" />
+              <div className="p-2 sm:p-3 bg-amber-100 rounded-xl">
+                <Key className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Đã kích hoạt</p>
-                <p className="text-lg font-bold text-gray-800">{activeSecurityCount} tính năng</p>
+                <p className="text-xs sm:text-sm text-gray-600">Đã kích hoạt</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">
+                  {activeSecurityCount} tính năng
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Monitor className="w-6 h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-xl">
+                <Monitor className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Thiết bị</p>
-                <p className="text-lg font-bold text-gray-800">3 hoạt động</p>
+                <p className="text-xs sm:text-sm text-gray-600">Thiết bị</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">3 hoạt động</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-amber-100">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-red-100 rounded-xl">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+              <div className="p-2 sm:p-3 bg-red-100 rounded-xl">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Cảnh báo</p>
-                <p className="text-lg font-bold text-gray-800">0 vấn đề</p>
+                <p className="text-xs sm:text-sm text-gray-600">Cảnh báo</p>
+                <p className="text-base sm:text-lg font-bold text-gray-800">0 vấn đề</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Security Settings */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {Object.entries(categories).map(([categoryKey, categoryInfo]) => {
               const categoryActions = securityActions.filter(
                 (action) => action.category === categoryKey,
@@ -301,16 +547,18 @@ export default function SecurityPage() {
               return (
                 <div
                   key={categoryKey}
-                  className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden"
+                  className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden"
                 >
-                  <div className="p-6 border-b border-gray-100">
+                  <div className="p-4 sm:p-6 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
                       <div className={`p-2 rounded-lg ${categoryInfo.color}`}>
                         {categoryInfo.icon}
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-gray-800">{categoryInfo.name}</h2>
-                        <p className="text-sm text-gray-600">
+                        <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+                          {categoryInfo.name}
+                        </h2>
+                        <p className="text-xs sm:text-sm text-gray-600">
                           {categoryActions.filter((a) => a.status === 'active').length} trên{' '}
                           {categoryActions.length} đã kích hoạt
                         </p>
@@ -318,25 +566,33 @@ export default function SecurityPage() {
                     </div>
                   </div>
 
-                  <div className="p-6 space-y-4">
+                  <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                     {categoryActions.map((action) => (
                       <div
                         key={action.id}
-                        className="border border-gray-200 rounded-xl p-4 hover:border-amber-300 transition-all duration-200"
+                        className="border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-[#FFD2B2] hover:shadow-md transition-all duration-200 bg-white"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                          <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
                             <div
-                              className={`p-3 rounded-xl ${action.status === 'active' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400'}`}
+                              className={`p-2 sm:p-3 rounded-xl shadow-sm ${
+                                action.status === 'active'
+                                  ? 'bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600'
+                                  : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400'
+                              }`}
                             >
                               {action.icon}
                             </div>
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-3 mb-1">
-                                <h3 className="font-semibold text-gray-800">{action.title}</h3>
-                                {getStatusBadge(action.status)}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-1">
+                                <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
+                                  {action.title}
+                                </h3>
+                                {getStatusBadge(action.status, action.id)}
                               </div>
-                              <p className="text-sm text-gray-600">{action.description}</p>
+                              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                {action.description}
+                              </p>
                               {action.lastUpdated && (
                                 <p className="text-xs text-gray-500 mt-1">
                                   Cập nhật cuối: {action.lastUpdated}
@@ -344,16 +600,22 @@ export default function SecurityPage() {
                               )}
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleActionClick(action)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                              action.status === 'active'
-                                ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            {action.action}
-                          </button>
+                          <div className="flex justify-start sm:justify-end">
+                            {action.id === '2fa' ? (
+                              <TwoFactorSetup onSuccess={handleTwoFactorSuccess} />
+                            ) : (
+                              <button
+                                onClick={() => handleActionClick(action)}
+                                className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors shadow-sm ${
+                                  action.status === 'active'
+                                    ? 'bg-gradient-to-r from-amber-100 to-amber-200 text-amber-700 hover:from-amber-200 hover:to-amber-300'
+                                    : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300'
+                                }`}
+                              >
+                                {action.action}
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -363,40 +625,44 @@ export default function SecurityPage() {
             })}
           </div>
 
-          {/* Recent Activity */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-amber-100 overflow-hidden">
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center">
-                  <Clock className="w-5 h-5 mr-2 text-amber-600" />
+            <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
+              <div className="p-4 sm:p-6 border-b border-gray-100">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-amber-600" />
                   Hoạt động gần đây
                 </h2>
               </div>
 
-              <div className="p-6">
-                <div className="space-y-4">
+              <div className="p-4 sm:p-6">
+                <div className="space-y-3 sm:space-y-4">
                   {recentActivity.map((activity) => (
-                    <div key={activity.id} className="border-l-4 border-amber-200 pl-4 py-2">
+                    <div
+                      key={activity.id}
+                      className="border-l-4 border-amber-200 pl-3 sm:pl-4 py-2"
+                    >
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-800">{activity.action}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-800">
+                            {activity.action}
+                          </p>
                           <div className="mt-1 space-y-1">
                             <div className="flex items-center text-xs text-gray-600">
-                              <MapPin className="w-3 h-3 mr-1" />
-                              <span>{activity.location}</span>
+                              <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{activity.location}</span>
                             </div>
                             <div className="flex items-center text-xs text-gray-600">
-                              <Monitor className="w-3 h-3 mr-1" />
-                              <span>{activity.device}</span>
+                              <Monitor className="w-3 h-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{activity.device}</span>
                             </div>
                             <div className="flex items-center text-xs text-gray-600">
-                              <Calendar className="w-3 h-3 mr-1" />
+                              <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
                               <span>{activity.time}</span>
                             </div>
                           </div>
                         </div>
                         <div
-                          className={`w-3 h-3 rounded-full ${
+                          className={`w-3 h-3 rounded-full flex-shrink-0 ml-2 ${
                             activity.status === 'success'
                               ? 'bg-green-400'
                               : activity.status === 'warning'
@@ -409,119 +675,13 @@ export default function SecurityPage() {
                   ))}
                 </div>
 
-                <button className="w-full mt-4 text-sm text-amber-600 hover:text-amber-700 font-medium">
+                <button className="w-full mt-4 sm:mt-6 text-xs sm:text-sm text-amber-600 hover:text-amber-700 font-medium py-2 px-4 border border-amber-200 rounded-lg hover:bg-amber-50 transition-colors">
                   Xem tất cả hoạt động
                 </button>
               </div>
             </div>
-
-            {/* Security Tip */}
-            <div className="mt-6 bg-gradient-to-r from-amber-100 to-orange-100 rounded-2xl shadow-lg p-6 border border-amber-200">
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-amber-500 rounded-xl">
-                  <Shield className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-amber-800 mb-2">💡 Mẹo bảo mật</h3>
-                  <p className="text-amber-700 text-sm leading-relaxed">
-                    Kích hoạt xác thực hai yếu tố để tăng cường bảo mật tài khoản. Thay đổi mật khẩu
-                    định kỳ và không sử dụng mật khẩu đơn giản.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-
-        {/* Password Change Modal */}
-        {isModalOpen && selectedAction?.id === 'password' && (
-          <>
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40"
-              onClick={() => setIsModalOpen(false)}
-            />
-            <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
-              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">Thay đổi mật khẩu</h2>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mật khẩu hiện tại
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={passwordForm.currentPassword}
-                        onChange={(e) =>
-                          setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
-                        }
-                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all pr-10"
-                        placeholder="Nhập mật khẩu hiện tại"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mật khẩu mới
-                    </label>
-                    <input
-                      type="password"
-                      value={passwordForm.newPassword}
-                      onChange={(e) =>
-                        setPasswordForm({ ...passwordForm, newPassword: e.target.value })
-                      }
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all"
-                      placeholder="Nhập mật khẩu mới"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Xác nhận mật khẩu mới
-                    </label>
-                    <input
-                      type="password"
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) =>
-                        setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
-                      }
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all"
-                      placeholder="Nhập lại mật khẩu mới"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-4 mt-8">
-                  <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 transition-colors font-medium"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    onClick={handlePasswordChange}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white transition-all font-medium shadow-lg hover:shadow-xl"
-                  >
-                    Đổi mật khẩu
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

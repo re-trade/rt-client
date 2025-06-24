@@ -1,9 +1,10 @@
 'use client';
-import { accountMe } from '@/services/auth.api';
+import { accountMe, TAccountMeResponse } from '@/services/auth.api';
 import { useCallback, useEffect, useState } from 'react';
 function useAuth() {
   const [auth, setIsAuth] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
+  const [account, setAccount] = useState<TAccountMeResponse>();
   const isAuth = useCallback(async () => {
     try {
       const response = await accountMe();
@@ -11,6 +12,7 @@ function useAuth() {
         throw new Error('No response');
       }
       setRoles(response.roles);
+      setAccount(response);
       setIsAuth(true);
     } catch {
       setIsAuth(false);
@@ -20,7 +22,7 @@ function useAuth() {
     isAuth();
   }, [isAuth]);
   const logout = useCallback(async () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('access-token');
     window.location.reload();
   }, []);
   return {
@@ -28,6 +30,7 @@ function useAuth() {
     roles,
     isAuth,
     auth,
+    account,
   };
 }
 

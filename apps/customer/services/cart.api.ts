@@ -8,6 +8,8 @@ export interface CartItemResponse {
   totalPrice: number;
   addedAt: string;
   productAvailable: boolean;
+  description: string;
+  discount: number;
   quantity: number;
 }
 
@@ -38,11 +40,10 @@ export const cartApi = {
     }
   },
 
-  async addToCart(productId: string, quantity: number): Promise<CartResponse> {
+  async addToCart(productId: string): Promise<CartResponse> {
     try {
       const response = await authApi.default.post<CartResponse>('/carts/items', {
         productId,
-        quantity,
       });
       return response.data;
     } catch (error) {

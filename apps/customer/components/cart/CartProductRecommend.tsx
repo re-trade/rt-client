@@ -2,83 +2,61 @@
 import { useCart } from '@/hooks/use-cart';
 import Image from 'next/image';
 
-export default function CartProductRecommend() {
-  const { products } = useCart();
-
+export default function CartProductRecommend({ products }: ReturnType<typeof useCart>) {
   return (
-    <div className="mt-6 grid grid-cols-3 gap-4 sm:mt-8">
-      {products.map((item) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      {products.slice(0, 6).map((item) => (
         <div
           key={item.id}
-          className="space-y-6 overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+          className="group bg-white rounded-xl border border-orange-100 shadow-lg overflow-hidden hover:shadow-xl hover:border-orange-200 transition-all duration-300"
         >
-          <a href="#" className="overflow-hidden rounded">
+          <div className="relative overflow-hidden bg-orange-25 p-3 md:p-4">
             <Image
-              width={176}
-              height={176}
-              className="mx-auto h-44 w-44"
+              width={150}
+              height={150}
+              className="mx-auto h-32 w-32 md:h-40 md:w-40 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
               src={item.productImages[0] ?? ''}
               alt={`${item.name} hình ảnh`}
             />
-          </a>
-          <div>
-            <a
-              href="#"
-              className="text-lg font-semibold leading-tight text-gray-900 hover:underline"
-            >
-              {item.name}
-            </a>
-            <p className="mt-2 text-base font-normal text-gray-500">{item.description}</p>
+            <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              -
+              {Math.round(
+                ((item.currentPrice * 1.2 - item.currentPrice) / (item.currentPrice * 1.2)) * 100,
+              )}
+              %
+            </div>
           </div>
-          <div>
-            <p className="text-lg font-bold text-gray-900">
-              <span className="line-through">{item.currentPrice.toLocaleString('vi-VN')}₫</span>
-            </p>
-            <p className="text-lg font-bold leading-tight text-red-600">
-              {item.currentPrice.toLocaleString('vi-VN')}₫
-            </p>
-          </div>
-          <div className="mt-6 flex items-center gap-2.5">
+
+          <div className="p-4 md:p-6 space-y-3 md:space-y-4">
+            <div>
+              <a
+                href="#"
+                className="text-sm md:text-base font-bold leading-tight text-gray-800 hover:text-orange-600 transition-colors line-clamp-2"
+              >
+                {item.name}
+              </a>
+              <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-600 line-clamp-2">
+                {item.description}
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-xs md:text-sm text-gray-400">
+                <span className="line-through">
+                  {(item.currentPrice * 1.2).toLocaleString('vi-VN')}₫
+                </span>
+              </p>
+              <p className="text-base md:text-xl font-bold text-orange-600">
+                {item.currentPrice.toLocaleString('vi-VN')}₫
+              </p>
+            </div>
+
             <button
               type="button"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white p-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-2 md:py-3 text-xs md:text-sm font-bold text-white hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              <svg
-                className="h-5 w-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="inline-flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300"
-            >
-              <svg
-                className="-ms-2 me-2 h-5 w-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7h-1M8 7h-.688M13 5v4m-2-2h4"
-                />
+              <svg className="h-3 h-3 md:h-4 md:w-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
               </svg>
               Thêm vào giỏ
             </button>
