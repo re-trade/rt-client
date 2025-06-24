@@ -10,7 +10,7 @@ export type TProduct = {
   thumbnail: string;
   productImages: string[];
   brand: string;
-  discount: string;
+  discount: number;
   model: string;
   currentPrice: number;
   categories: string[];
@@ -21,8 +21,24 @@ export type TProduct = {
   updatedAt: string;
 };
 
+export type CreateProductDto = {
+  name: string;
+  shortDescription: string;
+  description: string;
+  thumbnail: string;
+  productImages: string[];
+  brand: string;
+  discount: number;
+  model: string;
+  currentPrice: number;
+  categoryIds: string[];
+  keywords: string[];
+  tags: string[];
+  status: 'DRAFT' | 'ACTIVE' | 'INACTIVE';
+};
+
 export const productApi = {
-  async getProducts(page: number = 1, size: number = 10, query?: string): Promise<TProduct[]> {
+  async getProducts(page: number = 0, size: number = 10, query?: string): Promise<TProduct[]> {
     const response = await authApi.default.get<IResponseObject<TProduct[]>>(
       `/products/my-products`,
       {

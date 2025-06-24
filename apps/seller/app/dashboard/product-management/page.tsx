@@ -12,8 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { productApi, TProduct, CreateProductDto } from '@/service/product.api';
-import { Edit,Trash } from 'lucide-react';
+import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
+import { Edit, Trash } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 // ✅ Đảm bảo file tồn tại
@@ -56,11 +56,11 @@ export default function ProductManagement() {
     const updatedProducts = productList.map((product) =>
       product.id === selectedProduct.id
         ? {
-          ...product,
-          ...updatedData,
-          updatedAt: new Date().toISOString(),
-        }
-        : product
+            ...product,
+            ...updatedData,
+            updatedAt: new Date().toISOString(),
+          }
+        : product,
     );
     setProductList(updatedProducts);
     setSelectedProduct(null);
@@ -81,7 +81,6 @@ export default function ProductManagement() {
         <div>
           <h2 className="text-xl font-semibold">Danh sách sản phẩm</h2>
           <p className="text-muted-foreground">Quản lý tất cả sản phẩm của bạn</p>
-
         </div>
         <Button onClick={() => setIsCreateOpen(true)}>Tạo sản phẩm mới</Button>
         <CreateProductDialog
@@ -127,25 +126,26 @@ export default function ProductManagement() {
                   <TableCell>{product.categories.join(', ')}</TableCell>
                   <TableCell>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${product.verified
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                        }`}
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        product.verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}
                     >
                       {product.verified ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                   </TableCell>
-           
 
-                  <TableCell className='flex items-center gap-2'>
+                  <TableCell className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeletetProduct(product)}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeletetProduct(product)}
+                    >
                       <Trash className="h-4 w-4" />
                     </Button>
                   </TableCell>
-
                 </TableRow>
               ))}
             </TableBody>
