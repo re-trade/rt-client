@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { SellerFormData } from '@/hooks/useSellerRegistration';
-import React from 'react';
+import { storageApi } from '@/service/storage.api';
+import React, { useState } from 'react';
 
 type ShopInfoStepProps = {
   formData: SellerFormData;
@@ -23,27 +24,122 @@ export default function ShopInfoStep({
   errors,
   updateField = () => {},
 }: ShopInfoStepProps) {
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarProgress, setAvatarProgress] = useState(0);
+  const [backgroundLoading, setBackgroundLoading] = useState(false);
+  const [backgroundProgress, setBackgroundProgress] = useState(0);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          updateField('avatarUrl', event.target.result.toString());
+      const file = e.target.files[0];
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+
+      setAvatarLoading(true);
+      setAvatarProgress(0);
+
+      try {
+        // Create a preview URL for immediate display
+        const previewUrl = URL.createObjectURL(file);
+
+        // Save the file object and preview URL for display
+        updateField('avatarUrl', file);
+
+        // Start uploading animation
+        const uploadProgress = (percent: number) => {
+          setAvatarProgress(percent);
+        };
+
+        // Upload to server
+        uploadProgress(10);
+        const uploadInterval = setInterval(() => {
+          setAvatarProgress((prev) => Math.min(prev + 5, 90));
+        }, 300);
+
+        // Call the API to upload the file
+        const fileUrl = await storageApi.fileUpload(file);
+        clearInterval(uploadInterval);
+
+        if (fileUrl) {
+          // If upload successful, save the URL
+          updateField('avatarUrl', fileUrl);
+          setAvatarProgress(100);
+
+          // Complete animation
+          setTimeout(() => {
+            setAvatarLoading(false);
+            // Release the preview URL to free memory
+            URL.revokeObjectURL(previewUrl);
+          }, 500);
+        } else {
+          throw new Error('File upload failed');
         }
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
+        setAvatarLoading(false);
+        alert('Đã xảy ra lỗi khi tải ảnh lên. Vui lòng thử lại.');
+      }
     }
   };
 
-  const handleBackgroundChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBackgroundChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          updateField('background', event.target.result.toString());
+      const file = e.target.files[0];
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+
+      setBackgroundLoading(true);
+      setBackgroundProgress(0);
+
+      try {
+        // Create a preview URL for immediate display
+        const previewUrl = URL.createObjectURL(file);
+
+        // Save the file object for preview
+        updateField('background', file);
+
+        // Start uploading animation
+        const uploadProgress = (percent: number) => {
+          setBackgroundProgress(percent);
+        };
+
+        // Upload to server
+        uploadProgress(10);
+        const uploadInterval = setInterval(() => {
+          setBackgroundProgress((prev) => Math.min(prev + 5, 90));
+        }, 300);
+
+        // Call the API to upload the file
+        const fileUrl = await storageApi.fileUpload(file);
+        clearInterval(uploadInterval);
+
+        if (fileUrl) {
+          // If upload successful, save the URL
+          updateField('background', fileUrl);
+          setBackgroundProgress(100);
+
+          // Complete animation
+          setTimeout(() => {
+            setBackgroundLoading(false);
+            // Release the preview URL to free memory
+            URL.revokeObjectURL(previewUrl);
+          }, 500);
+        } else {
+          throw new Error('File upload failed');
         }
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      } catch (error) {
+        console.error('Error uploading background:', error);
+        setBackgroundLoading(false);
+        alert('Đã xảy ra lỗi khi tải ảnh lên. Vui lòng thử lại.');
+      }
     }
   };
 
@@ -73,11 +169,36 @@ export default function ShopInfoStep({
                       : 'border-amber-300 hover:border-amber-400 bg-white hover:bg-amber-25'
                   }`}
                 >
-                  {formData.avatarUrl ? (
+                  {avatarLoading ? (
+                    <div className="flex flex-col items-center justify-center w-full h-full">
+                      <div className="w-full h-1 bg-amber-100 relative">
+                        <div
+                          className="h-full bg-amber-500 transition-all duration-300"
+                          style={{ width: `${avatarProgress}%` }}
+                        ></div>
+                      </div>
+                      <div className="mt-2 text-amber-600 text-xs font-medium">
+                        {avatarProgress < 90
+                          ? 'Đang tải lên...'
+                          : avatarProgress < 100
+                            ? 'Đang xử lý...'
+                            : 'Hoàn thành!'}
+                      </div>
+                    </div>
+                  ) : formData.avatarUrl ? (
                     <img
-                      src={formData.avatarUrl}
+                      src={
+                        formData.avatarUrl instanceof File
+                          ? URL.createObjectURL(formData.avatarUrl)
+                          : formData.avatarUrl
+                      }
                       alt="Avatar preview"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Error loading avatar image');
+                        e.currentTarget.src =
+                          'https://placehold.co/300x300/FFB74D/ffffff?text=Avatar';
+                      }}
                     />
                   ) : (
                     <div className="text-center">
@@ -120,10 +241,15 @@ export default function ShopInfoStep({
                 variant="outline"
                 size="sm"
                 type="button"
-                className="mt-4 border-amber-300 text-amber-700 hover:bg-amber-50 px-6"
+                className={`mt-4 px-6 ${
+                  avatarLoading
+                    ? 'bg-amber-50 text-amber-700 border-amber-300 opacity-70 cursor-wait'
+                    : 'border-amber-300 text-amber-700 hover:bg-amber-50'
+                }`}
                 onClick={() => document.getElementById('avatar-upload')?.click()}
+                disabled={avatarLoading}
               >
-                {formData.avatarUrl ? 'Thay đổi logo' : 'Chọn logo'}
+                {avatarLoading ? 'Đang tải...' : formData.avatarUrl ? 'Thay đổi logo' : 'Chọn logo'}
               </Button>
 
               <div className="mt-3 text-xs text-amber-600 text-center">
@@ -151,11 +277,36 @@ export default function ShopInfoStep({
                       : 'border-amber-300 hover:border-amber-400 bg-white hover:bg-amber-25'
                   }`}
                 >
-                  {formData.background ? (
+                  {backgroundLoading ? (
+                    <div className="flex flex-col items-center justify-center w-full h-full p-4">
+                      <div className="w-full h-2 bg-amber-100 rounded-full relative">
+                        <div
+                          className="h-full bg-amber-500 rounded-full transition-all duration-300"
+                          style={{ width: `${backgroundProgress}%` }}
+                        ></div>
+                      </div>
+                      <div className="mt-2 text-amber-600 text-sm font-medium">
+                        {backgroundProgress < 90
+                          ? 'Đang tải lên...'
+                          : backgroundProgress < 100
+                            ? 'Đang xử lý...'
+                            : 'Hoàn thành!'}
+                      </div>
+                    </div>
+                  ) : formData.background ? (
                     <img
-                      src={formData.background}
+                      src={
+                        formData.background instanceof File
+                          ? URL.createObjectURL(formData.background)
+                          : formData.background
+                      }
                       alt="Background preview"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Error loading background image');
+                        e.currentTarget.src =
+                          'https://placehold.co/1200x300/FFB74D/ffffff?text=Background';
+                      }}
                     />
                   ) : (
                     <div className="text-center">
@@ -198,10 +349,19 @@ export default function ShopInfoStep({
                 variant="outline"
                 size="sm"
                 type="button"
-                className="mt-4 border-amber-300 text-amber-700 hover:bg-amber-50 px-6"
+                className={`mt-4 px-6 ${
+                  backgroundLoading
+                    ? 'bg-amber-50 text-amber-700 border-amber-300 opacity-70 cursor-wait'
+                    : 'border-amber-300 text-amber-700 hover:bg-amber-50'
+                }`}
                 onClick={() => document.getElementById('background-upload')?.click()}
+                disabled={backgroundLoading}
               >
-                {formData.background ? 'Thay đổi ảnh bìa' : 'Chọn ảnh bìa'}
+                {backgroundLoading
+                  ? 'Đang tải...'
+                  : formData.background
+                    ? 'Thay đổi ảnh bìa'
+                    : 'Chọn ảnh bìa'}
               </Button>
 
               <div className="mt-3 text-xs text-amber-600 text-center">

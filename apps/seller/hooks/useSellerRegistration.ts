@@ -2,7 +2,6 @@
 
 import { sellerApi, SellerProfileRegisterRequest } from '@/service/seller.api';
 import { storageApi } from '@/service/storage.api';
-import { base64ToFile } from '@retrade/util';
 import axios from 'axios';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
@@ -28,8 +27,8 @@ export type SellerFormData = {
   description: string;
   email: string;
   phoneNumber: string;
-  avatarUrl: string;
-  background: string;
+  avatarUrl: File | null | string;
+  background: File | null | string;
   addressLine: string;
   district: string;
   ward: string;
@@ -43,8 +42,8 @@ export const defaultFormData: SellerFormData = {
   description: '',
   email: '',
   phoneNumber: '',
-  avatarUrl: '',
-  background: '',
+  avatarUrl: null,
+  background: null,
   addressLine: '',
   district: '',
   ward: '',
@@ -76,8 +75,6 @@ const sellerSchema = Joi.object({
       'string.empty': 'Số điện thoại không được để trống',
       'any.required': 'Số điện thoại là bắt buộc',
     }),
-  avatarUrl: Joi.string().allow(''),
-  background: Joi.string().allow(''),
   addressLine: Joi.string().trim().min(1).required().messages({
     'string.empty': 'Địa chỉ không được để trống',
     'any.required': 'Địa chỉ là bắt buộc',
@@ -99,16 +96,6 @@ const sellerSchema = Joi.object({
     'any.required': 'Số CMND/CCCD là bắt buộc',
   }),
 });
-
-const updateImageProfile = async (req: {
-  avatar: File;
-  thumbnail: File;
-}): Promise<{ avatarUrl: string; thumbnailUrl: string }> => {
-  var avatarUrl = await storageApi.fileUpload(req.avatar);
-  var thumbnailUrl = await storageApi.fileUpload(req.thumbnail);
-  console.log(avatarUrl);
-  return { avatarUrl, thumbnailUrl };
-};
 
 export function useSellerRegistration() {
   const [formData, setFormData] = useState<SellerFormData>(defaultFormData);
@@ -152,22 +139,37 @@ export function useSellerRegistration() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
     const file = files && files.length > 0 ? files[0] : null;
-    setFormData((prev) => ({ ...prev, [name]: file }));
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    if (!file) {
+
+    // Handle file size validation - max 5MB
+    if (file && file.size > 5 * 1024 * 1024) {
       setErrors((prev) => ({
         ...prev,
-        [name]:
-          name === 'identityFrontImage'
-            ? 'Ảnh mặt trước CMND/CCCD là bắt buộc'
-            : 'Ảnh mặt sau CMND/CCCD là bắt buộc',
+        [name]: 'Kích thước file không được vượt quá 5MB',
       }));
-    } else {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name as string];
-        return newErrors;
-      });
+      return;
+    }
+
+    // For identity images, we handle them differently than avatar/background
+    // Avatar and background are now handled in their own components with API uploads
+    if (name === 'identityFrontImage' || name === 'identityBackImage') {
+      setFormData((prev) => ({ ...prev, [name]: file }));
+      setTouched((prev) => ({ ...prev, [name]: true }));
+
+      if (!file) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]:
+            name === 'identityFrontImage'
+              ? 'Ảnh mặt trước CMND/CCCD là bắt buộc'
+              : 'Ảnh mặt sau CMND/CCCD là bắt buộc',
+        }));
+      } else {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[name as string];
+          return newErrors;
+        });
+      }
     }
   };
   const handleFieldBlur = (name: keyof SellerFormData) => {
@@ -184,63 +186,65 @@ export function useSellerRegistration() {
     }
   };
   const validateField = (name: keyof SellerFormData, value: any) => {
+    // Helper function to clear errors for a field
+    const clearError = () => {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+      return true;
+    };
+
+    // Helper function to set an error message
+    const setError = (message: string) => {
+      setErrors((prev) => ({ ...prev, [name]: message }));
+      return false;
+    };
+
+    // Validate identity images
+    if (name === 'identityFrontImage' || name === 'identityBackImage') {
+      const file = formData[name];
+      if (!file) {
+        const errorMessage =
+          name === 'identityFrontImage'
+            ? 'Ảnh mặt trước CMND/CCCD là bắt buộc'
+            : 'Ảnh mặt sau CMND/CCCD là bắt buộc';
+        return setError(errorMessage);
+      }
+      return clearError();
+    }
+
+    // Validate avatar and background
+    if (name === 'avatarUrl' || name === 'background') {
+      const file = formData[name];
+      if (!file) {
+        const errorMessage =
+          name === 'avatarUrl' ? 'Ảnh đại diện là bắt buộc' : 'Ảnh bìa là bắt buộc';
+        return setError(errorMessage);
+      }
+      return clearError();
+    }
+    if (name === 'state' || name === 'district' || name === 'ward') {
+      if (!value) {
+        let errorMessage = '';
+        if (name === 'state') errorMessage = 'Vui lòng chọn Tỉnh/Thành phố';
+        else if (name === 'district') errorMessage = 'Vui lòng chọn Quận/Huyện';
+        else errorMessage = 'Vui lòng chọn Phường/Xã';
+
+        return setError(errorMessage);
+      }
+      return clearError();
+    }
     try {
-      if (name === 'identityFrontImage' || name === 'identityBackImage') {
-        const file = formData[name];
-        if (!file) {
-          setErrors((prev) => ({
-            ...prev,
-            [name]:
-              name === 'identityFrontImage'
-                ? 'Ảnh mặt trước CMND/CCCD là bắt buộc'
-                : 'Ảnh mặt sau CMND/CCCD là bắt buộc',
-          }));
-          return false;
-        } else {
-          setErrors((prev) => {
-            const newErrors = { ...prev };
-            delete newErrors[name];
-            return newErrors;
-          });
-          return true;
-        }
-      }
-      if (name === 'state' || name === 'district' || name === 'ward') {
-        if (!value) {
-          setErrors((prev) => ({
-            ...prev,
-            [name]:
-              name === 'state'
-                ? 'Vui lòng chọn Tỉnh/Thành phố'
-                : name === 'district'
-                  ? 'Vui lòng chọn Quận/Huyện'
-                  : 'Vui lòng chọn Phường/Xã',
-          }));
-          return false;
-        } else {
-          setErrors((prev) => {
-            const newErrors = { ...prev };
-            delete newErrors[name];
-            return newErrors;
-          });
-          return true;
-        }
-      }
-
       const schema = sellerSchema.extract(name);
-      const { error } = schema.validate(value);
+      const validationResult = schema.validate(value);
 
-      if (error) {
-        setErrors((prev) => ({ ...prev, [name]: error.details[0].message }));
-        return false;
-      } else {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[name];
-          return newErrors;
-        });
-        return true;
+      if (validationResult.error?.details?.[0]?.message) {
+        return setError(validationResult.error.details[0].message);
       }
+
+      return clearError();
     } catch (error) {
       return true;
     }
@@ -401,21 +405,6 @@ export function useSellerRegistration() {
         return false;
       }
 
-      const apiFormData = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'state') {
-          apiFormData.append(key, selectedProvince.name);
-        } else if (key === 'district') {
-          apiFormData.append(key, selectedDistrict.name);
-        } else if (key === 'ward') {
-          apiFormData.append(key, selectedWard.name);
-        } else if (value instanceof File) {
-          apiFormData.append(key, value);
-        } else if (value !== null && value !== undefined) {
-          apiFormData.append(key, value.toString());
-        }
-      });
-
       if (!formData.identityFrontImage) {
         setErrors((prev) => ({
           ...prev,
@@ -429,6 +418,16 @@ export function useSellerRegistration() {
         isValid = false;
       }
 
+      if (!formData.avatarUrl) {
+        setErrors((prev) => ({ ...prev, avatarUrl: 'Ảnh đại diện là bắt buộc' }));
+        isValid = false;
+      }
+
+      if (!formData.background) {
+        setErrors((prev) => ({ ...prev, background: 'Ảnh bìa là bắt buộc' }));
+        isValid = false;
+      }
+
       if (!isValid) {
         setTouched({
           ...touched,
@@ -437,31 +436,64 @@ export function useSellerRegistration() {
         });
         return false;
       }
-      const { avatarUrl, thumbnailUrl } = await updateImageProfile({
-        avatar: formData.avatarUrl,
-        thumbnail: formData.background,
-      });
+
+      let avatarUrl = '';
+      let background = '';
+
+      if (formData.avatarUrl instanceof File) {
+        avatarUrl = await storageApi.fileUpload(formData.avatarUrl);
+      } else if (typeof formData.avatarUrl === 'string') {
+        avatarUrl = formData.avatarUrl;
+      }
+
+      if (formData.background instanceof File) {
+        background = await storageApi.fileUpload(formData.background);
+      } else if (typeof formData.background === 'string') {
+        background = formData.background;
+      }
+
+      if (!avatarUrl || !background) {
+        setErrors((prev) => ({
+          ...prev,
+          ...(!avatarUrl ? { avatarUrl: 'Ảnh đại diện là bắt buộc' } : {}),
+          ...(!background ? { background: 'Ảnh bìa là bắt buộc' } : {}),
+        }));
+        return false;
+      }
       const requestBody: SellerProfileRegisterRequest = {
         shopName: formData.shopName,
         description: formData.description,
         addressLine: formData.addressLine,
-        district: formData.district,
-        ward: formData.ward,
-        state: formData.state,
+        district: selectedDistrict.name,
+        ward: selectedWard.name,
+        state: selectedProvince.name,
         email: formData.email,
         avatarUrl,
-        background: thumbnailUrl,
+        background,
         phoneNumber: formData.phoneNumber,
         identityNumber: formData.identityNumber,
       };
+      console.log(requestBody);
       const result = await sellerApi.registerSeller(requestBody);
       if (!result) {
         alert('Đăng ký không thành công!');
         return false;
       }
+      if (!formData.identityBackImage || !formData.identityFrontImage) {
+        setErrors((prev) => ({
+          ...prev,
+          ...(!formData.identityBackImage
+            ? { identityBackImage: 'Ảnh mặt sau CMND/CCCD là bắt buộc' }
+            : {}),
+          ...(!formData.identityFrontImage
+            ? { identityFrontImage: 'Ảnh mặt trước CMND/CCCD là bắt buộc' }
+            : {}),
+        }));
+        return false;
+      }
       const verifiUpload = await sellerApi.sellerVerification({
-        backIdentity: base64ToFile(formData.identityBackImage),
-        frontIdentity: base64ToFile(formData.identityFrontImage),
+        backIdentity: formData.identityBackImage,
+        frontIdentity: formData.identityFrontImage,
       });
       if (!verifiUpload) {
         alert('Đăng ký không thành công!');
