@@ -9,7 +9,6 @@ export interface CartItemResponse {
   addedAt: string;
   productAvailable: boolean;
   description: string;
-  discount: number;
   quantity: number;
 }
 
@@ -40,10 +39,11 @@ export const cartApi = {
     }
   },
 
-  async addToCart(productId: string): Promise<CartResponse> {
+  async addToCart(productId: string, quantity: number): Promise<CartResponse> {
     try {
       const response = await authApi.default.post<CartResponse>('/carts/items', {
         productId,
+        quantity,
       });
       return response.data;
     } catch (error) {
@@ -62,7 +62,8 @@ export const cartApi = {
 
   async updateCartItemQuantity(productId: string, quantity: number): Promise<CartResponse> {
     try {
-      const response = await authApi.default.put<CartResponse>(`/carts/items/${productId}`, {
+      const response = await authApi.default.put<CartResponse>(`/carts/items`, {
+        productId,
         quantity,
       });
       return response.data;

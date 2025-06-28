@@ -9,13 +9,16 @@ export type TProduct = {
   description: string;
   thumbnail: string;
   productImages: string[];
+  brandId: string;
   brand: string;
-  discount: string;
+  quantity: number;
+  warrantyExpiryDate: string;
   model: string;
   currentPrice: number;
+  discount?: number;
   categories: string[];
-  keywords: string[];
   tags: string[];
+  keywords?: string[];
   verified: boolean;
   createdAt: string;
   updatedAt: string;

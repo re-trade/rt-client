@@ -8,24 +8,19 @@ import { IconCheck } from '@tabler/icons-react';
 import Image from 'next/image';
 import { use, useEffect, useState } from 'react';
 import {
+  MdAdd,
   MdAddShoppingCart,
   MdAssignment,
+  MdError,
   MdFavoriteBorder,
   MdLocalShipping,
+  MdRemove,
   MdSecurity,
   MdShare,
   MdStar,
   MdVerified,
+  MdWarning,
 } from 'react-icons/md';
-
-interface Product {
-  name: string;
-  price: number;
-  discountPrice: number;
-  description: string;
-  images: string[];
-  shopName: string;
-}
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { addToCart } = useCart();
@@ -35,6 +30,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [stockWarning, setStockWarning] = useState(false);
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description',
   );
@@ -51,9 +47,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           ...(product.thumbnail ? [product.thumbnail] : []),
           ...(product.productImages || []),
         ]);
-      } catch (error) {
-        // Error fetching product details
-      }
+      } catch {}
     };
     fetchProductDetail();
   }, [id]);
@@ -66,8 +60,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       await addToCart(productDetail.id, quantity);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-    } catch (error) {
-      console.error('Error adding to cart:', error);
+    } catch {
     } finally {
       setIsAddingToCart(false);
     }
@@ -75,16 +68,30 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
   const handleQuantityChange = (increment: boolean) => {
     if (increment) {
-      setQuantity((prev) => prev + 1);
+      if (productDetail && quantity < productDetail.quantity) {
+        setQuantity((prev) => prev + 1);
+        if (quantity + 1 >= productDetail.quantity) {
+          setStockWarning(true);
+        }
+      }
     } else if (quantity > 1) {
       setQuantity((prev) => prev - 1);
+      setStockWarning(false);
     }
   };
 
-  const calculateDiscount = () => {
-    if (!productDetail?.discount || !productDetail?.currentPrice) return 0;
-    const discount = typeof productDetail.discount === 'number' ? productDetail.discount : 0;
-    return Math.round(((productDetail.currentPrice - discount) / productDetail.currentPrice) * 100);
+  const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (isNaN(value) || value < 1) {
+      setQuantity(1);
+      setStockWarning(false);
+    } else if (productDetail && value > productDetail.quantity) {
+      setQuantity(productDetail.quantity);
+      setStockWarning(true);
+    } else {
+      setQuantity(value);
+      setStockWarning(productDetail ? value >= productDetail.quantity * 0.8 : false);
+    }
   };
 
   if (!productDetail) {
@@ -113,7 +120,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-25 via-orange-50 to-orange-25">
-      {/* Success Toast */}
       {showSuccess && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-top duration-300">
           <IconCheck size={20} />
@@ -122,7 +128,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       )}
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-gray-600">
           <ol className="flex items-center space-x-2">
             <li>
@@ -137,9 +142,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </ol>
         </nav>
 
-        {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Image Gallery */}
           <div className="space-y-4">
             <div className="relative w-full h-[500px] rounded-2xl overflow-hidden border border-orange-100 bg-white shadow-lg">
               <Image
@@ -155,14 +158,8 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                   Đã xác minh
                 </div>
               )}
-              {calculateDiscount() > 0 && (
-                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  -{calculateDiscount()}%
-                </div>
-              )}
             </div>
 
-            {/* Thumbnail Gallery */}
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-orange-100">
               {listImg.map((img, index) => (
                 <button
@@ -181,9 +178,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          {/* Product Info */}
           <div className="space-y-6">
-            {/* Header */}
             <div className="space-y-3">
               <div className="flex items-start justify-between">
                 <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 leading-tight">
@@ -199,7 +194,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 </div>
               </div>
 
-              {/* Shop Info */}
               <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-xl border border-orange-100">
                 <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
                   <span className="text-white font-bold text-sm">
@@ -215,13 +209,11 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 </div>
               </div>
 
-              {/* Short Description */}
               <p className="text-gray-600 text-lg leading-relaxed">
                 {productDetail.shortDescription}
               </p>
             </div>
 
-            {/* Price Section */}
             <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200">
               <div className="space-y-4">
                 <div className="flex items-baseline gap-4 flex-wrap">
@@ -250,11 +242,67 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                   )}
                 </div>
 
-                {/* Action Buttons */}
+                <div className="mt-2 mb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-700 font-medium">Số lượng:</span>
+                    <div className="flex items-center">
+                      <span className="text-gray-600 mr-2">
+                        Còn lại:{' '}
+                        <span
+                          className={`font-medium ${
+                            productDetail.quantity < 10 ? 'text-red-500' : 'text-green-600'
+                          }`}
+                        >
+                          {productDetail.quantity}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center mt-2">
+                    <button
+                      onClick={() => handleQuantityChange(false)}
+                      disabled={quantity <= 1}
+                      className="w-10 h-10 rounded-l-lg bg-orange-100 text-orange-700 hover:bg-orange-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <MdRemove />
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={productDetail.quantity}
+                      value={quantity}
+                      onChange={handleQuantityInput}
+                      className="w-16 h-10 text-center border-y border-orange-200 text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    />
+                    <button
+                      onClick={() => handleQuantityChange(true)}
+                      disabled={quantity >= productDetail.quantity}
+                      className="w-10 h-10 rounded-r-lg bg-orange-100 text-orange-700 hover:bg-orange-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <MdAdd />
+                    </button>
+                  </div>
+
+                  {stockWarning && (
+                    <div className="mt-2 text-amber-600 text-sm flex items-center gap-1">
+                      <MdWarning size={16} />
+                      <span>Số lượng đang gần hết!</span>
+                    </div>
+                  )}
+
+                  {productDetail.quantity <= 0 && (
+                    <div className="mt-2 text-red-600 text-sm flex items-center gap-1">
+                      <MdError size={16} />
+                      <span>Sản phẩm đã hết hàng!</span>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={handleAddToCart}
-                    disabled={isAddingToCart}
+                    disabled={isAddingToCart || productDetail.quantity <= 0}
                     className="flex-1 bg-orange-500 text-white px-6 py-4 rounded-xl hover:bg-orange-600
                       transition-all duration-200 flex items-center justify-center gap-3 font-semibold text-lg
                       disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
@@ -264,12 +312,17 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                     ) : (
                       <MdAddShoppingCart size={24} />
                     )}
-                    {isAddingToCart ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+                    {isAddingToCart
+                      ? 'Đang thêm...'
+                      : productDetail.quantity <= 0
+                        ? 'Hết hàng'
+                        : 'Thêm vào giỏ hàng'}
                   </button>
                   <button
+                    disabled={productDetail.quantity <= 0}
                     className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4 rounded-xl
                     hover:from-orange-700 hover:to-orange-800 transition-all duration-200 font-semibold text-lg
-                    shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                    shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     Mua ngay
                   </button>
@@ -277,7 +330,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               </div>
             </div>
 
-            {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm">
                 <MdLocalShipping className="text-orange-500" size={24} />
@@ -304,9 +356,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </div>
         </div>
 
-        {/* Product Details Tabs */}
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100 mb-12">
-          {/* Tab Navigation */}
           <div className="border-b border-orange-100">
             <nav className="flex">
               {[
@@ -331,7 +381,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             </nav>
           </div>
 
-          {/* Tab Content */}
           <div className="p-6">
             {activeTab === 'description' && (
               <div className="prose max-w-none">
@@ -339,11 +388,11 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 <div className="text-gray-700 leading-relaxed whitespace-pre-line">
                   {productDetail.description || 'Chưa có mô tả chi tiết.'}
                 </div>
-                {productDetail.keywords?.length > 0 && (
+                {productDetail.keywords && productDetail.keywords.length > 0 && (
                   <div className="mt-6">
                     <h4 className="font-semibold text-gray-800 mb-3">Từ khóa:</h4>
                     <div className="flex flex-wrap gap-2">
-                      {productDetail.keywords.map((keyword, index) => (
+                      {productDetail.keywords.map((keyword: string, index: number) => (
                         <span
                           key={index}
                           className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm"
@@ -374,6 +423,16 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                       <span className="font-medium text-gray-600">Tình trạng:</span>
                       <span className="text-gray-800">
                         {productDetail.verified ? 'Đã xác minh' : 'Chưa xác minh'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-600">Số lượng trong kho:</span>
+                      <span
+                        className={`font-medium ${
+                          productDetail.quantity < 10 ? 'text-red-500' : 'text-green-600'
+                        }`}
+                      >
+                        {productDetail.quantity} sản phẩm
                       </span>
                     </div>
                   </div>
@@ -408,7 +467,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </div>
         </div>
 
-        {/* Price History Chart */}
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100 mb-12">
           <div className="p-6 border-b border-orange-100">
             <h2 className="text-2xl font-bold text-gray-800">Lịch sử giá</h2>
@@ -421,7 +479,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </div>
         </div>
 
-        {/* Related Products */}
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100">
           <div className="p-6 border-b border-orange-100">
             <h2 className="text-2xl font-bold text-gray-800">Sản phẩm tương tự</h2>
