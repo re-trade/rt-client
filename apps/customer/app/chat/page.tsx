@@ -1,11 +1,11 @@
-"use client"
+'use client';
 
-import { CallInterface } from "@/components/chat/CallInterface"
-import { ChatHeader } from "@/components/chat/ChatHeader"
-import { MessageInput } from "@/components/chat/MessageInput"
-import { MessagesList } from "@/components/chat/MessagesList"
-import { useMessengerContext } from "@/context/MessengerContext"
-import { IconSend } from "@tabler/icons-react"
+import { CallInterface } from '@/components/chat/CallInterface';
+import { ChatHeader } from '@/components/chat/ChatHeader';
+import { MessageInput } from '@/components/chat/MessageInput';
+import { MessagesList } from '@/components/chat/MessagesList';
+import { useMessengerContext } from '@/context/MessengerContext';
+import { IconSend } from '@tabler/icons-react';
 
 export default function MessengerPage() {
   const {
@@ -31,7 +31,7 @@ export default function MessengerPage() {
     startRecording,
     stopRecording,
     formatRecordingTime,
-  } = useMessengerContext()
+  } = useMessengerContext();
 
   if (!selectedContact) {
     return (
@@ -44,7 +44,7 @@ export default function MessengerPage() {
           <p className="text-gray-600">Chọn một cuộc trò chuyện để bắt đầu nhắn tin</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (isVideoCall || isAudioCall) {
@@ -67,14 +67,22 @@ export default function MessengerPage() {
         onEndCall={endCall}
         formatRecordingTime={formatRecordingTime}
       />
-    )
+    );
   }
 
   return (
     <div className="flex-1 flex flex-col">
-      <ChatHeader contact={selectedContact} onAudioCall={startAudioCall} onVideoCall={startVideoCall} />
+      <ChatHeader
+        contact={selectedContact}
+        onAudioCall={startAudioCall}
+        onVideoCall={startVideoCall}
+      />
       <MessagesList messages={messages} />
-      <MessageInput message={newMessage} onMessageChange={setNewMessage} onSendMessage={handleSendMessage} />
+      <MessageInput
+        message={newMessage}
+        onMessageChange={setNewMessage}
+        onSendMessage={handleSendMessage}
+      />
     </div>
-  )
+  );
 }

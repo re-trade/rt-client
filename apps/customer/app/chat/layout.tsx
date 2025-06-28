@@ -1,11 +1,12 @@
-"use client"
+'use client';
 
-import type React from "react"
-import { ContactsList } from "@/components/chat/ContactsList"
-import { MessengerProvider, useMessengerContext } from "@/context/MessengerContext"
+import { ContactsList } from '@/components/chat/ContactsList';
+import { MessengerProvider, useMessengerContext } from '@/context/MessengerContext';
+import type React from 'react';
 
 function MessengerLayoutContent({ children }: { children: React.ReactNode }) {
-  const { contacts, selectedContact, searchQuery, setSelectedContact, setSearchQuery, audioRef } = useMessengerContext()
+  const { contacts, selectedContact, searchQuery, setSelectedContact, setSearchQuery, audioRef } =
+    useMessengerContext();
 
   return (
     <div className="h-screen bg-gray-50 flex">
@@ -29,7 +30,7 @@ function MessengerLayoutContent({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       {children}
     </div>
-  )
+  );
 }
 
 export default function MessengerLayout({ children }: { children: React.ReactNode }) {
@@ -37,5 +38,5 @@ export default function MessengerLayout({ children }: { children: React.ReactNod
     <MessengerProvider>
       <MessengerLayoutContent>{children}</MessengerLayoutContent>
     </MessengerProvider>
-  )
+  );
 }
