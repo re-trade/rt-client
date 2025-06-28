@@ -1,11 +1,11 @@
 'use client';
 
-import { ReviewResponse } from '@/service/review.api';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ReviewResponse } from '@/service/review.api';
 import { CheckCircle, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';

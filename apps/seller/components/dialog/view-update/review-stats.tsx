@@ -74,7 +74,9 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.averagePositiveReviews}%</div>
-          <p className="text-xs text-muted-foreground">tổng {stats.totalPositiveReviews} đánh giá(4-5 sao)</p>
+          <p className="text-xs text-muted-foreground">
+            tổng {stats.totalPositiveReviews} đánh giá(4-5 sao)
+          </p>
         </CardContent>
       </Card>
 

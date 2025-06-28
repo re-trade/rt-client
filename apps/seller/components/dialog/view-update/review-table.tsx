@@ -47,7 +47,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
     return text.substring(0, maxLength) + '...';
   };
 
-    if (!reviews) {
+  if (!reviews) {
     return <p className="text-muted-foreground">Không có đánh giá...</p>;
   }
 

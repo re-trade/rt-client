@@ -62,10 +62,11 @@ export default function ReviewsPage() {
   };
 
   const handleSubmitReply = (reviewId: string, replyContent: string) => {
-    reviewApi.replyReview(reviewId, replyContent)
+    reviewApi
+      .replyReview(reviewId, replyContent)
       .then((updatedReview) => {
         setProductReviews((prevReviews) =>
-          prevReviews.map((r) => (r.id === updatedReview.id ? updatedReview : r))
+          prevReviews.map((r) => (r.id === updatedReview.id ? updatedReview : r)),
         );
         setIsReplyOpen(false);
       })
@@ -75,7 +76,6 @@ export default function ReviewsPage() {
     // Reset selected review after reply submission
     setSelectedReview(null);
   };
-  
 
   return (
     <div className="space-y-6">
