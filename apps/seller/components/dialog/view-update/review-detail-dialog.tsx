@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ReviewResponse } from '@/service/review.api';
@@ -88,7 +89,7 @@ export function ReviewDetailDialog({ open, onOpenChange, review }: ReviewDetailD
           {/* Review Content */}
           <Card>
             <CardContent className="p-4">
-              {/* <h4 className="font-semibold text-lg mb-3">{review.title}</h4> */}
+              <h4 className="font-semibold text-lg mb-3">Nội dung</h4>
               <p className="text-gray-700 leading-relaxed mb-4">{review.content}</p>
 
               {/* Review Images */}
@@ -118,6 +119,7 @@ export function ReviewDetailDialog({ open, onOpenChange, review }: ReviewDetailD
                 </div>
               </div>
             </CardContent>
+         
           </Card>
 
           {/* Shop Reply */}

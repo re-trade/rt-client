@@ -4,6 +4,7 @@ import { ReplyDialog } from '@/components/dialog/add/reply-review-dialog';
 import { ReviewDetailDialog } from '@/components/dialog/view-update/review-detail-dialog';
 import { ReviewStats } from '@/components/dialog/view-update/review-stats';
 import { ReviewTable } from '@/components/dialog/view-update/review-table';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -22,12 +23,12 @@ export default function ReviewsPage() {
   const [isReplyOpen, setIsReplyOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [ratingFilter, setRatingFilter] = useState<string>('all');
-  const [replyFilter, setReplyFilter] = useState<string>('all'); // chưa dùng
+  const [replyFilter, setReplyFilter] = useState<string>('all');
   const [productReviews, setProductReviews] = useState<ReviewResponse[]>([]);
 
-  const fetchReviews = async (vote?: number, q?: string) => {
+  const fetchReviews = async (vote?: number, q?: string, reply?: string) => {
     try {
-      const reviews = await reviewApi.getAllreviewsBySeller(0, 10, vote, 'a');
+      const reviews = await reviewApi.getAllreviewsBySeller(0, 10, vote, q);
       console.log('Fetched reviews:', reviews);
       setProductReviews(reviews);
     } catch (error) {
@@ -35,11 +36,20 @@ export default function ReviewsPage() {
     }
   };
 
+  // Fetch reviews on initial load and when ratingFilter or replyFilter changes
   useEffect(() => {
     const vote = ratingFilter === 'all' ? undefined : Number(ratingFilter);
     const q = searchTerm || undefined;
-    fetchReviews(vote, q);
-  }, [searchTerm, ratingFilter]);
+    const reply = replyFilter === 'all' ? undefined : replyFilter;
+    fetchReviews(vote, q, reply);
+  }, [ratingFilter, replyFilter]); // Dependencies: ratingFilter, replyFilter
+
+  const handleSearch = () => {
+    const vote = ratingFilter === 'all' ? undefined : Number(ratingFilter);
+    const q = searchTerm || undefined;
+    const reply = replyFilter === 'all' ? undefined : replyFilter;
+    fetchReviews(vote, q, reply);
+  };
 
   const handleViewDetail = (review: ReviewResponse) => {
     setSelectedReview(review);
@@ -52,29 +62,26 @@ export default function ReviewsPage() {
   };
 
   const handleSubmitReply = (reviewId: string, replyContent: string) => {
-    setProductReviews((prev) =>
-      prev.map((review) =>
-        review.id === reviewId
-          ? {
-              ...review,
-              shopReply: {
-                content: replyContent,
-                createdAt: new Date().toISOString(),
-              },
-            }
-          : review,
-      ),
-    );
-    setSelectedReview(null); // ✅ fix lỗi
+    reviewApi.replyReview(reviewId, replyContent)
+      .then((updatedReview) => {
+        setProductReviews((prevReviews) =>
+          prevReviews.map((r) => (r.id === updatedReview.id ? updatedReview : r))
+        );
+        setIsReplyOpen(false);
+      })
+      .catch((error) => {
+        console.error('Failed to submit reply:', error);
+      });
+    // Reset selected review after reply submission
+    setSelectedReview(null);
   };
+  
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">Quản lý đánh giá</h2>
         <p className="text-muted-foreground">Xem và phản hồi đánh giá từ khách hàng</p>
       </div>
-
       <ReviewStats reviews={productReviews} />
 
       {/* Filters */}
@@ -101,6 +108,19 @@ export default function ReviewsPage() {
             <SelectItem value="1">1 sao</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={replyFilter} onValueChange={setReplyFilter}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue placeholder="Lọc theo phản hồi" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả</SelectItem>
+            <SelectItem value="replied">Đã phản hồi</SelectItem>
+            <SelectItem value="unreplied">Chưa phản hồi</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button onClick={handleSearch} className="w-full sm:w-auto">
+          Tìm kiếm
+        </Button>
       </div>
 
       <ReviewTable reviews={productReviews} onViewDetail={handleViewDetail} onReply={handleReply} />

@@ -14,7 +14,6 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
     const fetchStats = async () => {
       try {
         const response = await reviewApi.getStatsReviewsSeller();
-        console.log('Review stats:', response);
         setStats(response);
       } catch (error) {
         console.error('Failed to fetch review stats:', error);
@@ -74,8 +73,8 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.averagePositiveRating}%</div>
-          <p className="text-xs text-muted-foreground">4-5 sao</p>
+          <div className="text-2xl font-bold">{stats.averagePositiveReviews}%</div>
+          <p className="text-xs text-muted-foreground">tổng {stats.totalPositiveReviews} đánh giá(4-5 sao)</p>
         </CardContent>
       </Card>
 

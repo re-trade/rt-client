@@ -1,6 +1,6 @@
 'use client';
 
-import type { Review } from '@/app/dashboard/review-management/page';
+import { ReviewResponse } from '@/service/review.api';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 interface ReplyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  review: Review | null;
+  review: ReviewResponse | null;
   onSubmitReply: (reviewId: string, replyContent: string) => void;
 }
 
@@ -21,8 +21,8 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
   const [replyContent, setReplyContent] = useState('');
 
   useEffect(() => {
-    if (review?.shopReply) {
-      setReplyContent(review.shopReply.content);
+    if (review?.reply) {
+      setReplyContent(review.reply.content);
     } else {
       setReplyContent('');
     }
@@ -72,13 +72,13 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
     }
   };
 
-  const suggestedReplies = getSuggestedReplies(review.rating);
+  const suggestedReplies = getSuggestedReplies(review.vote);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{review.shopReply ? 'Chỉnh sửa phản hồi' : 'Phản hồi đánh giá'}</DialogTitle>
+          <DialogTitle>{review.reply ? 'Chỉnh sửa phản hồi' : 'Phản hồi đánh giá'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -86,29 +86,29 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
           <div className="bg-muted p-4 rounded-lg">
             <div className="flex items-start gap-4">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={review.customerAvatar || '/placeholder.svg'} />
-                <AvatarFallback>{review.customerName.charAt(0)}</AvatarFallback>
+                <AvatarImage src={review.author.avatarUrl || '/placeholder.svg'} />
+                <AvatarFallback>{review.author.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold">{review.customerName}</span>
+                  <span className="font-semibold">{review.author.name}</span>
                   {review.isVerifiedPurchase && <CheckCircle className="h-4 w-4 text-green-600" />}
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                  {renderStars(review.rating)}
-                  <span className="text-sm text-muted-foreground">({review.rating}/5)</span>
+                  {renderStars(review.vote)}
+                  <span className="text-sm text-muted-foreground">({review.vote}/5)</span>
                 </div>
                 <div className="flex items-center gap-4 mb-3">
                   <Image
-                    src={review.productImage || '/placeholder.svg'}
-                    alt={review.productName}
+                    src={review.product.thumbnailUrl || '/placeholder.svg'}
+                    alt={review.product.productName}
                     width={40}
                     height={40}
                     className="rounded object-cover"
                   />
-                  <span className="text-sm font-medium">{review.productName}</span>
+                  <span className="text-sm font-medium">{review.product.productName}</span>
                 </div>
-                <h4 className="font-medium mb-1">{review.title}</h4>
+                <h4 className="font-medium mb-1">Nội dung</h4>
                 <p className="text-sm text-muted-foreground">{review.content}</p>
               </div>
             </div>
@@ -149,7 +149,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
           {/* Action Buttons */}
           <div className="flex gap-2 pt-4">
             <Button onClick={handleSubmit} disabled={!replyContent.trim()} className="flex-1">
-              {review.shopReply ? 'Cập nhật phản hồi' : 'Gửi phản hồi'}
+              {review.reply ? 'Cập nhật phản hồi' : 'Gửi phản hồi'}
             </Button>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Hủy

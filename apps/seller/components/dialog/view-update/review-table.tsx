@@ -35,7 +35,6 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
       </div>
     );
   };
-  console.log('ReviewTable rendered with reviews:', reviews);
 
   const getRatingColor = (rating: number) => {
     if (rating >= 4) return 'bg-green-100 text-green-800';
@@ -47,6 +46,10 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
+
+    if (!reviews) {
+    return <p className="text-muted-foreground">Không có đánh giá...</p>;
+  }
 
   return (
     <Card>
