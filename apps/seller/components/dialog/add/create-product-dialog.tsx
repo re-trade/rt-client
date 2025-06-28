@@ -4,22 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Category, getAllCategories } from '@/service/categories.api';
 import { CreateProductDto, TProduct } from '@/service/product.api';
 import { Image as ImageIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-
 import Image from 'next/image';
+import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
 
 interface CreateProductDialogProps {
   open: boolean;
@@ -42,89 +33,52 @@ export function CreateProductDialog({
     discount: '',
     model: '',
     currentPrice: '',
-    categoryIds: '',
-    keywords: '',
+    categoryIds: [] as string[], // Store category IDs as an array of strings
+    // quantities: 0,
     tags: '',
-    status: 'DRAFT',
+    status: 'DRAFT' as const,
   });
 
-  const handleSubmit = () => {
-    const productData: Omit<
-      TProduct,
-      'id' | 'createdAt' | 'updatedAt' | 'sellerId' | 'sellerShopName' | 'verified'
-    > = {
-      name: formData.name,
-      shortDescription: formData.shortDescription,
-      description: formData.description,
-      thumbnail: formData.thumbnail,
-      productImages: formData.productImages
-        .split(',')
-        .map((img) => img.trim())
-        .filter(Boolean),
-      brand: formData.brand,
-      discount: Number(formData.discount) || 0,
-      model: formData.model,
-      currentPrice: Number(formData.currentPrice) || 0,
-      categories: [],
-      categoryIds: formData.categoryIds
-        .split(',')
-        .map((id) => id.trim())
-        .filter(Boolean),
-      keywords: formData.keywords
-        .split(',')
-        .map((kw) => kw.trim())
-        .filter(Boolean),
-      tags: formData.tags
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      status: formData.status as 'DRAFT' | 'ACTIVE' | 'INACTIVE',
-    };
-
-    onCreateProduct(productData);
-    onOpenChange(false);
-    setFormData({
-      name: '',
-      shortDescription: '',
-      description: '',
-      thumbnail: '',
-      productImages: '',
-      brand: '',
-      discount: '',
-      model: '',
-      currentPrice: '',
-      categoryIds: '',
-      keywords: '',
-      tags: '',
-      status: 'DRAFT',
-    });
-  };
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const handleChooseFiles = () => {
-    fileInputRef.current?.click();
-  };
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+
+  // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getAllCategories();
         setCategories(response);
-        console.log('Fetched categories:', response);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
       }
     };
-
     fetchCategories();
   }, []);
+
+  // Clean up URLs on unmount or when previews change
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    };
+  }, [imagePreviews, thumbnailPreview]);
+
+  const handleFormChange = (field: keyof typeof formData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleChooseFiles = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
-    // Process files after user confirms selection (clicks "OK")
     const newPreviews = files.map((file) => URL.createObjectURL(file));
     setSelectedFiles((prev) => [...prev, ...files]);
     setImagePreviews((prev) => [...prev, ...newPreviews]);
@@ -137,25 +91,75 @@ export function CreateProductDialog({
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleRemoveThumbnail = () => {
-    if (formData.thumbnail) {
-      URL.revokeObjectURL(formData.thumbnail);
-      setFormData({ ...formData, thumbnail: '' });
-    }
-  };
-
-  const thumbnailInputRef = useRef<HTMLInputElement>(null);
-
   const handleChooseThumbnail = () => {
     thumbnailInputRef.current?.click();
   };
+
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
       const imageUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, thumbnail: imageUrl });
+      setThumbnailPreview(imageUrl);
+      setFormData((prev) => ({ ...prev, thumbnail: imageUrl }));
+    }
+    e.target.value = ''; // Reset input
+  };
+
+  const handleRemoveThumbnail = () => {
+    if (thumbnailPreview) {
+      URL.revokeObjectURL(thumbnailPreview);
+      setThumbnailPreview('');
+      setFormData((prev) => ({ ...prev, thumbnail: '' }));
     }
   };
+
+  const handleSubmit = () => {
+    const productData: Omit<
+      CreateProductDto,
+      'id' | 'createdAt' | 'updatedAt' | 'sellerId' | 'sellerShopName' | 'verified'
+    > = {
+      name: formData.name,
+      shortDescription: formData.shortDescription,
+      description: formData.description,
+      thumbnail: formData.thumbnail,
+      productImages: imagePreviews,
+      brand: formData.brand,
+      model: formData.model,
+      currentPrice: Number(formData.currentPrice) || 0,
+      categoryIds: formData.categoryIds, // Use categoryIds instead of categories
+      // quantities: formData.quantities,
+      tags: formData.tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+
+    };
+
+    onCreateProduct(productData);
+    onOpenChange(false);
+
+    // Reset form
+    setFormData({
+      name: '',
+      shortDescription: '',
+      description: '',
+      thumbnail: '',
+      productImages: '',
+      brand: '',
+      discount: '',
+      model: '',
+      currentPrice: '',
+      categoryIds: [],
+     
+      tags: '',
+      status: 'DRAFT',
+    });
+    setImagePreviews([]);
+    setSelectedFiles([]);
+    setThumbnailPreview('');
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
@@ -169,7 +173,7 @@ export function CreateProductDialog({
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => handleFormChange('name', e.target.value)}
             />
           </div>
 
@@ -178,70 +182,53 @@ export function CreateProductDialog({
             <Input
               id="brand"
               value={formData.brand}
-              onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+              onChange={(e) => handleFormChange('brand', e.target.value)}
             />
           </div>
-          <div>
-            <Label htmlFor="categoryIds">Danh mục </Label>
-            <Input
-              id="categoryIds"
+
+          <div className="md:col-span-2">
+            <Label htmlFor="categoryIds">Danh mục</Label>
+            <MultiSelectCategory
               value={formData.categoryIds}
-              onChange={(e) => setFormData({ ...formData, categoryIds: e.target.value })}
+              onChange={(selected) => handleFormChange('categoryIds', selected)}
             />
           </div>
-          <div>
-            <Label htmlFor="categoryIds">Danh mục </Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn danh mục" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Danh mục</SelectLabel>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          {/* <div>
-            <Label htmlFor="discount">Giảm giá (%)</Label>
-            <Input id="discount" type="number" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: e.target.value })} />
-          </div> */}
 
           <div>
             <Label htmlFor="model">Model</Label>
             <Input
               id="model"
               value={formData.model}
-              onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="currentPrice">Giá sản phẩm</Label>
-            <Input
-              id="currentPrice"
-              type="number"
-              value={formData.currentPrice}
-              onChange={(e) => setFormData({ ...formData, currentPrice: e.target.value })}
+              onChange={(e) => handleFormChange('model', e.target.value)}
             />
           </div>
 
           {/* <div>
-            <Label htmlFor="keywords">Từ khóa </Label>
-            <Input id="keywords" value={formData.keywords} onChange={(e) => setFormData({ ...formData, keywords: e.target.value })} />
+            <Label htmlFor="quantities">Số lượng</Label>
+            <Input
+              id="quantities"
+              type="number"
+              value={formData.quantities}
+              onChange={(e) => handleFormChange('quantities', Number(e.target.value))}
+            />
           </div> */}
 
           <div>
-            <Label htmlFor="tags">Tags </Label>
+            <Label htmlFor="currentPrice">Giá sản phẩm</Label>
+            <Input
+              id="currentPrice" // Fixed ID to match htmlFor
+              type="number" // Set type to number for better UX
+              value={formData.currentPrice}
+              onChange={(e) => handleFormChange('currentPrice', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="tags">Tags</Label>
             <Input
               id="tags"
               value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              onChange={(e) => handleFormChange('tags', e.target.value)}
             />
           </div>
 
@@ -250,7 +237,7 @@ export function CreateProductDialog({
             <Textarea
               id="shortDescription"
               value={formData.shortDescription}
-              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+              onChange={(e) => handleFormChange('shortDescription', e.target.value)}
             />
           </div>
 
@@ -259,16 +246,16 @@ export function CreateProductDialog({
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => handleFormChange('description', e.target.value)}
             />
           </div>
 
           <div className="md:col-span-2">
-            <div className="md:col-span-2 flex flex-row items-start">
+            <div className="flex flex-row items-start">
               <div className="flex flex-col items-start space-y-2">
                 <Label>Ảnh đại diện</Label>
                 <Button
-                  className="py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-500 text-sm font-medium flex items-center gap-2"
+                  className="py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-500"
                   variant="outline"
                   onClick={handleChooseThumbnail}
                 >
@@ -276,7 +263,7 @@ export function CreateProductDialog({
                   Chọn ảnh
                 </Button>
 
-                <Input
+                <input
                   type="file"
                   accept="image/*"
                   ref={thumbnailInputRef}
@@ -285,18 +272,17 @@ export function CreateProductDialog({
                 />
               </div>
               <div className="flex-1 flex justify-center ml-8">
-                {formData.thumbnail && (
+                {thumbnailPreview && (
                   <div className="relative w-36 h-36">
                     <Image
-                      src={formData.thumbnail}
+                      src={thumbnailPreview}
                       alt="Thumbnail"
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-lg"
+                      fill
+                      className="rounded-lg object-cover"
                     />
                     <button
                       type="button"
-                      onClick={() => handleRemoveThumbnail()}
+                      onClick={handleRemoveThumbnail}
                       className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
                     >
                       ✕
@@ -312,7 +298,7 @@ export function CreateProductDialog({
               <div className="flex flex-col items-start space-y-2">
                 <Label htmlFor="productImages">Ảnh sản phẩm chi tiết</Label>
                 <Button
-                  className=" bg-gray-600 text-white rounded-lg hover:bg-gray-500 text-sm font-medium flex items-center gap-2"
+                  className="py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-500"
                   variant="outline"
                   onClick={handleChooseFiles}
                 >
@@ -324,8 +310,8 @@ export function CreateProductDialog({
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={handleFileChange}
                   ref={fileInputRef}
+                  onChange={handleFileChange}
                   className="hidden"
                 />
               </div>
@@ -333,13 +319,12 @@ export function CreateProductDialog({
                 {imagePreviews.length > 0 && (
                   <div className="flex flex-wrap gap-4 justify-center">
                     {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative w-36 h-35">
+                      <div key={index} className="relative w-36 h-36">
                         <Image
                           src={preview}
                           alt={`Preview ${index}`}
-                          layout="fill"
-                          objectFit="cover"
-                          className="rounded-lg"
+                          fill
+                          className="rounded-lg object-cover"
                         />
                         <button
                           type="button"

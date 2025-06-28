@@ -23,6 +23,8 @@ import {
   Store,
   Ticket,
   Truck,
+  Settings,
+  ShieldEllipsis
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -59,11 +61,11 @@ const menuItems = [
     icon: ShoppingCart,
     href: '/dashboard/orders-management',
   },
-  {
-    title: 'Quản lý voucher',
-    icon: Ticket,
-    href: '/dashboard/voucher-management',
-  },
+  // {
+  //   title: 'Quản lý voucher',
+  //   icon: Ticket,
+  //   href: '/dashboard/voucher-management',
+  // },
   {
     title: 'Phương thức vận chuyển',
     icon: Truck,
@@ -73,6 +75,11 @@ const menuItems = [
     title: 'Quản lý địa chỉ',
     icon: MapPin,
     href: '/dashboard/address-management',
+  },
+  {
+    title: 'Bảo mật',
+    icon: ShieldEllipsis,
+    href: '/dashboard/security',
   },
 ];
 

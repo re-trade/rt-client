@@ -16,7 +16,6 @@ import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
 import { Edit, Trash } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-// ✅ Đảm bảo file tồn tại
 
 export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
@@ -36,18 +35,16 @@ export default function ProductManagement() {
     fetchProduct();
   }, []);
 
-  const handleCreateProduct = (productData: CreateProductDto) => {
-    const newProduct: TProduct = {
-      ...productData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      sellerId: 'mock-seller-id', // hoặc lấy từ context/token
-      sellerShopName: 'Gian hàng mẫu',
-      verified: false,
-      categories: [], // bạn có thể map từ categoryIds sang categories tên nếu cần
-    };
-    setProductList([...productList, newProduct]);
+  const handleCreateProduct = async (productData: CreateProductDto) => {
+    try {
+      const newProduct = await productApi.createProduct(productData);
+      console.log('New product created:', productData);
+      setProductList((prev) => [...prev, newProduct]);
+      setIsCreateOpen(false);
+    } catch (error) {
+      console.error('Error creating product:', error);
+      // Optionally, show a user-friendly error message (e.g., using a toast notification)
+    }
   };
 
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
@@ -70,6 +67,7 @@ export default function ProductManagement() {
     setSelectedProduct(product);
     setIsEditOpen(true);
   };
+
   const handleDeletetProduct = (product: TProduct) => {
     const updatedProducts = productList.filter((p) => p.id !== product.id);
     setProductList(updatedProducts);
@@ -111,7 +109,7 @@ export default function ProductManagement() {
             </TableHeader>
             <TableBody>
               {productList.map((product) => (
-                <TableRow key={product.id} className="cursor-pointer hover:bg-muted/50">
+                <TableRow key={product.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleEditProduct(product)}>
                   <TableCell>
                     <Image
                       src={product.thumbnail || '/placeholder.svg'}

@@ -14,7 +14,7 @@ export type TProduct = {
   model: string;
   currentPrice: number;
   categories: string[];
-  keywords: string[];
+  // quantities: number;
   tags: string[];
   verified: boolean;
   createdAt: string;
@@ -28,13 +28,11 @@ export type CreateProductDto = {
   thumbnail: string;
   productImages: string[];
   brand: string;
-  discount: number;
   model: string;
+  // quantities: number;
   currentPrice: number;
   categoryIds: string[];
-  keywords: string[];
   tags: string[];
-  status: 'DRAFT' | 'ACTIVE' | 'INACTIVE';
 };
 
 export const productApi = {
@@ -62,13 +60,14 @@ export const productApi = {
       throw error;
     }
   },
-  async createProdut(product: TProduct): Promise<TProduct> {
-    const response = await authApi.default.post<IResponseObject<TProduct>>('/products', product);
-    if (response.data.success) {
-      return response.data.content;
-    }
-    throw new Error('Failed to create product');
-  },
+async createProduct(product: CreateProductDto): Promise<TProduct> {
+  const response = await authApi.default.post<IResponseObject<TProduct>>('/products', product);
+  if (response.data.success) {
+    return response.data.content;
+  }
+  throw new Error('Failed to create product');
+},
+
   async updateProduct(id: string, product: Partial<TProduct>): Promise<TProduct> {
     const response = await authApi.default.put<IResponseObject<TProduct>>(
       `/products/${id}`,

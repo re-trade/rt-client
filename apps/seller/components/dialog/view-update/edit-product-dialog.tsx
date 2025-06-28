@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { TProduct } from '@/service/product.api';
 import { Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
 import { useEffect, useRef, useState } from 'react';
 
 interface EditProductDialogProps {
@@ -131,6 +132,9 @@ export function EditProductDialog({
     onOpenChange(false);
   };
 
+  const handleFormChange = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
@@ -149,11 +153,11 @@ export function EditProductDialog({
             value={formData.brand}
             onChange={(v) => setFormData({ ...formData, brand: v })}
           />
-          <InputField
+          {/* <InputField
             label="Danh mục"
             value={formData.categoryIds}
             onChange={(v) => setFormData({ ...formData, categoryIds: v })}
-          />
+          /> */}
           <InputField
             label="Giảm giá (%)"
             type="number"
@@ -182,6 +186,13 @@ export function EditProductDialog({
             value={formData.tags}
             onChange={(v) => setFormData({ ...formData, tags: v })}
           />
+           <div className="md:col-span-2">
+                      <Label htmlFor="categoryIds">Danh mục</Label>
+                      <MultiSelectCategory
+                        value={formData.categoryIds}
+                        onChange={(selected) => handleFormChange("categoryIds", selected)}
+                      />
+                    </div>
           <div className="md:col-span-2">
             <Label>Mô tả ngắn</Label>
             <Textarea

@@ -1,6 +1,6 @@
 'use client';
 
-import type { Review } from '@/app/dashboard/review-management/page';
+import { ReviewResponse, reviewApi } from '@/service/review.api';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,9 +17,9 @@ import { AlertTriangle, CheckCircle, Eye, MessageSquare, Star } from 'lucide-rea
 import Image from 'next/image';
 
 interface ReviewTableProps {
-  reviews: Review[];
-  onViewDetail: (review: Review) => void;
-  onReply: (review: Review) => void;
+  reviews: ReviewResponse[];
+  onViewDetail: (review: ReviewResponse) => void;
+  onReply: (review: ReviewResponse) => void;
 }
 
 export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps) {
@@ -35,6 +35,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
       </div>
     );
   };
+  console.log('ReviewTable rendered with reviews:', reviews);
 
   const getRatingColor = (rating: number) => {
     if (rating >= 4) return 'bg-green-100 text-green-800';
@@ -63,16 +64,16 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
             </TableRow>
           </TableHeader>
           <TableBody>
-            {reviews.map((review) => (
+          {Array.isArray(reviews) && reviews.map((review) => (
               <TableRow key={review.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={review.customerAvatar || '/placeholder.svg'} />
-                      <AvatarFallback>{review.customerName.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={review.author.avatarUrl || '/placeholder.svg'} />
+                      <AvatarFallback>{review.author.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-medium">{review.customerName}</div>
+                      <div className="font-medium">{review.author.name}</div>
                       <div className="text-sm text-muted-foreground flex items-center gap-1">
                         {review.isVerifiedPurchase && (
                           <>
@@ -87,15 +88,15 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Image
-                      src={review.productImage || '/placeholder.svg'}
-                      alt={review.productName}
+                      src={review.product.thumbnailUrl || '/placeholder.svg'}
+                      alt={review.product.productName}
                       width={40}
                       height={40}
                       className="rounded-md object-cover"
                     />
                     <div>
                       <div className="font-medium text-sm">
-                        {truncateText(review.productName, 30)}
+                        {truncateText(review.product.productName, 30)}
                       </div>
                       <div className="text-xs text-muted-foreground">#{review.orderId}</div>
                     </div>
@@ -103,19 +104,19 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
-                    {renderStars(review.rating)}
-                    <Badge className={getRatingColor(review.rating)}>{review.rating} sao</Badge>
+                    {renderStars(review.vote)}
+                    <Badge className={getRatingColor(review.vote)}>{review.vote} sao</Badge>
                   </div>
                 </TableCell>
                 <TableCell className="max-w-xs">
                   <div>
-                    <div className="font-medium text-sm">{truncateText(review.title, 40)}</div>
+                    {/* <div className="font-medium text-sm">{truncateText(review.title, 40)}</div> */}
                     <div className="text-sm text-muted-foreground">
                       {truncateText(review.content, 60)}
                     </div>
-                    {review.images && review.images.length > 0 && (
+                    {review.imageUrls && review.imageUrls.length > 0 && (
                       <div className="text-xs text-blue-600 mt-1">
-                        +{review.images.length} hình ảnh
+                        +{review.imageUrls.length} hình ảnh
                       </div>
                     )}
                   </div>
@@ -133,17 +134,11 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
-                    {review.shopReply ? (
+                    {review.reply ? (
                       <Badge className="bg-green-100 text-green-800">Đã phản hồi</Badge>
                     ) : (
                       <Badge className="bg-yellow-100 text-yellow-800">Chưa phản hồi</Badge>
-                    )}
-                    {review.reported && (
-                      <div className="flex items-center gap-1 text-xs text-red-600">
-                        <AlertTriangle className="h-3 w-3" />
-                        Bị báo cáo
-                      </div>
-                    )}
+                    )}         
                   </div>
                 </TableCell>
                 <TableCell>
@@ -151,7 +146,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                     <Button variant="outline" size="sm" onClick={() => onViewDetail(review)}>
                       <Eye className="h-4 w-4" />
                     </Button>
-                    {!review.shopReply && (
+                    {!review.reply && (
                       <Button variant="outline" size="sm" onClick={() => onReply(review)}>
                         <MessageSquare className="h-4 w-4" />
                       </Button>
