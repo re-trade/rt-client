@@ -28,7 +28,6 @@ type SellerProfileUpdateRequest = {
   phoneNumber: string;
 };
 
-
 type SellerProfileResponse = {
   id: string;
   shopName: string;
@@ -46,7 +45,6 @@ type SellerProfileResponse = {
   createdAt: string;
   updatedAt: string;
 };
-
 
 export const sellerApi = {
   registerSeller: async (
@@ -99,13 +97,12 @@ export const sellerApi = {
   },
   sellerInformation: async (): Promise<SellerProfileResponse | undefined> => {
     try {
-      const response = await authApi.default.get<IResponseObject<SellerProfileResponse>>(
-        '/sellers',
-      );
+      const response =
+        await authApi.default.get<IResponseObject<SellerProfileResponse>>('/sellers');
       return response.data.content;
     } catch {
       return undefined;
     }
-  }
+  },
 };
 export type { SellerProfileRegisterRequest, SellerProfileResponse, SellerProfileUpdateRequest };

@@ -12,9 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ReviewResponse, reviewApi } from '@/service/review.api';
 import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { ReviewResponse, reviewApi } from '@/service/review.api';
 
 export default function ReviewsPage() {
   const [selectedReview, setSelectedReview] = useState<ReviewResponse | null>(null);
@@ -27,7 +27,7 @@ export default function ReviewsPage() {
 
   const fetchReviews = async (vote?: number, q?: string) => {
     try {
-      const reviews = await reviewApi.getAllreviewsBySeller(0, 10, vote, "a");
+      const reviews = await reviewApi.getAllreviewsBySeller(0, 10, vote, 'a');
       console.log('Fetched reviews:', reviews);
       setProductReviews(reviews);
     } catch (error) {
@@ -62,8 +62,8 @@ export default function ReviewsPage() {
                 createdAt: new Date().toISOString(),
               },
             }
-          : review
-      )
+          : review,
+      ),
     );
     setSelectedReview(null); // ✅ fix lỗi
   };
@@ -103,11 +103,7 @@ export default function ReviewsPage() {
         </Select>
       </div>
 
-      <ReviewTable
-        reviews={productReviews}
-        onViewDetail={handleViewDetail}
-        onReply={handleReply}
-      />
+      <ReviewTable reviews={productReviews} onViewDetail={handleViewDetail} onReply={handleReply} />
 
       <ReviewDetailDialog
         open={isDetailOpen}

@@ -1,5 +1,6 @@
 'use client';
 
+import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -8,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { TProduct } from '@/service/product.api';
 import { Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
-import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
 import { useEffect, useRef, useState } from 'react';
 
 interface EditProductDialogProps {
@@ -186,13 +186,13 @@ export function EditProductDialog({
             value={formData.tags}
             onChange={(v) => setFormData({ ...formData, tags: v })}
           />
-           <div className="md:col-span-2">
-                      <Label htmlFor="categoryIds">Danh mục</Label>
-                      <MultiSelectCategory
-                        value={formData.categoryIds}
-                        onChange={(selected) => handleFormChange("categoryIds", selected)}
-                      />
-                    </div>
+          <div className="md:col-span-2">
+            <Label htmlFor="categoryIds">Danh mục</Label>
+            <MultiSelectCategory
+              value={formData.categoryIds}
+              onChange={(selected) => handleFormChange('categoryIds', selected)}
+            />
+          </div>
           <div className="md:col-span-2">
             <Label>Mô tả ngắn</Label>
             <Textarea

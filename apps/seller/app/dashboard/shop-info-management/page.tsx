@@ -1,31 +1,22 @@
 'use client';
-import {
-  IconBrandFacebook,
-  IconBrandInstagram,
-  IconBrandTiktok,
-  IconBrandYoutube,
-} from '@tabler/icons-react';
-import Link from 'next/link';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage
-} from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { sellerApi, SellerProfileResponse, SellerProfileUpdateRequest } from '@/service/seller.api';
+import { storageApi } from '@/service/storage.api';
+import {
+  IconBrandFacebook,
+  IconBrandInstagram,
+  IconBrandTiktok,
+  IconBrandYoutube,
+} from '@tabler/icons-react';
 import { Edit, Save, Upload, X } from 'lucide-react';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import {
-  SellerProfileResponse,
-  sellerApi,
-  SellerProfileUpdateRequest
-} from '@/service/seller.api';
-import { storageApi } from '@/service/storage.api';
+import { useEffect, useState } from 'react';
 
 type Statisticals = {
   totalProducts: number;
@@ -42,21 +33,20 @@ export default function ShopInfoManagement() {
   const [backgroundFile, setBackgroundFile] = useState<File | null>(null);
 
   const [statisticals, setStatisticals] = useState<Statisticals>({
-  totalProducts: 160,
-  totalOrders: 10,
-  rating: 4.8,
-  status: 'active'
-});
+    totalProducts: 160,
+    totalOrders: 10,
+    rating: 4.8,
+    status: 'active',
+  });
   const fetchShopInfo = async () => {
     const response = await sellerApi.sellerInformation();
     setSellerInfo(response);
-    setFormData(response); 
+    setFormData(response);
   };
 
   useEffect(() => {
     fetchShopInfo();
   }, []);
-
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -107,7 +97,7 @@ export default function ShopInfoManagement() {
       ward: formData.ward || '',
       state: formData.state || '',
       email: formData.email || '',
-      phoneNumber: formData.phoneNumber || ''
+      phoneNumber: formData.phoneNumber || '',
     };
 
     await sellerApi.updateSellerProfile(updatePayload);
@@ -183,7 +173,11 @@ export default function ShopInfoManagement() {
             <div>
               <div className="mt-2 relative">
                 <Image
-                  src={backgroundFile ? URL.createObjectURL(backgroundFile) : formData.background || '/placeholder.svg'}
+                  src={
+                    backgroundFile
+                      ? URL.createObjectURL(backgroundFile)
+                      : formData.background || '/placeholder.svg'
+                  }
                   alt="Cover"
                   width={400}
                   height={200}
@@ -214,7 +208,13 @@ export default function ShopInfoManagement() {
             <div className="flex gap-4">
               <div className="relative">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={avatarFile ? URL.createObjectURL(avatarFile) : formData.avatarUrl || '/placeholder.svg'} />
+                  <AvatarImage
+                    src={
+                      avatarFile
+                        ? URL.createObjectURL(avatarFile)
+                        : formData.avatarUrl || '/placeholder.svg'
+                    }
+                  />
                   <AvatarFallback>Shop</AvatarFallback>
                 </Avatar>
                 {isEditing && (
@@ -248,8 +248,12 @@ export default function ShopInfoManagement() {
                   <h3 className="text-lg font-semibold">{formData.shopName || 'Chưa thiết lập'}</h3>
                 )}
                 <div className="flex items-center gap-2">
-                  <Badge className={getStatusColor(statisticals.status)}>{getStatusText(statisticals.status)}</Badge>
-                  <span className="text-sm text-muted-foreground">⭐ {statisticals.rating}/5.0</span>
+                  <Badge className={getStatusColor(statisticals.status)}>
+                    {getStatusText(statisticals.status)}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    ⭐ {statisticals.rating}/5.0
+                  </span>
                 </div>
               </div>
             </div>
@@ -265,7 +269,9 @@ export default function ShopInfoManagement() {
                   rows={3}
                 />
               ) : (
-                <p className="mt-2 text-sm text-muted-foreground">{formData.description || 'Chưa thiết lập'}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {formData.description || 'Chưa thiết lập'}
+                </p>
               )}
             </div>
 
@@ -295,8 +301,8 @@ export default function ShopInfoManagement() {
                   <p className="mt-2 text-sm">{formData.phoneNumber || 'Chưa thiết lập'}</p>
                 )}
               </div>
-             <div className="md:col-span-2">
-               <CardTitle>Thông tin địa chỉ</CardTitle>
+              <div className="md:col-span-2">
+                <CardTitle>Thông tin địa chỉ</CardTitle>
               </div>
               <div>
                 <Label>Quận</Label>
@@ -323,7 +329,7 @@ export default function ShopInfoManagement() {
                 )}
               </div>
               <div>
-                <Label >Tỉnh/Thành phố</Label>
+                <Label>Tỉnh/Thành phố</Label>
                 {isEditing ? (
                   <Input
                     value={formData.state || ''}
@@ -334,7 +340,7 @@ export default function ShopInfoManagement() {
                   <p className="mt-2 text-sm">{formData.state || 'Chưa thiết lập'}</p>
                 )}
               </div>
-              <div >
+              <div>
                 <Label>Địa chỉ cụ thể</Label>
                 {isEditing ? (
                   <Input
@@ -384,11 +390,27 @@ export default function ShopInfoManagement() {
             </CardHeader>
             <CardContent className="space-y-4">
               {[
-                { key: 'facebook', icon: IconBrandFacebook, color: 'bg-blue-600', name: 'Facebook' },
-                { key: 'instagram', icon: IconBrandInstagram, color: 'bg-pink-600', name: 'Instagram' },
+                {
+                  key: 'facebook',
+                  icon: IconBrandFacebook,
+                  color: 'bg-blue-600',
+                  name: 'Facebook',
+                },
+                {
+                  key: 'instagram',
+                  icon: IconBrandInstagram,
+                  color: 'bg-pink-600',
+                  name: 'Instagram',
+                },
                 { key: 'youtube', icon: IconBrandYoutube, color: 'bg-red-600', name: 'YouTube' },
                 { key: 'tiktok', icon: IconBrandTiktok, color: 'bg-black', name: 'TikTok' },
-                { key: 'zalo', iconPath: '/icon_zalo.png', color: 'bg-blue-500', name: 'Zalo', isImage: true },
+                {
+                  key: 'zalo',
+                  iconPath: '/icon_zalo.png',
+                  color: 'bg-blue-500',
+                  name: 'Zalo',
+                  isImage: true,
+                },
               ].map(({ key, icon: Icon, iconPath, color, name, isImage }) => (
                 <div key={key} className="flex items-center gap-4">
                   <div

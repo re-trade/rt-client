@@ -1,16 +1,16 @@
 'use client';
 
+import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Category, getAllCategories } from '@/service/categories.api';
-import { CreateProductDto, TProduct } from '@/service/product.api';
+import { CreateProductDto } from '@/service/product.api';
 import { Image as ImageIcon } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
+import { useEffect, useRef, useState } from 'react';
 
 interface CreateProductDialogProps {
   open: boolean;
@@ -133,7 +133,6 @@ export function CreateProductDialog({
         .split(',')
         .map((tag) => tag.trim())
         .filter(Boolean),
-
     };
 
     onCreateProduct(productData);
@@ -151,7 +150,7 @@ export function CreateProductDialog({
       model: '',
       currentPrice: '',
       categoryIds: [],
-     
+
       tags: '',
       status: 'DRAFT',
     });

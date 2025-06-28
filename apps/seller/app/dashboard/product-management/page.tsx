@@ -109,7 +109,11 @@ export default function ProductManagement() {
             </TableHeader>
             <TableBody>
               {productList.map((product) => (
-                <TableRow key={product.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handleEditProduct(product)}>
+                <TableRow
+                  key={product.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleEditProduct(product)}
+                >
                   <TableCell>
                     <Image
                       src={product.thumbnail || '/placeholder.svg'}

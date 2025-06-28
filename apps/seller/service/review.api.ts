@@ -1,4 +1,4 @@
-import { unAuthApi, authApi, IResponseObject } from "@retrade/util";
+import { authApi, IResponseObject } from '@retrade/util';
 
 type ReviewResponse = {
   id: string;
@@ -46,7 +46,7 @@ export const reviewApi = {
   getReviews: async (
     productId: string,
     page: number = 1,
-    size: number = 10
+    size: number = 10,
   ): Promise<ReviewResponse[]> => {
     const response = await authApi.default.get<IResponseObject<ReviewResponse[]>>(
       `/products/${productId}/reviews`,
@@ -55,14 +55,14 @@ export const reviewApi = {
           page,
           size,
         },
-      }
+      },
     );
     return response.data.content;
   },
 
   getReview: async (reviewId: string): Promise<ReviewResponse> => {
     const response = await authApi.default.get<IResponseObject<ReviewResponse>>(
-      `/reviews/${reviewId}`
+      `/reviews/${reviewId}`,
     );
     return response.data.content;
   },
@@ -71,7 +71,7 @@ export const reviewApi = {
     page: number = 0,
     size: number = 10,
     vote?: number,
-    q?: string
+    q?: string,
   ): Promise<ReviewResponse[]> => {
     const response = await authApi.default.get<IResponseObject<ReviewResponse[]>>(
       `/product-review/search`,
@@ -82,15 +82,14 @@ export const reviewApi = {
           vote,
           q,
         },
-      }
+      },
     );
     return response.data.content;
   },
 
   getStatsReviewsSeller: async (): Promise<StatsReViewResponse> => {
-    const response = await authApi.default.get<IResponseObject<StatsReViewResponse>>(
-      `/product-review/stats`
-    );
+    const response =
+      await authApi.default.get<IResponseObject<StatsReViewResponse>>(`/product-review/stats`);
     return response.data.content;
   },
 };

@@ -18,13 +18,11 @@ import {
   LayoutDashboard,
   MapPin,
   Package,
+  ShieldEllipsis,
   ShoppingCart,
   Star,
   Store,
-  Ticket,
   Truck,
-  Settings,
-  ShieldEllipsis
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

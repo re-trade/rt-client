@@ -1,8 +1,8 @@
-import { ReviewResponse, reviewApi } from '@/service/review.api';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ReviewResponse } from '@/service/review.api';
 import { CheckCircle, MessageSquare, Star, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
 
