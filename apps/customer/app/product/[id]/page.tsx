@@ -220,26 +220,6 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                   <span className="text-4xl font-bold text-orange-600">
                     {productDetail.currentPrice?.toLocaleString()}₫
                   </span>
-                  {(typeof productDetail.discount === 'number' ? productDetail.discount : 0) >
-                    0 && (
-                    <>
-                      <span className="text-xl text-gray-500 line-through">
-                        {(
-                          productDetail.currentPrice +
-                          (typeof productDetail.discount === 'number' ? productDetail.discount : 0)
-                        ).toLocaleString()}
-                        ₫
-                      </span>
-                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                        Tiết kiệm{' '}
-                        {(typeof productDetail.discount === 'number'
-                          ? productDetail.discount
-                          : 0
-                        ).toLocaleString()}
-                        ₫
-                      </span>
-                    </>
-                  )}
                 </div>
 
                 <div className="mt-2 mb-4">

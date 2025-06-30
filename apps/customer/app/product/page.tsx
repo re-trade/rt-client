@@ -1,113 +1,93 @@
 'use client';
 
 import ProductFilter from '@/components/common/FillterProduct';
-import { productApi, TProduct } from '@/services/product.api';
+import ProductCard from '@/components/product/ProductCard';
+import { useProductList } from '@/hooks/use-product-list';
 import { motion } from 'framer-motion';
-import { BadgeCheckIcon, StoreIcon } from 'lucide-react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
 
 export default function ProductListPage() {
-  const [filter, setFilter] = useState({
-    name: '',
-    categories: [],
-    brands: [],
-  });
-
-  const router = useRouter();
-  const [products, setProducts] = useState<TProduct[]>([]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const listProduct = await productApi.getProducts();
-      setProducts(listProduct);
-    };
-    fetchProducts();
-  }, []);
-  console.log('Products:', products);
-
-  const handleFilterChange = (newFilter: typeof filter) => {
-    setFilter(newFilter);
-  };
-
-  // Lọc sản phẩm theo filter
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesName = product.name?.toLowerCase().includes(filter.name.toLowerCase());
-      const matchesBrand = filter.brands.length === 0 || filter.brands.includes(product.brand);
-      // Nếu bạn có categories trong TProduct, hãy lọc theo nó ở đây
-      return matchesName && matchesBrand;
-    });
-  }, [products, filter]);
+  const {
+    allProducts,
+    loading,
+    isPaginating,
+    filter,
+    filterLoading,
+    handleFilterChange,
+    loadMore,
+  } = useProductList();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 bg-gray-50">
+    <div className="max-w-7xl mx-auto px-4 py-12 bg-gray-50 min-h-screen">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <aside className="md:col-span-1">
           <div className="sticky top-4 space-y-6 bg-white p-6 rounded-xl shadow-sm">
-            <ProductFilter filter={filter} onChange={handleFilterChange} />
+            <ProductFilter
+              filter={filter}
+              onChange={handleFilterChange}
+              isLoading={filterLoading}
+              availableOptions={{
+                categories: filter?.categoriesAdvanceSearch ?? [],
+                brands: filter?.brands ?? [],
+                states: filter?.states ?? [],
+                sellers: filter?.sellers ?? [],
+              }}
+            />
           </div>
         </aside>
 
         <main className="md:col-span-3">
           <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-            Products ({filteredProducts.length})
+            Sản phẩm ({allProducts.length})
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <motion.div
-                onClick={() => router.push(`/product/${product.id}`)}
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white rounded-xl shadow hover:shadow-lg overflow-hidden transition"
-              >
-                <div className="relative h-48">
-                  {/* Product Image */}
-                  <Image
-                    src={product.thumbnail || '/placeholder.jpg'}
-                    alt={product.name || 'Product'}
-                    fill
-                    className="object-cover"
-                  />
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="h-72 bg-white rounded-xl shadow animate-pulse"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                />
+              ))}
+            </div>
+          ) : allProducts.length === 0 ? (
+            <p className="text-gray-500">Không có sản phẩm phù hợp.</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {allProducts.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ProductCard
+                      id={product.id}
+                      name={product.name}
+                      price={product.currentPrice}
+                      image={product.thumbnail}
+                      shortDescription={product.shortDescription}
+                      brand={product.brand}
+                      verified={product.verified}
+                      sellerShopName={product.sellerShopName}
+                    />
+                  </motion.div>
+                ))}
+              </div>
 
-                  {/* Discount Badge */}
-                  {product.discount !== '0%' && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow-md">
-                      -{product.discount}
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-4 space-y-1">
-                  <h3 className="font-semibold text-gray-900 text-base line-clamp-1">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center text-sm text-gray-600 gap-1">
-                    <BadgeCheckIcon className="w-4 h-4 text-blue-500" />
-                    <span>Thương hiệu: {product.brand}</span>
-                  </div>
-
-                  {/* Store Name with Icon */}
-                  <div className="flex items-center text-sm text-gray-600 gap-1">
-                    <StoreIcon className="w-4 h-4 text-purple-500" />
-                    <span>{product.sellerShopName}</span>
-                  </div>
-
-                  {/* Price */}
-                  <p className="text-red-600 font-bold text-lg pt-2">
-                    {(product.currentPrice || 0).toLocaleString('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND',
-                    })}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={loadMore}
+                  disabled={isPaginating}
+                  className="px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+                >
+                  {isPaginating ? 'Đang tải...' : 'Tải thêm'}
+                </button>
+              </div>
+            </>
+          )}
         </main>
       </div>
     </div>

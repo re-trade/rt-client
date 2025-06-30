@@ -1,301 +1,257 @@
 'use client';
 
+import { ClientToServerEvents, Message, Room, ServerToClientEvents } from '@/types/chat';
+import { SignalData } from '@/types/webrtc';
 import { useEffect, useRef, useState } from 'react';
-
-export interface Message {
-  id: string;
-  text: string;
-  sender: 'customer' | 'seller';
-  timestamp: Date;
-  type: 'text' | 'image';
-  imageUrl?: string;
-}
-
-export interface Contact {
-  id: string;
-  name: string;
-  avatar: string;
-  lastMessage: string;
-  timestamp: string;
-  isOnline: boolean;
-  unreadCount: number;
-}
+import { io, Socket } from 'socket.io-client';
 
 export function useMessenger() {
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [selectedContact, setSelectedContact] = useState<Room | null>(null);
+  const [contacts, setContacts] = useState<Room[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const [isVideoCall, setIsVideoCall] = useState(false);
   const [isAudioCall, setIsAudioCall] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
 
+  const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Mock contacts data
-  const contacts: Contact[] = [
-    {
-      id: '1',
-      name: 'Nguyễn Văn An',
-      avatar: '/placeholder.svg?height=40&width=40',
-      lastMessage: 'Sản phẩm còn không bạn?',
-      timestamp: '2 phút',
-      isOnline: true,
-      unreadCount: 2,
-    },
-    {
-      id: '2',
-      name: 'Trần Thị Bình',
-      avatar: '/placeholder.svg?height=40&width=40',
-      lastMessage: 'Cảm ơn bạn nhé!',
-      timestamp: '15 phút',
-      isOnline: false,
-      unreadCount: 0,
-    },
-    {
-      id: '3',
-      name: 'Lê Minh Cường',
-      avatar: '/placeholder.svg?height=40&width=40',
-      lastMessage: 'Giá này có thương lượng được không?',
-      timestamp: '1 giờ',
-      isOnline: true,
-      unreadCount: 1,
-    },
-  ];
+  const peerRef = useRef<RTCPeerConnection | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const remoteStreamRef = useRef<MediaStream | null>(null);
 
-  // Mock messages for selected contact - Fixed to trigger when selectedContact changes
   useEffect(() => {
-    if (selectedContact) {
-      console.log('Loading messages for contact:', selectedContact.name); // Debug log
+    const socket = io('http://localhost:3001', {
+      transports: ['websocket'],
+      withCredentials: true,
+    });
 
-      // Simulate loading delay
-      const loadMessages = () => {
-        const mockMessages: Message[] = [
-          {
-            id: '1',
-            text: 'Chào bạn, tôi quan tâm đến sản phẩm này',
-            sender: 'customer',
-            timestamp: new Date(Date.now() - 3600000),
-            type: 'text',
-          },
-          {
-            id: '2',
-            text: 'Chào bạn! Sản phẩm vẫn còn nhé. Bạn có câu hỏi gì không?',
-            sender: 'seller',
-            timestamp: new Date(Date.now() - 3500000),
-            type: 'text',
-          },
-          {
-            id: '3',
-            text: `Tình trạng sản phẩm như thế nào ạ? (Tin nhắn với ${selectedContact.name})`,
-            sender: 'customer',
-            timestamp: new Date(Date.now() - 3000000),
-            type: 'text',
-          },
-        ];
-        setMessages(mockMessages);
-      };
+    socketRef.current = socket;
 
-      // Small delay to simulate real data loading
-      const timer = setTimeout(loadMessages, 100);
-      return () => clearTimeout(timer);
-    } else {
-      setMessages([]);
+    socket.on('connect', () => {
+      socket.emit('authenticate', {
+        token: localStorage.getItem('access-token'),
+        senderType: 'customer',
+      });
+      socket.emit('');
+    });
+
+    socket.on('message', (msg: Message) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    socket.on('signal', async (data: SignalData) => {
+      await handleSignal(data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedContact && socketRef.current) {
+      socketRef.current.emit('joinRoom', selectedContact.id);
     }
-  }, [selectedContact]); // This dependency ensures messages reload when contact changes
+
+    return () => {
+      if (selectedContact && socketRef.current) {
+        socketRef.current.emit('leaveRoom', selectedContact.id);
+      }
+    };
+  }, [selectedContact]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRecording) {
-      interval = setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
-      }, 1000);
+      interval = setInterval(() => setRecordingTime((t) => t + 1), 1000);
     } else {
       setRecordingTime(0);
     }
+
     return () => clearInterval(interval);
   }, [isRecording]);
 
-  useEffect(() => {
-    return () => {
-      // Cleanup streams on component unmount
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-      if (remoteStream) {
-        remoteStream.getTracks().forEach((track) => track.stop());
+  const handleSendMessage = () => {
+    if (!newMessage.trim() || !selectedContact || !socketRef.current) return;
+
+    socketRef.current.emit('sendMessage', {
+      content: newMessage,
+      roomId: selectedContact.id,
+    });
+
+    setNewMessage('');
+  };
+
+  const startCamera = async (withVideo: boolean) => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: withVideo,
+      audio: true,
+    });
+    streamRef.current = stream;
+    if (videoRef.current && withVideo) videoRef.current.srcObject = stream;
+
+    const remoteStream = new MediaStream();
+    remoteStreamRef.current = remoteStream;
+    if (remoteVideoRef.current && withVideo) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+
+    const peer = new RTCPeerConnection();
+    peerRef.current = peer;
+
+    stream.getTracks().forEach((track) => {
+      peer.addTrack(track, stream);
+    });
+
+    peer.ontrack = (event) => {
+      event.streams[0].getTracks().forEach((track) => {
+        remoteStream.addTrack(track);
+      });
+    };
+
+    peer.onicecandidate = (event) => {
+      if (event.candidate && socketRef.current && selectedContact) {
+        socketRef.current.emit('signal', {
+          to: selectedContact.id,
+          type: 'ice-candidate',
+          data: event.candidate,
+          roomId: selectedContact.id,
+        });
       }
     };
-  }, [stream, remoteStream]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() && selectedContact) {
-      const message: Message = {
-        id: Date.now().toString(),
-        text: newMessage,
-        sender: 'seller',
-        timestamp: new Date(),
-        type: 'text',
-      };
-      setMessages((prev) => [...prev, message]);
-      setNewMessage('');
-    }
+    return peer;
   };
 
   const startVideoCall = async () => {
     setIsVideoCall(true);
     setIsCalling(true);
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
+    const peer = await startCamera(true);
+    const offer = await peer.createOffer();
+    await peer.setLocalDescription(offer);
 
-    // Start camera when video call begins
-    await startCamera();
-
-    setTimeout(() => {
-      setIsCalling(false);
-    }, 3000);
+    socketRef.current?.emit('signal', {
+      to: selectedContact?.id || '',
+      type: 'offer',
+      data: offer,
+      roomId: selectedContact?.id || '',
+    });
   };
 
   const startAudioCall = async () => {
     setIsAudioCall(true);
     setIsCalling(true);
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
+    const peer = await startCamera(false);
+    const offer = await peer.createOffer();
+    await peer.setLocalDescription(offer);
 
-    // Start audio stream for audio call
-    await startCamera();
-
-    setTimeout(() => {
-      setIsCalling(false);
-    }, 3000);
+    socketRef.current?.emit('signal', {
+      to: selectedContact?.id || '',
+      type: 'offer',
+      data: offer,
+      roomId: selectedContact?.id || '',
+    });
   };
 
-  const endCall = () => {
-    setIsVideoCall(false);
-    setIsAudioCall(false);
-    setIsCalling(false);
-    setIsRecording(false);
-    stopCamera();
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  };
+  const handleSignal = async (data: SignalData) => {
+    const { type, data: signalData } = data;
+    const peer = peerRef.current;
+    if (!peer) return;
 
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: isVideoCall,
-        audio: true,
+    if (type === 'offer') {
+      await startCamera(true);
+      await peer.setRemoteDescription(new RTCSessionDescription(signalData));
+      const answer = await peer.createAnswer();
+      await peer.setLocalDescription(answer);
+
+      socketRef.current?.emit('signal', {
+        to: selectedContact?.id || '',
+        type: 'answer',
+        data: answer,
+        roomId: selectedContact?.id || '',
       });
-      setStream(mediaStream);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-
-      const simulatedRemoteStream = await navigator.mediaDevices.getUserMedia({
-        video: isVideoCall,
-        audio: true,
-      });
-      setRemoteStream(simulatedRemoteStream);
-
-      if (remoteVideoRef.current && isVideoCall) {
-        remoteVideoRef.current.srcObject = simulatedRemoteStream;
-      }
-    } catch (error) {
-      console.error('Error accessing camera/microphone:', error);
+    } else if (type === 'answer') {
+      await peer.setRemoteDescription(new RTCSessionDescription(signalData));
+    } else if (type === 'ice-candidate') {
+      try {
+        await peer.addIceCandidate(new RTCIceCandidate(signalData));
+      } catch (err) {}
     }
   };
 
   const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
-    if (remoteStream) {
-      remoteStream.getTracks().forEach((track) => track.stop());
-      setRemoteStream(null);
-    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    remoteStreamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    remoteStreamRef.current = null;
+  };
+
+  const endCall = () => {
+    stopCamera();
+    peerRef.current?.close();
+    peerRef.current = null;
+    setIsVideoCall(false);
+    setIsAudioCall(false);
+    setIsCalling(false);
+    setIsRecording(false);
   };
 
   const toggleVideo = () => {
-    if (stream) {
-      const videoTrack = stream.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.enabled = !videoTrack.enabled;
-        setIsVideoEnabled(videoTrack.enabled);
-      }
+    const videoTrack = streamRef.current?.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      setIsVideoEnabled(videoTrack.enabled);
     }
   };
 
   const toggleAudio = () => {
-    if (stream) {
-      const audioTrack = stream.getAudioTracks()[0];
-      if (audioTrack) {
-        audioTrack.enabled = !audioTrack.enabled;
-        setIsAudioEnabled(audioTrack.enabled);
-      }
+    const audioTrack = streamRef.current?.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      setIsAudioEnabled(audioTrack.enabled);
     }
   };
 
-  const startRecording = () => {
-    setIsRecording(true);
-  };
+  const startRecording = () => setIsRecording(true);
+  const stopRecording = () => setIsRecording(false);
 
-  const stopRecording = () => {
-    setIsRecording(false);
-  };
-
-  const formatRecordingTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const filteredContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const formatRecordingTime = (s: number) =>
+    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
   return {
     selectedContact,
+    setSelectedContact,
+    contacts,
     messages,
     newMessage,
+    setNewMessage,
+    searchQuery,
+    setSearchQuery,
+    handleSendMessage,
+    videoRef,
+    remoteVideoRef,
+    audioRef,
+
     isVideoCall,
     isAudioCall,
     isCalling,
     isVideoEnabled,
     isAudioEnabled,
-    searchQuery,
-    stream,
-    remoteStream,
     isRecording,
     recordingTime,
-    contacts: filteredContacts,
-
-    videoRef,
-    remoteVideoRef,
-    audioRef,
-
-    setSelectedContact,
-    setNewMessage,
-    setSearchQuery,
-    handleSendMessage,
     startVideoCall,
     startAudioCall,
     endCall,
-    startCamera,
-    stopCamera,
     toggleVideo,
     toggleAudio,
     startRecording,

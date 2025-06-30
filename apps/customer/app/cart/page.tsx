@@ -23,11 +23,7 @@ const ShoppingCart: React.FC = () => {
     if (!cartHook.cartGroups || Object.keys(cartHook.cartGroups).length === 0) {
       return false;
     }
-    const hasAnyItems = Object.values(cartHook.cartGroups).some(
-      (shop) => shop.items && shop.items.length > 0,
-    );
-
-    return hasAnyItems;
+    return Object.values(cartHook.cartGroups).some((shop) => shop.items && shop.items.length > 0);
   };
 
   const showSummary = shouldShowCartSummary();
@@ -52,7 +48,6 @@ const ShoppingCart: React.FC = () => {
           <div className="w-16 md:w-20 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
         </div>
         <div className={`flex flex-col gap-6 lg:gap-8 ${showSummary ? 'xl:flex-row' : ''}`}>
-          {/* Cart Items */}
           <div className={`space-y-6 md:space-y-8 ${showSummary ? 'w-full xl:w-2/3' : 'w-full'}`}>
             <CartSection {...cartHook} />
 
@@ -72,7 +67,6 @@ const ShoppingCart: React.FC = () => {
             </div>
           </div>
 
-          {/* Cart Summary - Conditionally rendered */}
           {showSummary && (
             <div className="w-full xl:w-1/3">
               <div className="xl:sticky xl:top-6">
@@ -82,7 +76,6 @@ const ShoppingCart: React.FC = () => {
           )}
         </div>
 
-        {/* Continue Shopping */}
         <div className="mt-8 md:mt-12 text-center">
           <button
             onClick={navigateHome}
