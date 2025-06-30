@@ -1,18 +1,25 @@
 'use client';
 
 import { productApi, TProduct, TProductFilter } from '@/services/product.api';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useProductList() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<TProduct[]>([]);
   const [allProducts, setAllProducts] = useState<TProduct[]>([]);
-  const [filter, setFilter] = useState<TProductFilter>();
+  const [filter, setFilter] = useState<TProductFilter>({
+    states: [],
+    categoriesAdvanceSearch: [],
+    sellers: [],
+    brands: [],
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [filterLoading, setFilterLoading] = useState<boolean>(false);
   const [isPaginating, setIsPaginating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [filterError, setFilterError] = useState<string | null>(null);
-  const [keywords, setKeywords] = useState<string>('');
+  const keyword = searchParams.get('keyword') || '';
   const [page, setPage] = useState<number>(0);
 
   const PAGE_SIZE = 10;
@@ -21,7 +28,7 @@ export function useProductList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await productApi.searchProducts(0, PAGE_SIZE);
+      const response = await productApi.searchProducts(0, PAGE_SIZE, `keyword=${keyword}`);
       const products = response || [];
       setProducts(products);
       setAllProducts(products);
@@ -31,20 +38,20 @@ export function useProductList() {
     } finally {
       setLoading(false);
     }
-  }, [filter]);
+  }, []);
 
   const fetchFilter = useCallback(async () => {
     setFilterLoading(true);
     setFilterError(null);
     try {
-      const response = await productApi.getProductFilter(keywords);
+      const response = await productApi.getProductFilter(keyword);
       setFilter(response);
     } catch {
       setFilterError('Không thể tải filter. Vui lòng thử lại sau.');
     } finally {
       setFilterLoading(false);
     }
-  }, [keywords]);
+  }, [keyword]);
 
   const refetch = useCallback(() => {
     fetchProducts();
@@ -57,8 +64,7 @@ export function useProductList() {
   const loadMore = useCallback(async () => {
     setIsPaginating(true);
     try {
-      const nextPage = page;
-      const response = await productApi.searchProducts(nextPage, PAGE_SIZE, filter);
+      const response = await productApi.searchProducts(page, PAGE_SIZE, `keyword=${keyword}`);
       const moreProducts = response || [];
       setAllProducts((prev) => [...prev, ...moreProducts]);
       setPage((prev) => prev + 1);
@@ -67,7 +73,7 @@ export function useProductList() {
     } finally {
       setIsPaginating(false);
     }
-  }, [filter, page]);
+  }, [keyword, page]);
 
   useEffect(() => {
     fetchProducts();
@@ -83,8 +89,7 @@ export function useProductList() {
     products,
     allProducts,
     filter,
-    keywords,
-    setKeywords,
+    keyword,
     handleFilterChange,
     refetch,
     loadMore,

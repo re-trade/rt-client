@@ -78,7 +78,7 @@ export const productApi = {
       '/products/filter',
       {
         params: {
-          q: keyword,
+          q: `keyword=${keyword}`,
         },
       },
     );

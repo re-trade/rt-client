@@ -24,7 +24,6 @@ import {
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { addToCart } = useCart();
-
   const [selectedImage, setSelectedImage] = useState(0);
   const [productDetail, setProductDetail] = useState<TProduct | null>(null);
   const [quantity, setQuantity] = useState(1);
