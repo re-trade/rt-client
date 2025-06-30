@@ -9,16 +9,36 @@ export type TProduct = {
   description: string;
   thumbnail: string;
   productImages: string[];
+  brandId: string;
   brand: string;
-  discount: string;
+  quantity: number;
+  warrantyExpiryDate: string;
   model: string;
   currentPrice: number;
   categories: string[];
-  keywords: string[];
   tags: string[];
+  keywords?: string[];
   verified: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+export type TProductFilter = {
+  categoriesAdvanceSearch: {
+    id: string;
+    name: string;
+  }[];
+  brands: {
+    id: string;
+    name: string;
+    imgUrl: string;
+  }[];
+  states: string[];
+  sellers: {
+    sellerId: string;
+    sellerName: string;
+    sellerAvatarUrl: string;
+  }[];
 };
 
 export const productApi = {
@@ -52,5 +72,19 @@ export const productApi = {
     } catch (error) {
       throw error;
     }
+  },
+  async getProductFilter(keyword: string): Promise<TProductFilter> {
+    const response = await unAuthApi.default.get<IResponseObject<TProductFilter>>(
+      '/products/filter',
+      {
+        params: {
+          q: `keyword=${keyword}`,
+        },
+      },
+    );
+    if (!response.data.success) {
+      throw new Error('Failed to fetch filter');
+    }
+    return response.data.content;
   },
 };

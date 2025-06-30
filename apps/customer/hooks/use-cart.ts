@@ -102,12 +102,10 @@ function useCart() {
     });
   }, []);
 
-  // Enhanced cart actions with auto-refresh
   const addToCart = useCallback(
     async (productId: string, quantity: number = 1) => {
       try {
         await cartApi.addToCart(productId, quantity);
-        // Silently refresh cart data after successful addition
         await fetchCart(true);
         return true;
       } catch (err) {
@@ -223,7 +221,6 @@ function useCart() {
     contacts,
     selectedAddressId,
     selectAddress,
-    // Cart actions
     addToCart,
     removeFromCart,
     updateCartItemQuantity,
@@ -233,7 +230,6 @@ function useCart() {
 
 export { useCart };
 
-// Simplified useCartActions that uses the global cart context
 export const useCartActions = () => {
   const { addToCart, removeFromCart, updateCartItemQuantity, clearCart, refreshing } = useCart();
 

@@ -13,12 +13,13 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 const Header: React.FC = () => {
-  const { auth, logout } = useAuth();
+  const router = useRouter();
+  const { auth, logout, account } = useAuth();
   const { cartGroups, loading: cartLoading } = useCart();
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -27,7 +28,6 @@ const Header: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Calculate total cart items count
   const getTotalCartItems = () => {
     if (!cartGroups || Object.keys(cartGroups).length === 0) {
       return 0;
@@ -62,12 +62,11 @@ const Header: React.FC = () => {
     const newHistory = [search, ...searchHistory.filter((h) => h !== search)].slice(0, 5);
     setSearchHistory(newHistory);
     localStorage.setItem('searchHistory', JSON.stringify(newHistory));
-    setSearch('');
+    router.push(`/product?keyword=${encodeURIComponent(search)}`);
   };
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-orange-100">
-      {/* Top Bar */}
       <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200 hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-2">
           <div className="flex justify-between items-center text-sm">
@@ -118,8 +117,6 @@ const Header: React.FC = () => {
               ReTrade
             </Link>
           </div>
-
-          {/* Desktop Search Bar - Hidden on mobile */}
           <div className="hidden lg:flex flex-1 max-w-2xl mx-4 relative">
             <div className="relative w-full">
               <input
@@ -232,7 +229,7 @@ const Header: React.FC = () => {
                         </div>
                         <div>
                           <p className="font-semibold text-gray-800">Xin chào!</p>
-                          <p className="text-sm text-gray-600">{auth.email}</p>
+                          <p className="text-sm text-gray-600">{account?.username}</p>
                         </div>
                       </div>
                     </div>
