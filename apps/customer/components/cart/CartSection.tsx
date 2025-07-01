@@ -24,7 +24,6 @@ export default function CartSection({
   const [showRemoveModal, setShowRemoveModal] = useState(false);
 
   const handleProductSelect = (itemId: string, event: React.MouseEvent) => {
-    // Prevent selection if clicking on interactive elements
     const target = event.target as HTMLElement;
     if (
       target.closest('button') ||
@@ -55,9 +54,7 @@ export default function CartSection({
 
     try {
       await removeFromCart(itemToRemove.id);
-      // No need to manually refresh - it's handled automatically
-    } catch (error) {
-      console.error('Error removing item from cart:', error);
+    } catch {
     } finally {
       setRemovingItems((prev) => {
         const newSet = new Set(prev);
@@ -74,12 +71,10 @@ export default function CartSection({
     setShowRemoveModal(false);
   };
 
-  // Show loading skeleton while loading
   if (loading) {
     return <CartSkeleton />;
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="text-center py-12">
@@ -110,7 +105,6 @@ export default function CartSection({
     );
   }
 
-  // Show empty cart when no cart groups or cartGroups is empty
   if (!cartGroups || Object.keys(cartGroups).length === 0) {
     return <CartEmpty />;
   }
@@ -121,7 +115,6 @@ export default function CartSection({
         const shopSelectedCount = shopSection.items.filter((item) =>
           selectedItems.includes(item.productId),
         ).length;
-        const shopTotalCount = shopSection.items.length;
         const shopAvailableCount = shopSection.items.filter((item) => item.productAvailable).length;
         const allShopItemsSelected =
           shopSelectedCount === shopAvailableCount && shopAvailableCount > 0;

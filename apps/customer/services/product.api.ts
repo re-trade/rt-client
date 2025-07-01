@@ -39,6 +39,8 @@ export type TProductFilter = {
     sellerName: string;
     sellerAvatarUrl: string;
   }[];
+  minPrice: number;
+  maxPrice: number;
 };
 
 export const productApi = {
@@ -52,7 +54,11 @@ export const productApi = {
     });
     return response.data.success ? response.data.content : [];
   },
-  async searchProducts(page: number = 0, size: number = 10, query?: string): Promise<TProduct[]> {
+  async searchProducts(
+    page: number = 0,
+    size: number = 10,
+    query?: string,
+  ): Promise<IResponseObject<TProduct[]>> {
     const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products/search', {
       params: {
         page,
@@ -60,7 +66,7 @@ export const productApi = {
         ...(query ? { q: query } : {}),
       },
     });
-    return response.data.success ? response.data.content : [];
+    return response.data;
   },
   async getProduct(id: string): Promise<TProduct> {
     try {

@@ -34,7 +34,7 @@ export function useProductHome() {
         8,
         categoryId ? `categoryId=${categoryId}` : undefined,
       );
-      const products = response || [];
+      const products = response.content || [];
       setProducts(products);
     } catch {
       setError('Không thể tải sản phẩm. Vui lòng thử lại sau.');

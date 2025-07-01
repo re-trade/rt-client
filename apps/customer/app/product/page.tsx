@@ -1,10 +1,11 @@
 'use client';
-import ProductFilter from '@/components/common/FillterProduct';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductList } from '@/hooks/use-product-list';
+import ProductFilter from '@components/product/FillterProduct';
 import { IconFilter, IconGridDots, IconList } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+
 const ProductCardSkeleton = ({ index }: { index: number }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -120,35 +121,30 @@ const PaginationBar = ({
 };
 
 export default function ProductListPage() {
-  const { allProducts, loading, isPaginating, filter, filterLoading, handleFilterChange } =
-    useProductList();
-
+  const {
+    products,
+    loading,
+    isPaginating,
+    filter,
+    filterLoading,
+    handlePageChange,
+    handleFilterReset,
+    handleSelectedFilterChange,
+    selectedFilter,
+    page,
+    maxPage,
+  } = useProductList();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
-  const filteredProducts = allProducts.filter((product) =>
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const startIndex = (currentPage - 1) * productsPerPage;
-  const displayedProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Enhanced Sidebar */}
           <aside className="lg:col-span-1">
             <motion.div
               className="sticky top-4"
@@ -166,15 +162,11 @@ export default function ProductListPage() {
 
                 <div className="p-6">
                   <ProductFilter
+                    selectedFilter={selectedFilter}
                     filter={filter}
-                    onChange={handleFilterChange}
-                    isLoading={filterLoading}
-                    availableOptions={{
-                      categories: filter?.categoriesAdvanceSearch ?? [],
-                      brands: filter?.brands ?? [],
-                      states: filter?.states ?? [],
-                      sellers: filter?.sellers ?? [],
-                    }}
+                    handleFilterReset={handleFilterReset}
+                    handleSelectedFilterChange={handleSelectedFilterChange}
+                    filterLoading={filterLoading}
                   />
                 </div>
               </div>
@@ -197,13 +189,12 @@ export default function ProductListPage() {
                 </h2>
                 {searchTerm && (
                   <p className="text-gray-600">
-                    Kết quả tìm kiếm cho: "
-                    <span className="font-semibold text-orange-600">{searchTerm}</span>"
+                    Kết quả tìm kiếm cho: &#34;
+                    <span className="font-semibold text-orange-600">{searchTerm}</span>&#34;
                   </p>
                 )}
               </div>
 
-              {/* View Mode Toggle */}
               <div className="flex items-center gap-2">
                 <div className="btn-group">
                   <button
@@ -222,7 +213,6 @@ export default function ProductListPage() {
               </div>
             </motion.div>
 
-            {/* Products Grid/List */}
             {loading ? (
               <div
                 className={`grid gap-6 ${
@@ -251,7 +241,7 @@ export default function ProductListPage() {
                   className="btn bg-gradient-to-r from-orange-500 to-orange-600 text-white border-none hover:from-orange-600 hover:to-orange-700"
                   onClick={() => {
                     setSearchTerm('');
-                    setCurrentPage(1);
+                    handlePageChange(0);
                   }}
                 >
                   Xóa bộ lọc
@@ -266,7 +256,7 @@ export default function ProductListPage() {
                       : 'grid-cols-1'
                   }`}
                 >
-                  {displayedProducts.map((product, index) => (
+                  {products.map((product, index) => (
                     <motion.div
                       key={product.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -288,24 +278,20 @@ export default function ProductListPage() {
                   ))}
                 </div>
 
-                {/* Pagination */}
                 <PaginationBar
-                  currentPage={currentPage}
-                  totalPages={totalPages}
+                  currentPage={page}
+                  totalPages={maxPage}
                   onPageChange={handlePageChange}
                   loading={isPaginating}
                 />
-
-                {/* Results Summary */}
                 <motion.div
                   className="text-center mt-8 text-gray-600"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.4, delay: 0.2 }}
                 >
-                  Hiển thị {startIndex + 1}-
-                  {Math.min(startIndex + productsPerPage, filteredProducts.length)} trong tổng số{' '}
-                  {filteredProducts.length} sản phẩm
+                  Hiển thị {page + 1}-{Math.min(page + productsPerPage, filteredProducts.length)}{' '}
+                  trong tổng số {filteredProducts.length} sản phẩm
                 </motion.div>
               </>
             )}
