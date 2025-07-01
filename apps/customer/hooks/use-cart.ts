@@ -122,9 +122,7 @@ function useCart() {
     async (productId: string) => {
       try {
         await cartApi.removeFromCart(productId);
-        // Remove from selected items if it was selected
         setSelectedItems((prev) => prev.filter((id) => id !== productId));
-        // Silently refresh cart data after successful removal
         await fetchCart(true);
         return true;
       } catch (err) {
@@ -140,7 +138,6 @@ function useCart() {
     async (productId: string, quantity: number) => {
       try {
         await cartApi.updateCartItemQuantity(productId, quantity);
-        // Silently refresh cart data after successful update
         await fetchCart(true);
         return true;
       } catch (err) {
@@ -157,7 +154,6 @@ function useCart() {
     try {
       await cartApi.clearCart();
       setSelectedItems([]);
-      // Silently refresh cart data after successful clear
       await fetchCart(true);
       return true;
     } catch (err) {
@@ -204,7 +200,7 @@ function useCart() {
     fetchCart();
     fetchAddresses();
     fetchRecommendProduct();
-  }, []);
+  }, [fetchCart, fetchAddresses, fetchRecommendProduct]);
 
   return {
     cart,

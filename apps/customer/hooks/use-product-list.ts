@@ -9,8 +9,10 @@ export type TFilterSelected = {
   categories: string[];
   seller: string;
   brands: string[];
-  priceRange: number;
+  minPrice?: number;
+  maxPrice?: number;
 };
+
 export function useProductList() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<TProduct[]>([]);
@@ -27,7 +29,8 @@ export function useProductList() {
     categories: [],
     seller: '',
     brands: [],
-    priceRange: 0,
+    minPrice: 0,
+    maxPrice: 0,
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [filterLoading, setFilterLoading] = useState<boolean>(false);
@@ -49,14 +52,19 @@ export function useProductList() {
 
       if (keyword) params.append('keyword', keyword);
       if (selectedFilter.states.length)
-        selectedFilter.states.forEach((s) => params.append('states', s));
+        selectedFilter.states.forEach((s) => params.append('state', s));
       if (selectedFilter.categories.length)
-        selectedFilter.categories.forEach((c) => params.append('categories', c));
+        selectedFilter.categories.forEach((c) => params.append('categoryId', c));
       if (selectedFilter.brands.length)
-        selectedFilter.brands.forEach((b) => params.append('brands', b));
+        selectedFilter.brands.forEach((b) => params.append('brand', b));
       if (selectedFilter.seller) params.append('seller', selectedFilter.seller);
-      if (selectedFilter.priceRange)
-        params.append('currentPrice', `0..${selectedFilter.priceRange}`);
+      if (selectedFilter.minPrice && selectedFilter.minPrice > 0) {
+        if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
+          params.append('currentPrice', `${selectedFilter.minPrice}..${selectedFilter.maxPrice}`);
+        }
+      } else if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
+        params.append('currentPrice', `0..${selectedFilter.maxPrice}`);
+      }
 
       const response = await productApi.searchProducts(page - 1, PAGE_SIZE, params.toString());
 
@@ -101,7 +109,7 @@ export function useProductList() {
           } else {
             updated.seller = value as string;
           }
-        } else if (key === 'priceRange') {
+        } else if (key === 'minPrice' || key === 'maxPrice') {
           updated[key] = value as number;
         } else if (Array.isArray(prev[key])) {
           const list = prev[key] as string[];
@@ -111,7 +119,7 @@ export function useProductList() {
         }
         return updated;
       });
-      setPage(0);
+      setPage(1); // Reset to first page when filter changes
     },
     [],
   );
@@ -122,13 +130,15 @@ export function useProductList() {
       categories: [],
       seller: '',
       brands: [],
-      priceRange: 0,
+      minPrice: 0,
+      maxPrice: 0,
     });
+    setPage(1);
   }, []);
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts, selectedFilter]);
+  }, [fetchProducts]);
 
   useEffect(() => {
     fetchFilter();

@@ -160,15 +160,13 @@ export default function ProductListPage() {
                   </div>
                 </div>
 
-                <div className="p-6">
-                  <ProductFilter
-                    selectedFilter={selectedFilter}
-                    filter={filter}
-                    handleFilterReset={handleFilterReset}
-                    handleSelectedFilterChange={handleSelectedFilterChange}
-                    filterLoading={filterLoading}
-                  />
-                </div>
+                <ProductFilter
+                  selectedFilter={selectedFilter}
+                  filter={filter}
+                  handleFilterReset={handleFilterReset}
+                  handleSelectedFilterChange={handleSelectedFilterChange}
+                  filterLoading={filterLoading}
+                />
               </div>
             </motion.div>
           </aside>

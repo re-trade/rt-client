@@ -120,28 +120,6 @@ export default function ProductFilter({
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden transition-all duration-300 ease-in-out">
-      {hasActiveFilters && (
-        <motion.div
-          className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-3 text-center"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="flex items-center justify-center gap-2">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium">
-              {selectedFilter.categories.length +
-              selectedFilter.brands.length +
-              selectedFilter.states.length +
-              selectedFilter.seller
-                ? 1
-                : 0}{' '}
-              bộ lọc đang áp dụng
-            </span>
-          </div>
-        </motion.div>
-      )}
-
       <div className="p-6 space-y-6">
         {filter.categoriesAdvanceSearch.length > 0 && (
           <FilterSection
@@ -237,33 +215,38 @@ export default function ProductFilter({
           </FilterSection>
         )}
 
-        {/*<FilterSection*/}
-        {/*  title="Khoảng giá"*/}
-        {/*  icon={<span className="text-orange-500 font-bold">₫</span>}*/}
-        {/*  delay={0.5}*/}
-        {/*>*/}
-        {/*  <div className="w-full flex gap-2">*/}
-        {/*    <input*/}
-        {/*      type="number"*/}
-        {/*      className="input input-sm w-full border border-orange-300"*/}
-        {/*      placeholder="Giá thấp nhất"*/}
-        {/*      value={selectedFilter.minPrice || ''}*/}
-        {/*      onChange={(e) =>*/}
-        {/*        handleSelectedFilterChange('minPrice', parseInt(e.target.value || '0'))*/}
-        {/*      }*/}
-        {/*    />*/}
-        {/*    <span className="px-2 py-1 text-sm text-gray-500">–</span>*/}
-        {/*    <input*/}
-        {/*      type="number"*/}
-        {/*      className="input input-sm w-full border border-orange-300"*/}
-        {/*      placeholder="Giá cao nhất"*/}
-        {/*      value={selectedFilter.maxPrice || ''}*/}
-        {/*      onChange={(e) =>*/}
-        {/*        handleSelectedFilterChange('maxPrice', parseInt(e.target.value || '0'))*/}
-        {/*      }*/}
-        {/*    />*/}
-        {/*  </div>*/}
-        {/*</FilterSection>*/}
+        {filter.minPrice !== filter.maxPrice && (
+          <FilterSection
+            title="Khoảng giá"
+            icon={<span className="text-orange-500 font-bold">₫</span>}
+            delay={0.5}
+          >
+            <div className="w-full flex gap-2">
+              <input
+                type="number"
+                className="input input-sm w-full border border-orange-300"
+                placeholder="Giá thấp nhất"
+                min={selectedFilter.minPrice || ''}
+                max={selectedFilter.maxPrice || ''}
+                value={selectedFilter.minPrice || ''}
+                onChange={(e) =>
+                  handleSelectedFilterChange('minPrice', parseInt(e.target.value || '0'))
+                }
+              />
+              <span className="px-2 py-1 text-sm text-gray-500">–</span>
+              <input
+                type="number"
+                className="input input-sm w-full border border-orange-300"
+                placeholder="Giá cao nhất"
+                value={selectedFilter.maxPrice || ''}
+                max={selectedFilter.maxPrice || ''}
+                onChange={(e) =>
+                  handleSelectedFilterChange('maxPrice', parseInt(e.target.value || '0'))
+                }
+              />
+            </div>
+          </FilterSection>
+        )}
 
         <motion.div
           className="pt-4 border-t border-orange-100"
