@@ -65,7 +65,7 @@ export default function PurchasePage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [filteredOrders, setFilteredOrders] = useState<OrderCombo[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  
+
   useEffect(() => {
     const loadInitialOrders = async () => {
       try {

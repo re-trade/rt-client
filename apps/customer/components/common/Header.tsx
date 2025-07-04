@@ -1,6 +1,7 @@
 'use client';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/use-auth';
+import { unAuthApi } from '@retrade/util';
 import {
   IconBell,
   IconClock,
@@ -17,7 +18,6 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { unAuthApi } from '@retrade/util';
 
 const Header: React.FC = () => {
   const router = useRouter();
