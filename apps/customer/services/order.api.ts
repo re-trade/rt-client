@@ -1,8 +1,12 @@
 import { authApi, IResponseObject } from '@retrade/util';
 
+export interface CreateOrderItemRequest {
+  productId: string;
+  quantity: number;
+}
+
 export interface CreateOrderRequest {
-  productIds: string[];
-  voucherCode?: string;
+  items: CreateOrderItemRequest[];
   addressId: string;
 }
 

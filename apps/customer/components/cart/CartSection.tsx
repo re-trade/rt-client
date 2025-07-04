@@ -25,7 +25,7 @@ export default function CartSection({
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [quantityUpdates, setQuantityUpdates] = useState<Record<string, number>>({});
 
-  const handleProductSelect = (itemId: string, event: React.MouseEvent) => {
+  const handleProductSelect = (itemId: string, quantity: number, event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     if (
       target.closest('button') ||
@@ -35,12 +35,12 @@ export default function CartSection({
     ) {
       return;
     }
-    toggleItemSelection(itemId);
+    toggleItemSelection(itemId, quantity);
   };
 
-  const handleCheckboxClick = (itemId: string, event: React.MouseEvent) => {
+  const handleCheckboxClick = (itemId: string, quantity: number, event: React.MouseEvent) => {
     event.stopPropagation();
-    toggleItemSelection(itemId);
+    toggleItemSelection(itemId, quantity);
   };
 
   const handleRemoveClick = (itemId: string, itemName: string, event: React.MouseEvent) => {
@@ -124,7 +124,7 @@ export default function CartSection({
     <div className="space-y-4 md:space-y-6">
       {Object.entries(cartGroups).map(([sellerId, shopSection]) => {
         const shopSelectedCount = shopSection.items.filter((item) =>
-          selectedItems.includes(item.productId),
+          selectedItems.find((selected) => selected.productId === item.productId),
         ).length;
         const shopAvailableCount = shopSection.items.filter((item) => item.productAvailable).length;
         const allShopItemsSelected =
@@ -138,14 +138,17 @@ export default function CartSection({
 
           if (allShopItemsSelected) {
             shopSection.items.forEach((item) => {
-              if (selectedItems.includes(item.productId)) {
-                toggleItemSelection(item.productId);
+              if (selectedItems.find((selected) => selected.productId === item.productId)) {
+                toggleItemSelection(item.productId, item.quantity);
               }
             });
           } else {
             shopSection.items.forEach((item) => {
-              if (item.productAvailable && !selectedItems.includes(item.productId)) {
-                toggleItemSelection(item.productId);
+              if (
+                item.productAvailable &&
+                !selectedItems.find((selected) => selected.productId === item.productId)
+              ) {
+                toggleItemSelection(item.productId, item.quantity);
               }
             });
           }
@@ -235,7 +238,9 @@ export default function CartSection({
                   <div className="p-4 md:p-6 pt-0 space-y-3 md:space-y-4">
                     {shopSection.items.map((item) => {
                       const isSoldOut = !item.productAvailable;
-                      const isSelected = selectedItems.includes(item.productId);
+                      const isSelected = selectedItems.find(
+                        (selected) => selected.productId === item.productId,
+                      );
                       const isRemoving = removingItems.has(item.productId);
                       const currentQuantity = quantityUpdates[item.productId] || item.quantity;
 
@@ -257,7 +262,9 @@ export default function CartSection({
                                   : 'bg-white border-orange-50 hover:bg-orange-25 hover:border-orange-200 hover:shadow-md cursor-pointer'
                           }`}
                           onClick={(e) =>
-                            !isSoldOut && !isRemoving && handleProductSelect(item.productId, e)
+                            !isSoldOut &&
+                            !isRemoving &&
+                            handleProductSelect(item.productId, item.quantity, e)
                           }
                         >
                           {/* Removing Overlay */}
@@ -280,7 +287,11 @@ export default function CartSection({
                                 />
                               </div>
                             ) : !isSoldOut && !isRemoving ? (
-                              <div onClick={(e) => handleCheckboxClick(item.productId, e)}>
+                              <div
+                                onClick={(e) =>
+                                  handleCheckboxClick(item.productId, item.quantity, e)
+                                }
+                              >
                                 <Checkbox
                                   checked={false}
                                   onChange={() => {}}
@@ -460,7 +471,11 @@ export default function CartSection({
                           </div>
                           <span className="text-xl font-bold text-orange-600">
                             {shopSection.items
-                              .filter((item) => selectedItems.includes(item.productId))
+                              .filter((item) =>
+                                selectedItems.find(
+                                  (selected) => selected.productId === item.productId,
+                                ),
+                              )
                               .reduce(
                                 (total, item) =>
                                   total +
