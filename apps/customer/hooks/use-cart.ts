@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 type TCartSummary = {
   originalPrice: number;
-  savings: number;
   tax: number;
   total: number;
 };
@@ -17,11 +16,10 @@ function useCart() {
     Record<string, CartGroupResponse & { isOpen: boolean }>
   >({});
   const [contacts, setContacts] = useState<TAddress[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<{ productId: string; quantity: number }[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [cartSummary, setCartSummary] = useState<TCartSummary>({
     originalPrice: 0,
-    savings: 0,
     tax: 0,
     total: 0,
   });
@@ -92,12 +90,13 @@ function useCart() {
     });
   }, []);
 
-  const toggleItemSelection = useCallback((productId: string) => {
+  const toggleItemSelection = useCallback((productId: string, quantity: number) => {
     setSelectedItems((prev) => {
-      if (prev.includes(productId)) {
-        return prev.filter((id) => id !== productId);
+      const existing = prev.find((item) => item.productId === productId);
+      if (existing) {
+        return prev.filter((item) => item.productId !== productId);
       } else {
-        return [...prev, productId];
+        return [...prev, { productId, quantity }];
       }
     });
   }, []);
@@ -122,7 +121,7 @@ function useCart() {
     async (productId: string) => {
       try {
         await cartApi.removeFromCart(productId);
-        setSelectedItems((prev) => prev.filter((id) => id !== productId));
+        setSelectedItems((prev) => prev.filter((item) => item.productId !== productId));
         await fetchCart(true);
         return true;
       } catch (err) {
@@ -167,7 +166,6 @@ function useCart() {
     if (!cart || !selectedItems.length) {
       setCartSummary({
         originalPrice: 0,
-        savings: 0,
         tax: 0,
         total: 0,
       });
@@ -179,18 +177,16 @@ function useCart() {
 
     cart.cartGroupResponses.forEach((group) => {
       group.items.forEach((item) => {
-        if (selectedItems.includes(item.productId)) {
+        if (selectedItems.find((selected) => selected.productId === item.productId)) {
           originalPrice += item.totalPrice;
           total += item.totalPrice;
         }
       });
     });
-    const savings = originalPrice - total;
     const tax = Math.round(total * 0.05);
 
     setCartSummary({
       originalPrice,
-      savings,
       tax,
       total: total + tax,
     });
@@ -225,15 +221,3 @@ function useCart() {
 }
 
 export { useCart };
-
-export const useCartActions = () => {
-  const { addToCart, removeFromCart, updateCartItemQuantity, clearCart, refreshing } = useCart();
-
-  return {
-    addToCart,
-    removeFromCart,
-    updateCartItemQuantity,
-    clearCart,
-    isLoading: refreshing,
-  };
-};

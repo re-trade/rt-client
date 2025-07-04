@@ -3,6 +3,7 @@ import Modal from '@/components/reusable/modal';
 import { useCart } from '@/hooks/use-cart';
 import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
+import { CreateOrderRequest } from '@services/order.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -64,8 +65,8 @@ export default function CartSummary({
     }
 
     try {
-      const orderPayload = {
-        productIds: selectedItems,
+      const orderPayload: CreateOrderRequest = {
+        items: selectedItems,
         addressId: selectedAddressId!,
       };
 
@@ -314,16 +315,6 @@ export default function CartSummary({
               </div>
               <span className="text-sm md:text-base font-semibold text-gray-800">
                 {cartSummary.originalPrice.toLocaleString('vi-VN')}₫
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-100 shadow-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
-                <span className="text-sm md:text-base font-medium text-gray-600">Tiết kiệm</span>
-              </div>
-              <span className="text-sm md:text-base font-semibold text-green-600">
-                -{cartSummary.savings.toLocaleString('vi-VN')}₫
               </span>
             </div>
 

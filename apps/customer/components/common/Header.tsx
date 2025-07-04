@@ -1,14 +1,17 @@
 'use client';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/use-auth';
+import { unAuthApi } from '@retrade/util';
 import {
   IconBell,
   IconClock,
   IconLogout,
   IconMenu2,
   IconPackage,
+  IconPhoto,
   IconSearch,
   IconShoppingCart,
+  IconUpload,
   IconUser,
   IconX,
 } from '@tabler/icons-react';
@@ -25,8 +28,12 @@ const Header: React.FC = () => {
   const [search, setSearch] = useState('');
   const [searchFocus, setSearchFocus] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [imageSearchOpen, setImageSearchOpen] = useState(false);
+  const [imageSearchLoading, setImageSearchLoading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getTotalCartItems = () => {
     if (!cartGroups || Object.keys(cartGroups).length === 0) {
@@ -63,6 +70,73 @@ const Header: React.FC = () => {
     setSearchHistory(newHistory);
     localStorage.setItem('searchHistory', JSON.stringify(newHistory));
     router.push(`/product?keyword=${encodeURIComponent(search)}`);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setImageSearchLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await unAuthApi.imageSearch.post<{ analysis: string }>(
+        '/analyze-image',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+
+      if (response.status !== 200) {
+        throw new Error('Failed to analyze image');
+      }
+      const { analysis } = response.data;
+      if (analysis) {
+        setSearch(response.data.analysis);
+        setImageSearchOpen(false);
+        const newHistory = [analysis, ...searchHistory.filter((h) => h !== analysis)].slice(0, 5);
+        setSearchHistory(newHistory);
+        localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+        router.push(`/product?keyword=${encodeURIComponent(analysis)}`);
+      }
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+    } finally {
+      setImageSearchLoading(false);
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        handleImageUpload(file);
+      }
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type.startsWith('image/')) {
+        handleImageUpload(file);
+      }
+    }
   };
 
   return (
@@ -105,10 +179,8 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Header */}
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
-          {/* Logo */}
           <div className="flex items-center gap-4">
             <Link
               href="/"
@@ -123,7 +195,7 @@ const Header: React.FC = () => {
                 ref={searchInputRef}
                 type="text"
                 placeholder="Tìm kiếm sản phẩm, thương hiệu, danh mục..."
-                className="w-full pl-12 pr-4 py-3 border-2 border-orange-200 rounded-xl bg-orange-25
+                className="w-full pl-12 pr-20 py-3 border-2 border-orange-200 rounded-xl bg-orange-25
                   focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400
                   transition-all duration-200 text-gray-700 placeholder-gray-500
                   hover:border-orange-300"
@@ -137,6 +209,15 @@ const Header: React.FC = () => {
                 size={20}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-500"
               />
+
+              <button
+                onClick={() => setImageSearchOpen(true)}
+                className="absolute right-16 top-1/2 -translate-y-1/2 p-2 hover:bg-orange-100 rounded-lg transition-colors duration-200"
+                title="Tìm kiếm bằng hình ảnh"
+              >
+                <IconPhoto size={18} className="text-orange-500" />
+              </button>
+
               <button
                 onClick={handleSearch}
                 className="absolute right-2 top-1/2 -translate-y-1/2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-medium"
@@ -145,7 +226,6 @@ const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Search History Dropdown */}
             {searchFocus && searchHistory.length > 0 && (
               <div className="absolute z-20 mt-2 w-full bg-white border border-orange-200 rounded-xl shadow-xl overflow-hidden top-full">
                 <div className="p-3 bg-orange-50 border-b border-orange-100">
@@ -176,7 +256,6 @@ const Header: React.FC = () => {
             )}
           </div>
 
-          {/* Action Buttons - Only show when user is authenticated */}
           <div className="flex items-center space-x-2">
             {/* Cart with Badge - Only show when authenticated */}
             {auth && (
@@ -316,7 +395,6 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="lg:hidden bg-white border-t border-orange-200 shadow-lg">
           <div className="px-4 py-6 space-y-4">
@@ -325,7 +403,7 @@ const Header: React.FC = () => {
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
-                className="w-full pl-10 pr-4 py-3 border-2 border-orange-200 rounded-xl bg-orange-25 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 text-gray-700 placeholder-gray-500"
+                className="w-full pl-10 pr-12 py-3 border-2 border-orange-200 rounded-xl bg-orange-25 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 text-gray-700 placeholder-gray-500"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -334,6 +412,14 @@ const Header: React.FC = () => {
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500"
               />
+              {/* Mobile Image Search Button */}
+              <button
+                onClick={() => setImageSearchOpen(true)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-orange-100 rounded-lg transition-colors duration-200"
+                title="Tìm kiếm bằng hình ảnh"
+              >
+                <IconPhoto size={18} className="text-orange-500" />
+              </button>
             </div>
 
             {/* Mobile Cart Link - Only show when authenticated */}
@@ -405,6 +491,70 @@ const Header: React.FC = () => {
                   </button>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Search Modal */}
+      {imageSearchOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-gray-800">Tìm kiếm bằng hình ảnh</h3>
+                <button
+                  onClick={() => setImageSearchOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                  disabled={imageSearchLoading}
+                >
+                  <IconX size={20} className="text-gray-500" />
+                </button>
+              </div>
+
+              <div
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
+                  dragActive
+                    ? 'border-orange-400 bg-orange-50'
+                    : 'border-orange-200 hover:border-orange-300 hover:bg-orange-25'
+                }`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                {imageSearchLoading ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                    <p className="text-gray-600">Đang phân tích hình ảnh...</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
+                      <IconUpload size={32} className="text-orange-500" />
+                    </div>
+                    <div>
+                      <p className="text-gray-700 font-medium mb-1">Kéo và thả hình ảnh vào đây</p>
+                      <p className="text-gray-500 text-sm">hoặc</p>
+                    </div>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-medium"
+                    >
+                      Chọn hình ảnh
+                    </button>
+                    <p className="text-xs text-gray-400">Hỗ trợ: JPG, PNG, GIF (tối đa 10MB)</p>
+                  </div>
+                )}
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
             </div>
           </div>
         </div>
