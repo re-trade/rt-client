@@ -5,7 +5,6 @@ import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
 import ChangePhoneForm from '@/components/auth/ChangePhoneForm';
 import ChangeUsernameForm from '@/components/auth/ChangeUsernameForm';
 import TwoFactorSetup from '@/components/auth/TwoFactorSetup';
-import SecurityModal from '@/components/common/SecurityModal';
 import { useAuth } from '@/hooks/use-auth';
 import {
   changeEmailInternal,
@@ -13,6 +12,7 @@ import {
   changePhoneInternal,
   changeUsernameInternal,
 } from '@/services/security.api';
+import SecurityModal from '@components/common/SecurityModal';
 
 import { checkUsernameAvailability } from '@services/auth.api';
 import {

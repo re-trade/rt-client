@@ -1,9 +1,9 @@
 'use client';
 
-import AddressCard from '@/components/common/AddressCard';
-import AddressCreateDialog from '@/components/common/AddressCreateDialog';
-import AddressUpdateDialog from '@/components/common/AddressUpdateDialog';
 import { useAddressManager } from '@/hooks/use-address-manager';
+import AddressCard from '@components/common/AddressCard';
+import AddressCreateDialog from '@components/common/AddressCreateDialog';
+import AddressUpdateDialog from '@components/common/AddressUpdateDialog';
 import { Gift, Home, MapPin, Navigation, Plus, RefreshCw, Shield, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 

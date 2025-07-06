@@ -1,17 +1,20 @@
 'use client';
 
-import RelatedProducts from '@/components/related-product/page';
 import { useCart } from '@/context/CartContext';
-import { productApi, TProduct } from '@/services/product.api';
+import { useProductDetail } from '@/hooks/use-product-detail';
 import Chart from '@components/chart/chart';
+import ContentSkeleton from '@components/product/ProductContentSkeleton';
+import { ProductHistoryList } from '@components/product/ProductHistoryList';
+import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
+import ProductInfoSkeleton from '@components/product/ProductInfoSkeleton';
+import RelatedProducts from '@components/related-product/RelatedProduct';
 import { IconCheck } from '@tabler/icons-react';
 import Image from 'next/image';
-import { use, useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   MdAdd,
   MdAddShoppingCart,
   MdAssignment,
-  MdError,
   MdFavoriteBorder,
   MdLocalShipping,
   MdRemove,
@@ -21,11 +24,12 @@ import {
   MdVerified,
   MdWarning,
 } from 'react-icons/md';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
+export default function ProductDetail({ params }: { params: { id: string } }) {
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [productDetail, setProductDetail] = useState<TProduct | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -33,23 +37,9 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description',
   );
-
-  const { id } = use(params);
-  const [listImg, setListImg] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchProductDetail = async () => {
-      try {
-        const product = await productApi.getProduct(id);
-        setProductDetail(product);
-        setListImg([
-          ...(product.thumbnail ? [product.thumbnail] : []),
-          ...(product.productImages || []),
-        ]);
-      } catch {}
-    };
-    fetchProductDetail();
-  }, [id]);
+  const { id } = params;
+  const { productDetail, listImg, loading, relatedProducts, productHistories } =
+    useProductDetail(id);
 
   const handleAddToCart = async () => {
     if (!productDetail) return;
@@ -93,25 +83,24 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
     }
   };
 
-  if (!productDetail) {
+  if (!productDetail || loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="w-full h-[480px] bg-gray-200 rounded-xl"></div>
-              <div className="flex gap-3">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-20 h-20 bg-gray-200 rounded-lg"></div>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-6">
-              <div className="h-8 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-20 bg-gray-200 rounded"></div>
+      <div className="min-h-screen bg-gradient-to-br from-orange-25 via-orange-50 to-orange-25">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <div className="flex space-x-2 text-sm">
+              <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse rounded w-20" />
+              <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse rounded w-16" />
+              <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse rounded w-32" />
             </div>
           </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <ProductImageSkeleton />
+            <ProductInfoSkeleton />
+          </div>
+
+          <ContentSkeleton />
         </div>
       </div>
     );
@@ -127,36 +116,64 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       )}
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <nav className="mb-6 text-sm text-gray-600">
-          <ol className="flex items-center space-x-2">
-            <li>
-              <span className="hover:text-orange-600 cursor-pointer">Trang chủ</span>
-            </li>
-            <li>
-              <span className="mx-2">/</span>
-            </li>
-            <li>
-              <span className="text-orange-600 font-medium">{productDetail.name}</span>
+        <nav className="mb-8">
+          <ol className="flex items-center space-x-2 flex-wrap text-sm">
+            {productDetail.listOfCategories?.map((cat, index: number) => (
+              <li key={index} className="flex items-center">
+                {index !== 0 ? (
+                  <span className="mx-2 text-gray-400" style={{ color: '#9ca3af' }}>
+                    /
+                  </span>
+                ) : (
+                  <></>
+                )}
+                <a
+                  href={`/category/${cat.id}`}
+                  className="text-gray-600 hover:text-orange-600 transition-colors font-medium"
+                  style={{ color: '#6b7280' }}
+                >
+                  {cat.name}
+                </a>
+              </li>
+            ))}
+            <li className="flex items-center">
+              <span className="mx-2 text-gray-400" style={{ color: '#9ca3af' }}>
+                /
+              </span>
+              <span
+                className="text-orange-600 font-semibold truncate max-w-[200px]"
+                style={{ color: '#ea580c' }}
+              >
+                {productDetail.name}
+              </span>
             </li>
           </ol>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div className="space-y-4">
-            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden border border-orange-100 bg-white shadow-lg">
+            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden border border-orange-100 bg-white shadow-lg group">
               <Image
                 src={listImg[selectedImage] || '/image_login.jpg'}
                 alt={productDetail.name}
                 fill
-                className="object-cover hover:scale-105 transition-transform duration-500"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
                 priority
               />
               {productDetail.verified && (
-                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-md">
                   <MdVerified size={16} />
                   Đã xác minh
                 </div>
               )}
+              {productDetail.condition === 'NEW' && (
+                <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm shadow-md">
+                  Mới
+                </div>
+              )}
+              <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                Hover để phóng to
+              </div>
             </div>
 
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-orange-100">
@@ -164,7 +181,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`relative min-w-[100px] h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105
+                  className={`relative min-w-[100px] h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 hover:shadow-md
                     ${
                       selectedImage === index
                         ? 'border-orange-500 ring-2 ring-orange-200 shadow-md'
@@ -172,44 +189,86 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                     }`}
                 >
                   <Image src={img} alt={`Ảnh ${index + 1}`} fill className="object-cover" />
+                  {selectedImage === index && (
+                    <div className="absolute inset-0 border border-orange-500" />
+                  )}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="space-y-6">
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-start justify-between">
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 leading-tight">
+                <h1
+                  className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight flex-1 pr-4"
+                  style={{ color: '#111827' }}
+                >
                   {productDetail.name}
                 </h1>
-                <div className="flex gap-2">
-                  <button className="p-2 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors">
+                <div className="flex gap-2 flex-shrink-0">
+                  <button className="p-3 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors hover:scale-105">
                     <MdFavoriteBorder size={20} className="text-orange-600" />
                   </button>
-                  <button className="p-2 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors">
+                  <button className="p-3 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors hover:scale-105">
                     <MdShare size={20} className="text-orange-600" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-xl border border-orange-100">
-                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">
+              <div className="flex items-center gap-4 text-sm flex-wrap">
+                <span
+                  className="flex items-center gap-1 text-gray-600"
+                  style={{ color: '#6b7280' }}
+                >
+                  <MdStar className="text-yellow-400" size={16} />
+                  4.5 (256 đánh giá)
+                </span>
+                <span className="text-gray-400" style={{ color: '#9ca3af' }}>
+                  |
+                </span>
+                <span className="text-gray-600" style={{ color: '#6b7280' }}>
+                  Còn {productDetail.quantity} sản phẩm
+                </span>
+                <span className="text-gray-400" style={{ color: '#9ca3af' }}>
+                  |
+                </span>
+                <span
+                  className="flex items-center gap-1 text-gray-600"
+                  style={{ color: '#6b7280' }}
+                >
+                  <MdLocalShipping size={16} />
+                  Miễn phí vận chuyển
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-xl border border-orange-100 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold text-lg" style={{ color: '#ffffff' }}>
                     {productDetail.sellerShopName?.charAt(0) || 'S'}
                   </span>
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-800">{productDetail.sellerShopName}</p>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>
+                    {productDetail.sellerShopName}
+                  </p>
                   <div className="flex items-center gap-1">
                     <MdStar className="text-yellow-500" size={16} />
-                    <span className="text-sm text-gray-600">4.8 (256 đánh giá)</span>
+                    <span className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
+                      4.8 (256 đánh giá)
+                    </span>
                   </div>
                 </div>
+                <button
+                  className="px-4 py-2 bg-white border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors text-sm font-medium"
+                  style={{ color: '#1f2937' }}
+                >
+                  Xem shop
+                </button>
               </div>
 
-              <p className="text-gray-600 text-lg leading-relaxed">
-                {productDetail.shortDescription}
+              <p className="text-gray-700 text-lg leading-relaxed" style={{ color: '#374151' }}>
+                {productDetail.shortDescription || 'Không có mô tả ngắn.'}
               </p>
             </div>
 
@@ -217,118 +276,130 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
               <div className="space-y-4">
                 <div className="flex items-baseline gap-4 flex-wrap">
                   <span className="text-4xl font-bold text-orange-600">
-                    {productDetail.currentPrice?.toLocaleString()}₫
+                    {productDetail.currentPrice?.toLocaleString('vi-VN')}₫
                   </span>
                 </div>
 
-                <div className="mt-2 mb-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700 font-medium">Số lượng:</span>
-                    <div className="flex items-center">
-                      <span className="text-gray-600 mr-2">
-                        Còn lại:{' '}
-                        <span
-                          className={`font-medium ${
-                            productDetail.quantity < 10 ? 'text-red-500' : 'text-green-600'
-                          }`}
-                        >
-                          {productDetail.quantity}
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center mt-2">
-                    <button
-                      onClick={() => handleQuantityChange(false)}
-                      disabled={quantity <= 1}
-                      className="w-10 h-10 rounded-l-lg bg-orange-100 text-orange-700 hover:bg-orange-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <MdRemove />
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      max={productDetail.quantity}
-                      value={quantity}
-                      onChange={handleQuantityInput}
-                      className="w-16 h-10 text-center border-y border-orange-200 text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-orange-300"
-                    />
-                    <button
-                      onClick={() => handleQuantityChange(true)}
-                      disabled={quantity >= productDetail.quantity}
-                      className="w-10 h-10 rounded-r-lg bg-orange-100 text-orange-700 hover:bg-orange-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <MdAdd />
-                    </button>
-                  </div>
-
-                  {stockWarning && (
-                    <div className="mt-2 text-amber-600 text-sm flex items-center gap-1">
-                      <MdWarning size={16} />
-                      <span>Số lượng đang gần hết!</span>
-                    </div>
-                  )}
-
-                  {productDetail.quantity <= 0 && (
-                    <div className="mt-2 text-red-600 text-sm flex items-center gap-1">
-                      <MdError size={16} />
-                      <span>Sản phẩm đã hết hàng!</span>
-                    </div>
-                  )}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
+                    Tình trạng:
+                  </span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      productDetail.quantity > 0
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                    style={{
+                      color: productDetail.quantity > 0 ? '#166534' : '#991b1b',
+                      backgroundColor: productDetail.quantity > 0 ? '#dcfce7' : '#fee2e2',
+                    }}
+                  >
+                    {productDetail.quantity > 0
+                      ? `Còn ${productDetail.quantity} sản phẩm`
+                      : 'Hết hàng'}
+                  </span>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={isAddingToCart || productDetail.quantity <= 0}
-                    className="flex-1 bg-orange-500 text-white px-6 py-4 rounded-xl hover:bg-orange-600
-                      transition-all duration-200 flex items-center justify-center gap-3 font-semibold text-lg
-                      disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                  >
-                    {isAddingToCart ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                    ) : (
-                      <MdAddShoppingCart size={24} />
-                    )}
-                    {isAddingToCart
-                      ? 'Đang thêm...'
-                      : productDetail.quantity <= 0
-                        ? 'Hết hàng'
-                        : 'Thêm vào giỏ hàng'}
-                  </button>
-                  <button
-                    disabled={productDetail.quantity <= 0}
-                    className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-4 rounded-xl
-                    hover:from-orange-700 hover:to-orange-800 transition-all duration-200 font-semibold text-lg
-                    shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    Mua ngay
-                  </button>
+                {stockWarning && (
+                  <div className="flex items-center gap-2 text-amber-600 text-sm">
+                    <MdWarning size={16} />
+                    <span style={{ color: '#d97706' }}>
+                      Sắp hết hàng! Chỉ còn {productDetail.quantity} sản phẩm.
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex items-center">
+                    <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                      Số lượng:
+                    </span>
+                    <div className="flex items-center border border-orange-200 rounded-lg">
+                      <button
+                        onClick={() => handleQuantityChange(false)}
+                        className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={quantity <= 1}
+                      >
+                        <MdRemove size={16} className="text-gray-600" />
+                      </button>
+                      <input
+                        type="number"
+                        value={quantity}
+                        onChange={handleQuantityInput}
+                        className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
+                        min="1"
+                        max={productDetail.quantity}
+                      />
+                      <button
+                        onClick={() => handleQuantityChange(true)}
+                        className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={quantity >= productDetail.quantity}
+                      >
+                        <MdAdd size={16} className="text-gray-600" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 flex-1">
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={isAddingToCart || productDetail.quantity === 0}
+                      className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isAddingToCart ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          Đang thêm...
+                        </>
+                      ) : (
+                        <>
+                          <MdAddShoppingCart size={20} />
+                          Thêm vào giỏ
+                        </>
+                      )}
+                    </button>
+                    <button className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors">
+                      Mua ngay
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm">
-                <MdLocalShipping className="text-orange-500" size={24} />
+              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
+                <MdLocalShipping className="text-orange-500 flex-shrink-0" size={24} />
                 <div>
-                  <p className="font-semibold text-gray-800">Miễn phí vận chuyển</p>
-                  <p className="text-sm text-gray-600">Đơn từ 500k</p>
+                  <p className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>
+                    Miễn phí vận chuyển
+                  </p>
+                  <p className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
+                    Toàn quốc
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm">
-                <MdSecurity className="text-orange-500" size={24} />
+              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
+                <MdSecurity className="text-orange-500 flex-shrink-0" size={24} />
                 <div>
-                  <p className="font-semibold text-gray-800">Bảo hành 12 tháng</p>
-                  <p className="text-sm text-gray-600">Chính hãng</p>
+                  <p className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>
+                    Bảo hành chính hãng
+                  </p>
+                  <p className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
+                    12 tháng
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm">
-                <MdAssignment className="text-orange-500" size={24} />
+              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
+                <MdAssignment className="text-orange-500 flex-shrink-0" size={24} />
                 <div>
-                  <p className="font-semibold text-gray-800">Đổi trả 7 ngày</p>
-                  <p className="text-sm text-gray-600">Miễn phí</p>
+                  <p className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>
+                    Đổi trả 7 ngày
+                  </p>
+                  <p className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
+                    Miễn phí
+                  </p>
                 </div>
               </div>
             </div>
@@ -353,6 +424,9 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
                       ? 'text-orange-600 border-b-2 border-orange-600'
                       : 'text-gray-600 hover:text-orange-600'
                   }`}
+                  style={{
+                    color: activeTab === tab.key ? '#ea580c' : '#6b7280',
+                  }}
                 >
                   {tab.label}
                 </button>
@@ -362,69 +436,176 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
           <div className="p-6">
             {activeTab === 'description' && (
-              <div className="prose max-w-none">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Mô tả chi tiết</h3>
-                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {productDetail.description || 'Chưa có mô tả chi tiết.'}
-                </div>
-                {productDetail.keywords && productDetail.keywords.length > 0 && (
-                  <div className="mt-6">
-                    <h4 className="font-semibold text-gray-800 mb-3">Từ khóa:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {productDetail.keywords.map((keyword: string, index: number) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm"
+              <div className="prose prose-orange max-w-none">
+                <h3 className="text-xl font-bold text-gray-800 mb-4" style={{ color: '#1f2937' }}>
+                  Mô tả chi tiết
+                </h3>
+                <div className="text-gray-700 leading-relaxed markdown-content">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      h1: ({ children }) => (
+                        <h1 className="text-2xl font-bold text-gray-900 mt-6 mb-4">{children}</h1>
+                      ),
+                      h2: ({ children }) => (
+                        <h2 className="text-xl font-bold text-gray-800 mt-5 mb-3">{children}</h2>
+                      ),
+                      h3: ({ children }) => (
+                        <h3 className="text-lg font-semibold text-gray-800 mt-4 mb-2">
+                          {children}
+                        </h3>
+                      ),
+                      p: ({ children }) => (
+                        <p className="text-gray-700 leading-relaxed mb-4">{children}</p>
+                      ),
+                      ul: ({ children }) => (
+                        <ul className="list-disc list-inside text-gray-700 mb-4 space-y-1">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="list-decimal list-inside text-gray-700 mb-4 space-y-1">
+                          {children}
+                        </ol>
+                      ),
+                      li: ({ children }) => <li className="text-gray-700">{children}</li>,
+                      strong: ({ children }) => (
+                        <strong className="font-semibold text-gray-900">{children}</strong>
+                      ),
+                      em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
+                      code: ({ children }) => (
+                        <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono text-gray-800">
+                          {children}
+                        </code>
+                      ),
+                      pre: ({ children }) => (
+                        <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4 text-sm">
+                          {children}
+                        </pre>
+                      ),
+                      blockquote: ({ children }) => (
+                        <blockquote className="border-l-4 border-orange-300 pl-4 italic text-gray-600 my-4">
+                          {children}
+                        </blockquote>
+                      ),
+                      a: ({ href, children }) => (
+                        <a
+                          href={href}
+                          className="text-orange-600 hover:text-orange-700 underline transition-colors"
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          {keyword}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                          {children}
+                        </a>
+                      ),
+                      table: ({ children }) => (
+                        <div className="overflow-x-auto mb-4">
+                          <table className="min-w-full border border-gray-200 rounded-lg">
+                            {children}
+                          </table>
+                        </div>
+                      ),
+                      thead: ({ children }) => <thead className="bg-gray-50">{children}</thead>,
+                      tbody: ({ children }) => (
+                        <tbody className="divide-y divide-gray-200">{children}</tbody>
+                      ),
+                      tr: ({ children }) => <tr className="hover:bg-gray-50">{children}</tr>,
+                      th: ({ children }) => (
+                        <th className="px-4 py-2 text-left text-sm font-semibold text-gray-900 border-b">
+                          {children}
+                        </th>
+                      ),
+                      td: ({ children }) => (
+                        <td className="px-4 py-2 text-sm text-gray-700 border-b">{children}</td>
+                      ),
+                    }}
+                  >
+                    {productDetail.description || 'Chưa có mô tả chi tiết.'}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
 
             {activeTab === 'specifications' && (
               <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-800">Thông số kỹ thuật</h3>
+                <h3 className="text-xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
+                  Thông số kỹ thuật
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div className="flex justify-between py-3 border-b border-gray-100">
-                      <span className="font-medium text-gray-600">Thương hiệu:</span>
-                      <span className="text-gray-800">{productDetail.brand || 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between py-3 border-b border-gray-100">
-                      <span className="font-medium text-gray-600">Model:</span>
-                      <span className="text-gray-800">{productDetail.model || 'N/A'}</span>
-                    </div>
-                    <div className="flex justify-between py-3 border-b border-gray-100">
-                      <span className="font-medium text-gray-600">Tình trạng:</span>
-                      <span className="text-gray-800">
-                        {productDetail.verified ? 'Đã xác minh' : 'Chưa xác minh'}
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Thương hiệu:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
+                        {productDetail.brand || 'N/A'}
                       </span>
                     </div>
                     <div className="flex justify-between py-3 border-b border-gray-100">
-                      <span className="font-medium text-gray-600">Số lượng trong kho:</span>
-                      <span
-                        className={`font-medium ${
-                          productDetail.quantity < 10 ? 'text-red-500' : 'text-green-600'
-                        }`}
-                      >
-                        {productDetail.quantity} sản phẩm
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Model:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
+                        {productDetail.model || 'N/A'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Tình trạng:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
+                        {productDetail.condition === 'NEW' ? 'Mới' : 'Đã sử dụng'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Bảo hành đến:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
+                        {productDetail.warrantyExpiryDate
+                          ? new Date(productDetail.warrantyExpiryDate).toLocaleDateString('vi-VN')
+                          : 'Không có'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Xác minh:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
+                        {productDetail.verified ? 'Đã xác minh' : 'Chưa xác minh'}
                       </span>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between py-3 border-b border-gray-100">
-                      <span className="font-medium text-gray-600">Ngày tạo:</span>
-                      <span className="text-gray-800">
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Danh mục:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
+                        {productDetail.categories?.map((cat) => cat).join(', ') || 'Không có'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Tags:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
+                        {productDetail.tags?.length ? productDetail.tags.join(', ') : 'Không có'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Ngày tạo:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
                         {new Date(productDetail.createdAt).toLocaleDateString('vi-VN')}
                       </span>
                     </div>
                     <div className="flex justify-between py-3 border-b border-gray-100">
-                      <span className="font-medium text-gray-600">Cập nhật:</span>
-                      <span className="text-gray-800">
+                      <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
+                        Cập nhật:
+                      </span>
+                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
                         {new Date(productDetail.updatedAt).toLocaleDateString('vi-VN')}
                       </span>
                     </div>
@@ -435,8 +616,10 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
             {activeTab === 'reviews' && (
               <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-800">Đánh giá từ khách hàng</h3>
-                <div className="text-center py-12 text-gray-500">
+                <h3 className="text-xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
+                  Đánh giá từ khách hàng
+                </h3>
+                <div className="text-center py-12 text-gray-500" style={{ color: '#6b7280' }}>
                   <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
                   <p>Chưa có đánh giá nào cho sản phẩm này.</p>
                   <p className="text-sm">Hãy là người đầu tiên đánh giá!</p>
@@ -446,10 +629,18 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
           </div>
         </div>
 
+        <div className="mb-12">
+          <ProductHistoryList history={productHistories} />
+        </div>
+
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100 mb-12">
           <div className="p-6 border-b border-orange-100">
-            <h2 className="text-2xl font-bold text-gray-800">Lịch sử giá</h2>
-            <p className="text-gray-600 mt-1">Theo dõi xu hướng giá của sản phẩm</p>
+            <h2 className="text-2xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
+              Lịch sử giá
+            </h2>
+            <p className="text-gray-600 mt-1" style={{ color: '#6b7280' }}>
+              Theo dõi xu hướng giá của sản phẩm
+            </p>
           </div>
           <div className="p-6">
             <div className="h-[300px]">
@@ -460,11 +651,15 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
 
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100">
           <div className="p-6 border-b border-orange-100">
-            <h2 className="text-2xl font-bold text-gray-800">Sản phẩm tương tự</h2>
-            <p className="text-gray-600 mt-1">Khám phá những sản phẩm liên quan khác</p>
+            <h2 className="text-2xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
+              Sản phẩm tương tự
+            </h2>
+            <p className="text-gray-600 mt-1" style={{ color: '#6b7280' }}>
+              Khám phá những sản phẩm liên quan khác
+            </p>
           </div>
           <div className="p-6">
-            <RelatedProducts />
+            <RelatedProducts products={relatedProducts} />
           </div>
         </div>
       </div>
