@@ -464,7 +464,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
             <p className="text-gray-600 mt-1">Khám phá những sản phẩm liên quan khác</p>
           </div>
           <div className="p-6">
-            <RelatedProducts />
+            <RelatedProducts productId={id} />
           </div>
         </div>
       </div>

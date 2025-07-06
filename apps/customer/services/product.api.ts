@@ -93,4 +93,18 @@ export const productApi = {
     }
     return response.data.content;
   },
+  async getProductSimilar(
+    productId: string,
+    page: number = 0,
+    size: number = 10,
+  ): Promise<TProduct[]> {
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products/similar', {
+      params: {
+        page,
+        size,
+        q: `id=${productId}`,
+      },
+    });
+    return response.data.content;
+  },
 };

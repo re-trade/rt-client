@@ -110,16 +110,10 @@ const SearchBar = () => {
           />
           <button
             onClick={() => setImageSearchOpen(true)}
-            className="absolute right-16 top-1/2 -translate-y-1/2 p-2 hover:bg-orange-100 rounded-lg transition-colors duration-200"
+            className="absolute right-5 top-1/2 -translate-y-1/2 p-2 hover:bg-orange-100 rounded-lg transition-colors duration-200"
             title="Tìm kiếm bằng hình ảnh"
           >
             <IconPhoto size={18} className="text-orange-500" />
-          </button>
-          <button
-            onClick={handleSearch}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-medium"
-          >
-            Tìm
           </button>
         </div>
 

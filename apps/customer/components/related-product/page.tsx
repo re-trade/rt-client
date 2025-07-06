@@ -3,11 +3,15 @@ import { productApi, TProduct } from '@/services/product.api';
 import ProductCard from '@components/product/ProductCard';
 import { useEffect, useState } from 'react';
 
-export default function RelatedProducts() {
+interface RelatedProductsProps {
+  productId: string;
+}
+
+export default function RelatedProducts(data: RelatedProductsProps) {
   const [products, setProducts] = useState<TProduct[]>([]);
   useEffect(() => {
     const fetchProduct = async () => {
-      const response = await productApi.getProducts(0, 4);
+      const response = await productApi.getProductSimilar(data.productId, 0, 4);
       setProducts(response);
     };
     fetchProduct();
