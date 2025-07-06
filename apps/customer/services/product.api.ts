@@ -10,6 +10,8 @@ export type TProduct = {
   thumbnail: string;
   productImages: string[];
   brandId: string;
+  condition: string;
+  listOfCategories: { id: string; name: string }[];
   brand: string;
   quantity: number;
   warrantyExpiryDate: string;
@@ -21,6 +23,16 @@ export type TProduct = {
   verified: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+export type TProductHistory = {
+  productId: string;
+  productName: string;
+  productThumbnail: string;
+  productDescription: string;
+  ownerId: string;
+  ownerName: string;
+  ownerAvatarUrl: string;
 };
 
 export type TProductFilter = {
@@ -105,6 +117,22 @@ export const productApi = {
         q: `id=${productId}`,
       },
     });
+    return response.data.content;
+  },
+  async getProductHistory(
+    productId: string,
+    page: number = 0,
+    size: number = 10,
+  ): Promise<TProductHistory[]> {
+    const response = await unAuthApi.default.get<IResponseObject<TProductHistory[]>>(
+      `/product-histories/product/${productId}`,
+      {
+        params: {
+          page,
+          size,
+        },
+      },
+    );
     return response.data.content;
   },
 };
