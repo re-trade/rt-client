@@ -1,9 +1,9 @@
 'use client';
 
-import { ReplyDialog } from '@/components/dialog/add/reply-review-dialog';
-import { ReviewDetailDialog } from '@/components/dialog/view-update/review-detail-dialog';
-import { ReviewStats } from '@/components/dialog/view-update/review-stats';
-import { ReviewTable } from '@/components/dialog/view-update/review-table';
+import { ReplyDialog } from '@/components/dialog-common/add/reply-review-dialog';
+import { ReviewDetailDialog } from '@/components/dialog-common/view-update/review-detail-dialog';
+import { ReviewStats } from '@/components/dialog-common/view-update/review-stats';
+import { ReviewTable } from '@/components/dialog-common/view-update/review-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -79,9 +79,9 @@ export default function ReviewsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      {/* <div>
         <p className="text-muted-foreground">Xem và phản hồi đánh giá từ khách hàng</p>
-      </div>
+      </div> */}
       <ReviewStats reviews={productReviews} />
 
       {/* Filters */}
@@ -113,7 +113,7 @@ export default function ReviewsPage() {
             <SelectValue placeholder="Lọc theo phản hồi" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tất cả</SelectItem>
+            <SelectItem value="all">Tất cả phản hồi</SelectItem>
             <SelectItem value="replied">Đã phản hồi</SelectItem>
             <SelectItem value="unreplied">Chưa phản hồi</SelectItem>
           </SelectContent>

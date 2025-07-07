@@ -6,58 +6,45 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Category, getAllCategories } from '@/service/categories.api';
-import { CreateProductDto } from '@/service/product.api';
+import { storageApi } from '@/service/storage.api'; // Added missing import
 import { Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
+import { SelectBrand } from '@/components/common/SelectBrand';
+import { toast } from 'sonner';
+import { FancyMultiSelect } from '@/components/common/MultiSectCate';
 
 interface CreateProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreateProduct: (product: CreateProductDto) => void;
 }
 
-export function CreateProductDialog({
-  open,
-  onOpenChange,
-  onCreateProduct,
-}: CreateProductDialogProps) {
+export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
     shortDescription: '',
     description: '',
     thumbnail: '',
     productImages: '',
-    brand: '',
+    brandId: '',
     discount: '',
     model: '',
     currentPrice: '',
-    categoryIds: [] as string[], // Store category IDs as an array of strings
-    // quantities: 0,
+    quantity: 0,
+    warrantyExpiryDate: '',
+    condition: 'NEW' as const,
+    categoryIds: [] as string[],
     tags: '',
     status: 'DRAFT' as const,
   });
-
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(["react", "angular"]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [thumbnailFile, setThumbnailFile] = useState<File | undefined>(); // Added missing state
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  // Fetch categories on mount
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getAllCategories();
-        setCategories(response);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   // Clean up URLs on unmount or when previews change
   useEffect(() => {
@@ -101,6 +88,7 @@ export function CreateProductDialog({
       if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
       const imageUrl = URL.createObjectURL(file);
       setThumbnailPreview(imageUrl);
+      setThumbnailFile(file); // Store the actual file
       setFormData((prev) => ({ ...prev, thumbnail: imageUrl }));
     }
     e.target.value = ''; // Reset input
@@ -110,53 +98,101 @@ export function CreateProductDialog({
     if (thumbnailPreview) {
       URL.revokeObjectURL(thumbnailPreview);
       setThumbnailPreview('');
+      setThumbnailFile(undefined);
       setFormData((prev) => ({ ...prev, thumbnail: '' }));
     }
   };
 
-  const handleSubmit = () => {
-    const productData: Omit<
-      CreateProductDto,
-      'id' | 'createdAt' | 'updatedAt' | 'sellerId' | 'sellerShopName' | 'verified'
-    > = {
-      name: formData.name,
-      shortDescription: formData.shortDescription,
-      description: formData.description,
-      thumbnail: formData.thumbnail,
-      productImages: imagePreviews,
-      brand: formData.brand,
-      model: formData.model,
-      currentPrice: Number(formData.currentPrice) || 0,
-      categoryIds: formData.categoryIds, // Use categoryIds instead of categories
-      // quantities: formData.quantities,
-      tags: formData.tags
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    };
+  const handleSubmit = async () => {
+    // Basic validation
+    if (!formData.name.trim()) {
+      toast.error('Vui lòng nhập tên sản phẩm');
+      return;
+    }
 
-    onCreateProduct(productData);
-    onOpenChange(false);
+    if (!formData.brandId) {
+      toast.error('Vui lòng chọn thương hiệu');
+      return;
+    }
 
-    // Reset form
+    if (!formData.currentPrice || Number(formData.currentPrice) <= 0) {
+      toast.error('Vui lòng nhập giá sản phẩm hợp lệ');
+      return;
+    }
+
+    if (formData.categoryIds.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một danh mục');
+      return;
+    }
+
+    toast.loading('Đang tạo sản phẩm...');
+    try {
+      let thumbnailUrl = '';
+      let productImageUrls: string[] = [];
+
+      if (thumbnailFile) {
+        const res = await storageApi.fileUpload(thumbnailFile);
+        thumbnailUrl = res;
+      }
+
+      if (selectedFiles.length > 0) {
+        const res = await storageApi.fileBulkUpload(selectedFiles);
+        productImageUrls = res.content;
+      }
+
+      const productData: CreateProductDto = {
+        name: formData.name,
+        shortDescription: formData.shortDescription,
+        description: formData.description,
+        thumbnail: thumbnailUrl,
+        productImages: productImageUrls,
+        brandId: formData.brandId,
+        model: formData.model,
+        currentPrice: Number(formData.currentPrice) || 0,
+        categoryIds: formData.categoryIds,
+        quantity: formData.quantity,
+        warrantyExpiryDate: formData.warrantyExpiryDate,
+        condition: formData.condition,
+        status: formData.status,
+        tags: formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
+      };
+
+      const created = await productApi.createProduct(productData);
+      toast.success('Tạo sản phẩm thành công');
+      // Chỉ đóng dialog khi tạo thành công
+      onOpenChange(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error creating product:', error);
+      toast.error('Không thể tạo sản phẩm. Vui lòng thử lại.');
+      // Không đóng dialog khi có lỗi để user có thể sửa và thử lại
+    } finally {
+      toast.dismiss();
+    }
+  };
+
+  const resetForm = () => {
     setFormData({
       name: '',
       shortDescription: '',
       description: '',
       thumbnail: '',
       productImages: '',
-      brand: '',
+      brandId: '',
       discount: '',
       model: '',
       currentPrice: '',
       categoryIds: [],
-
+      quantity: 0,
+      warrantyExpiryDate: '',
+      condition: 'NEW',
       tags: '',
       status: 'DRAFT',
     });
     setImagePreviews([]);
     setSelectedFiles([]);
     setThumbnailPreview('');
+    setThumbnailFile(undefined);
   };
 
   return (
@@ -168,28 +204,44 @@ export function CreateProductDialog({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="name">Tên sản phẩm</Label>
+            <Label htmlFor="name">Tên sản phẩm *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleFormChange('name', e.target.value)}
+              required
             />
           </div>
 
           <div>
-            <Label htmlFor="brand">Thương hiệu</Label>
-            <Input
-              id="brand"
-              value={formData.brand}
-              onChange={(e) => handleFormChange('brand', e.target.value)}
+            <Label htmlFor="brand">Thương hiệu *</Label>
+            <SelectBrand
+              value={formData.brandId}
+              onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
             />
           </div>
 
-          <div className="md:col-span-2">
-            <Label htmlFor="categoryIds">Danh mục</Label>
-            <MultiSelectCategory
-              value={formData.categoryIds}
-              onChange={(selected) => handleFormChange('categoryIds', selected)}
+          <div>
+            <Label htmlFor="currentPrice">Giá sản phẩm *</Label>
+            <Input
+              id="currentPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.currentPrice}
+              onChange={(e) => handleFormChange('currentPrice', e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="quantity">Số lượng</Label>
+            <Input
+              type="number"
+              id="quantity"
+              min="0"
+              value={formData.quantity}
+              onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
             />
           </div>
 
@@ -202,24 +254,31 @@ export function CreateProductDialog({
             />
           </div>
 
-          {/* <div>
-            <Label htmlFor="quantities">Số lượng</Label>
+          <div>
+            <Label htmlFor="warrantyExpiryDate">Ngày hết hạn bảo hành</Label>
             <Input
-              id="quantities"
-              type="number"
-              value={formData.quantities}
-              onChange={(e) => handleFormChange('quantities', Number(e.target.value))}
+              id="warrantyExpiryDate"
+              type="date"
+              value={formData.warrantyExpiryDate}
+              onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
             />
-          </div> */}
+          </div>
 
           <div>
-            <Label htmlFor="currentPrice">Giá sản phẩm</Label>
-            <Input
-              id="currentPrice" // Fixed ID to match htmlFor
-              type="number" // Set type to number for better UX
-              value={formData.currentPrice}
-              onChange={(e) => handleFormChange('currentPrice', e.target.value)}
-            />
+            <Label htmlFor="condition">Tình trạng sản phẩm</Label>
+            <select
+              id="condition"
+              value={formData.condition}
+              onChange={(e) => handleFormChange('condition', e.target.value)}
+              className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="NEW">Mới</option>
+              <option value="LIKE_NEW">Như mới</option>
+              <option value="USED_GOOD">Đã qua sử dụng - Tốt</option>
+              <option value="USED_FAIR">Đã qua sử dụng - Trung bình</option>
+              <option value="BROKEN">Hỏng</option>
+              <option value="DAMAGED">Hư hại</option>
+            </select>
           </div>
 
           <div>
@@ -228,6 +287,19 @@ export function CreateProductDialog({
               id="tags"
               value={formData.tags}
               onChange={(e) => handleFormChange('tags', e.target.value)}
+              placeholder="Ngăn cách bằng dấu phẩy"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <Label htmlFor="categoryIds">Danh mục *</Label>
+            {/* <MultiSelectCategory
+              value={formData.categoryIds}
+              onChange={(selected) => handleFormChange('categoryIds', selected)}
+            /> */}
+            <FancyMultiSelect
+              value={formData.categoryIds}
+              onChange={(selected) => handleFormChange("categoryIds", selected)}
             />
           </div>
 
@@ -237,6 +309,7 @@ export function CreateProductDialog({
               id="shortDescription"
               value={formData.shortDescription}
               onChange={(e) => handleFormChange('shortDescription', e.target.value)}
+              rows={3}
             />
           </div>
 
@@ -246,6 +319,7 @@ export function CreateProductDialog({
               id="description"
               value={formData.description}
               onChange={(e) => handleFormChange('description', e.target.value)}
+              rows={4}
             />
           </div>
 
@@ -254,11 +328,12 @@ export function CreateProductDialog({
               <div className="flex flex-col items-start space-y-2">
                 <Label>Ảnh đại diện</Label>
                 <Button
+                  type="button"
                   className="py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-500"
                   variant="outline"
                   onClick={handleChooseThumbnail}
                 >
-                  <ImageIcon className="w-4 h-4" />
+                  <ImageIcon className="w-4 h-4 mr-2" />
                   Chọn ảnh
                 </Button>
 
@@ -282,7 +357,7 @@ export function CreateProductDialog({
                     <button
                       type="button"
                       onClick={handleRemoveThumbnail}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
                     >
                       ✕
                     </button>
@@ -297,11 +372,12 @@ export function CreateProductDialog({
               <div className="flex flex-col items-start space-y-2">
                 <Label htmlFor="productImages">Ảnh sản phẩm chi tiết</Label>
                 <Button
+                  type="button"
                   className="py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-500"
                   variant="outline"
                   onClick={handleChooseFiles}
                 >
-                  <ImageIcon className="w-4 h-4" />
+                  <ImageIcon className="w-4 h-4 mr-2" />
                   Chọn ảnh
                 </Button>
 
@@ -321,14 +397,14 @@ export function CreateProductDialog({
                       <div key={index} className="relative w-36 h-36">
                         <Image
                           src={preview}
-                          alt={`Preview ${index}`}
+                          alt={`Preview ${index + 1}`}
                           fill
                           className="rounded-lg object-cover"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveImage(index)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
                         >
                           ✕
                         </button>
@@ -341,9 +417,16 @@ export function CreateProductDialog({
           </div>
         </div>
 
-        <Button onClick={handleSubmit} className="w-full mt-6">
-          Tạo sản phẩm
-        </Button>
+
+        <div className="flex gap-4 mt-6">
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            className="flex-1"
+          >
+            Tạo sản phẩm
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

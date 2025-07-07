@@ -1,6 +1,6 @@
 'use client';
 
-import { RevenueDetailDialog } from '@/components/dialog/view-update/revenue-detail-dialog';
+import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {

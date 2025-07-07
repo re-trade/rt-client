@@ -1,7 +1,8 @@
+// ProductManagement.tsx
 'use client';
 
-import { CreateProductDialog } from '@/components/dialog/add/create-product-dialog';
-import { EditProductDialog } from '@/components/dialog/view-update/edit-product-dialog';
+import { CreateProductDialog } from '@/components/dialog-common/add/create-product-dialog';
+import { EditProductDialog } from '@/components/dialog-common/view-update/edit-product-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -12,10 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { storageApi } from '@/service/storage.api';
 import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
 import { Edit, Trash } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
@@ -30,22 +33,16 @@ export default function ProductManagement() {
         setProductList(productList);
       } catch (error) {
         console.error('Error fetching products:', error);
+        toast.error('Lỗi khi tải danh sách sản phẩm');
       }
     };
     fetchProduct();
   }, []);
 
-  const handleCreateProduct = async (productData: CreateProductDto) => {
-    try {
-      const newProduct = await productApi.createProduct(productData);
-      console.log('New product created:', productData);
-      setProductList((prev) => [...prev, newProduct]);
-      setIsCreateOpen(false);
-    } catch (error) {
-      console.error('Error creating product:', error);
-      // Optionally, show a user-friendly error message (e.g., using a toast notification)
-    }
-  };
+const handleCreateProduct = ()=> {
+    setIsCreateOpen(false);
+  }
+
 
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
     if (!selectedProduct) return;
@@ -53,11 +50,11 @@ export default function ProductManagement() {
     const updatedProducts = productList.map((product) =>
       product.id === selectedProduct.id
         ? {
-            ...product,
-            ...updatedData,
-            updatedAt: new Date().toISOString(),
-          }
-        : product,
+          ...product,
+          ...updatedData,
+          updatedAt: new Date().toISOString(),
+        }
+        : product
     );
     setProductList(updatedProducts);
     setSelectedProduct(null);
@@ -68,9 +65,10 @@ export default function ProductManagement() {
     setIsEditOpen(true);
   };
 
-  const handleDeletetProduct = (product: TProduct) => {
+  const handleDeleteProduct = (product: TProduct) => {
     const updatedProducts = productList.filter((p) => p.id !== product.id);
     setProductList(updatedProducts);
+    toast.success('Đã xoá sản phẩm');
   };
 
   return (
@@ -84,7 +82,6 @@ export default function ProductManagement() {
         <CreateProductDialog
           open={isCreateOpen}
           onOpenChange={setIsCreateOpen}
-          onCreateProduct={handleCreateProduct}
         />
         <EditProductDialog
           open={isEditOpen}
@@ -93,67 +90,87 @@ export default function ProductManagement() {
           onUpdateProduct={handleUpdateProduct}
         />
       </div>
-
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Hình ảnh</TableHead>
-                <TableHead>Tên sản phẩm</TableHead>
-                <TableHead>Giá</TableHead>
-                <TableHead>Danh mục</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {productList.map((product) => (
-                <TableRow
-                  key={product.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleEditProduct(product)}
-                >
-                  <TableCell>
-                    <Image
-                      src={product.thumbnail || '/placeholder.svg'}
-                      alt={product.name}
-                      width={70}
-                      height={70}
-                      className="rounded-md object-cover"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.currentPrice.toLocaleString('vi-VN')}đ</TableCell>
-                  <TableCell>{product.categories.join(', ')}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        product.verified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {product.verified ? 'Hoạt động' : 'Không hoạt động'}
-                    </span>
-                  </TableCell>
-
-                  <TableCell className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeletetProduct(product)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+      {productList.length > 0 && (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Hình ảnh</TableHead>
+                  <TableHead>Tên sản phẩm</TableHead>
+                  <TableHead>Giá</TableHead>
+                  <TableHead>Thương hiệu</TableHead>
+                  <TableHead>Số lượng</TableHead>
+                  <TableHead>Danh mục</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Đã xác minh</TableHead>
+                  <TableHead>Thao tác</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {productList.map((product) => (
+                  <TableRow
+                    key={product.id}
+                    className="hover:bg-muted/50"
+                    onClick={() => handleEditProduct(product)}
+                  >
+                    <TableCell>
+                      <Image
+                        src={product.thumbnail || '/placeholder.svg'}
+                        alt={product.name}
+                        width={70}
+                        height={70}
+                        className="rounded-md object-cover"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell>{product.currentPrice.toLocaleString('vi-VN')}đ</TableCell>
+                    <TableCell>{product.brand}</TableCell>
+                    <TableCell>{product.quantity}</TableCell>
+                    <TableCell>{product.categories.join(', ')}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${product.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                      >
+                        {product.status === 'ACTIVE' ? 'Hoạt động' : 'Không hoạt động'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${product.verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                      >
+                        {product.verified ? 'Đã xác minh' : 'Chưa xác minh'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditProduct(product);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteProduct(product);
+                        }}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
