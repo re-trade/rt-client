@@ -1,17 +1,16 @@
 'use client';
 
-import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
+import { FancyMultiSelect } from '@/components/common/MultiSectCate';
+import { SelectBrand } from '@/components/common/SelectBrand';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { CreateProductDto, productApi, TProduct, UpdateProductDto } from '@/service/product.api';
+import { productApi, TProduct, UpdateProductDto } from '@/service/product.api';
 import { Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { SelectBrand } from '@/components/common/SelectBrand';
-import { FancyMultiSelect } from '@/components/common/MultiSectCate';
 
 interface EditProductDialogProps {
   open: boolean;
@@ -55,21 +54,21 @@ export function EditProductDialog({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
-const formatDateFromArray = (dateInput: number[] | string): string => {
-  // Trường hợp là mảng số
-  if (Array.isArray(dateInput) && dateInput.length === 3) {
-    const [year, month, day] = dateInput;
-    const paddedMonth = String(month).padStart(2, '0');
-    const paddedDay = String(day).padStart(2, '0');
-    return `${year}-${paddedMonth}-${paddedDay}`;
-  }
-  // Trường hợp là chuỗi
-  if (typeof dateInput === 'string' && dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    return dateInput; // Nếu chuỗi đã đúng định dạng YYYY-MM-DD, trả về nguyên vẹn
-  }
-  // Trường hợp không hợp lệ
-  return '';
-};
+  const formatDateFromArray = (dateInput: number[] | string): string => {
+    // Trường hợp là mảng số
+    if (Array.isArray(dateInput) && dateInput.length === 3) {
+      const [year, month, day] = dateInput;
+      const paddedMonth = String(month).padStart(2, '0');
+      const paddedDay = String(day).padStart(2, '0');
+      return `${year}-${paddedMonth}-${paddedDay}`;
+    }
+    // Trường hợp là chuỗi
+    if (typeof dateInput === 'string' && dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateInput; // Nếu chuỗi đã đúng định dạng YYYY-MM-DD, trả về nguyên vẹn
+    }
+    // Trường hợp không hợp lệ
+    return '';
+  };
 
   useEffect(() => {
     if (product) {
@@ -87,7 +86,7 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
         quantity: product.quantity || 0,
         warrantyExpiryDate: formatDateFromArray(product.warrantyExpiryDate),
         condition: product.condition || 'NEW',
-        categoryIds: (product.listOfCategories || []).map(c => c.id),
+        categoryIds: (product.listOfCategories || []).map((c) => c.id),
         tags: (product.tags || []).join(','),
         status: product.status || 'DRAFT',
       };
@@ -97,7 +96,6 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
     }
   }, [product]);
   // helper: format mảng [YYYY, MM, DD] thành chuỗi YYYY-MM-DD
-
 
   const handleChooseFiles = () => fileInputRef.current?.click();
   const handleChooseThumbnail = () => thumbnailInputRef.current?.click();
@@ -264,12 +262,25 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InputField label="Tên sản phẩm" value={formData.name} onChange={(v) => handleFormChange('name', v)} />
-          <InputField label="Giá sản phẩm" type="number" value={formData.currentPrice} onChange={(v) => handleFormChange('currentPrice', v)} />
+          <InputField
+            label="Tên sản phẩm"
+            value={formData.name}
+            onChange={(v) => handleFormChange('name', v)}
+          />
+          <InputField
+            label="Giá sản phẩm"
+            type="number"
+            value={formData.currentPrice}
+            onChange={(v) => handleFormChange('currentPrice', v)}
+          />
 
           <div>
             <Label>Số lượng</Label>
-            <Input type="number" value={formData.quantity} onChange={(e) => handleFormChange('quantity', Number(e.target.value))} />
+            <Input
+              type="number"
+              value={formData.quantity}
+              onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
+            />
           </div>
 
           <div>
@@ -281,11 +292,19 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
             />
           </div>
 
-          <InputField label="Model" value={formData.model} onChange={(v) => handleFormChange('model', v)} />
+          <InputField
+            label="Model"
+            value={formData.model}
+            onChange={(v) => handleFormChange('model', v)}
+          />
 
           <div>
             <Label>Tình trạng sản phẩm</Label>
-            <select value={formData.condition} onChange={(e) => handleFormChange('condition', e.target.value)} className="w-full p-2 border rounded">
+            <select
+              value={formData.condition}
+              onChange={(e) => handleFormChange('condition', e.target.value)}
+              className="w-full p-2 border rounded"
+            >
               <option value="NEW">Mới</option>
               <option value="LIKE_NEW">Như mới</option>
               <option value="USED_GOOD">Đã qua sử dụng - Tốt</option>
@@ -297,10 +316,18 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
 
           <div>
             <Label>Ngày hết hạn bảo hành</Label>
-            <Input type="date" value={formData.warrantyExpiryDate} onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)} />
+            <Input
+              type="date"
+              value={formData.warrantyExpiryDate}
+              onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
+            />
           </div>
 
-          <InputField label="Tags" value={formData.tags} onChange={(v) => handleFormChange('tags', v)} />
+          <InputField
+            label="Tags"
+            value={formData.tags}
+            onChange={(v) => handleFormChange('tags', v)}
+          />
 
           <div className="md:col-span-2">
             <Label>Danh mục</Label>
@@ -313,29 +340,55 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
 
           <div className="md:col-span-2">
             <Label>Mô tả ngắn</Label>
-            <Textarea value={formData.shortDescription} onChange={(e) => handleFormChange('shortDescription', e.target.value)} />
+            <Textarea
+              value={formData.shortDescription}
+              onChange={(e) => handleFormChange('shortDescription', e.target.value)}
+            />
           </div>
 
           <div className="md:col-span-2">
             <Label>Mô tả chi tiết</Label>
-            <Textarea value={formData.description} onChange={(e) => handleFormChange('description', e.target.value)} />
+            <Textarea
+              value={formData.description}
+              onChange={(e) => handleFormChange('description', e.target.value)}
+            />
           </div>
 
           {/* Thumbnail */}
           <div className="md:col-span-2 flex flex-row items-start">
             <div className="flex flex-col space-y-2">
               <Label>Ảnh đại diện</Label>
-              <Button variant="outline" className="flex gap-2 items-center bg-gray-600 text-white hover:bg-gray-500" onClick={handleChooseThumbnail}>
+              <Button
+                variant="outline"
+                className="flex gap-2 items-center bg-gray-600 text-white hover:bg-gray-500"
+                onClick={handleChooseThumbnail}
+              >
                 <ImageIcon className="w-4 h-4" />
                 Chọn ảnh
               </Button>
-              <Input type="file" accept="image/*" ref={thumbnailInputRef} onChange={handleThumbnailChange} className="hidden" />
+              <Input
+                type="file"
+                accept="image/*"
+                ref={thumbnailInputRef}
+                onChange={handleThumbnailChange}
+                className="hidden"
+              />
             </div>
             <div className="flex-1 flex justify-center ml-8">
               {formData.thumbnail && (
                 <div className="relative w-36 h-36">
-                  <Image src={formData.thumbnail} alt="Thumbnail" layout="fill" objectFit="cover" className="rounded-lg" />
-                  <button type="button" onClick={handleRemoveThumbnail} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600">
+                  <Image
+                    src={formData.thumbnail}
+                    alt="Thumbnail"
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveThumbnail}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                  >
                     ✕
                   </button>
                 </div>
@@ -347,17 +400,38 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
           <div className="md:col-span-2 flex flex-row items-start">
             <div className="flex flex-col space-y-2">
               <Label>Ảnh sản phẩm chi tiết</Label>
-              <Button variant="outline" className="flex gap-2 items-center bg-gray-600 text-white hover:bg-gray-500" onClick={handleChooseFiles}>
+              <Button
+                variant="outline"
+                className="flex gap-2 items-center bg-gray-600 text-white hover:bg-gray-500"
+                onClick={handleChooseFiles}
+              >
                 <ImageIcon className="w-4 h-4" />
                 Chọn ảnh
               </Button>
-              <Input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
             <div className="flex-1 flex flex-wrap gap-4 justify-center ml-4">
               {imagePreviews.map((preview, index) => (
                 <div key={index} className="relative w-36 h-36">
-                  <Image src={preview} alt={`Preview ${index}`} layout="fill" objectFit="cover" className="rounded-lg" />
-                  <button type="button" onClick={() => handleRemoveImage(index)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600">
+                  <Image
+                    src={preview}
+                    alt={`Preview ${index}`}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                  >
                     ✕
                   </button>
                 </div>
@@ -366,7 +440,12 @@ const formatDateFromArray = (dateInput: number[] | string): string => {
           </div>
         </div>
 
-        <Button onClick={handleSubmit} className="w-full mt-6" disabled={!isFormChanged()} variant={isFormChanged() ? 'default' : 'secondary'}>
+        <Button
+          onClick={handleSubmit}
+          className="w-full mt-6"
+          disabled={!isFormChanged()}
+          variant={isFormChanged() ? 'default' : 'secondary'}
+        >
           Cập nhật sản phẩm
         </Button>
       </DialogContent>
@@ -389,6 +468,11 @@ const InputField = ({
 }) => (
   <div>
     <Label>{label}</Label>
-    <Input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
+    <Input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+    />
   </div>
 );

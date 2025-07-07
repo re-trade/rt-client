@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { storageApi } from '@/service/storage.api';
 import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
 import { Edit, Trash } from 'lucide-react';
 import Image from 'next/image';
@@ -39,10 +38,9 @@ export default function ProductManagement() {
     fetchProduct();
   }, []);
 
-const handleCreateProduct = ()=> {
+  const handleCreateProduct = () => {
     setIsCreateOpen(false);
-  }
-
+  };
 
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
     if (!selectedProduct) return;
@@ -50,11 +48,11 @@ const handleCreateProduct = ()=> {
     const updatedProducts = productList.map((product) =>
       product.id === selectedProduct.id
         ? {
-          ...product,
-          ...updatedData,
-          updatedAt: new Date().toISOString(),
-        }
-        : product
+            ...product,
+            ...updatedData,
+            updatedAt: new Date().toISOString(),
+          }
+        : product,
     );
     setProductList(updatedProducts);
     setSelectedProduct(null);
@@ -79,10 +77,7 @@ const handleCreateProduct = ()=> {
           <p className="text-muted-foreground">Quản lý tất cả sản phẩm của bạn</p>
         </div>
         <Button onClick={() => setIsCreateOpen(true)}>Tạo sản phẩm mới</Button>
-        <CreateProductDialog
-          open={isCreateOpen}
-          onOpenChange={setIsCreateOpen}
-        />
+        <CreateProductDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
         <EditProductDialog
           open={isEditOpen}
           onOpenChange={setIsEditOpen}

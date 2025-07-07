@@ -1,12 +1,18 @@
-"use client";
+'use client';
 
-import type * as React from "react";
-import { useEffect, useState, useRef } from "react";
-import { brandApi, type TBrand } from "@/service/brand.api";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { brandApi, type TBrand } from '@/service/brand.api';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import type * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface SelectBrandProps {
   value: string;
@@ -18,7 +24,7 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
   const [brands, setBrands] = useState<TBrand[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [filteredBrands, setFilteredBrands] = useState<TBrand[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,11 +40,10 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
           const current = data.find((b) => b.id === currentBrandId);
           if (current) {
             setInputValue(current.name);
-
           }
         }
       } catch (error) {
-        console.error("Lỗi khi lấy danh sách thương hiệu:", error);
+        console.error('Lỗi khi lấy danh sách thương hiệu:', error);
       } finally {
         setLoading(false);
       }
@@ -50,7 +55,9 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
     if (!inputValue.trim()) {
       setFilteredBrands(brands);
     } else {
-      const filtered = brands.filter((brand) => brand.name.toLowerCase().includes(inputValue.toLowerCase()));
+      const filtered = brands.filter((brand) =>
+        brand.name.toLowerCase().includes(inputValue.toLowerCase()),
+      );
       setFilteredBrands(filtered);
     }
   }, [inputValue, brands]);
@@ -68,17 +75,17 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setOpen(false);
         if (!selectedBrand) {
-          setInputValue("");
+          setInputValue('');
         }
       }
     };
 
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [open, selectedBrand]);
 
@@ -87,7 +94,7 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
     setInputValue(newValue);
 
     if (selectedBrand && newValue !== selectedBrand.name) {
-      onChange("");
+      onChange('');
     }
 
     if (!open) {
@@ -102,7 +109,7 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
   const handleInputClick = () => {
     setOpen(true);
     if (selectedBrand && inputValue === selectedBrand.name) {
-      setInputValue("");
+      setInputValue('');
     }
   };
 
@@ -113,7 +120,7 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       setOpen(false);
       inputRef.current?.blur();
     }
@@ -129,7 +136,7 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
           onFocus={handleInputFocus}
           onClick={handleInputClick}
           onKeyDown={handleKeyDown}
-          placeholder={loading ? "Đang tải..." : "Chọn hoặc tìm thương hiệu..."}
+          placeholder={loading ? 'Đang tải...' : 'Chọn hoặc tìm thương hiệu...'}
           disabled={loading}
           className="pr-8"
           autoComplete="off"
@@ -151,7 +158,12 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
                       onSelect={() => handleSelectBrand(brand)}
                       className="cursor-pointer"
                     >
-                      <Check className={cn("mr-2 h-4 w-4", brand.id === value ? "opacity-100" : "opacity-0")} />
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          brand.id === value ? 'opacity-100' : 'opacity-0',
+                        )}
+                      />
                       {brand.name}
                     </CommandItem>
                   ))}

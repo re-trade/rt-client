@@ -1,19 +1,18 @@
 'use client';
 
-import { MultiSelectCategory } from '@/components/common/MultiSelectCategory';
+import { FancyMultiSelect } from '@/components/common/MultiSectCate';
+import { SelectBrand } from '@/components/common/SelectBrand';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { CreateProductDto, productApi } from '@/service/product.api';
 import { storageApi } from '@/service/storage.api'; // Added missing import
 import { Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
-import { SelectBrand } from '@/components/common/SelectBrand';
 import { toast } from 'sonner';
-import { FancyMultiSelect } from '@/components/common/MultiSectCate';
 
 interface CreateProductDialogProps {
   open: boolean;
@@ -38,7 +37,7 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
     tags: '',
     status: 'DRAFT' as const,
   });
-  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(["react", "angular"]);
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(['react', 'angular']);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -154,7 +153,10 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
         warrantyExpiryDate: formData.warrantyExpiryDate,
         condition: formData.condition,
         status: formData.status,
-        tags: formData.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
+        tags: formData.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
       };
 
       const created = await productApi.createProduct(productData);
@@ -299,7 +301,7 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
             /> */}
             <FancyMultiSelect
               value={formData.categoryIds}
-              onChange={(selected) => handleFormChange("categoryIds", selected)}
+              onChange={(selected) => handleFormChange('categoryIds', selected)}
             />
           </div>
 
@@ -417,13 +419,8 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
           </div>
         </div>
 
-
         <div className="flex gap-4 mt-6">
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            className="flex-1"
-          >
+          <Button type="button" onClick={handleSubmit} className="flex-1">
             Tạo sản phẩm
           </Button>
         </div>

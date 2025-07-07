@@ -22,27 +22,27 @@ export type TProduct = {
   quantity: number;
   tags: string[];
   verified: boolean;
-  condition:string
-  status: string
+  condition: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 };
 
 export type CreateProductDto = {
- name: string;
+  name: string;
   shortDescription: string;
   description: string;
-  thumbnail: string; 
+  thumbnail: string;
   productImages: string[];
   brandId: string;
   model: string;
   currentPrice: number;
   quantity: number;
-  warrantyExpiryDate: string; 
+  warrantyExpiryDate: string;
   condition: string;
   categoryIds: string[];
   tags: string[];
-  status:string;
+  status: string;
 };
 export type UpdateProductDto = {
   name: string;
