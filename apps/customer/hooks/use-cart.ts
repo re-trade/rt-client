@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 type TCartSummary = {
   originalPrice: number;
-  savings: number;
   tax: number;
   total: number;
 };
@@ -17,11 +16,10 @@ function useCart() {
     Record<string, CartGroupResponse & { isOpen: boolean }>
   >({});
   const [contacts, setContacts] = useState<TAddress[]>([]);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<{ productId: string; quantity: number }[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [cartSummary, setCartSummary] = useState<TCartSummary>({
     originalPrice: 0,
-    savings: 0,
     tax: 0,
     total: 0,
   });
@@ -92,22 +90,21 @@ function useCart() {
     });
   }, []);
 
-  const toggleItemSelection = useCallback((productId: string) => {
+  const toggleItemSelection = useCallback((productId: string, quantity: number) => {
     setSelectedItems((prev) => {
-      if (prev.includes(productId)) {
-        return prev.filter((id) => id !== productId);
+      const existing = prev.find((item) => item.productId === productId);
+      if (existing) {
+        return prev.filter((item) => item.productId !== productId);
       } else {
-        return [...prev, productId];
+        return [...prev, { productId, quantity }];
       }
     });
   }, []);
 
-  // Enhanced cart actions with auto-refresh
   const addToCart = useCallback(
     async (productId: string, quantity: number = 1) => {
       try {
         await cartApi.addToCart(productId, quantity);
-        // Silently refresh cart data after successful addition
         await fetchCart(true);
         return true;
       } catch (err) {
@@ -124,9 +121,7 @@ function useCart() {
     async (productId: string) => {
       try {
         await cartApi.removeFromCart(productId);
-        // Remove from selected items if it was selected
-        setSelectedItems((prev) => prev.filter((id) => id !== productId));
-        // Silently refresh cart data after successful removal
+        setSelectedItems((prev) => prev.filter((item) => item.productId !== productId));
         await fetchCart(true);
         return true;
       } catch (err) {
@@ -142,7 +137,6 @@ function useCart() {
     async (productId: string, quantity: number) => {
       try {
         await cartApi.updateCartItemQuantity(productId, quantity);
-        // Silently refresh cart data after successful update
         await fetchCart(true);
         return true;
       } catch (err) {
@@ -159,7 +153,6 @@ function useCart() {
     try {
       await cartApi.clearCart();
       setSelectedItems([]);
-      // Silently refresh cart data after successful clear
       await fetchCart(true);
       return true;
     } catch (err) {
@@ -173,7 +166,6 @@ function useCart() {
     if (!cart || !selectedItems.length) {
       setCartSummary({
         originalPrice: 0,
-        savings: 0,
         tax: 0,
         total: 0,
       });
@@ -185,18 +177,16 @@ function useCart() {
 
     cart.cartGroupResponses.forEach((group) => {
       group.items.forEach((item) => {
-        if (selectedItems.includes(item.productId)) {
+        if (selectedItems.find((selected) => selected.productId === item.productId)) {
           originalPrice += item.totalPrice;
           total += item.totalPrice;
         }
       });
     });
-    const savings = originalPrice - total;
     const tax = Math.round(total * 0.05);
 
     setCartSummary({
       originalPrice,
-      savings,
       tax,
       total: total + tax,
     });
@@ -206,7 +196,7 @@ function useCart() {
     fetchCart();
     fetchAddresses();
     fetchRecommendProduct();
-  }, []);
+  }, [fetchCart, fetchAddresses, fetchRecommendProduct]);
 
   return {
     cart,
@@ -223,7 +213,6 @@ function useCart() {
     contacts,
     selectedAddressId,
     selectAddress,
-    // Cart actions
     addToCart,
     removeFromCart,
     updateCartItemQuantity,
@@ -232,16 +221,3 @@ function useCart() {
 }
 
 export { useCart };
-
-// Simplified useCartActions that uses the global cart context
-export const useCartActions = () => {
-  const { addToCart, removeFromCart, updateCartItemQuantity, clearCart, refreshing } = useCart();
-
-  return {
-    addToCart,
-    removeFromCart,
-    updateCartItemQuantity,
-    clearCart,
-    isLoading: refreshing,
-  };
-};

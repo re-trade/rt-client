@@ -1,7 +1,7 @@
-import { CookieConsent } from '@/components/common/CookieConsent';
-import Footer from '@/components/common/Footer';
-import Header from '@/components/common/Header';
 import { CartProvider } from '@/context/CartContext';
+import { CookieConsent } from '@components/common/CookieConsent';
+import Footer from '@components/common/Footer';
+import Header from '@components/header/Header';
 import { ReactNode, Suspense } from 'react';
 import './globals.css';
 

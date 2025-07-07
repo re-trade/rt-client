@@ -182,7 +182,7 @@ apps/seller/
 │   │   ├── shop-info-management/ # Shop settings
 │   │   ├── voucher-management/   # Promotions & discounts
 │   │   ├── layout.tsx            # Dashboard layout
-│   │   └── page.tsx              # Dashboard home
+│   │   └── RelatedProduct.tsx              # Dashboard home
 │   ├── login/                    # Seller authentication
 │   ├── register/                 # Seller registration
 │   ├── globals.css               # Global styles

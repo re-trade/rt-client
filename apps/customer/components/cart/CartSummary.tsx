@@ -3,42 +3,10 @@ import Modal from '@/components/reusable/modal';
 import { useCart } from '@/hooks/use-cart';
 import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
+import { CreateOrderRequest } from '@services/order.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-const mockVouchers = [
-  {
-    id: '1',
-    code: 'SAVE20',
-    name: 'Giảm 20% tối đa 100k',
-    discount: 20,
-    maxDiscount: 100000,
-    minOrder: 500000,
-    type: 'percentage',
-    expiry: '2024-12-31',
-  },
-  {
-    id: '2',
-    code: 'FREESHIP',
-    name: 'Miễn phí vận chuyển',
-    discount: 30000,
-    maxDiscount: 30000,
-    minOrder: 200000,
-    type: 'shipping',
-    expiry: '2024-12-25',
-  },
-  {
-    id: '3',
-    code: 'WELCOME50',
-    name: 'Giảm 50k cho đơn hàng đầu',
-    discount: 50000,
-    maxDiscount: 50000,
-    minOrder: 300000,
-    type: 'fixed',
-    expiry: '2024-12-20',
-  },
-];
 
 export default function CartSummary({
   cartSummary,
@@ -60,52 +28,15 @@ export default function CartSummary({
     initPayment,
     clearError: clearPaymentError,
   } = usePayment();
-
-  const [selectedVoucher, setSelectedVoucher] = useState<string | null>(null);
-  const [showVoucherModal, setShowVoucherModal] = useState(false);
-  const [voucherCode, setVoucherCode] = useState('');
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
 
-  // Load payment methods on component mount
   useEffect(() => {
     getPaymentMethods().catch(console.error);
   }, [getPaymentMethods]);
 
-  const calculateVoucherDiscount = () => {
-    if (!selectedVoucher) return 0;
-    const voucher = mockVouchers.find((v) => v.id === selectedVoucher);
-    if (!voucher) return 0;
-
-    if (cartSummary.total < voucher.minOrder) return 0;
-
-    switch (voucher.type) {
-      case 'percentage':
-        return Math.min((cartSummary.total * voucher.discount) / 100, voucher.maxDiscount);
-      case 'fixed':
-      case 'shipping':
-        return voucher.discount;
-      default:
-        return 0;
-    }
-  };
-
-  const voucherDiscount = calculateVoucherDiscount();
-  const finalTotal = cartSummary.total - voucherDiscount;
-
-  const applyVoucherCode = () => {
-    const voucher = mockVouchers.find((v) => v.code === voucherCode.toUpperCase());
-    if (voucher) {
-      setSelectedVoucher(voucher.id);
-      setVoucherCode('');
-    }
-  };
-
-  const handleVoucherSelect = (voucherId: string) => {
-    setSelectedVoucher(voucherId);
-    setShowVoucherModal(false);
-  };
+  const finalTotal = cartSummary.total;
 
   const validateOrder = (): string | null => {
     if (!selectedAddressId) {
@@ -134,15 +65,9 @@ export default function CartSummary({
     }
 
     try {
-      // Step 1: Create the order
-      const selectedVoucherObj = selectedVoucher
-        ? mockVouchers.find((v) => v.id === selectedVoucher)
-        : null;
-
-      const orderPayload = {
-        productIds: selectedItems,
+      const orderPayload: CreateOrderRequest = {
+        items: selectedItems,
         addressId: selectedAddressId!,
-        ...(selectedVoucherObj && { voucherCode: selectedVoucherObj.code }),
       };
 
       const createdOrder = await createOrder(orderPayload);
@@ -150,7 +75,6 @@ export default function CartSummary({
       if (createdOrder) {
         setCreatedOrderId(createdOrder.orderId);
 
-        // Step 2: Initialize payment
         const paymentPayload = {
           paymentMethodId: selectedPaymentMethodId!,
           paymentContent: 'Cam on shop',
@@ -160,14 +84,12 @@ export default function CartSummary({
         const paymentUrl = await initPayment(paymentPayload);
 
         if (paymentUrl) {
-          // Step 3: Redirect to payment page
           window.location.href = paymentUrl;
         } else {
           throw new Error('Không nhận được URL thanh toán');
         }
       }
-    } catch (error) {
-      console.error('Error during checkout:', error);
+    } catch {
       setOrderSuccess(false);
       setShowOrderModal(true);
     }
@@ -176,7 +98,6 @@ export default function CartSummary({
   const handleOrderModalClose = () => {
     setShowOrderModal(false);
     if (orderSuccess) {
-      // Redirect to order success page or order details
       if (createdOrderId) {
         router.push(`/orders/${createdOrderId}`);
       } else {
@@ -195,7 +116,6 @@ export default function CartSummary({
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {/* Address Selection Card */}
       <div className="rounded-xl border border-orange-100 bg-white shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 md:p-6 border-b border-orange-100">
           <div className="flex items-center gap-3">
@@ -280,7 +200,6 @@ export default function CartSummary({
         </div>
       </div>
 
-      {/* Payment Method Selection Card */}
       <div className="rounded-xl border border-orange-100 bg-white shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 md:p-6 border-b border-orange-100">
           <div className="flex items-center gap-3">
@@ -363,89 +282,6 @@ export default function CartSummary({
         </div>
       </div>
 
-      {/* Voucher Selection Card */}
-      <div className="rounded-xl border border-orange-100 bg-white shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 md:p-6 border-b border-orange-100">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
-              <svg
-                className="w-3 h-3 md:w-4 md:h-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-base md:text-lg font-bold text-gray-800">Mã giảm giá</h3>
-          </div>
-        </div>
-
-        <div className="p-4 md:p-6 bg-orange-25 space-y-4">
-          {/* Voucher Code Input */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={voucherCode}
-              onChange={(e) => setVoucherCode(e.target.value)}
-              placeholder="Nhập mã giảm giá"
-              className="flex-1 rounded-lg border border-orange-200 px-3 py-2 text-sm md:text-base focus:border-orange-500 focus:ring-2 focus:ring-orange-400 focus:ring-opacity-50"
-            />
-            <button
-              onClick={applyVoucherCode}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm md:text-base font-medium whitespace-nowrap"
-            >
-              Áp dụng
-            </button>
-          </div>
-
-          {/* Selected Voucher Display */}
-          {selectedVoucher && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-sm font-medium text-green-800">
-                    {mockVouchers.find((v) => v.id === selectedVoucher)?.name}
-                  </span>
-                </div>
-                <button
-                  onClick={() => setSelectedVoucher(null)}
-                  className="text-green-600 hover:text-green-800"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Browse Vouchers Button */}
-          <button
-            onClick={() => setShowVoucherModal(true)}
-            className="w-full p-3 border-2 border-dashed border-orange-300 rounded-lg text-orange-600 hover:border-orange-400 hover:bg-orange-50 transition-colors text-sm md:text-base font-medium"
-          >
-            Chọn mã giảm giá khác
-          </button>
-        </div>
-      </div>
-
       {/* Order Summary Card */}
       <div className="rounded-xl border border-orange-100 bg-white shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 md:p-6 border-b border-orange-100">
@@ -481,30 +317,6 @@ export default function CartSummary({
                 {cartSummary.originalPrice.toLocaleString('vi-VN')}₫
               </span>
             </div>
-
-            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-100 shadow-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
-                <span className="text-sm md:text-base font-medium text-gray-600">Tiết kiệm</span>
-              </div>
-              <span className="text-sm md:text-base font-semibold text-green-600">
-                -{cartSummary.savings.toLocaleString('vi-VN')}₫
-              </span>
-            </div>
-
-            {voucherDiscount > 0 && (
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-100 shadow-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0"></div>
-                  <span className="text-sm md:text-base font-medium text-gray-600">
-                    Mã giảm giá
-                  </span>
-                </div>
-                <span className="text-sm md:text-base font-semibold text-purple-600">
-                  -{voucherDiscount.toLocaleString('vi-VN')}₫
-                </span>
-              </div>
-            )}
 
             <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-50 shadow-sm">
               <div className="flex items-center gap-2">
@@ -594,64 +406,6 @@ export default function CartSummary({
           </div>
         </div>
       </div>
-
-      {/* Voucher Modal */}
-      <Modal
-        opened={showVoucherModal}
-        onClose={() => setShowVoucherModal(false)}
-        title="Chọn mã giảm giá"
-        size="md"
-        className="max-w-md"
-      >
-        <div className="p-6 space-y-3">
-          {mockVouchers.map((voucher) => {
-            const isEligible = cartSummary.total >= voucher.minOrder;
-            return (
-              <div
-                key={voucher.id}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  selectedVoucher === voucher.id
-                    ? 'border-orange-500 bg-orange-50'
-                    : isEligible
-                      ? 'border-gray-200 hover:border-orange-300 bg-white'
-                      : 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
-                }`}
-                onClick={() => {
-                  if (isEligible) {
-                    handleVoucherSelect(voucher.id);
-                  }
-                }}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-orange-600">{voucher.code}</span>
-                  {selectedVoucher === voucher.id && (
-                    <svg
-                      className="w-5 h-5 text-orange-500"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                </div>
-                <p className="text-sm text-gray-700 mb-1">{voucher.name}</p>
-                <p className="text-xs text-gray-500">
-                  Đơn tối thiểu: {voucher.minOrder.toLocaleString('vi-VN')}₫
-                </p>
-                {!isEligible && (
-                  <p className="text-xs text-red-500 mt-1">Không đủ điều kiện áp dụng</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
-
-      {/* Order Status Modal */}
       <Modal
         opened={showOrderModal}
         onClose={handleOrderModalClose}

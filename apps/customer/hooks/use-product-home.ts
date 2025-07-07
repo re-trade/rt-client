@@ -31,10 +31,10 @@ export function useProductHome() {
     try {
       const response = await productApi.searchProducts(
         0,
-        6,
+        8,
         categoryId ? `categoryId=${categoryId}` : undefined,
       );
-      const products = response || [];
+      const products = response.content || [];
       setProducts(products);
     } catch {
       setError('Không thể tải sản phẩm. Vui lòng thử lại sau.');

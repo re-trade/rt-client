@@ -66,7 +66,6 @@ export default function PurchasePage() {
   const [filteredOrders, setFilteredOrders] = useState<OrderCombo[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-  // Load initial orders
   useEffect(() => {
     const loadInitialOrders = async () => {
       try {
@@ -81,7 +80,6 @@ export default function PurchasePage() {
     loadInitialOrders();
   }, [getMyOrders]);
 
-  // Filter orders based on search and status
   useEffect(() => {
     let filtered = orders;
 
@@ -453,7 +451,6 @@ export default function PurchasePage() {
           </div>
         )}
 
-        {/* Pagination Info */}
         {pagination && (
           <div className="text-center text-sm text-gray-600">
             Hiển thị {orders.length} trên {pagination.totalElements} đơn hàng

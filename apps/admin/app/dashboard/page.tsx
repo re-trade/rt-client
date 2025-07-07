@@ -6,7 +6,7 @@ const Dashboard = () => {
 };
 
 export default Dashboard;*/
-// app/admin/page.tsx
+// app/admin/RelatedProduct.tsx
 import {
   Activity,
   ArrowDownRight,

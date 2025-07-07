@@ -10,7 +10,7 @@ export enum ETokenName {
 export enum EApiService {
   MAIN = 'main',
   VOUCHER = 'user',
-  CATALOG = 'catalog',
+  IMAGE_SEARCH = 'image-search',
   STORAGE = 'storage',
 }
 
@@ -111,7 +111,7 @@ export const createApiInstances = (getDeviceInfo?: () => Promise<DeviceInfo>) =>
   const authApi: Record<string, AxiosInstance> & {
     default: AxiosInstance;
     voucher: AxiosInstance;
-    catalog: AxiosInstance;
+    imageSearch: AxiosInstance;
     storage: AxiosInstance;
   } = {
     get default() {
@@ -120,8 +120,8 @@ export const createApiInstances = (getDeviceInfo?: () => Promise<DeviceInfo>) =>
     get voucher() {
       return createAuthApi(EApiService.VOUCHER, getDeviceInfo);
     },
-    get catalog() {
-      return createAuthApi(EApiService.CATALOG, getDeviceInfo);
+    get imageSearch() {
+      return createAuthApi(EApiService.IMAGE_SEARCH, getDeviceInfo);
     },
     get storage() {
       return createAuthApi(EApiService.STORAGE, getDeviceInfo);
@@ -131,7 +131,7 @@ export const createApiInstances = (getDeviceInfo?: () => Promise<DeviceInfo>) =>
   const unAuthApi: Record<string, AxiosInstance> & {
     default: AxiosInstance;
     voucher: AxiosInstance;
-    catalog: AxiosInstance;
+    imageSearch: AxiosInstance;
     storage: AxiosInstance;
   } = {
     get default() {
@@ -140,8 +140,8 @@ export const createApiInstances = (getDeviceInfo?: () => Promise<DeviceInfo>) =>
     get voucher() {
       return createUnAuthApi(EApiService.VOUCHER);
     },
-    get catalog() {
-      return createUnAuthApi(EApiService.CATALOG);
+    get imageSearch() {
+      return createUnAuthApi(EApiService.IMAGE_SEARCH);
     },
     get storage() {
       return createUnAuthApi(EApiService.STORAGE);

@@ -170,13 +170,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FDFEF9]">
-      {/* Hero Section with Carousel */}
       <div className="w-full space-y-8 mb-12">
         <div className="rounded-xl overflow-hidden shadow-lg mx-4 sm:mx-6">
           <CarouselComponent />
         </div>
 
-        {/* Quick Stats */}
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -259,7 +257,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Products Sections */}
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         <ProductSection
           title="Được quan tâm"
@@ -274,7 +271,6 @@ export default function Home() {
         />
       </div>
 
-      {/* How It Works Section */}
       <section className="bg-white py-16 sm:py-20 px-4 sm:px-6 mt-16 border-t border-[#525252]/20">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
@@ -347,7 +343,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Newsletter Section */}
       <section className="bg-gradient-to-r from-[#FFD2B2] to-[#FFBB99] py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="flex justify-center mb-6">

@@ -1,14 +1,4 @@
-import {
-  IconBrandFacebook,
-  IconBrandInstagram,
-  IconBrandTiktok,
-  IconBrandYoutube,
-  IconChevronRight,
-  IconMail,
-  IconMapPin,
-  IconPhone,
-  IconSend,
-} from '@tabler/icons-react';
+import { IconChevronRight, IconMail, IconMapPin, IconPhone, IconSend } from '@tabler/icons-react';
 import Link from 'next/link';
 
 export default function Footer() {
@@ -122,40 +112,6 @@ export default function Footer() {
                 />
                 <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl">
                   <IconSend size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* Social Media */}
-            <div>
-              <p className="text-gray-800 font-semibold mb-4">Theo dõi chúng tôi</p>
-              <div className="flex gap-3">
-                {[
-                  { icon: IconBrandFacebook, href: '#', color: 'hover:bg-blue-600' },
-                  { icon: IconBrandInstagram, href: '#', color: 'hover:bg-pink-600' },
-                  { icon: IconBrandYoutube, href: '#', color: 'hover:bg-red-600' },
-                  { icon: IconBrandTiktok, href: '#', color: 'hover:bg-black' },
-                ].map((social, index) => (
-                  <Link
-                    key={index}
-                    href={social.href}
-                    className={`w-10 h-10 flex items-center justify-center bg-white border-2 border-orange-200 rounded-lg text-gray-600 hover:text-white ${social.color} transition-all duration-200 hover:scale-110 hover:shadow-lg`}
-                  >
-                    <social.icon size={20} />
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* App Download */}
-            <div className="mt-6">
-              <p className="text-gray-800 font-semibold mb-3">Tải ứng dụng</p>
-              <div className="space-y-2">
-                <button className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm font-medium">
-                  Download on App Store
-                </button>
-                <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm font-medium">
-                  Get it on Google Play
                 </button>
               </div>
             </div>

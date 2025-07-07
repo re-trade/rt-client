@@ -5,7 +5,7 @@ import CartSkeleton from '@/components/cart/CartSkeleton';
 import Checkbox from '@/components/reusable/checkbox';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/context/CartContext';
-import { IconAlertTriangle, IconCheck, IconTrash } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCheck, IconMinus, IconPlus, IconTrash } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -16,15 +16,16 @@ export default function CartSection({
   toggleShopSection,
   selectedItems,
   toggleItemSelection,
+  updateCartItemQuantity,
+  removeFromCart,
   refresh,
 }: ReturnType<typeof useCart>) {
-  const { removeFromCart } = useCart();
   const [removingItems, setRemovingItems] = useState<Set<string>>(new Set());
   const [itemToRemove, setItemToRemove] = useState<{ id: string; name: string } | null>(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [quantityUpdates, setQuantityUpdates] = useState<Record<string, number>>({});
 
-  const handleProductSelect = (itemId: string, event: React.MouseEvent) => {
-    // Prevent selection if clicking on interactive elements
+  const handleProductSelect = (itemId: string, quantity: number, event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     if (
       target.closest('button') ||
@@ -34,18 +35,27 @@ export default function CartSection({
     ) {
       return;
     }
-    toggleItemSelection(itemId);
+    toggleItemSelection(itemId, quantity);
   };
 
-  const handleCheckboxClick = (itemId: string, event: React.MouseEvent) => {
+  const handleCheckboxClick = (itemId: string, quantity: number, event: React.MouseEvent) => {
     event.stopPropagation();
-    toggleItemSelection(itemId);
+    toggleItemSelection(itemId, quantity);
   };
 
   const handleRemoveClick = (itemId: string, itemName: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setItemToRemove({ id: itemId, name: itemName });
     setShowRemoveModal(true);
+  };
+
+  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+    if (newQuantity < 1) return;
+    updateCartItemQuantity(itemId, newQuantity).then((result) => {
+      if (result) {
+        setQuantityUpdates((prev) => ({ ...prev, [itemId]: newQuantity }));
+      }
+    });
   };
 
   const confirmRemove = async () => {
@@ -55,9 +65,7 @@ export default function CartSection({
 
     try {
       await removeFromCart(itemToRemove.id);
-      // No need to manually refresh - it's handled automatically
-    } catch (error) {
-      console.error('Error removing item from cart:', error);
+    } catch {
     } finally {
       setRemovingItems((prev) => {
         const newSet = new Set(prev);
@@ -74,12 +82,10 @@ export default function CartSection({
     setShowRemoveModal(false);
   };
 
-  // Show loading skeleton while loading
   if (loading) {
     return <CartSkeleton />;
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="text-center py-12">
@@ -101,7 +107,7 @@ export default function CartSection({
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Có lỗi xảy ra</h3>
         <p className="text-gray-600 mb-4">{error}</p>
         <button
-          onClick={refresh}
+          onClick={() => refresh(false)}
           className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
         >
           Thử lại
@@ -110,7 +116,6 @@ export default function CartSection({
     );
   }
 
-  // Show empty cart when no cart groups or cartGroups is empty
   if (!cartGroups || Object.keys(cartGroups).length === 0) {
     return <CartEmpty />;
   }
@@ -119,9 +124,8 @@ export default function CartSection({
     <div className="space-y-4 md:space-y-6">
       {Object.entries(cartGroups).map(([sellerId, shopSection]) => {
         const shopSelectedCount = shopSection.items.filter((item) =>
-          selectedItems.includes(item.productId),
+          selectedItems.find((selected) => selected.productId === item.productId),
         ).length;
-        const shopTotalCount = shopSection.items.length;
         const shopAvailableCount = shopSection.items.filter((item) => item.productAvailable).length;
         const allShopItemsSelected =
           shopSelectedCount === shopAvailableCount && shopAvailableCount > 0;
@@ -129,29 +133,28 @@ export default function CartSection({
           shopSelectedCount > 0 && shopSelectedCount < shopAvailableCount;
 
         const handleShopSelectAll = (event: React.MouseEvent) => {
-          // Prevent accordion toggle when clicking checkbox
           event.stopPropagation();
           event.preventDefault();
 
           if (allShopItemsSelected) {
-            // Deselect all items in this shop
             shopSection.items.forEach((item) => {
-              if (selectedItems.includes(item.productId)) {
-                toggleItemSelection(item.productId);
+              if (selectedItems.find((selected) => selected.productId === item.productId)) {
+                toggleItemSelection(item.productId, item.quantity);
               }
             });
           } else {
-            // Select all available items in this shop
             shopSection.items.forEach((item) => {
-              if (item.productAvailable && !selectedItems.includes(item.productId)) {
-                toggleItemSelection(item.productId);
+              if (
+                item.productAvailable &&
+                !selectedItems.find((selected) => selected.productId === item.productId)
+              ) {
+                toggleItemSelection(item.productId, item.quantity);
               }
             });
           }
         };
 
         const handleAccordionToggle = (event: React.MouseEvent) => {
-          // Prevent if clicking on checkbox
           const target = event.target as HTMLElement;
           if (target.closest('.shop-checkbox')) {
             return;
@@ -172,12 +175,11 @@ export default function CartSection({
                   onClick={handleAccordionToggle}
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    {/* Shop Selection Checkbox - Separated click area */}
                     <div className="shop-checkbox flex-shrink-0" onClick={handleShopSelectAll}>
                       <Checkbox
                         checked={allShopItemsSelected}
                         indeterminate={someShopItemsSelected}
-                        onChange={() => {}} // Handled by onClick above
+                        onChange={() => {}}
                         variant="primary"
                         size="md"
                         round={true}
@@ -186,7 +188,6 @@ export default function CartSection({
                       />
                     </div>
 
-                    {/* Shop Info - Clickable area for accordion toggle */}
                     <div className="flex items-center gap-3 flex-1">
                       <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -208,7 +209,6 @@ export default function CartSection({
                     </div>
                   </div>
 
-                  {/* Chevron indicator */}
                   <div className="flex-shrink-0 ml-3">
                     <svg
                       className={`w-5 h-5 text-orange-600 transition-all duration-200 ease-out transform origin-center group-hover:text-orange-700 group-hover:scale-110 ${
@@ -229,7 +229,6 @@ export default function CartSection({
                 </div>
               </div>
 
-              {/* Accordion content */}
               <div
                 className={`grid text-sm overflow-hidden transition-all duration-300 ease-in-out ${
                   shopSection.isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
@@ -239,8 +238,16 @@ export default function CartSection({
                   <div className="p-4 md:p-6 pt-0 space-y-3 md:space-y-4">
                     {shopSection.items.map((item) => {
                       const isSoldOut = !item.productAvailable;
-                      const isSelected = selectedItems.includes(item.productId);
+                      const isSelected = selectedItems.find(
+                        (selected) => selected.productId === item.productId,
+                      );
                       const isRemoving = removingItems.has(item.productId);
+                      const currentQuantity = quantityUpdates[item.productId] || item.quantity;
+
+                      const handleIncrement = () =>
+                        handleQuantityChange(item.productId, currentQuantity + 1);
+                      const handleDecrement = () =>
+                        handleQuantityChange(item.productId, currentQuantity - 1);
 
                       return (
                         <div
@@ -255,7 +262,9 @@ export default function CartSection({
                                   : 'bg-white border-orange-50 hover:bg-orange-25 hover:border-orange-200 hover:shadow-md cursor-pointer'
                           }`}
                           onClick={(e) =>
-                            !isSoldOut && !isRemoving && handleProductSelect(item.productId, e)
+                            !isSoldOut &&
+                            !isRemoving &&
+                            handleProductSelect(item.productId, item.quantity, e)
                           }
                         >
                           {/* Removing Overlay */}
@@ -268,10 +277,8 @@ export default function CartSection({
                             </div>
                           )}
 
-                          {/* Selection Control - Top Right Corner */}
                           <div className="absolute top-3 right-3 z-10">
                             {isSelected && !isSoldOut && !isRemoving ? (
-                              // Selected Indicator
                               <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-200">
                                 <IconCheck
                                   size={16}
@@ -280,11 +287,14 @@ export default function CartSection({
                                 />
                               </div>
                             ) : !isSoldOut && !isRemoving ? (
-                              // Checkbox when not selected
-                              <div onClick={(e) => handleCheckboxClick(item.productId, e)}>
+                              <div
+                                onClick={(e) =>
+                                  handleCheckboxClick(item.productId, item.quantity, e)
+                                }
+                              >
                                 <Checkbox
                                   checked={false}
-                                  onChange={() => {}} // Handled by onClick above
+                                  onChange={() => {}}
                                   variant="primary"
                                   size="md"
                                   round={true}
@@ -294,7 +304,6 @@ export default function CartSection({
                             ) : null}
                           </div>
 
-                          {/* Mobile Layout */}
                           <div className="flex items-start gap-3 md:hidden pr-8">
                             <div className="relative rounded-lg overflow-hidden bg-orange-25 p-2 flex-shrink-0">
                               <Image
@@ -312,17 +321,39 @@ export default function CartSection({
                                 </div>
                               )}
                             </div>
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 space-y-2">
                               <h4
-                                className={`text-sm font-semibold transition-colors mb-1 ${
+                                className={`text-sm font-semibold transition-colors ${
                                   isSoldOut || isRemoving ? 'text-gray-500' : 'text-gray-800'
                                 }`}
                               >
                                 {item.productName}
                               </h4>
-                              <p className="text-xs text-gray-600 mb-2">{item.addedAt}</p>
+                              <p className="text-xs text-gray-800 border border-orange-200 bg-orange-100 inline-block px-2 py-1 rounded-lg">
+                                {item.productBrand}
+                              </p>
+                              <p className="text-xs text-gray-600 truncate">{item.description}</p>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={handleDecrement}
+                                  disabled={isRemoving || isSoldOut || currentQuantity <= 1}
+                                  className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                >
+                                  <IconMinus size={14} />
+                                </button>
+                                <span className="text-sm font-medium text-gray-800">
+                                  {currentQuantity}
+                                </span>
+                                <button
+                                  onClick={handleIncrement}
+                                  disabled={isRemoving || isSoldOut}
+                                  className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                >
+                                  <IconPlus size={14} />
+                                </button>
+                              </div>
                               <p className="text-base font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded inline-block">
-                                {item.totalPrice.toLocaleString('vi-VN')}₫
+                                {item.totalPrice * currentQuantity}₫
                               </p>
                               <div className="mt-2">
                                 <button
@@ -368,8 +399,29 @@ export default function CartSection({
                                 >
                                   {item.productName}
                                 </h4>
-                                <p className="text-sm text-gray-600">{item.addedAt}</p>
-
+                                <p className="text-sm text-gray-800 border border-orange-200 bg-orange-100 inline-block px-2 py-1 rounded-lg">
+                                  {item.productBrand}
+                                </p>
+                                <p className="text-sm text-gray-600 truncate">{item.description}</p>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={handleDecrement}
+                                    disabled={isRemoving || isSoldOut || currentQuantity <= 1}
+                                    className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                  >
+                                    <IconMinus size={16} />
+                                  </button>
+                                  <span className="text-base font-medium text-gray-800">
+                                    {currentQuantity}
+                                  </span>
+                                  <button
+                                    onClick={handleIncrement}
+                                    disabled={isRemoving || isSoldOut}
+                                    className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                  >
+                                    <IconPlus size={16} />
+                                  </button>
+                                </div>
                                 <div className="flex items-center gap-4">
                                   <button
                                     type="button"
@@ -388,12 +440,11 @@ export default function CartSection({
 
                             <div className="text-right flex-shrink-0">
                               <p className="text-lg font-bold text-orange-600 bg-orange-100 px-3 py-2 rounded-lg">
-                                {item.totalPrice.toLocaleString('vi-VN')}₫
+                                {item.totalPrice * currentQuantity}₫
                               </p>
                             </div>
                           </div>
 
-                          {/* Selection State Indicator Border */}
                           {isSelected && !isSoldOut && !isRemoving && (
                             <div className="absolute inset-0 border-2 border-orange-400 rounded-lg pointer-events-none opacity-60"></div>
                           )}
@@ -401,7 +452,6 @@ export default function CartSection({
                       );
                     })}
 
-                    {/* Shop Summary */}
                     {shopSection.items.length > 0 && (
                       <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
                         <div className="flex items-center justify-between">
@@ -421,8 +471,18 @@ export default function CartSection({
                           </div>
                           <span className="text-xl font-bold text-orange-600">
                             {shopSection.items
-                              .filter((item) => selectedItems.includes(item.productId))
-                              .reduce((total, item) => total + item.totalPrice, 0)
+                              .filter((item) =>
+                                selectedItems.find(
+                                  (selected) => selected.productId === item.productId,
+                                ),
+                              )
+                              .reduce(
+                                (total, item) =>
+                                  total +
+                                  item.totalPrice *
+                                    (quantityUpdates[item.productId] || item.quantity),
+                                0,
+                              )
                               .toLocaleString('vi-VN')}
                             ₫
                           </span>
