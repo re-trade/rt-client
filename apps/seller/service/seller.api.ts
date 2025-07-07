@@ -14,6 +14,20 @@ type SellerProfileRegisterRequest = {
   identityNumber: string;
 };
 
+type SellerProfileUpdateRequest = {
+  shopName: string;
+  description: string;
+  // businessType: number;
+  addressLine: string;
+  avatarUrl: string;
+  background: string;
+  district: string;
+  ward: string;
+  state: string;
+  email: string;
+  phoneNumber: string;
+};
+
 type SellerProfileResponse = {
   id: string;
   shopName: string;
@@ -31,11 +45,6 @@ type SellerProfileResponse = {
   createdAt: string;
   updatedAt: string;
 };
-
-type SellerProfileUpdateRequest = Omit<
-  SellerProfileRegisterRequest,
-  'avatarUrl' | 'background' | 'identityNumber'
->;
 
 export const sellerApi = {
   registerSeller: async (
@@ -86,5 +95,14 @@ export const sellerApi = {
       return undefined;
     }
   },
+  sellerInformation: async (): Promise<SellerProfileResponse | undefined> => {
+    try {
+      const response =
+        await authApi.default.get<IResponseObject<SellerProfileResponse>>('/sellers');
+      return response.data.content;
+    } catch {
+      return undefined;
+    }
+  },
 };
-export type { SellerProfileRegisterRequest, SellerProfileResponse };
+export type { SellerProfileRegisterRequest, SellerProfileResponse, SellerProfileUpdateRequest };

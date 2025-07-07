@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         hostname: 'retrade.hcm.ss.bfcplatform.vn',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+        pathname: '/**',
+      },
     ],
   },
 };

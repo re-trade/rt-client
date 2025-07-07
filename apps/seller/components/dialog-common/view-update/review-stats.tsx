@@ -1,22 +1,31 @@
-import type { Review } from '@/app/dashboard/review-management/page';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { reviewApi, ReviewResponse, StatsReViewResponse } from '@/service/review.api';
 import { MessageSquare, Star, TrendingUp, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ReviewStatsProps {
-  reviews: Review[];
+  reviews: ReviewResponse[];
 }
 
 export function ReviewStats({ reviews }: ReviewStatsProps) {
-  const totalReviews = reviews.length;
-  const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
-  const repliedReviews = reviews.filter((review) => review.shopReply).length;
-  const replyRate = (repliedReviews / totalReviews) * 100;
+  const [stats, setStats] = useState<StatsReViewResponse | null>(null);
 
-  const ratingDistribution = [5, 4, 3, 2, 1].map((rating) => ({
-    rating,
-    count: reviews.filter((review) => review.rating === rating).length,
-    percentage: (reviews.filter((review) => review.rating === rating).length / totalReviews) * 100,
-  }));
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await reviewApi.getStatsReviewsSeller();
+        setStats(response);
+      } catch (error) {
+        console.error('Failed to fetch review stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (!stats) {
+    return <p className="text-muted-foreground">Đang tải thống kê đánh giá...</p>;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -26,7 +35,7 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalReviews}</div>
+          <div className="text-2xl font-bold">{stats.totalReviews}</div>
           <p className="text-xs text-muted-foreground">+12% so với tháng trước</p>
         </CardContent>
       </Card>
@@ -38,7 +47,7 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold flex items-center gap-1">
-            {averageRating.toFixed(1)}
+            {stats.averageRating}
             <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
           </div>
           <p className="text-xs text-muted-foreground">+0.2 so với tháng trước</p>
@@ -51,9 +60,9 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
           <MessageSquare className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{replyRate.toFixed(1)}%</div>
+          <div className="text-2xl font-bold">{stats.replyRate}%</div>
           <p className="text-xs text-muted-foreground">
-            {repliedReviews}/{totalReviews} đã phản hồi
+            {stats.repliedReviews}/{stats.totalReviews} đã phản hồi
           </p>
         </CardContent>
       </Card>
@@ -64,10 +73,10 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            {((reviews.filter((r) => r.rating >= 4).length / totalReviews) * 100 || 0).toFixed(1)}%
-          </div>
-          <p className="text-xs text-muted-foreground">4-5 sao</p>
+          <div className="text-2xl font-bold">{stats.averagePositiveReviews}%</div>
+          <p className="text-xs text-muted-foreground">
+            tổng {stats.totalPositiveReviews} đánh giá(4-5 sao)
+          </p>
         </CardContent>
       </Card>
 
@@ -78,23 +87,24 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {ratingDistribution.map((item) => (
-              <div key={item.rating} className="flex items-center gap-4">
-                <div className="flex items-center gap-1 w-16">
-                  <span className="text-sm">{item.rating}</span>
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            {Array.isArray(stats.ratingDistribution) &&
+              stats.ratingDistribution.map((item) => (
+                <div key={item.vote} className="flex items-center gap-4">
+                  <div className="flex items-center gap-1 w-16">
+                    <span className="text-sm">{item.vote}</span>
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  </div>
+                  <div className="flex-1 bg-muted rounded-full h-2">
+                    <div
+                      className="bg-yellow-400 h-2 rounded-full transition-all"
+                      style={{ width: `${item.percentage}%` }}
+                    />
+                  </div>
+                  <div className="text-sm text-muted-foreground w-16 text-right">
+                    {item.count} ({item.percentage}%)
+                  </div>
                 </div>
-                <div className="flex-1 bg-muted rounded-full h-2">
-                  <div
-                    className="bg-yellow-400 h-2 rounded-full transition-all"
-                    style={{ width: `${item.percentage}%` }}
-                  />
-                </div>
-                <div className="text-sm text-muted-foreground w-16 text-right">
-                  {item.count} ({item.percentage.toFixed(1)}%)
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </CardContent>
       </Card>

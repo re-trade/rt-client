@@ -1,8 +1,8 @@
 'use client';
 
-import { OrderDetailDialog } from '@/components/dialog/add/order-detail-dialog';
-import { OrderTable } from '@/components/dialog/view-update/order-table';
-import { UpdateStatusDialog } from '@/components/dialog/view-update/update-status-dialog';
+import { OrderDetailDialog } from '@/components/dialog-common/add/order-detail-dialog';
+import { OrderTable } from '@/components/dialog-common/view-update/order-table';
+import { UpdateStatusDialog } from '@/components/dialog-common/view-update/update-status-dialog';
 import { Input } from '@/components/ui/input';
 import {
   Select,
