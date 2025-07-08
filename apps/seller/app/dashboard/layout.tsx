@@ -42,7 +42,7 @@ const menuItems = [
   {
     title: 'Thông tin seller',
     icon: Store,
-    href: '/dashboard/seller-info-management',
+    href: '/dashboard/shop-info-management',
   },
   {
     title: 'Quản lý đánh giá',
