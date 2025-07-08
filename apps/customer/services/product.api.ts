@@ -11,13 +11,12 @@ export type TProduct = {
   productImages: string[];
   brandId: string;
   condition: string;
-  listOfCategories: { id: string; name: string }[];
   brand: string;
   quantity: number;
   warrantyExpiryDate: string;
   model: string;
   currentPrice: number;
-  categories: string[];
+  categories: { id: string; name: string }[];
   tags: string[];
   keywords?: string[];
   verified: boolean;

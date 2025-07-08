@@ -118,7 +118,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 flex-wrap text-sm">
-            {productDetail.listOfCategories?.map((cat, index: number) => (
+            {productDetail.categories?.map((cat, index: number) => (
               <li key={index} className="flex items-center">
                 {index !== 0 ? (
                   <span className="mx-2 text-gray-400" style={{ color: '#9ca3af' }}>
@@ -581,16 +581,54 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                       <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
                         Danh mục:
                       </span>
-                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
-                        {productDetail.categories?.map((cat) => cat).join(', ') || 'Không có'}
+                      <span className="text-gray-800">
+                        {productDetail.categories?.length > 0
+                          ? productDetail.categories.map((cat, index) => {
+                              const colorClasses = [
+                                'text-orange-500 border-orange-500',
+                                'text-blue-500 border-blue-500',
+                                'text-yellow-500 border-yellow-500',
+                                'text-teal-500 border-teal-500',
+                                'text-red-500 border-red-500',
+                              ];
+                              const colorClass = colorClasses[index % colorClasses.length];
+                              return (
+                                <span
+                                  key={cat.name}
+                                  className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
+                                >
+                                  {cat.name}
+                                </span>
+                              );
+                            })
+                          : 'Không có'}
                       </span>
                     </div>
                     <div className="flex justify-between py-3 border-b border-gray-100">
                       <span className="font-medium text-gray-600" style={{ color: '#6b7280' }}>
                         Tags:
                       </span>
-                      <span className="text-gray-800" style={{ color: '#1f2937' }}>
-                        {productDetail.tags?.length ? productDetail.tags.join(', ') : 'Không có'}
+                      <span className="text-gray-800">
+                        {productDetail.tags?.length > 0
+                          ? productDetail.tags.map((tag, index) => {
+                              const colorClasses = [
+                                'text-orange-500 border-orange-500',
+                                'text-blue-500 border-blue-500',
+                                'text-yellow-500 border-yellow-500',
+                                'text-teal-500 border-teal-500',
+                                'text-red-500 border-red-500',
+                              ];
+                              const colorClass = colorClasses[index % colorClasses.length];
+                              return (
+                                <span
+                                  key={tag}
+                                  className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
+                                >
+                                  {tag}
+                                </span>
+                              );
+                            })
+                          : 'Không có'}
                       </span>
                     </div>
                     <div className="flex justify-between py-3 border-b border-gray-100">
