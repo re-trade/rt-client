@@ -1,6 +1,6 @@
 'use client';
 
-import { CreateVoucherDialog } from '@/components/dialog/add/create-voucher-dialog';
+import { CreateVoucherDialog } from '@/components/dialog-common/add/create-voucher-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';

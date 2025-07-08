@@ -12,7 +12,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { CheckCircle, Edit, Eye, Package, Truck } from 'lucide-react';
+import {
+  CheckCheck,
+  CheckCircle,
+  Clock,
+  Edit,
+  Eye,
+  Package,
+  RefreshCw,
+  Truck,
+  XCircle,
+} from 'lucide-react';
 
 interface OrderTableProps {
   orders: Order[];
@@ -91,12 +101,20 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
 
   const getStatusIcon = (status: Order['orderStatus']) => {
     switch (status) {
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-600" />;
+      case 'confirmed':
+        return <CheckCheck className="h-4 w-4 text-blue-600" />;
       case 'preparing':
-        return <Package className="h-4 w-4" />;
+        return <Package className="h-4 w-4 text-purple-600" />;
+      case 'ready_to_ship':
+        return <RefreshCw className="h-4 w-4 text-orange-600" />;
       case 'shipped':
-        return <Truck className="h-4 w-4" />;
+        return <Truck className="h-4 w-4 text-indigo-600" />;
       case 'delivered':
-        return <CheckCircle className="h-4 w-4" />;
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'cancelled':
+        return <XCircle className="h-4 w-4 text-red-600" />;
       default:
         return null;
     }

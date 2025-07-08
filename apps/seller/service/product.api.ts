@@ -9,14 +9,21 @@ export type TProduct = {
   description: string;
   thumbnail: string;
   productImages: string[];
+  brandId: string;
   brand: string;
-  discount: number;
+  warrantyExpiryDate: string;
   model: string;
   currentPrice: number;
   categories: string[];
-  keywords: string[];
+  listOfCategories: {
+    id: string;
+    name: string;
+  }[];
+  quantity: number;
   tags: string[];
   verified: boolean;
+  condition: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -27,18 +34,34 @@ export type CreateProductDto = {
   description: string;
   thumbnail: string;
   productImages: string[];
-  brand: string;
-  discount: number;
+  brandId: string;
+  model: string;
+  currentPrice: number;
+  quantity: number;
+  warrantyExpiryDate: string;
+  condition: string;
+  categoryIds: string[];
+  tags: string[];
+  status: string;
+};
+export type UpdateProductDto = {
+  name: string;
+  shortDescription: string;
+  description: string;
+  thumbnail: string;
+  productImages: string[];
+  brandId: string;
+  quantity: number;
+  warrantyExpiryDate: string; // ISO date string (e.g., "2025-07-06")
+  condition: string;
   model: string;
   currentPrice: number;
   categoryIds: string[];
-  keywords: string[];
   tags: string[];
-  status: 'DRAFT' | 'ACTIVE' | 'INACTIVE';
 };
 
 export const productApi = {
-  async getProducts(page: number = 0, size: number = 10, query?: string): Promise<TProduct[]> {
+  async getProducts(page: number = 0, size: number = 15, query?: string): Promise<TProduct[]> {
     const response = await authApi.default.get<IResponseObject<TProduct[]>>(
       `/products/my-products`,
       {
@@ -62,14 +85,15 @@ export const productApi = {
       throw error;
     }
   },
-  async createProdut(product: TProduct): Promise<TProduct> {
+  async createProduct(product: CreateProductDto): Promise<TProduct> {
     const response = await authApi.default.post<IResponseObject<TProduct>>('/products', product);
     if (response.data.success) {
       return response.data.content;
     }
     throw new Error('Failed to create product');
   },
-  async updateProduct(id: string, product: Partial<TProduct>): Promise<TProduct> {
+
+  async updateProduct(id: string, product: UpdateProductDto): Promise<TProduct> {
     const response = await authApi.default.put<IResponseObject<TProduct>>(
       `/products/${id}`,
       product,
