@@ -9,7 +9,7 @@ import { useSellerRegistration } from '@/hooks/useSellerRegistration';
 import { useState } from 'react';
 
 const steps = [
-  { id: 1, title: 'Thông tin shop', description: 'Tên shop và mô tả' },
+  { id: 1, title: 'Thông tin seller', description: 'Tên seller và mô tả' },
   { id: 2, title: 'Địa chỉ', description: 'Vị trí cửa hàng' },
   { id: 3, title: 'Giấy tờ', description: 'CMND/CCCD' },
   { id: 4, title: 'Hoàn tất', description: 'Xác nhận thông tin' },

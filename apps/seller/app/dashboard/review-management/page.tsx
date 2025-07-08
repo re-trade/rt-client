@@ -47,7 +47,7 @@ const mockReviews: Review[] = [
     rating: 5,
     title: 'Sản phẩm rất tốt, chất lượng vượt mong đợi',
     content:
-      'Áo thun chất liệu cotton rất mềm mại, thoáng mát. Size vừa vặn, màu sắc đẹp như hình. Giao hàng nhanh, đóng gói cẩn thận. Sẽ ủng hộ shop tiếp.',
+      'Áo thun chất liệu cotton rất mềm mại, thoáng mát. Size vừa vặn, màu sắc đẹp như hình. Giao hàng nhanh, đóng gói cẩn thận. Sẽ ủng hộ seller tiếp.',
     images: ['/placeholder.svg?height=100&width=100', '/placeholder.svg?height=100&width=100'],
     createdAt: '2024-01-15T10:30:00Z',
     isVerifiedPurchase: true,
@@ -69,7 +69,7 @@ const mockReviews: Review[] = [
     isVerifiedPurchase: true,
     shopReply: {
       content:
-        'Cảm ơn bạn đã đánh giá! Shop sẽ cập nhật bảng size chi tiết hơn để khách hàng dễ chọn size phù hợp. Lần sau bạn có thể inbox shop để được tư vấn size nhé!',
+        'Cảm ơn bạn đã đánh giá! Shop sẽ cập nhật bảng size chi tiết hơn để khách hàng dễ chọn size phù hợp. Lần sau bạn có thể inbox seller để được tư vấn size nhé!',
       createdAt: '2024-01-14T16:00:00Z',
     },
     helpful: 8,
@@ -106,7 +106,7 @@ const mockReviews: Review[] = [
     isVerifiedPurchase: true,
     shopReply: {
       content:
-        'Cảm ơn bạn rất nhiều! Shop rất vui khi bạn hài lòng với sản phẩm. Hiện tại shop có thêm màu hồng và xanh mint, bạn có thể tham khảo nhé!',
+        'Cảm ơn bạn rất nhiều! Shop rất vui khi bạn hài lòng với sản phẩm. Hiện tại seller có thêm màu hồng và xanh mint, bạn có thể tham khảo nhé!',
       createdAt: '2024-01-12T18:00:00Z',
     },
     helpful: 15,

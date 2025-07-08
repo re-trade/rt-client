@@ -40,9 +40,9 @@ const menuItems = [
     href: '/dashboard/revenue-management',
   },
   {
-    title: 'Thông tin shop',
+    title: 'Thông tin seller',
     icon: Store,
-    href: '/dashboard/shop-info-management',
+    href: '/dashboard/seller-info-management',
   },
   {
     title: 'Quản lý đánh giá',

@@ -37,7 +37,7 @@ const mockShopInfo: ShopInfo = {
     'Chuyên cung cấp các sản phẩm thời trang chất lượng cao với giá cả hợp lý. Cam kết mang đến cho khách hàng những trải nghiệm mua sắm tuyệt vời nhất.',
   logo: '/placeholder.svg?height=100&width=100',
   coverImage: '/placeholder.svg?height=200&width=400',
-  email: 'shop@example.com',
+  email: 'seller@example.com',
   phone: '0123456789',
   address: '123 Đường ABC, Phường 1, Quận 1, TP. Hồ Chí Minh',
   website: 'https://shop-abc.com',
