@@ -32,13 +32,13 @@ export const AuthSellerApi = {
     if (response.status === 200) {
       return response.data;
     }
-    throw new Error('Failed to get seller shop');
+    throw new Error('Failed to get seller seller');
   },
   async updateShopSeller(id: string, data: Partial<TSeller>): Promise<TSeller> {
     const response = await authApi.default.put<TSeller>(`/auth/seller/${id}`, data);
     if (response.status === 200) {
       return response.data;
     }
-    throw new Error('Failed to update seller shop');
+    throw new Error('Failed to update seller seller');
   },
 };

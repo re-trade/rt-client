@@ -54,7 +54,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
     if (rating >= 4) {
       return [
         'Cảm ơn bạn đã đánh giá tích cực! Shop rất vui khi bạn hài lòng với sản phẩm.',
-        'Cảm ơn bạn đã ủng hộ shop! Hy vọng sẽ được phục vụ bạn trong những lần mua sắm tiếp theo.',
+        'Cảm ơn bạn đã ủng hộ seller! Hy vọng sẽ được phục vụ bạn trong những lần mua sắm tiếp theo.',
         'Shop rất cảm kích sự tin tưởng của bạn. Chúc bạn sử dụng sản phẩm vui vẻ!',
       ];
     } else if (rating >= 3) {
@@ -65,8 +65,8 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
       ];
     } else {
       return [
-        'Shop rất xin lỗi vì trải nghiệm chưa tốt. Vui lòng liên hệ shop để được hỗ trợ giải quyết.',
-        'Shop chân thành xin lỗi và sẽ khắc phục vấn đề này. Vui lòng inbox để shop hỗ trợ bạn.',
+        'Shop rất xin lỗi vì trải nghiệm chưa tốt. Vui lòng liên hệ seller để được hỗ trợ giải quyết.',
+        'Shop chân thành xin lỗi và sẽ khắc phục vấn đề này. Vui lòng inbox để seller hỗ trợ bạn.',
         'Cảm ơn phản hồi của bạn. Shop sẽ cải thiện và bồi thường thỏa đáng cho bạn.',
       ];
     }

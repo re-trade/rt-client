@@ -43,7 +43,7 @@ const menuItems = [
       { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product-management' },
       { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user-management' },
       { title: 'Quản lý đơn hàng', icon: ShoppingCart, href: '/dashboard/order-management' },
-      { title: 'Quản lý shop', icon: Store, href: '/dashboard/shop-management' },
+      { title: 'Quản lý seller', icon: Store, href: '/dashboard/seller-management' },
     ],
   },
   {

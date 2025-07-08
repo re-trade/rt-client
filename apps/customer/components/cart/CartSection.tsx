@@ -156,7 +156,7 @@ export default function CartSection({
 
         const handleAccordionToggle = (event: React.MouseEvent) => {
           const target = event.target as HTMLElement;
-          if (target.closest('.shop-checkbox')) {
+          if (target.closest('.seller-checkbox')) {
             return;
           }
           toggleShopSection(sellerId);

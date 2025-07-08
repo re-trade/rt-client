@@ -77,7 +77,7 @@ export default function CartSummary({
 
         const paymentPayload = {
           paymentMethodId: selectedPaymentMethodId!,
-          paymentContent: 'Cam on shop',
+          paymentContent: 'Cam on seller',
           orderId: createdOrder.orderId,
         };
 

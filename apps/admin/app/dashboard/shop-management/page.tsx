@@ -151,7 +151,7 @@ export default function ShopManagementPage() {
   const totalRevenue = shops.reduce((sum, shop) => sum + shop.totalRevenue, 0);
 
   const handleToggleStatus = (shopId: string, currentStatus: string) => {
-    // TODO: Implement API call to toggle shop status
+    // TODO: Implement API call to toggle seller status
     console.log(`Toggle status for shop ${shopId}, current status: ${currentStatus}`);
   };
 
