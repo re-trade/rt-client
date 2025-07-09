@@ -13,17 +13,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import {
-  DollarSign,
-  LayoutDashboard,
-  MapPin,
-  Package,
-  ShieldEllipsis,
-  ShoppingCart,
-  Star,
-  Store,
-  Truck,
-} from 'lucide-react';
+import { DollarSign, LayoutDashboard, Package, ShoppingCart, Star, Store } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
@@ -42,7 +32,7 @@ const menuItems = [
   {
     title: 'Thông tin shop',
     icon: Store,
-    href: '/dashboard/shop-info',
+    href: '/dashboard/seller-info',
   },
   {
     title: 'Quản lý đánh giá',
