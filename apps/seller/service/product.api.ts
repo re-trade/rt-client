@@ -14,8 +14,7 @@ export type TProduct = {
   warrantyExpiryDate: string;
   model: string;
   currentPrice: number;
-  categories: string[];
-  listOfCategories: {
+  categories: {
     id: string;
     name: string;
   }[];

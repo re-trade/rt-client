@@ -1,6 +1,5 @@
 'use client';
 
-import type { Order } from '@/app/dashboard/orders-management/page';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { OrderResponse } from '@/service/orders.api';
 import {
   CheckCheck,
   CheckCircle,
@@ -25,13 +25,13 @@ import {
 } from 'lucide-react';
 
 interface OrderTableProps {
-  orders: Order[];
-  onViewDetail: (order: Order) => void;
-  onUpdateStatus: (order: Order) => void;
+  orders: OrderResponse[];
+  onViewDetail: (order: OrderResponse) => void;
+  onUpdateStatus: (order: OrderResponse) => void;
 }
 
 export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableProps) {
-  const getStatusColor = (status: Order['orderStatus']) => {
+  const getStatusColor = (status: OrderResponse['orderStatus']) => {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
@@ -52,7 +52,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
     }
   };
 
-  const getStatusText = (status: Order['orderStatus']) => {
+  const getStatusText = (status: OrderResponse['orderStatus']) => {
     switch (status) {
       case 'pending':
         return 'Chờ xác nhận';
@@ -73,7 +73,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
     }
   };
 
-  const getPaymentStatusColor = (status: Order['paymentStatus']) => {
+  const getPaymentStatusColor = (status: OrderResponse['orderStatus']) => {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
@@ -86,7 +86,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
     }
   };
 
-  const getPaymentStatusText = (status: Order['paymentStatus']) => {
+  const getPaymentStatusText = (status: OrderResponse['orderStatus']) => {
     switch (status) {
       case 'pending':
         return 'Chờ thanh toán';
@@ -99,7 +99,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
     }
   };
 
-  const getStatusIcon = (status: Order['orderStatus']) => {
+  const getStatusIcon = (status: OrderResponse['orderStatus']) => {
     switch (status) {
       case 'pending':
         return <Clock className="h-4 w-4 text-yellow-600" />;
@@ -120,7 +120,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
     }
   };
 
-  const canUpdateStatus = (status: Order['orderStatus']) => {
+  const canUpdateStatus = (status: OrderResponse['orderStatus']) => {
     return !['delivered', 'cancelled'].includes(status);
   };
 
@@ -142,38 +142,33 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id}>
+              <TableRow key={order.comboId}>
                 <TableCell className="font-medium">
                   <div>
-                    <div>{order.orderNumber}</div>
-                    {order.trackingNumber && (
-                      <div className="text-xs text-muted-foreground">
-                        Mã vận đơn: {order.trackingNumber}
-                      </div>
-                    )}
+                    <div>{order.comboId}</div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div>
-                    <div className="font-medium">{order.customerName}</div>
-                    <div className="text-sm text-muted-foreground">{order.customerPhone}</div>
+                    <div className="font-medium">{order.destination.customerName}</div>
+                    <div className="text-sm text-muted-foreground">{order.destination.phone}</div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">
                     {order.items.length} sản phẩm
                     <div className="text-xs text-muted-foreground">
-                      {order.items[0]?.productName}
+                      {order.items[0]?.productName || 'Không có tên sản phẩm'}
                       {order.items.length > 1 && ` +${order.items.length - 1} khác`}
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="font-medium">
-                  {order.finalAmount.toLocaleString('vi-VN')}đ
+                  {order.grandPrice.toLocaleString('vi-VN')}đ
                 </TableCell>
                 <TableCell>
-                  <Badge className={getPaymentStatusColor(order.paymentStatus)}>
-                    {getPaymentStatusText(order.paymentStatus)}
+                  <Badge className={getPaymentStatusColor(order.orderStatus)}>
+                    {getPaymentStatusText(order.orderStatus)}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -184,7 +179,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
                     </Badge>
                   </div>
                 </TableCell>
-                <TableCell>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</TableCell>
+                <TableCell>{new Date(order.createDate).toLocaleDateString('vi-VN')}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm" onClick={() => onViewDetail(order)}>
