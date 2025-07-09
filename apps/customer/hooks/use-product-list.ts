@@ -65,7 +65,7 @@ export function useProductList() {
       } else if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
         params.append('currentPrice', `0..${selectedFilter.maxPrice}`);
       }
-
+      params.append('verified', String(true));
       const response = await productApi.searchProducts(page - 1, PAGE_SIZE, params.toString());
 
       setProducts(response.content || []);
@@ -119,7 +119,7 @@ export function useProductList() {
         }
         return updated;
       });
-      setPage(1); // Reset to first page when filter changes
+      setPage(1);
     },
     [],
   );

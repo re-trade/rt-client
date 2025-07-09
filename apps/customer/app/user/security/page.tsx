@@ -307,8 +307,8 @@ export default function SecurityPage() {
   }) => {
     try {
       const success = await changeUsernameInternal({
-        newUsername: values.newUsername,
-        password: values.password,
+        username: values.newUsername,
+        passwordConfirm: values.password,
       });
 
       if (success) {

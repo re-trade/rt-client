@@ -8,8 +8,10 @@ import { ProductHistoryList } from '@components/product/ProductHistoryList';
 import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
 import ProductInfoSkeleton from '@components/product/ProductInfoSkeleton';
 import RelatedProducts from '@components/related-product/RelatedProduct';
-import { IconCheck } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
   MdAdd,
@@ -28,6 +30,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -110,7 +113,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
     <div className="min-h-screen bg-gradient-to-br from-orange-25 via-orange-50 to-orange-25">
       {showSuccess && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-top duration-300">
-          <IconCheck size={20} />
+          <Check size={20} />
           <span>Đã thêm vào giỏ hàng!</span>
         </div>
       )}
@@ -149,6 +152,48 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
             </li>
           </ol>
         </nav>
+
+        {!productDetail.verified && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="mb-6 bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 border-t border-b border-orange-300 shadow-md overflow-hidden relative"
+          >
+            <div className="py-3 relative">
+              <motion.div
+                animate={{ x: [1000, -1000] }}
+                transition={{
+                  duration: 15,
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+                className="whitespace-nowrap flex items-center text-white font-semibold"
+              >
+                <span className="flex items-center space-x-3 mx-8">
+                  <MdWarning className="h-5 w-5 text-yellow-200 flex-shrink-0" />
+                  <span className="text-lg">CẢNH BÁO: Sản phẩm chưa được xác minh</span>
+                </span>
+                <span className="text-orange-200 mx-4">•</span>
+                <span className="flex items-center space-x-3 mx-8">
+                  <MdSecurity className="h-5 w-5 text-yellow-200 flex-shrink-0" />
+                  <span className="text-lg">Vui lòng kiểm tra kỹ trước khi mua</span>
+                </span>
+                <span className="text-orange-200 mx-4">•</span>
+                <span className="flex items-center space-x-3 mx-8">
+                  <MdWarning className="h-5 w-5 text-yellow-200 flex-shrink-0" />
+                  <span className="text-lg">CẢNH BÁO: Sản phẩm chưa được xác minh</span>
+                </span>
+                <span className="text-orange-200 mx-4">•</span>
+                <span className="flex items-center space-x-3 mx-8">
+                  <MdSecurity className="h-5 w-5 text-yellow-200 flex-shrink-0" />
+                  <span className="text-lg">Vui lòng kiểm tra kỹ trước khi mua</span>
+                </span>
+                <span className="text-orange-200 mx-4">•</span>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div className="space-y-4">
@@ -262,8 +307,9 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                 <button
                   className="px-4 py-2 bg-white border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors text-sm font-medium"
                   style={{ color: '#1f2937' }}
+                  onClick={() => router.push(`/seller/${productDetail.sellerId}`)}
                 >
-                  Xem shop
+                  Xem người bán
                 </button>
               </div>
 

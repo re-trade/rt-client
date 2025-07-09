@@ -5,7 +5,7 @@ import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import { TCustomerProfileResponse } from '@/services/customer-profile.api';
 import { Calendar, Camera, Check, Edit3, Mail, Map, Phone, Shield, User, X } from 'lucide-react';
 import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function ProfilePage() {
   const {
