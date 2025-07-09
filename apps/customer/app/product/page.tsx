@@ -1,124 +1,12 @@
 'use client';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductList } from '@/hooks/use-product-list';
+import PaginationBar from '@components/common/PaginationBar';
 import ProductFilter from '@components/product/FillterProduct';
+import ProductCardSkeleton from '@components/product/ProductCardSkeleton';
 import { IconFilter, IconGridDots, IconList } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-
-const ProductCardSkeleton = ({ index }: { index: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3, delay: index * 0.1 }}
-    className="bg-white rounded-xl shadow-lg overflow-hidden"
-  >
-    <div className="animate-pulse">
-      <div className="bg-gradient-to-r from-orange-100 to-orange-200 h-48 w-full"></div>
-
-      <div className="p-4 space-y-3">
-        <div className="bg-gradient-to-r from-gray-200 to-gray-300 h-4 rounded w-3/4"></div>
-        <div className="bg-gradient-to-r from-gray-200 to-gray-300 h-4 rounded w-1/2"></div>
-
-        <div className="bg-gradient-to-r from-orange-200 to-orange-300 h-6 rounded w-1/3"></div>
-
-        <div className="flex justify-between items-center">
-          <div className="bg-gradient-to-r from-gray-200 to-gray-300 h-3 rounded w-1/4"></div>
-          <div className="bg-gradient-to-r from-gray-200 to-gray-300 h-3 rounded w-1/3"></div>
-        </div>
-
-        <div className="bg-gradient-to-r from-orange-200 to-orange-300 h-10 rounded-lg w-full"></div>
-      </div>
-    </div>
-  </motion.div>
-);
-
-const PaginationBar = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  loading,
-}: {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  loading: boolean;
-}) => {
-  const getVisiblePages = () => {
-    const delta = 2;
-    const range = [];
-    const rangeWithDots = [];
-
-    for (
-      let i = Math.max(2, currentPage - delta);
-      i <= Math.min(totalPages - 1, currentPage + delta);
-      i++
-    ) {
-      range.push(i);
-    }
-
-    if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...');
-    } else {
-      rangeWithDots.push(1);
-    }
-
-    rangeWithDots.push(...range);
-
-    if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages);
-    } else {
-      rangeWithDots.push(totalPages);
-    }
-
-    return rangeWithDots;
-  };
-
-  if (totalPages <= 1) return null;
-
-  return (
-    <motion.div
-      className="flex justify-center mt-12"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="btn-group shadow-lg">
-        <button
-          className="btn btn-outline border-orange-200 hover:bg-orange-500 hover:border-orange-500 disabled:opacity-50"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1 || loading}
-        >
-          «
-        </button>
-
-        {getVisiblePages().map((page, index) => (
-          <button
-            key={index}
-            className={`btn ${
-              page === currentPage
-                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-orange-500'
-                : page === '...'
-                  ? 'btn-disabled'
-                  : 'btn-outline border-orange-200 hover:bg-orange-500 hover:border-orange-500'
-            }`}
-            onClick={() => typeof page === 'number' && onPageChange(page)}
-            disabled={page === '...' || loading}
-          >
-            {page}
-          </button>
-        ))}
-        <button
-          className="btn btn-outline border-orange-200 hover:bg-orange-500 hover:border-orange-500 disabled:opacity-50"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages || loading}
-        >
-          »
-        </button>
-      </div>
-    </motion.div>
-  );
-};
 
 export default function ProductListPage() {
   const {

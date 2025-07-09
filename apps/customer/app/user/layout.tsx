@@ -10,7 +10,6 @@ import {
   Settings,
   Shield,
   ShoppingBag,
-  Ticket,
   User,
   X,
 } from 'lucide-react';
@@ -88,11 +87,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
       name: 'Đơn Mua',
       icon: <ShoppingBag className="w-5 h-5" />,
       path: 'purchase',
-    },
-    {
-      name: 'Kho Voucher',
-      icon: <Ticket className="w-5 h-5" />,
-      path: 'vouchers',
     },
   ];
 

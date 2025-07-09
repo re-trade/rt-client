@@ -29,11 +29,15 @@ export function useProductHome() {
     setLoading(true);
     setError(null);
     try {
-      const response = await productApi.searchProducts(
-        0,
-        8,
-        categoryId ? `categoryId=${categoryId}` : undefined,
-      );
+      const params = new URLSearchParams();
+
+      if (categoryId) {
+        params.set('categoryId', categoryId.toString());
+      }
+
+      params.set('verified', 'true');
+
+      const response = await productApi.searchProducts(0, 8, params.toString());
       const products = response.content || [];
       setProducts(products);
     } catch {
