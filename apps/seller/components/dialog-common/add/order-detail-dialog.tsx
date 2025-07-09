@@ -1,4 +1,4 @@
-import type { Order } from '@/app/dashboard/orders-management/page';
+import { OrderResponse, ordersApi } from '@/service/orders.api';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -8,13 +8,13 @@ import Image from 'next/image';
 interface OrderDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  order: Order | null;
+  order: OrderResponse | null;
 }
 
 export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDialogProps) {
   if (!order) return null;
 
-  const getStatusColor = (status: Order['orderStatus']) => {
+  const getStatusColor = (status: OrderResponse['orderStatus']) => {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
@@ -35,7 +35,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
     }
   };
 
-  const getStatusText = (status: Order['orderStatus']) => {
+  const getStatusText = (status: OrderResponse['orderStatus']) => {
     switch (status) {
       case 'pending':
         return 'Chờ xác nhận';
@@ -56,24 +56,12 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
     }
   };
 
-  const getPaymentMethodText = (method: Order['paymentMethod']) => {
-    switch (method) {
-      case 'cod':
-        return 'Thanh toán khi nhận hàng';
-      case 'bank_transfer':
-        return 'Chuyển khoản ngân hàng';
-      case 'e_wallet':
-        return 'Ví điện tử';
-      default:
-        return 'Không xác định';
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Chi tiết đơn hàng {order.orderNumber}</DialogTitle>
+          <DialogTitle>Chi tiết đơn hàng {order.comboId}</DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -85,7 +73,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
             <CardContent className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Mã đơn hàng:</span>
-                <span className="font-medium">{order.orderNumber}</span>
+                <span className="font-medium">{order.comboId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Trạng thái:</span>
@@ -95,13 +83,13 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Ngày tạo:</span>
-                <span>{new Date(order.createdAt).toLocaleString('vi-VN')}</span>
+                <span>{new Date(order.createDate).toLocaleString('vi-VN')}</span>
               </div>
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span className="text-muted-foreground">Cập nhật lần cuối:</span>
                 <span>{new Date(order.updatedAt).toLocaleString('vi-VN')}</span>
-              </div>
-              {order.trackingNumber && (
+              </div> */}
+              {/* {order.trackingNumber && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Mã vận đơn:</span>
                   <span className="font-medium">{order.trackingNumber}</span>
@@ -116,7 +104,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
                   <span className="text-muted-foreground">Ghi chú:</span>
                   <p className="mt-1 text-sm">{order.notes}</p>
                 </div>
-              )}
+              )} */}
             </CardContent>
           </Card>
 
@@ -128,19 +116,15 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
             <CardContent className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Họ tên:</span>
-                <span className="font-medium">{order.customerName}</span>
+                <span className="font-medium">{order.destination.customerName}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Số điện thoại:</span>
-                <span>{order.customerPhone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Email:</span>
-                <span>{order.customerEmail}</span>
+                <span>{order.destination.phone}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Địa chỉ giao hàng:</span>
-                <p className="mt-1 text-sm">{order.shippingAddress}</p>
+                <p className="mt-1 text-sm">{order.destination.ward}, {order.destination.state}, {order.destination.district}, {order.destination.country}</p>
               </div>
             </CardContent>
           </Card>
@@ -154,23 +138,23 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
           <CardContent>
             <div className="space-y-4">
               {order.items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                <div key={item.productId} className="flex items-center gap-4 p-4 border rounded-lg">
                   <Image
-                    src={item.image || '/placeholder.svg'}
-                    alt={item.productName}
+                    src={item.itemThumbnail || '/placeholder.svg'}
+                    alt={item.itemName}
                     width={60}
                     height={60}
                     className="rounded-md object-cover"
                   />
                   <div className="flex-1">
-                    <h4 className="font-medium">{item.productName}</h4>
+                    <h4 className="font-medium">{item.itemName}</h4>
                     <p className="text-sm text-muted-foreground">
-                      Số lượng: {item.quantity} × {item.price.toLocaleString('vi-VN')}đ
+                      Số lượng: {item.quantity} × {item.basePrice.toLocaleString('vi-VN')}đ
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {(item.quantity * item.price).toLocaleString('vi-VN')}đ
+                      {(item.quantity * item.basePrice).toLocaleString('vi-VN')}đ
                     </p>
                   </div>
                 </div>
@@ -187,40 +171,40 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
           <CardContent className="space-y-4">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Phương thức thanh toán:</span>
-              <span>{getPaymentMethodText(order.paymentMethod)}</span>
+              {/* <span>{getPaymentMethodText(order.paymentMethod)}</span> */}
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Trạng thái thanh toán:</span>
               <Badge
                 className={
-                  order.paymentStatus === 'paid'
+                  order.orderStatus === 'paid'
                     ? 'bg-green-100 text-green-800'
                     : 'bg-yellow-100 text-yellow-800'
                 }
               >
-                {order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán'}
+                {order.orderStatus === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán'}
               </Badge>
             </div>
             <Separator />
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Tạm tính:</span>
-                <span>{order.totalAmount.toLocaleString('vi-VN')}đ</span>
+                <span>{order.grandPrice.toLocaleString('vi-VN')}đ</span>
               </div>
               <div className="flex justify-between">
                 <span>Phí vận chuyển:</span>
-                <span>{order.shippingFee.toLocaleString('vi-VN')}đ</span>
+                {/* <span>{order.shippingFee.toLocaleString('vi-VN')}đ</span> */}
               </div>
-              {order.discount > 0 && (
+              {/* {order.discount > 0 && (
                 <div className="flex justify-between text-red-600">
                   <span>Giảm giá:</span>
                   <span>-{order.discount.toLocaleString('vi-VN')}đ</span>
                 </div>
-              )}
+              )} */}
               <Separator />
               <div className="flex justify-between text-lg font-semibold">
                 <span>Tổng cộng:</span>
-                <span>{order.finalAmount.toLocaleString('vi-VN')}đ</span>
+                <span>{order.grandPrice.toLocaleString('vi-VN')}đ</span>
               </div>
             </div>
           </CardContent>
