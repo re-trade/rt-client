@@ -11,10 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { OrderResponse, ordersApi } from '@/service/orders.api';
-
+import { Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([]);

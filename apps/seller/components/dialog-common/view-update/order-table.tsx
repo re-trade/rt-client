@@ -1,6 +1,5 @@
 'use client';
 
-import { OrderResponse, ordersApi } from '@/service/orders.api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { OrderResponse } from '@/service/orders.api';
 import {
   CheckCheck,
   CheckCircle,

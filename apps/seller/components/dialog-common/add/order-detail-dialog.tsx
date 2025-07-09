@@ -1,8 +1,8 @@
-import { OrderResponse, ordersApi } from '@/service/orders.api';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { OrderResponse } from '@/service/orders.api';
 import Image from 'next/image';
 
 interface OrderDetailDialogProps {
@@ -55,7 +55,6 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
         return 'Không xác định';
     }
   };
-
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,7 +123,10 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
               </div>
               <div>
                 <span className="text-muted-foreground">Địa chỉ giao hàng:</span>
-                <p className="mt-1 text-sm">{order.destination.ward}, {order.destination.state}, {order.destination.district}, {order.destination.country}</p>
+                <p className="mt-1 text-sm">
+                  {order.destination.ward}, {order.destination.state}, {order.destination.district},{' '}
+                  {order.destination.country}
+                </p>
               </div>
             </CardContent>
           </Card>

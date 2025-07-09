@@ -224,4 +224,3 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
     </Command>
   );
 }
-
