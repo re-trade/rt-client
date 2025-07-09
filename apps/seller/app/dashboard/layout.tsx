@@ -13,17 +13,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import {
-  DollarSign,
-  LayoutDashboard,
-  MapPin,
-  Package,
-  ShieldEllipsis,
-  ShoppingCart,
-  Star,
-  Store,
-  Truck,
-} from 'lucide-react';
+import { DollarSign, LayoutDashboard, Package, ShoppingCart, Star, Store } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
@@ -37,48 +27,48 @@ const menuItems = [
   {
     title: 'Quản lý doanh thu',
     icon: DollarSign,
-    href: '/dashboard/revenue-management',
+    href: '/dashboard/revenue',
   },
   {
     title: 'Thông tin seller',
     icon: Store,
-    href: '/dashboard/shop-info-management',
+    href: '/dashboard/seller-info',
   },
   {
     title: 'Quản lý đánh giá',
     icon: Star,
-    href: '/dashboard/review-management',
+    href: '/dashboard/review',
   },
   {
     title: 'Quản lý sản phẩm',
     icon: Package,
-    href: '/dashboard/product-management',
+    href: '/dashboard/product',
   },
   {
     title: 'Quản lý đơn hàng',
     icon: ShoppingCart,
-    href: '/dashboard/orders-management',
+    href: '/dashboard/orders',
   },
   // {
   //   title: 'Quản lý voucher',
   //   icon: Ticket,
   //   href: '/dashboard/voucher-management',
   // },
-  {
-    title: 'Phương thức vận chuyển',
-    icon: Truck,
-    href: '/dashboard/shipping-management',
-  },
-  {
-    title: 'Quản lý địa chỉ',
-    icon: MapPin,
-    href: '/dashboard/address-management',
-  },
-  {
-    title: 'Bảo mật',
-    icon: ShieldEllipsis,
-    href: '/dashboard/security',
-  },
+  // {
+  //   title: 'Phương thức vận chuyển',
+  //   icon: Truck,
+  //   href: '/dashboard/shipping-management',
+  // },
+  // {
+  //   title: 'Quản lý địa chỉ',
+  //   icon: MapPin,
+  //   href: '/dashboard/address-management',
+  // },
+  // {
+  //   title: 'Bảo mật',
+  //   icon: ShieldEllipsis,
+  //   href: '/dashboard/security',
+  // },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
