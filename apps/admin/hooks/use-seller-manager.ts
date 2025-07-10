@@ -17,6 +17,7 @@ const useSellerManager = () => {
     setError(null);
     try {
       const result = await getSellers(page, pageSize, searchQuery);
+      console.log(result);
       if (result?.success) {
         setSellers(result.content || []);
         setTotal(result.content?.length || 0);
