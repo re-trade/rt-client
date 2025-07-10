@@ -17,15 +17,25 @@ export type TSellerProfile = {
   updatedAt: string;
 };
 
-const getSellerProfile = async (id: string): Promise<TSellerProfile | undefined> => {
+const getSellers = async (
+  page: number = 0,
+  size: number = 10,
+  query?: string,
+): Promise<IResponseObject<TSellerProfile[]> | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TSellerProfile>>(`/sellers/${id}`);
+    const result = await authApi.default.get<IResponseObject<TSellerProfile[]>>(`/sellers`, {
+      params: {
+        page,
+        size,
+        ...(query ? { q: query } : {}),
+      },
+    });
     if (result.data.success && result.status === 200) {
-      return result.data.content;
+      return result.data;
     }
   } catch {
     return undefined;
   }
 };
 
-export { getSellerProfile };
+export { getSellers };

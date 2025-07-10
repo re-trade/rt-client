@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useProductManager } from '@/hooks/use-product-manager';
 import { ArrowUpDown, Package, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -48,81 +49,6 @@ const categories = [
   },
 ];
 
-const products = {
-  '1': [
-    {
-      id: '1',
-      name: 'iPhone 13',
-      price: 999,
-      stock: 50,
-      status: 'active',
-      createdAt: '2024-03-15',
-    },
-    {
-      id: '2',
-      name: 'Samsung Galaxy S21',
-      price: 899,
-      stock: 30,
-      status: 'active',
-      createdAt: '2024-03-14',
-    },
-  ],
-  '2': [
-    {
-      id: '3',
-      name: "Men's T-Shirt",
-      price: 29.99,
-      stock: 100,
-      status: 'active',
-      createdAt: '2024-03-13',
-    },
-    {
-      id: '4',
-      name: "Women's Dress",
-      price: 59.99,
-      stock: 75,
-      status: 'active',
-      createdAt: '2024-03-12',
-    },
-  ],
-  '3': [
-    {
-      id: '5',
-      name: 'The Great Gatsby',
-      price: 14.99,
-      stock: 200,
-      status: 'active',
-      createdAt: '2024-03-11',
-    },
-    {
-      id: '6',
-      name: 'To Kill a Mockingbird',
-      price: 12.99,
-      stock: 150,
-      status: 'active',
-      createdAt: '2024-03-10',
-    },
-  ],
-  '4': [
-    {
-      id: '7',
-      name: 'Coffee Maker',
-      price: 79.99,
-      stock: 40,
-      status: 'active',
-      createdAt: '2024-03-09',
-    },
-    {
-      id: '8',
-      name: 'Blender',
-      price: 49.99,
-      stock: 60,
-      status: 'active',
-      createdAt: '2024-03-08',
-    },
-  ],
-};
-
 type SortField = 'name' | 'price' | 'stock' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
 
@@ -133,40 +59,7 @@ export default function ProductManagementPage() {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const itemsPerPage = 10;
-
-  const filteredProducts = selectedCategory
-    ? products[selectedCategory as keyof typeof products]
-        .filter((product) => {
-          const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-          const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
-          return matchesSearch && matchesStatus;
-        })
-        .sort((a, b) => {
-          let comparison = 0;
-          switch (sortField) {
-            case 'name':
-              comparison = a.name.localeCompare(b.name);
-              break;
-            case 'price':
-              comparison = a.price - b.price;
-              break;
-            case 'stock':
-              comparison = a.stock - b.stock;
-              break;
-            case 'createdAt':
-              comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-              break;
-          }
-          return sortOrder === 'asc' ? comparison : -comparison;
-        })
-    : [];
-
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const { products, page, maxPage } = useProductManager();
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -286,20 +179,20 @@ export default function ProductManagementPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentProducts.map((product) => (
+                {products.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>${product.price.toFixed(2)}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>${product.currentPrice.toFixed(2)}</TableCell>
+                    <TableCell>{product.quantity}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          product.status === 'active'
+                          product.verified
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
                         }`}
                       >
-                        {product.status}
+                        {product.verified ? 'Da Xac Minh' : 'Chua Xac Minh'}
                       </span>
                     </TableCell>
                     <TableCell>{product.createdAt}</TableCell>
@@ -318,15 +211,14 @@ export default function ProductManagementPage() {
 
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredProducts.length)} of{' '}
-              {filteredProducts.length} products
+              Showing {page} to {maxPage} of {products.length} products
             </div>
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage)}
+                disabled={page === 1}
               >
                 Previous
               </Button>
@@ -334,7 +226,7 @@ export default function ProductManagementPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                disabled={currentPage === page}
               >
                 Next
               </Button>
