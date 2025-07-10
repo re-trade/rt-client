@@ -1,4 +1,5 @@
 'use client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Activity,
   ArrowDownRight,
@@ -9,7 +10,6 @@ import {
   Users,
 } from 'lucide-react';
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
 const StatCard = ({
   title,

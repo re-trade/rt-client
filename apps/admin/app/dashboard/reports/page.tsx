@@ -1,5 +1,6 @@
 'use client';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -25,7 +26,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 
 // Dữ liệu mẫu cho biểu đồ doanh thu
 const revenueData = [

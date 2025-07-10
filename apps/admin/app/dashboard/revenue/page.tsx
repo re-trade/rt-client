@@ -1,13 +1,13 @@
 'use client';
 
-import { Card } from '@/app/components/ui/card';
+import { Card } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/app/components/ui/select';
+} from '@/components/ui/select';
 import {
   ArrowDownRight,
   ArrowUpRight,
