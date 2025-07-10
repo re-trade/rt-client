@@ -57,12 +57,7 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  const handleStatusUpdate = (
-    comboId: string,
-    newStatus: string,
-    trackingNumber?: string,
-    notes?: string,
-  ) => {
+  const handleStatusUpdate = (comboId: string, newStatus: string) => {
     setOrders(
       orders.map((order) =>
         order.comboId === comboId

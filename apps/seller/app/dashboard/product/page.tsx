@@ -14,15 +14,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
+import '@uiw/react-markdown-preview/markdown.css';
+import '@uiw/react-md-editor/markdown-editor.css';
 import { Edit, Trash } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import "@uiw/react-md-editor/markdown-editor.css";
-import "@uiw/react-markdown-preview/markdown.css";
-import dynamic from "next/dynamic";
-import { Select } from '@radix-ui/react-select';
-const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
@@ -53,10 +52,10 @@ export default function ProductManagement() {
     const updatedProducts = productList.map((product) =>
       product.id === selectedProduct.id
         ? {
-          ...product,
-          ...updatedData,
-          updatedAt: new Date().toISOString(),
-        }
+            ...product,
+            ...updatedData,
+            updatedAt: new Date().toISOString(),
+          }
         : product,
     );
     setProductList(updatedProducts);
@@ -139,7 +138,6 @@ export default function ProductManagement() {
                         ))}
                       </div>
                     </TableCell>
-
 
                     <TableCell>
                       <span

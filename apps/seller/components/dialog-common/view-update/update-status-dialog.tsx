@@ -1,6 +1,5 @@
 'use client';
 
-import type { Order } from '@/app/dashboard/orders/page';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -14,16 +13,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { OrderResponse } from '@/service/orders.api';
 import { AlertCircle, CheckCircle, Package, Truck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface UpdateStatusDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  order: Order | null;
+  order: OrderResponse | null;
   onUpdateStatus: (
     orderId: string,
-    newStatus: Order['orderStatus'],
+    newStatus: OrderResponse['orderStatus'],
     trackingNumber?: string,
     notes?: string,
   ) => void;
@@ -35,22 +35,21 @@ export function UpdateStatusDialog({
   order,
   onUpdateStatus,
 }: UpdateStatusDialogProps) {
-  const [newStatus, setNewStatus] = useState<Order['orderStatus']>('pending');
+  const [newStatus, setNewStatus] = useState<OrderResponse['orderStatus']>('pending');
   const [trackingNumber, setTrackingNumber] = useState('');
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
     if (order) {
       setNewStatus(order.orderStatus);
-      setTrackingNumber(order.trackingNumber || '');
-      setNotes(order.notes || '');
+      // setNotes(order.notes || '');
     }
   }, [order]);
 
   if (!order) return null;
 
-  const getStatusColor = (status: Order['orderStatus']) => {
-    switch (status) {
+  const getStatusColor = (status: OrderResponse['orderStatus']) => {
+    switch (status.code) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'confirmed':
@@ -70,8 +69,8 @@ export function UpdateStatusDialog({
     }
   };
 
-  const getStatusText = (status: Order['orderStatus']) => {
-    switch (status) {
+  const getStatusText = (status: OrderResponse['orderStatus']) => {
+    switch (status.code) {
       case 'pending':
         return 'Chờ xác nhận';
       case 'confirmed':
@@ -91,8 +90,8 @@ export function UpdateStatusDialog({
     }
   };
 
-  const getStatusIcon = (status: Order['orderStatus']) => {
-    switch (status) {
+  const getStatusIcon = (status: OrderResponse['orderStatus']) => {
+    switch (status.code) {
       case 'preparing':
         return <Package className="h-4 w-4" />;
       case 'shipped':
@@ -106,8 +105,10 @@ export function UpdateStatusDialog({
     }
   };
 
-  const getAvailableStatuses = (currentStatus: Order['orderStatus']): Order['orderStatus'][] => {
-    switch (currentStatus) {
+  const getAvailableStatuses = (
+    currentStatus: OrderResponse['orderStatus'],
+  ): OrderResponse['orderStatus'][] => {
+    switch (currentStatus.code) {
       case 'pending':
         return ['confirmed', 'cancelled'];
       case 'confirmed':
@@ -123,8 +124,8 @@ export function UpdateStatusDialog({
     }
   };
 
-  const requiresTrackingNumber = (status: Order['orderStatus']) => {
-    return ['shipped', 'delivered'].includes(status);
+  const requiresTrackingNumber = (status: OrderResponse['orderStatus']) => {
+    return ['shipped', 'delivered'].includes(status.code);
   };
 
   const handleSubmit = () => {
