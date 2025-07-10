@@ -15,7 +15,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
   if (!order) return null;
 
   const getStatusColor = (status: OrderResponse['orderStatus']) => {
-    switch (status) {
+    switch (status.code) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'confirmed':
@@ -36,7 +36,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
   };
 
   const getStatusText = (status: OrderResponse['orderStatus']) => {
-    switch (status) {
+    switch (status.code) {
       case 'pending':
         return 'Chờ xác nhận';
       case 'confirmed':
@@ -179,12 +179,12 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
               <span className="text-muted-foreground">Trạng thái thanh toán:</span>
               <Badge
                 className={
-                  order.orderStatus === 'paid'
+                  order.paymentStatus === 'paid'
                     ? 'bg-green-100 text-green-800'
                     : 'bg-yellow-100 text-yellow-800'
                 }
               >
-                {order.orderStatus === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán'}
+                {order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán'}
               </Badge>
             </div>
             <Separator />
