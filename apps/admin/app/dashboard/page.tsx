@@ -1,12 +1,4 @@
 'use client';
-/*
-
-const Dashboard = () => {
-  return <></>;
-};
-
-export default Dashboard;*/
-// app/admin/RelatedProduct.tsx
 import {
   Activity,
   ArrowDownRight,

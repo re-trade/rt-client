@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// Sample data
 const languages = [
   { value: 'vi', label: 'Tiếng Việt' },
   { value: 'en', label: 'English' },

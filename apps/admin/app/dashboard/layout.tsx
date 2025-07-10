@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Package,
   Settings,
-  ShoppingCart,
   Store,
   Users,
 } from 'lucide-react';
@@ -40,17 +39,16 @@ const menuItems = [
   {
     group: 'Quản lý',
     items: [
-      { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product-management' },
-      { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user-management' },
-      { title: 'Quản lý đơn hàng', icon: ShoppingCart, href: '/dashboard/order-management' },
-      { title: 'Quản lý seller', icon: Store, href: '/dashboard/seller-management' },
+      { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product' },
+      { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user' },
+      { title: 'Quản lý Seller', icon: Store, href: '/dashboard/seller' },
     ],
   },
   {
     group: 'Tài chính',
     items: [
-      { title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue-management' },
-      { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial-reports' },
+      { title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue' },
+      { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial' },
     ],
   },
   {

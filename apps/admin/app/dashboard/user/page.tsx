@@ -22,7 +22,6 @@ import { Search, Shield, User } from 'lucide-react';
 import { useState } from 'react';
 import { ViewUserDialog } from './components/user-dialogs';
 
-// Sample data - replace with actual API call
 const users = [
   {
     id: '1',
