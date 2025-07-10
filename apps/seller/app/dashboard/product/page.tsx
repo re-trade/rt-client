@@ -18,6 +18,11 @@ import { Edit, Trash } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import dynamic from "next/dynamic";
+import { Select } from '@radix-ui/react-select';
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
@@ -48,10 +53,10 @@ export default function ProductManagement() {
     const updatedProducts = productList.map((product) =>
       product.id === selectedProduct.id
         ? {
-            ...product,
-            ...updatedData,
-            updatedAt: new Date().toISOString(),
-          }
+          ...product,
+          ...updatedData,
+          updatedAt: new Date().toISOString(),
+        }
         : product,
     );
     setProductList(updatedProducts);
@@ -122,7 +127,20 @@ export default function ProductManagement() {
                     <TableCell>{product.currentPrice.toLocaleString('vi-VN')}đ</TableCell>
                     <TableCell>{product.brand}</TableCell>
                     <TableCell>{product.quantity}</TableCell>
-                    <TableCell>{product.categories.join(', ')}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-2">
+                        {product.categories.map((c) => (
+                          <span
+                            key={c.id}
+                            className="border border-blue-500 px-2 py-1 rounded text-sm text-blue-700"
+                          >
+                            {c.name}
+                          </span>
+                        ))}
+                      </div>
+                    </TableCell>
+
+
                     <TableCell>
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${product.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
