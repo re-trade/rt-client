@@ -21,7 +21,6 @@ import {
 import { ArrowUpDown, Package, Search } from 'lucide-react';
 import { useState } from 'react';
 
-// Sample data - replace with actual API call
 const categories = [
   {
     id: '1',
@@ -136,7 +135,6 @@ export default function ProductManagementPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const itemsPerPage = 10;
 
-  // Filter and sort products
   const filteredProducts = selectedCategory
     ? products[selectedCategory as keyof typeof products]
         .filter((product) => {
