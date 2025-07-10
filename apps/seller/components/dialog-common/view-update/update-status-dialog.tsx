@@ -1,6 +1,5 @@
 'use client';
 
-import { OrderResponse, ordersApi } from '@/service/orders.api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -14,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { OrderResponse } from '@/service/orders.api';
 import { AlertCircle, CheckCircle, Package, Truck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -105,7 +105,9 @@ export function UpdateStatusDialog({
     }
   };
 
-  const getAvailableStatuses = (currentStatus: OrderResponse['orderStatus']): OrderResponse['orderStatus'][] => {
+  const getAvailableStatuses = (
+    currentStatus: OrderResponse['orderStatus'],
+  ): OrderResponse['orderStatus'][] => {
     switch (currentStatus.code) {
       case 'pending':
         return ['confirmed', 'cancelled'];
