@@ -1,15 +1,15 @@
 'use client';
 
-import { Button } from '@/app/components/ui/button';
-import { Card } from '@/app/components/ui/card';
-import { Input } from '@/app/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/app/components/ui/select';
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -17,10 +17,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/app/components/ui/table';
+} from '@/components/ui/table';
 import { Search, Shield, User } from 'lucide-react';
 import { useState } from 'react';
-import { ViewUserDialog } from './components/user-dialogs';
+import { ViewUserDialog } from '../../../components/dialog/user-dialogs';
 
 const users = [
   {
