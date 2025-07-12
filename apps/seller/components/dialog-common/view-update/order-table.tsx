@@ -22,6 +22,8 @@ import {
   RefreshCw,
   Truck,
   XCircle,
+  CreditCard,
+  AlertCircle
 } from 'lucide-react';
 
 interface OrderTableProps {
@@ -127,7 +129,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
       case 'PENDING':
         return 'Chờ thanh toán';
       case 'PAYMENT_CONFIRMATION':
-        return 'Xác nhận thanh toán';
+        return 'Đã thanh toán';
       case 'PAYMENT_FAILED':
         return 'Thất bại';
       case 'PAYMENT_CANCELLED':
@@ -136,8 +138,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
         return 'Không xác định';
     }
   };
-
-  const getStatusIcon = (status: OrderResponse['orderStatus']) => {
+const getStatusIcon = (status: OrderResponse['orderStatus']) => {
     switch (status.code) {
       case 'PENDING':
         return <Clock className="h-4 w-4 text-yellow-600" />;
@@ -165,11 +166,12 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
         return <Package className="h-4 w-4 text-gray-600" />;
       case 'RETURN_APPROVED':
         return <CheckCheck className="h-4 w-4 text-blue-600" />;
-      // Các trạng thái thanh toán được xử lý như "Chưa xác nhận"
       case 'PAYMENT_CONFIRMATION':
+        return <CreditCard className="h-4 w-4 text-yellow-600" />;
       case 'PAYMENT_FAILED':
+        return <AlertCircle className="h-4 w-4 text-red-600" />;
       case 'PAYMENT_CANCELLED':
-        return <Clock className="h-4 w-4 text-gray-600" />;
+        return <XCircle className="h-4 w-4 text-gray-600" />;
       default:
         return null;
     }
