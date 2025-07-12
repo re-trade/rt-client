@@ -17,11 +17,10 @@ export const orderStatusApi = {
     );
     return response.data.success ? response.data.content : null;
   },
-  async getNextStepOrderStaus(id: string):  Promise<OrderStatusResponse[]> {
+  async getNextStepOrderStaus(id: string): Promise<OrderStatusResponse[]> {
     const response = await authApi.default.get<IResponseObject<OrderStatusResponse[]>>(
-       `/order-status/next-step/${id}`,
-    )
-    return response.data.success ? response.data.content :[];
+      `/order-status/next-step/${id}`,
+    );
+    return response.data.success ? response.data.content : [];
   },
-
 };

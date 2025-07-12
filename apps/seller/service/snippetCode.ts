@@ -1,7 +1,5 @@
-
-
 export const snipppetCode = {
-   cutCode(code: string) {
+  cutCode(code: string) {
     if (!code) {
       return null;
     }
