@@ -1,16 +1,16 @@
 'use client';
 
-import { Badge } from '@/app/components/ui/badge';
-import { Button } from '@/app/components/ui/button';
-import { Card } from '@/app/components/ui/card';
-import { Input } from '@/app/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/app/components/ui/select';
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -18,10 +18,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/app/components/ui/table';
+} from '@/components/ui/table';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { VoucherDialog } from '../../components/voucher-dialog';
+// import { VoucherDialog } from '../../components/voucher-dialog';
 
 // Sample data - replace with actual API call
 const vouchers = [
@@ -214,7 +214,7 @@ export default function VoucherManagementPage() {
         </Table>
       </Card>
 
-      <VoucherDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      {/* <VoucherDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} /> */}
     </div>
   );
 }
