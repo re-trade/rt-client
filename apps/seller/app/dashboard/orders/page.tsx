@@ -29,7 +29,7 @@ export default function OrdersPage() {
       order.destination.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.destination.phone.includes(searchTerm);
 
-    const matchesStatus = statusFilter === 'all' || order.orderStatus === statusFilter;
+    const matchesStatus = statusFilter === 'all' || order.orderStatus.code === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -48,7 +48,6 @@ export default function OrdersPage() {
     const fetchOrders = async () => {
       try {
         const response = await ordersApi.getAllOrdersBySeller();
-        console.log('Fetched orders:', response);
         setOrders(response);
       } catch (error) {
         console.error('Failed to fetch orders:', error);

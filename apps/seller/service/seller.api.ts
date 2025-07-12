@@ -98,7 +98,7 @@ export const sellerApi = {
   sellerInformation: async (): Promise<SellerProfileResponse | undefined> => {
     try {
       const response =
-        await authApi.default.get<IResponseObject<SellerProfileResponse>>('/sellers');
+        await authApi.default.get<IResponseObject<SellerProfileResponse>>('/sellers/profile');
       return response.data.content;
     } catch {
       return undefined;

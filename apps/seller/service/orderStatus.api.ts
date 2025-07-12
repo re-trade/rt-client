@@ -8,13 +8,20 @@ export type OrderStatusResponse = {
 export const orderStatusApi = {
   async getAllOrderStatuses(): Promise<OrderStatusResponse[]> {
     const response =
-      await authApi.default.get<IResponseObject<OrderStatusResponse[]>>(`/orders/status`);
+      await authApi.default.get<IResponseObject<OrderStatusResponse[]>>(`/order-status`);
     return response.data.success ? response.data.content : [];
   },
   async getOrderStatusById(id: string): Promise<OrderStatusResponse | null> {
     const response = await authApi.default.get<IResponseObject<OrderStatusResponse>>(
-      `/orders/status/${id}`,
+      `/order-status/${id}`,
     );
     return response.data.success ? response.data.content : null;
   },
+  async getNextStepOrderStaus(id: string):  Promise<OrderStatusResponse[]> {
+    const response = await authApi.default.get<IResponseObject<OrderStatusResponse[]>>(
+       `/order-status/next-step/${id}`,
+    )
+    return response.data.success ? response.data.content :[];
+  },
+
 };
