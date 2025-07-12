@@ -1,7 +1,15 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -18,43 +26,34 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { useProductManager } from '@/hooks/use-product-manager';
-import { 
-  ArrowUpDown, 
-  Package, 
-  Search, 
-  RefreshCw, 
-  AlertCircle, 
-  Eye, 
-  CheckCircle, 
-  XCircle, 
-  Filter,
+import {
+  AlertCircle,
+  ArrowUpDown,
   BarChart3,
-  Download,
-  MoreHorizontal,
-  Edit,
-  Trash2,
   Calendar,
+  CheckCircle,
+  Download,
+  Edit,
+  Eye,
+  Filter,
+  Package,
+  RefreshCw,
+  Search,
+  Store,
   Tag,
+  Trash2,
   User,
-  Store
+  XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
 
 // Thống kê sản phẩm
 const ProductStats = ({ products }: { products: any[] }) => {
   const totalProducts = products.length;
-  const verifiedProducts = products.filter(p => p.verified).length;
-  const pendingProducts = products.filter(p => !p.verified).length;
-  const totalValue = products.reduce((sum, p) => sum + (p.currentPrice * p.quantity), 0);
+  const verifiedProducts = products.filter((p) => p.verified).length;
+  const pendingProducts = products.filter((p) => !p.verified).length;
+  const totalValue = products.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -67,7 +66,7 @@ const ProductStats = ({ products }: { products: any[] }) => {
           <Package className="h-8 w-8 text-blue-500" />
         </div>
       </Card>
-      
+
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -77,7 +76,7 @@ const ProductStats = ({ products }: { products: any[] }) => {
           <CheckCircle className="h-8 w-8 text-green-500" />
         </div>
       </Card>
-      
+
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -87,12 +86,14 @@ const ProductStats = ({ products }: { products: any[] }) => {
           <AlertCircle className="h-8 w-8 text-orange-500" />
         </div>
       </Card>
-      
+
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Tổng giá trị</p>
-            <p className="text-2xl font-bold text-purple-600">{totalValue.toLocaleString('vi-VN')} ₫</p>
+            <p className="text-2xl font-bold text-purple-600">
+              {totalValue.toLocaleString('vi-VN')} ₫
+            </p>
           </div>
           <BarChart3 className="h-8 w-8 text-purple-500" />
         </div>
@@ -102,15 +103,15 @@ const ProductStats = ({ products }: { products: any[] }) => {
 };
 
 // Filter nâng cao
-const AdvancedFilters = ({ 
-  searchQuery, 
+const AdvancedFilters = ({
+  searchQuery,
   onSearch,
-  selectedStatus, 
+  selectedStatus,
   setSelectedStatus,
   selectedCategory,
   setSelectedCategory,
   priceRange,
-  setPriceRange 
+  setPriceRange,
 }: any) => {
   return (
     <Card className="p-4">
@@ -118,7 +119,7 @@ const AdvancedFilters = ({
         <Filter className="h-4 w-4" />
         <h3 className="font-medium">Bộ lọc nâng cao</h3>
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -129,7 +130,7 @@ const AdvancedFilters = ({
             className="pl-8"
           />
         </div>
-        
+
         <Select value={selectedStatus} onValueChange={setSelectedStatus}>
           <SelectTrigger>
             <SelectValue placeholder="Trạng thái" />
@@ -141,7 +142,7 @@ const AdvancedFilters = ({
             <SelectItem value="rejected">Từ chối</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger>
             <SelectValue placeholder="Danh mục" />
@@ -154,7 +155,7 @@ const AdvancedFilters = ({
             <SelectItem value="home">Nhà cửa</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Select value={priceRange} onValueChange={setPriceRange}>
           <SelectTrigger>
             <SelectValue placeholder="Khoảng giá" />
@@ -173,25 +174,42 @@ const AdvancedFilters = ({
 };
 
 // Modal xem chi tiết sản phẩm
-const ProductDetailModal = ({ product, isOpen, onClose }: { product: any; isOpen: boolean; onClose: () => void }) => {
+const ProductDetailModal = ({
+  product,
+  isOpen,
+  onClose,
+}: {
+  product: any;
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
   if (!product) return null;
 
   const getConditionText = (condition: string) => {
     switch (condition) {
-      case 'NEW': return 'Mới';
-      case 'LIKE_NEW': return 'Như mới';
-      case 'USED_GOOD': return 'Đã sử dụng - Tốt';
-      case 'DAMAGED': return 'Bị hư hỏng';
-      default: return condition;
+      case 'NEW':
+        return 'Mới';
+      case 'LIKE_NEW':
+        return 'Như mới';
+      case 'USED_GOOD':
+        return 'Đã sử dụng - Tốt';
+      case 'DAMAGED':
+        return 'Bị hư hỏng';
+      default:
+        return condition;
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'ACTIVE': return 'Hoạt động';
-      case 'DRAFT': return 'Bản nháp';
-      case 'INACTIVE': return 'Không hoạt động';
-      default: return status;
+      case 'ACTIVE':
+        return 'Hoạt động';
+      case 'DRAFT':
+        return 'Bản nháp';
+      case 'INACTIVE':
+        return 'Không hoạt động';
+      default:
+        return status;
     }
   };
 
@@ -203,17 +221,15 @@ const ProductDetailModal = ({ product, isOpen, onClose }: { product: any; isOpen
             <Package className="h-5 w-5" />
             Chi tiết sản phẩm
           </DialogTitle>
-          <DialogDescription>
-            Thông tin chi tiết về sản phẩm {product.name}
-          </DialogDescription>
+          <DialogDescription>Thông tin chi tiết về sản phẩm {product.name}</DialogDescription>
         </DialogHeader>
-        
+
         <div className="grid gap-6 md:grid-cols-2">
           {/* Hình ảnh sản phẩm */}
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg border">
-              <img 
-                src={product.thumbnail} 
+              <img
+                src={product.thumbnail}
                 alt={product.name}
                 className="h-full w-full object-cover"
               />
@@ -222,8 +238,8 @@ const ProductDetailModal = ({ product, isOpen, onClose }: { product: any; isOpen
               <div className="grid grid-cols-4 gap-2">
                 {product.productImages.slice(0, 4).map((image: string, index: number) => (
                   <div key={index} className="aspect-square overflow-hidden rounded border">
-                    <img 
-                      src={image} 
+                    <img
+                      src={image}
                       alt={`${product.name} ${index + 1}`}
                       className="h-full w-full object-cover"
                     />
@@ -252,7 +268,15 @@ const ProductDetailModal = ({ product, isOpen, onClose }: { product: any; isOpen
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">Số lượng:</span>
-                <Badge variant={product.quantity > 10 ? "default" : product.quantity > 0 ? "secondary" : "destructive"}>
+                <Badge
+                  variant={
+                    product.quantity > 10
+                      ? 'default'
+                      : product.quantity > 0
+                        ? 'secondary'
+                        : 'destructive'
+                  }
+                >
                   {product.quantity}
                 </Badge>
               </div>
@@ -291,9 +315,13 @@ const ProductDetailModal = ({ product, isOpen, onClose }: { product: any; isOpen
 
               <div className="flex items-center gap-2">
                 <span className="font-medium">Xác minh:</span>
-                <Badge 
-                  variant={product.verified ? "default" : "secondary"}
-                  className={product.verified ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}
+                <Badge
+                  variant={product.verified ? 'default' : 'secondary'}
+                  className={
+                    product.verified
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-orange-100 text-orange-800'
+                  }
                 >
                   {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
                 </Badge>
@@ -303,7 +331,13 @@ const ProductDetailModal = ({ product, isOpen, onClose }: { product: any; isOpen
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">Bảo hành đến:</span>
-                  <span>{new Date(product.warrantyExpiryDate[0], product.warrantyExpiryDate[1] - 1, product.warrantyExpiryDate[2]).toLocaleDateString('vi-VN')}</span>
+                  <span>
+                    {new Date(
+                      product.warrantyExpiryDate[0],
+                      product.warrantyExpiryDate[1] - 1,
+                      product.warrantyExpiryDate[2],
+                    ).toLocaleDateString('vi-VN')}
+                  </span>
                 </div>
               )}
 
@@ -359,20 +393,20 @@ const ProductActions = ({ product, onVerify, onReject, onView, onEdit, onDelete 
       <Button variant="ghost" size="icon" onClick={() => onView(product)}>
         <Eye className="h-4 w-4" />
       </Button>
-      
+
       {!product.verified && (
         <>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => onVerify(product.id)}
             className="text-green-600 hover:text-green-700"
           >
             <CheckCircle className="h-4 w-4" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => onReject(product.id)}
             className="text-red-600 hover:text-red-700"
           >
@@ -380,11 +414,11 @@ const ProductActions = ({ product, onVerify, onReject, onView, onEdit, onDelete 
           </Button>
         </>
       )}
-      
+
       <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>
         <Edit className="h-4 w-4" />
       </Button>
-      
+
       <Button variant="ghost" size="icon" onClick={() => onDelete(product.id)}>
         <Trash2 className="h-4 w-4" />
       </Button>
@@ -402,7 +436,17 @@ export default function ProductManagementPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const { products, page, maxPage, totalProducts, loading, error, refetch, goToPage, searchProducts } = useProductManager();
+  const {
+    products,
+    page,
+    maxPage,
+    totalProducts,
+    loading,
+    error,
+    refetch,
+    goToPage,
+    searchProducts,
+  } = useProductManager();
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -463,25 +507,36 @@ export default function ProductManagementPage() {
   };
 
   // Filter products based on local filters (status, category, price)
-  const filteredProducts = products.filter(product => {
-    const matchesStatus = selectedStatus === 'all' || 
-                         (selectedStatus === 'verified' && product.verified) ||
-                         (selectedStatus === 'pending' && !product.verified);
-    
-    const matchesCategory = selectedCategory === 'all' || 
-                           product.categories.some((cat: any) => cat.name.toLowerCase().includes(selectedCategory.toLowerCase()));
-    
-    const matchesPrice = priceRange === 'all' || (() => {
-      const price = product.currentPrice;
-      switch (priceRange) {
-        case '0-100000': return price < 100000;
-        case '100000-500000': return price >= 100000 && price < 500000;
-        case '500000-1000000': return price >= 500000 && price < 1000000;
-        case '1000000+': return price >= 1000000;
-        default: return true;
-      }
-    })();
-    
+  const filteredProducts = products.filter((product) => {
+    const matchesStatus =
+      selectedStatus === 'all' ||
+      (selectedStatus === 'verified' && product.verified) ||
+      (selectedStatus === 'pending' && !product.verified);
+
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      product.categories.some((cat: any) =>
+        cat.name.toLowerCase().includes(selectedCategory.toLowerCase()),
+      );
+
+    const matchesPrice =
+      priceRange === 'all' ||
+      (() => {
+        const price = product.currentPrice;
+        switch (priceRange) {
+          case '0-100000':
+            return price < 100000;
+          case '100000-500000':
+            return price >= 100000 && price < 500000;
+          case '500000-1000000':
+            return price >= 500000 && price < 1000000;
+          case '1000000+':
+            return price >= 1000000;
+          default:
+            return true;
+        }
+      })();
+
     return matchesStatus && matchesCategory && matchesPrice;
   });
 
@@ -519,7 +574,7 @@ export default function ProductManagementPage() {
       <ProductStats products={products} />
 
       {/* Advanced Filters */}
-      <AdvancedFilters 
+      <AdvancedFilters
         searchQuery={searchQuery}
         onSearch={handleSearch}
         selectedStatus={selectedStatus}
@@ -600,21 +655,27 @@ export default function ProductManagementPage() {
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         {product.thumbnail && (
-                          <img 
-                            src={product.thumbnail} 
+                          <img
+                            src={product.thumbnail}
                             alt={product.name}
                             className="w-10 h-10 rounded object-cover"
                           />
                         )}
                         <div>
                           <div className="font-medium">{product.name}</div>
-                          <div className="text-sm text-muted-foreground">{product.shortDescription}</div>
-                          <div className="text-xs text-muted-foreground">{product.brand} • {product.model}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {product.shortDescription}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {product.brand} • {product.model}
+                          </div>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium">{product.currentPrice.toLocaleString('vi-VN')} ₫</div>
+                      <div className="font-medium">
+                        {product.currentPrice.toLocaleString('vi-VN')} ₫
+                      </div>
                       {product.quantity > 0 ? (
                         <div className="text-sm text-green-600">Còn hàng</div>
                       ) : (
@@ -622,13 +683,23 @@ export default function ProductManagementPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={product.quantity > 10 ? "default" : product.quantity > 0 ? "secondary" : "destructive"}>
+                      <Badge
+                        variant={
+                          product.quantity > 10
+                            ? 'default'
+                            : product.quantity > 0
+                              ? 'secondary'
+                              : 'destructive'
+                        }
+                      >
                         {product.quantity}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm font-medium">{product.sellerShopName}</div>
-                      <div className="text-xs text-muted-foreground">ID: {product.sellerId.slice(0, 8)}...</div>
+                      <div className="text-xs text-muted-foreground">
+                        ID: {product.sellerId.slice(0, 8)}...
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
@@ -645,16 +716,20 @@ export default function ProductManagementPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge 
-                        variant={product.verified ? "default" : "secondary"}
-                        className={product.verified ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}
+                      <Badge
+                        variant={product.verified ? 'default' : 'secondary'}
+                        className={
+                          product.verified
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-orange-100 text-orange-800'
+                        }
                       >
                         {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
                       </Badge>
                     </TableCell>
                     <TableCell>{new Date(product.createdAt).toLocaleDateString('vi-VN')}</TableCell>
                     <TableCell className="text-right">
-                      <ProductActions 
+                      <ProductActions
                         product={product}
                         onVerify={handleVerify}
                         onReject={handleReject}
@@ -673,7 +748,8 @@ export default function ProductManagementPage() {
         {!loading && products.length > 0 && (
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Hiển thị {products.length} sản phẩm trên trang {page} / {maxPage} (Tổng cộng {totalProducts} sản phẩm)
+              Hiển thị {products.length} sản phẩm trên trang {page} / {maxPage} (Tổng cộng{' '}
+              {totalProducts} sản phẩm)
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -701,7 +777,7 @@ export default function ProductManagementPage() {
       </Card>
 
       {/* Product Detail Modal */}
-      <ProductDetailModal 
+      <ProductDetailModal
         product={selectedProduct}
         isOpen={isDetailModalOpen}
         onClose={() => {
