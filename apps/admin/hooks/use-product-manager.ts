@@ -16,14 +16,14 @@ const useProductManager = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Tính toán page cho API (API sử dụng 0-based indexing)
       const apiPage = currentPage - 1;
       const pageSize = 10; // 10 sản phẩm mỗi trang
-      
+
       // Sử dụng API mới getAllProducts với pagination và search
       const response = await productApi.getAllProducts(apiPage, pageSize, searchQuery);
-      
+
       if (response.success) {
         setProducts(response.content || []);
         setTotalProducts(response.pagination?.totalElements || 0);
@@ -42,15 +42,21 @@ const useProductManager = () => {
     }
   }, []);
 
-  const goToPage = useCallback((newPage: number, searchQuery?: string) => {
-    if (newPage >= 1 && newPage <= maxPage) {
-      fetchProducts(newPage, searchQuery);
-    }
-  }, [maxPage, fetchProducts]);
+  const goToPage = useCallback(
+    (newPage: number, searchQuery?: string) => {
+      if (newPage >= 1 && newPage <= maxPage) {
+        fetchProducts(newPage, searchQuery);
+      }
+    },
+    [maxPage, fetchProducts],
+  );
 
-  const searchProducts = useCallback((query: string) => {
-    fetchProducts(1, query); // Reset về trang 1 khi search
-  }, [fetchProducts]);
+  const searchProducts = useCallback(
+    (query: string) => {
+      fetchProducts(1, query); // Reset về trang 1 khi search
+    },
+    [fetchProducts],
+  );
 
   useEffect(() => {
     fetchProducts(1); // Load trang đầu tiên khi component mount
