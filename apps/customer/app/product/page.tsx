@@ -1,409 +1,189 @@
 'use client';
-
-import React, { useState } from 'react';
-
-const productsData = [
-  {
-    id: 1,
-    name: 'Áo thun nam',
-    category: 'Thời trang',
-    price: 150000,
-    image: 'https://via.placeholder.com/150?text=Aothun',
-    location: 'Hà Nội',
-    logistics: 'Hỏa Tốc',
-    brand: 'NoBrand',
-    shopType: 'Shopee Mall',
-    condition: 'Mới',
-    rating: 5,
-    promotions: ['Đang giảm giá'],
-  },
-  {
-    id: 2,
-    name: 'Tai nghe Bluetooth',
-    category: 'Điện tử',
-    price: 500000,
-    image: 'https://via.placeholder.com/150?text=Tai+nghe',
-    location: 'TP. Hồ Chí Minh',
-    logistics: 'Nhanh',
-    brand: 'Goodtool',
-    shopType: 'Shop Yêu thích',
-    condition: 'Mới',
-    rating: 4,
-    promotions: ['Hàng có sẵn'],
-  },
-  {
-    id: 3,
-    name: 'Giày thể thao',
-    category: 'Thời trang',
-    price: 750000,
-    image: 'https://via.placeholder.com/150?text=Giay',
-    location: 'Bình Dương',
-    logistics: 'Tiết Kiệm',
-    brand: 'NoBrand',
-    shopType: 'Normal',
-    condition: 'Đã sử dụng',
-    rating: 3,
-    promotions: [],
-  },
-  {
-    id: 4,
-    name: 'Sách kỹ năng',
-    category: 'Sách',
-    price: 120000,
-    image: 'https://via.placeholder.com/150?text=Sach',
-    location: 'Thái Nguyên',
-    logistics: 'Nhanh',
-    brand: 'NoBrand',
-    shopType: 'Shopee Mall',
-    condition: 'Mới',
-    rating: 5,
-    promotions: ['Gì Cũng Rẻ'],
-  },
-  {
-    id: 5,
-    name: 'Laptop gaming',
-    category: 'Điện tử',
-    price: 15000000,
-    image: 'https://via.placeholder.com/150?text=Laptop',
-    location: 'Hà Nội',
-    logistics: 'Hỏa Tốc',
-    brand: 'Goodtool',
-    shopType: 'Shop Yêu thích',
-    condition: 'Mới',
-    rating: 4,
-    promotions: ['Mua giá bán buôn/ bán sỉ'],
-  },
-];
-
-const categories = ['Thời trang', 'Điện tử', 'Sách'];
-const locations = ['Bình Dương', 'Hà Nội', 'TP. Hồ Chí Minh', 'Thái Nguyên'];
-const logisticsOptions = ['Hỏa Tốc', 'Nhanh', 'Tiết Kiệm'];
-const brands = ['NoBrand', 'Goodtool'];
-const shopTypes = ['Shopee Mall', 'Shop Yêu thích', 'Normal'];
-const conditions = ['Mới', 'Đã sử dụng'];
-const ratings = [5, 4, 3, 2];
-const promotions = ['Đang giảm giá', 'Hàng có sẵn', 'Mua giá bán buôn/ bán sỉ', 'Gì Cũng Rẻ'];
+import ProductCard from '@/components/product/ProductCard';
+import { useProductList } from '@/hooks/use-product-list';
+import PaginationBar from '@components/common/PaginationBar';
+import ProductFilter from '@components/product/FillterProduct';
+import ProductCardSkeleton from '@components/product/ProductCardSkeleton';
+import { IconFilter, IconGridDots, IconList } from '@tabler/icons-react';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 export default function ProductListPage() {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-  const [selectedLogistics, setSelectedLogistics] = useState<string[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedShopTypes, setSelectedShopTypes] = useState<string[]>([]);
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
-  const [minPrice, setMinPrice] = useState<number | ''>('');
-  const [maxPrice, setMaxPrice] = useState<number | ''>('');
-  const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [selectedPromotions, setSelectedPromotions] = useState<string[]>([]);
-
-  const toggleFilter = (
-    filter: string,
-    setFilter: React.Dispatch<React.SetStateAction<string[]>>,
-  ) => {
-    setFilter((prev) =>
-      prev.includes(filter) ? prev.filter((c) => c !== filter) : [...prev, filter],
-    );
-  };
-
-  const resetAllFilters = () => {
-    setSelectedCategories([]);
-    setSelectedLocations([]);
-    setSelectedLogistics([]);
-    setSelectedBrands([]);
-    setSelectedShopTypes([]);
-    setSelectedConditions([]);
-    setMinPrice('');
-    setMaxPrice('');
-    setSelectedRating(null);
-    setSelectedPromotions([]);
-  };
-
-  const filteredProducts = productsData.filter((product) => {
-    if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
-      return false;
-    }
-    if (selectedLocations.length > 0 && !selectedLocations.includes(product.location)) {
-      return false;
-    }
-    if (selectedLogistics.length > 0 && !selectedLogistics.includes(product.logistics)) {
-      return false;
-    }
-    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
-      return false;
-    }
-    if (selectedShopTypes.length > 0 && !selectedShopTypes.includes(product.shopType)) {
-      return false;
-    }
-    if (selectedConditions.length > 0 && !selectedConditions.includes(product.condition)) {
-      return false;
-    }
-    if (minPrice !== '' && product.price < Number(minPrice)) {
-      return false;
-    }
-    if (maxPrice !== '' && product.price > Number(maxPrice)) {
-      return false;
-    }
-    if (selectedRating !== null && product.rating < selectedRating) {
-      return false;
-    }
-    if (
-      selectedPromotions.length > 0 &&
-      !selectedPromotions.every((promo) => product.promotions.includes(promo))
-    ) {
-      return false;
-    }
-    return true;
-  });
+  const {
+    products,
+    loading,
+    isPaginating,
+    filter,
+    filterLoading,
+    handlePageChange,
+    handleFilterReset,
+    handleSelectedFilterChange,
+    selectedFilter,
+    page,
+    maxPage,
+  } = useProductList();
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchTerm, setSearchTerm] = useState('');
+  const productsPerPage = 12;
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
-    <div className="max-w-[80%] mx-auto px-10 py-10 grid grid-cols-12 gap-6 font-[Open_Sans]">
-      <aside className="col-span-12 md:col-span-3 border border-gray-300 rounded-md p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <svg enableBackground="new 0 0 15 15" viewBox="0 0 15 15" x="0" y="0" className="w-5 h-5">
-            <g>
-              <polyline
-                fill="none"
-                points="5.5 13.2 5.5 5.8 1.5 1.2 13.5 1.2 9.5 5.8 9.5 10.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeMiterlimit="10"
-                stroke="currentColor"
-              ></polyline>
-            </g>
-          </svg>
-          <h2 className="font-semibold text-xl">Bộ lọc tìm kiếm</h2>
-        </div>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Theo Danh Mục</legend>
-          {categories.map((category) => (
-            <label key={category} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedCategories.includes(category)}
-                onChange={() => toggleFilter(category, setSelectedCategories)}
-                className="form-checkbox h-4 w-4 text-[#ee4d2d]"
-              />
-              <span>{category}</span>
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Nơi Bán</legend>
-          {locations.map((location) => (
-            <label key={location} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedLocations.includes(location)}
-                onChange={() => toggleFilter(location, setSelectedLocations)}
-                className="form-checkbox h-4 w-4 text-[#ee4d2d]"
-              />
-              <span>{location}</span>
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Đơn Vị Vận Chuyển</legend>
-          {logisticsOptions.map((logistic) => (
-            <label key={logistic} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedLogistics.includes(logistic)}
-                onChange={() => toggleFilter(logistic, setSelectedLogistics)}
-                className="form-checkbox h-4 w-4 text-[#ee4d2d]"
-              />
-              <span>{logistic}</span>
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Thương Hiệu</legend>
-          {brands.map((brand) => (
-            <label key={brand} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedBrands.includes(brand)}
-                onChange={() => toggleFilter(brand, setSelectedBrands)}
-                className="form-checkbox h-4 w-4 text-[#ee4d2d]"
-              />
-              <span>{brand}</span>
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Khoảng Giá</legend>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              placeholder="₫ TỪ"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value === '' ? '' : Number(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              maxLength={13}
-            />
-            <div className="border-t border-gray-300 w-4 my-3"></div>
-            <input
-              type="text"
-              placeholder="₫ ĐẾN"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              maxLength={13}
-            />
-          </div>
-          <button
-            className="w-full bg-[#ee4d2d] text-white p-2 rounded-md hover:bg-[#d9431f]"
-            onClick={() => {
-              setMinPrice('');
-              setMaxPrice('');
-            }}
-          >
-            Áp dụng
-          </button>
-        </fieldset>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Loại Shop</legend>
-          {shopTypes.map((type) => (
-            <label key={type} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedShopTypes.includes(type)}
-                onChange={() => toggleFilter(type, setSelectedShopTypes)}
-                className="form-checkbox h-4 w-4 text-[#ee4d2d]"
-              />
-              <span>{type}</span>
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Tình Trạng</legend>
-          {conditions.map((condition) => (
-            <label key={condition} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedConditions.includes(condition)}
-                onChange={() => toggleFilter(condition, setSelectedConditions)}
-                className="form-checkbox h-4 w-4 text-[#ee4d2d]"
-              />
-              <span>{condition}</span>
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Đánh Giá</legend>
-          {ratings.map((rating) => (
-            <label key={rating} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="radio"
-                name="rating"
-                value={rating}
-                checked={selectedRating === rating}
-                onChange={() => setSelectedRating(rating)}
-                className="form-radio h-4 w-4 text-[#ee4d2d]"
-              />
-              <div className="flex">
-                {Array(5)
-                  .fill(0)
-                  .map((_, i) => (
-                    <svg
-                      key={i}
-                      viewBox="0 0 9.5 8"
-                      className={`w-3 h-3 ${i < rating ? 'fill-[#ffca11]' : 'fill-gray-300'}`}
-                    >
-                      <defs>
-                        <linearGradient id="ratingStarGradient" x1="50%" x2="50%" y1="0%" y2="100%">
-                          <stop offset="0" stopColor="#ffca11" />
-                          <stop offset="1" stopColor="#ffad27" />
-                        </linearGradient>
-                      </defs>
-                      <g
-                        fill={i < rating ? 'url(#ratingStarGradient)' : 'none'}
-                        stroke="#ffa727"
-                        strokeWidth="0.5"
-                      >
-                        <polygon points="14.910357 6.35294118 12.4209136 7.66171903 12.896355 4.88968305 10.8823529 2.92651626 13.6656353 2.52208166 14.910357 0 16.1550787 2.52208166 18.9383611 2.92651626 16.924359 4.88968305 17.3998004 7.66171903" />
-                      </g>
-                    </svg>
-                  ))}
-              </div>
-              <span> trở lên</span>
-            </label>
-          ))}
-          {selectedRating !== null && (
-            <button
-              onClick={() => setSelectedRating(null)}
-              className="text-sm text-[#ee4d2d] mt-2 hover:underline"
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100">
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <aside className="lg:col-span-1">
+            <motion.div
+              className="sticky top-4"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              Xóa bộ lọc đánh giá
-            </button>
-          )}
-        </fieldset>
+              <div className="bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden">
+                <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4">
+                  <div className="flex items-center gap-2">
+                    <IconFilter size={20} />
+                    <h2 className="font-bold text-lg">Bộ lọc sản phẩm</h2>
+                  </div>
+                </div>
 
-        <fieldset className="mb-6">
-          <legend className="font-semibold mb-2">Dịch Vụ & Khuyến Mãi</legend>
-          {promotions.map((promotion) => (
-            <label key={promotion} className="flex items-center gap-2 mb-1 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedPromotions.includes(promotion)}
-                onChange={() => toggleFilter(promotion, setSelectedPromotions)}
-                className="form-checkbox h-4 w-4 text-[#ee4d2d]"
-              />
-              <span>{promotion}</span>
-            </label>
-          ))}
-        </fieldset>
+                <ProductFilter
+                  selectedFilter={selectedFilter}
+                  filter={filter}
+                  handleFilterReset={handleFilterReset}
+                  handleSelectedFilterChange={handleSelectedFilterChange}
+                  filterLoading={filterLoading}
+                />
+              </div>
+            </motion.div>
+          </aside>
 
-        {(selectedCategories.length > 0 ||
-          selectedLocations.length > 0 ||
-          selectedLogistics.length > 0 ||
-          selectedBrands.length > 0 ||
-          selectedShopTypes.length > 0 ||
-          selectedConditions.length > 0 ||
-          minPrice !== '' ||
-          maxPrice !== '' ||
-          selectedRating !== null ||
-          selectedPromotions.length > 0) && (
-          <button
-            className="w-full bg-[#ee4d2d] text-white p-2 rounded-md hover:bg-[#d9431f]"
-            onClick={resetAllFilters}
-          >
-            Xóa tất cả
-          </button>
-        )}
-      </aside>
+          <main className="lg:col-span-3">
+            <motion.div
+              className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-6 rounded-xl shadow-lg border border-orange-100"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  Sản phẩm
+                  <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+                    ({filteredProducts.length})
+                  </span>
+                </h2>
+                {searchTerm && (
+                  <p className="text-gray-600">
+                    Kết quả tìm kiếm cho: &#34;
+                    <span className="font-semibold text-orange-600">{searchTerm}</span>&#34;
+                  </p>
+                )}
+              </div>
 
-      <section className="col-span-12 md:col-span-9">
-        <h2 className="font-semibold text-xl mb-6">{filteredProducts.length} sản phẩm</h2>
-        {filteredProducts.length === 0 && (
-          <p className="text-gray-500">Không có sản phẩm phù hợp.</p>
-        )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="border border-gray-300 rounded-md p-4 flex flex-col">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-40 object-cover mb-4 rounded"
-              />
-              <h3 className="font-semibold text-lg">{product.name}</h3>
-              <p className="text-[#ee4d2d] font-semibold mt-auto">
-                {product.price.toLocaleString('vi-VN', {
-                  style: 'currency',
-                  currency: 'VND',
-                })}
-              </p>
-            </div>
-          ))}
+              <div className="flex items-center gap-2">
+                <div className="btn-group">
+                  <button
+                    className={`btn btn-sm ${viewMode === 'grid' ? 'btn-active bg-orange-500 border-orange-500' : 'btn-outline border-orange-200'}`}
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <IconGridDots size={16} />
+                  </button>
+                  <button
+                    className={`btn btn-sm ${viewMode === 'list' ? 'btn-active bg-orange-500 border-orange-500' : 'btn-outline border-orange-200'}`}
+                    onClick={() => setViewMode('list')}
+                  >
+                    <IconList size={16} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+
+            {loading ? (
+              <div
+                className={`grid gap-6 ${
+                  viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'
+                }`}
+              >
+                {[...Array(6)].map((_, i) => (
+                  <ProductCardSkeleton key={i} index={i} />
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <motion.div
+                className="text-center py-16 bg-white rounded-xl shadow-lg border border-orange-100"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  Không tìm thấy sản phẩm
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc của bạn
+                </p>
+                <button
+                  className="btn bg-gradient-to-r from-orange-500 to-orange-600 text-white border-none hover:from-orange-600 hover:to-orange-700"
+                  onClick={() => {
+                    setSearchTerm('');
+                    handlePageChange(0);
+                  }}
+                >
+                  Xóa bộ lọc
+                </button>
+              </motion.div>
+            ) : (
+              <>
+                <div
+                  className={`grid gap-6 ${
+                    viewMode === 'grid'
+                      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                      : 'grid-cols-1'
+                  }`}
+                >
+                  {products.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      className="transform hover:scale-105 transition-transform duration-300"
+                    >
+                      <ProductCard
+                        id={product.id}
+                        name={product.name}
+                        price={product.currentPrice}
+                        image={product.thumbnail}
+                        shortDescription={product.shortDescription}
+                        brand={product.brand}
+                        verified={product.verified}
+                        sellerShopName={product.sellerShopName}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+
+                <PaginationBar
+                  currentPage={page}
+                  totalPages={maxPage}
+                  onPageChange={handlePageChange}
+                  loading={isPaginating}
+                />
+                <motion.div
+                  className="text-center mt-8 text-gray-600"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                >
+                  Hiển thị {page + 1}-{Math.min(page + productsPerPage, filteredProducts.length)}{' '}
+                  trong tổng số {filteredProducts.length} sản phẩm
+                </motion.div>
+              </>
+            )}
+          </main>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

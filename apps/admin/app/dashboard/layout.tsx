@@ -1,22 +1,6 @@
 'use client';
 
 import {
-  AlertCircle,
-  BarChart3,
-  DollarSign,
-  FileText,
-  LayoutDashboard,
-  Package,
-  Settings,
-  ShoppingCart,
-  Store,
-  Ticket,
-  Users,
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import type React from 'react';
-import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -28,7 +12,21 @@ import {
   SidebarProvider,
   SidebarTrigger,
   useSidebar,
-} from '../components/ui/sidebar';
+} from '@/components/ui/sidebar';
+import {
+  AlertCircle,
+  BarChart3,
+  DollarSign,
+  FileText,
+  LayoutDashboard,
+  Package,
+  Settings,
+  Store,
+  Users,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import type React from 'react';
 
 const menuItems = [
   {
@@ -41,18 +39,16 @@ const menuItems = [
   {
     group: 'Quản lý',
     items: [
-      { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product-management' },
-      { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user-management' },
-      { title: 'Quản lý đơn hàng', icon: ShoppingCart, href: '/dashboard/order-management' },
-      { title: 'Quản lý shop', icon: Store, href: '/dashboard/shop-management' },
-      { title: 'Quản lý voucher', icon: Ticket, href: '/dashboard/voucher-management' },
+      { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product' },
+      { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user' },
+      { title: 'Quản lý Seller', icon: Store, href: '/dashboard/seller' },
     ],
   },
   {
     group: 'Tài chính',
     items: [
-      { title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue-management' },
-      { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial-reports' },
+      { title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue' },
+      { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial' },
     ],
   },
   {

@@ -1,12 +1,5 @@
 'use client';
-/*
-
-const Dashboard = () => {
-  return <></>;
-};
-
-export default Dashboard;*/
-// app/admin/page.tsx
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Activity,
   ArrowDownRight,
@@ -17,7 +10,6 @@ import {
   Users,
 } from 'lucide-react';
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
 const StatCard = ({
   title,

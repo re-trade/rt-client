@@ -152,7 +152,7 @@ apps/admin/
 ├── app/                          # Next.js App Router
 │   ├── admin/                    # Admin routes
 │   │   ├── layout.tsx           # Admin layout
-│   │   ├── page.tsx             # Admin dashboard
+│   │   ├── RelatedProduct.tsx             # Admin dashboard
 │   │   ├── products/            # Product management
 │   │   └── users/               # User management
 │   ├── dashboard/               # Main dashboard
@@ -166,7 +166,7 @@ apps/admin/
 │   │   ├── shop-management/     # Shop administration
 │   │   ├── user-management/     # User administration
 │   │   ├── layout.tsx           # Dashboard layout
-│   │   └── page.tsx             # Dashboard home
+│   │   └── RelatedProduct.tsx             # Dashboard home
 │   ├── components/              # Shared components
 │   │   ├── AdminNavbar.tsx      # Navigation component
 │   │   ├── ProductTable.tsx     # Product data table
