@@ -26,12 +26,12 @@ import { useState } from 'react';
 
 const statusLabels: Record<string, string> = {
   true: 'Đang hoạt động',
-  false: 'Chờ duyệt',
+  false: 'Không hoạt động',
 };
 
 const statusColors: Record<string, string> = {
   true: 'bg-green-100 text-green-800',
-  false: 'bg-yellow-100 text-yellow-800',
+  false: 'bg-red-100 text-yellow-800',
 };
 
 export default function ShopManagementPage() {
@@ -46,6 +46,8 @@ export default function ShopManagementPage() {
     setSearchQuery,
     pageSize: itemsPerPage,
     stats,
+    banSeller,
+    unbanSeller,
   } = useSellerManager();
 
   if (loading) return <div>Loading sellers...</div>;
@@ -53,6 +55,15 @@ export default function ShopManagementPage() {
 
   const handleViewDetails = (seller: TSellerProfile) => {
     setSelectedSeller(seller);
+  };
+
+  const handleToggleStatus = async (seller: TSellerProfile) => {
+    const success = seller.verified
+      ? await banSeller(seller.id) // Đang hoạt động → call unbanSeller
+      : await unbanSeller(seller.id); // Chờ duyệt → call banSeller
+    if (success) {
+      setSelectedSeller(null); // Close the dialog on success
+    }
   };
 
   return (
@@ -234,12 +245,14 @@ export default function ShopManagementPage() {
                   Đóng
                 </Button>
                 <Button
-                  variant="destructive"
-                  onClick={() => {
-                    console.log('Toggle status for seller:', selectedSeller.id);
-                  }}
+                  className={
+                    selectedSeller.verified
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  }
+                  onClick={() => handleToggleStatus(selectedSeller)}
                 >
-                  {selectedSeller.verified ? 'Khóa cửa hàng' : 'Xác thực cửa hàng'}
+                  {selectedSeller.verified ? 'Vô hiệu hóa người bán' : 'Xác thực người bán'}
                 </Button>
               </DialogFooter>
             </div>
