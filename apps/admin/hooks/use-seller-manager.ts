@@ -1,6 +1,6 @@
 'use client';
 
-import { getSellers, TSellerProfile } from '@/services/seller.api';
+import { getSellers, banSeller, unbanSeller, TSellerProfile } from '@/services/seller.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const useSellerManager = () => {
@@ -17,7 +17,6 @@ const useSellerManager = () => {
     setError(null);
     try {
       const result = await getSellers(page, pageSize, searchQuery);
-      console.log(result);
       if (result?.success) {
         setSellers(result.content || []);
         setTotal(result.content?.length || 0);
@@ -32,6 +31,43 @@ const useSellerManager = () => {
       setLoading(false);
     }
   }, [page, searchQuery]);
+
+  const handleBanSeller = useCallback(
+    async (id: string) => {
+      try {
+        const result = await banSeller(id);
+        if (result?.success) {
+          await fetchSeller(); // Refresh the seller list
+          return true;
+        }
+        setError('Failed to ban seller');
+        return false;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to ban seller');
+        return false;
+      }
+    },
+    [fetchSeller],
+  );
+
+  // Unban a seller
+  const handleUnbanSeller = useCallback(
+    async (id: string) => {
+      try {
+        const result = await unbanSeller(id);
+        if (result?.success) {
+          await fetchSeller(); // Refresh the seller list
+          return true;
+        }
+        setError('Failed to unban seller');
+        return false;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to unban seller');
+        return false;
+      }
+    },
+    [fetchSeller],
+  );
 
   useEffect(() => {
     fetchSeller();
@@ -57,6 +93,8 @@ const useSellerManager = () => {
     pageSize,
     stats,
     refresh: fetchSeller,
+    banSeller: handleBanSeller,
+    unbanSeller: handleUnbanSeller,
   };
 };
 
