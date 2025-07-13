@@ -132,7 +132,7 @@ export function UpdateStatusDialog({
       CANCELLED: {
         color: 'bg-red-50 text-red-700 border-red-200',
         icon: <Ban className="h-4 w-4" />,
-        text: 'Đã hủy',
+        text: 'Huỷ đơn',
         bgColor: 'bg-red-500',
       },
       RETURNING: {
@@ -303,6 +303,7 @@ export function UpdateStatusDialog({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">Chuyển trạng thái</h3>
+
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Info className="h-4 w-4" />
                 <span>Chọn trạng thái tiếp theo</span>
@@ -336,24 +337,26 @@ export function UpdateStatusDialog({
               </div>
 
               {/* New Status */}
-              <Card className="border-2 border-blue-200 bg-blue-50/30">
-                <CardContent className="p-4 text-center">
-                  <div className="mb-3">
-                    <div
-                      className={cn(
-                        'inline-flex h-12 w-12 items-center justify-center rounded-full',
-                        newStatusConfig.bgColor,
-                      )}
-                    >
-                      {newStatusConfig.icon}
+              {newStatus.code !== order.orderStatus.code && (
+                <Card className="border-2 border-blue-200 bg-blue-50/30">
+                  <CardContent className="p-4 text-center">
+                    <div className="mb-3">
+                      <div
+                        className={cn(
+                          'inline-flex h-12 w-12 items-center justify-center rounded-full',
+                          newStatusConfig.bgColor,
+                        )}
+                      >
+                        {newStatusConfig.icon}
+                      </div>
                     </div>
-                  </div>
-                  <h4 className="font-medium text-gray-900 mb-1">Mới</h4>
-                  <Badge className={cn('text-xs', newStatusConfig.color)}>
-                    {newStatusConfig.text}
-                  </Badge>
-                </CardContent>
-              </Card>
+                    <h4 className="font-medium text-gray-900 mb-1">Mới</h4>
+                    <Badge className={cn('text-xs', newStatusConfig.color)}>
+                      {newStatusConfig.text}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
 
@@ -363,9 +366,6 @@ export function UpdateStatusDialog({
           <div className="space-y-4">
             <div>
               <Label className="text-base font-medium">Chọn trạng thái mới</Label>
-              <p className="text-sm text-gray-600 mt-1">
-                Chỉ hiển thị các trạng thái có thể chuyển đổi
-              </p>
             </div>
 
             <Select
