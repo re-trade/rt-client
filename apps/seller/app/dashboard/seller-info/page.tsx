@@ -206,7 +206,7 @@ export default function ShopInfoManagement() {
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto" />
-          <p className="text-gray-600 font-medium">Đang tải thông tin cửa hàng...</p>
+          <p className="text-gray-600 font-medium">Đang tải thông tin của bạn...</p>
         </div>
       </div>
     );
@@ -218,9 +218,9 @@ export default function ShopInfoManagement() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div className="space-y-2 text-left">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Thông tin cửa hàng
+              Thông tin của bạn
             </h1>
-            <p className="text-gray-600">Quản lý thông tin và thiết lập cửa hàng của bạn</p>
+            <p className="text-gray-600">Quản lý thông tin và thiết lập trang bán của bạn</p>
           </div>
 
           {/* Action Button */}
