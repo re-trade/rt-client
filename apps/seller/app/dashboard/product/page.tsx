@@ -37,25 +37,24 @@ import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
 import {
   AlertCircle,
+  BarChart3,
   CheckCircle,
+  ChevronDown,
+  DollarSign,
   Edit,
   Eye,
   Filter,
   MoreHorizontal,
   Package,
   Plus,
-  Search,
-  Trash,
-  XCircle,
-  ChevronDown,
   RefreshCw,
-  TrendingUp,
+  Search,
   Star,
-  ShoppingCart,
   Tags,
-  DollarSign,
-  BarChart3,
+  Trash,
+  TrendingUp,
   X,
+  XCircle,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -112,10 +111,10 @@ export default function ProductManagement() {
   // Statistics
   const stats = useMemo(() => {
     const totalProducts = productList.length;
-    const activeProducts = productList.filter(p => p.status === 'ACTIVE').length;
-    const verifiedProducts = productList.filter(p => p.verified).length;
-    const totalValue = productList.reduce((sum, p) => sum + (p.currentPrice * p.quantity), 0);
-    
+    const activeProducts = productList.filter((p) => p.status === 'ACTIVE').length;
+    const verifiedProducts = productList.filter((p) => p.verified).length;
+    const totalValue = productList.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0);
+
     return {
       totalProducts,
       activeProducts,
@@ -169,7 +168,7 @@ export default function ProductManagement() {
 
   // Active filters count
   const activeFiltersCount = useMemo(() => {
-    return Object.values(filters).filter(value => value !== '').length;
+    return Object.values(filters).filter((value) => value !== '').length;
   }, [filters]);
 
   useEffect(() => {
@@ -327,7 +326,9 @@ export default function ProductManagement() {
             >
               <Filter className="w-4 h-4" />
               Bộ lọc
-              <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`}
+              />
               {activeFiltersCount > 0 && (
                 <Badge className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center">
                   {activeFiltersCount}
@@ -561,20 +562,28 @@ export default function ProductManagement() {
                   <TableHeader>
                     <TableRow className="border-slate-200 bg-slate-50/50">
                       <TableHead className="w-20 font-semibold text-slate-700">Hình ảnh</TableHead>
-                      <TableHead className="min-w-40 font-semibold text-slate-700">Tên sản phẩm</TableHead>
+                      <TableHead className="min-w-40 font-semibold text-slate-700">
+                        Tên sản phẩm
+                      </TableHead>
                       <TableHead className="w-32 font-semibold text-slate-700">Giá</TableHead>
-                      <TableHead className="w-32 font-semibold text-slate-700">Thương hiệu</TableHead>
+                      <TableHead className="w-32 font-semibold text-slate-700">
+                        Thương hiệu
+                      </TableHead>
                       <TableHead className="w-20 font-semibold text-slate-700">Số lượng</TableHead>
-                      <TableHead className="min-w-40 font-semibold text-slate-700">Danh mục</TableHead>
-                      <TableHead className="w-36 font-semibold text-slate-700">Trạng thái</TableHead>
+                      <TableHead className="min-w-40 font-semibold text-slate-700">
+                        Danh mục
+                      </TableHead>
+                      <TableHead className="w-36 font-semibold text-slate-700">
+                        Trạng thái
+                      </TableHead>
                       <TableHead className="w-36 font-semibold text-slate-700">Xác minh</TableHead>
                       <TableHead className="w-24 font-semibold text-slate-700">Thao tác</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredProducts.map((product, index) => (
-                      <TableRow 
-                        key={product.id} 
+                      <TableRow
+                        key={product.id}
                         className="hover:bg-slate-50/50 transition-colors border-slate-100"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
@@ -629,24 +638,29 @@ export default function ProductManagement() {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button 
-                                variant="ghost" 
+                              <Button
+                                variant="ghost"
                                 className="h-8 w-8 p-0 hover:bg-slate-100 border border-transparent hover:border-slate-200"
                               >
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm shadow-xl border-slate-200">
-                              <DropdownMenuLabel className="text-slate-700">Thao tác</DropdownMenuLabel>
+                            <DropdownMenuContent
+                              align="end"
+                              className="bg-white/95 backdrop-blur-sm shadow-xl border-slate-200"
+                            >
+                              <DropdownMenuLabel className="text-slate-700">
+                                Thao tác
+                              </DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 onClick={() => handleEditProduct(product)}
                                 className="hover:bg-blue-50 hover:text-blue-700"
                               >
                                 <Eye className="mr-2 h-4 w-4" />
                                 Xem chi tiết
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 onClick={() => handleEditProduct(product)}
                                 className="hover:bg-amber-50 hover:text-amber-700"
                               >
@@ -674,7 +688,7 @@ export default function ProductManagement() {
         ) : (
           <Card className="border-0 shadow-lg shadow-slate-200/50 bg-white/80 backdrop-blur-sm">
             <CardContent className="flex flex-col items-center justify-center py-16">
-                              <div className="text-center max-w-md">
+              <div className="text-center max-w-md">
                 <div className="relative mb-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center mx-auto">
                     <Package className="w-10 h-10 text-slate-400" />
@@ -683,23 +697,25 @@ export default function ProductManagement() {
                     <Search className="w-4 h-4 text-blue-600" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Không tìm thấy sản phẩm</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                  Không tìm thấy sản phẩm
+                </h3>
                 <p className="text-slate-500 mb-6">
                   {productList.length === 0
                     ? 'Chưa có sản phẩm nào. Hãy tạo sản phẩm đầu tiên của bạn!'
                     : 'Không có sản phẩm nào phù hợp với bộ lọc hiện tại. Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm khác.'}
                 </p>
                 {productList.length === 0 ? (
-                  <Button 
-                    onClick={() => setIsCreateOpen(true)} 
+                  <Button
+                    onClick={() => setIsCreateOpen(true)}
                     className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/20"
                   >
                     <Plus className="w-4 h-4" />
                     Tạo sản phẩm mới
                   </Button>
                 ) : (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={clearFilters}
                     className="flex items-center gap-2 border-slate-200 hover:bg-slate-50"
                   >
