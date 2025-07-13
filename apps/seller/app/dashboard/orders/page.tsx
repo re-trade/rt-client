@@ -3,6 +3,7 @@
 import { OrderDetailDialog } from '@/components/dialog-common/add/order-detail-dialog';
 import { OrderTable } from '@/components/dialog-common/view-update/order-table';
 import { UpdateStatusDialog } from '@/components/dialog-common/view-update/update-status-dialog';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -12,9 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { OrderResponse, ordersApi } from '@/service/orders.api';
-import { Search,ShoppingBag,Users } from 'lucide-react';
+import { Search, ShoppingBag, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
@@ -72,7 +72,7 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-3">
-            <CardHeader className="border-b border-gray-100 pb-4">
+      <CardHeader className="border-b border-gray-100 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-50 rounded-lg">
@@ -95,32 +95,32 @@ export default function OrdersPage() {
       </CardHeader>
 
       <CardContent>
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Tìm kiếm theo tên khách hàng, SĐT..."
-            // value={searchTerm}
-            // onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Tìm kiếm theo tên khách hàng, SĐT..."
+              // value={searchTerm}
+              // onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Trạng thái đơn hàng" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
+              <SelectItem value="pending">Chờ xác nhận</SelectItem>
+              <SelectItem value="confirmed">Đã xác nhận</SelectItem>
+              <SelectItem value="preparing">Đang chuẩn bị</SelectItem>
+              <SelectItem value="ready_to_ship">Sẵn sàng giao</SelectItem>
+              <SelectItem value="shipped">Đã giao shipper</SelectItem>
+              <SelectItem value="delivered">Đã giao hàng</SelectItem>
+              <SelectItem value="cancelled">Đã hủy</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Trạng thái đơn hàng" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả trạng thái</SelectItem>
-            <SelectItem value="pending">Chờ xác nhận</SelectItem>
-            <SelectItem value="confirmed">Đã xác nhận</SelectItem>
-            <SelectItem value="preparing">Đang chuẩn bị</SelectItem>
-            <SelectItem value="ready_to_ship">Sẵn sàng giao</SelectItem>
-            <SelectItem value="shipped">Đã giao shipper</SelectItem>
-            <SelectItem value="delivered">Đã giao hàng</SelectItem>
-            <SelectItem value="cancelled">Đã hủy</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
       </CardContent>
       <OrderTable
         orders={filteredOrders}
