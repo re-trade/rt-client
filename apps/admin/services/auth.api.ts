@@ -1,5 +1,5 @@
 import { getDeviceInfo } from '@/lib/device-fingerprint';
-import { authApi, ETokenName, IResponseObject, unAuthApi } from '@retrade/util';
+import { ETokenName } from '@retrade/util';
 
 type TLocalLogin = {
   username: string;
@@ -28,15 +28,15 @@ type TAccountMeResponse = {
 
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
-  
+
   // Sử dụng URL đúng cho API
   const url = 'https://dev.retrades.trade/api/main/v1/auth/local';
-  
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
       'x-device-name': encodeURIComponent(deviceInfo.deviceName),
       'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
@@ -50,14 +50,14 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   }
 
   const result = await response.json();
-  
+
   if (result.success && response.status === 200) {
     const { ACCESS_TOKEN, REFRESH_TOKEN } = result.content.tokens;
-    
+
     // Save to localStorage
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
     localStorage.setItem(ETokenName.REFRESH_TOKEN, REFRESH_TOKEN);
-    
+
     // Save to cookies for middleware
     if (typeof document !== 'undefined') {
       document.cookie = `access-token=${ACCESS_TOKEN}; path=/; max-age=3600; SameSite=Strict`;
@@ -77,12 +77,12 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
     }
 
     const url = 'https://dev.retrades.trade/api/main/v1/accounts/me';
-    
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -91,7 +91,7 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
     }
 
     const result = await response.json();
-    
+
     if (result.success && response.status === 200) {
       return result.content;
     }

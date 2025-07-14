@@ -610,9 +610,13 @@ export default function ProductManagementPage() {
               <span className="font-medium">Lỗi:</span> {error || deleteError}
               {(error || deleteError)?.includes('đăng nhập') && (
                 <div className="mt-2 text-sm">
-                  <p>Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao tác này.</p>
+                  <p>
+                    Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao
+                    tác này.
+                  </p>
                   <p className="mt-1 text-xs text-red-600">
-                    <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3 giây.
+                    <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3
+                    giây.
                   </p>
                 </div>
               )}

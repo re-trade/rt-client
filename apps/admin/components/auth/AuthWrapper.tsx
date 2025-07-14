@@ -57,4 +57,4 @@ const AuthWrapper = ({ children, condition, redirectPath = '/login' }: AuthWrapp
   return <>{children}</>;
 };
 
-export default AuthWrapper; 
+export default AuthWrapper;

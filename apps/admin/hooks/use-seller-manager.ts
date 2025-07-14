@@ -1,6 +1,6 @@
 'use client';
 
-import { getSellers, banSeller, unbanSeller, TSellerProfile } from '@/services/seller.api';
+import { banSeller, getSellers, TSellerProfile, unbanSeller } from '@/services/seller.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const useSellerManager = () => {

@@ -150,4 +150,4 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       </main>
     </div>
   );
-} 
+}

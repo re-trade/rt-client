@@ -36,13 +36,13 @@ function useAuth() {
     // Remove from localStorage
     localStorage.removeItem('access-token');
     localStorage.removeItem('refresh-token');
-    
+
     // Remove from cookies
     if (typeof document !== 'undefined') {
       document.cookie = 'access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       document.cookie = 'refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
-    
+
     setIsAuth(false);
     setRoles([]);
     setAccount(undefined);
@@ -65,4 +65,4 @@ function useAuth() {
 }
 
 export { useAuth };
-export type { TAccountMeResponse }; 
+export type { TAccountMeResponse };
