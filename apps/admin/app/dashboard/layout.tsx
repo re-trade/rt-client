@@ -22,6 +22,7 @@ import {
   Package,
   Settings,
   Store,
+  User,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -41,6 +42,7 @@ const menuItems = [
     items: [
       { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product' },
       { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user' },
+      { title: 'Quản lý Customer', icon: User, href: '/dashboard/customer' },
       { title: 'Quản lý Seller', icon: Store, href: '/dashboard/seller' },
     ],
   },

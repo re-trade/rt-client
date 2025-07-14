@@ -1,10 +1,15 @@
 'use client';
 
-import { banSeller, getSellers, TSellerProfile, unbanSeller } from '@/services/seller.api';
+import {
+  disableCustomer,
+  enableCustomer,
+  getCustomer,
+  TCustomerProfile,
+} from '@/services/customer.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const useSellerManager = () => {
-  const [sellers, setSellers] = useState<TSellerProfile[]>([]);
+const useCustomerManager = () => {
+  const [customers, setCustomers] = useState<TCustomerProfile[]>([]);
   const [page, setPage] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
@@ -16,53 +21,52 @@ const useSellerManager = () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await getSellers(page, pageSize, searchQuery);
+      const result = await getCustomer(page, pageSize, searchQuery);
       if (result?.success) {
-        setSellers(result.content || []);
+        setCustomers(result.content || []);
         setTotal(result.content?.length || 0);
       } else {
-        setSellers([]);
+        setCustomers([]);
         setTotal(0);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch sellers');
-      setSellers([]);
+      setError(err instanceof Error ? err.message : 'Failed to fetch customer');
+      setCustomers([]);
     } finally {
       setLoading(false);
     }
   }, [page, searchQuery]);
 
-  const handleBanSeller = useCallback(
+  const handleDisableCustomer = useCallback(
     async (id: string) => {
       try {
-        const result = await banSeller(id);
+        const result = await disableCustomer(id);
         if (result?.success) {
-          await fetchSeller(); // Refresh the seller list
+          await fetchSeller();
           return true;
         }
-        setError('Failed to ban seller');
+        setError('Failed to disable customer');
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to ban seller');
+        setError(err instanceof Error ? err.message : 'Failed to disable customer');
         return false;
       }
     },
     [fetchSeller],
   );
 
-  // Unban a seller
-  const handleUnbanSeller = useCallback(
+  const handleEnableCustomer = useCallback(
     async (id: string) => {
       try {
-        const result = await unbanSeller(id);
+        const result = await enableCustomer(id);
         if (result?.success) {
-          await fetchSeller(); // Refresh the seller list
+          await fetchSeller();
           return true;
         }
-        setError('Failed to unban seller');
+        setError('Failed to enable customer');
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to unban seller');
+        setError(err instanceof Error ? err.message : 'Failed to enable customer');
         return false;
       }
     },
@@ -76,16 +80,16 @@ const useSellerManager = () => {
   const stats = useMemo(
     () => ({
       total: total,
-      verified: sellers?.filter((seller) => seller.verified)?.length || 0,
-      pending: sellers?.filter((seller) => !seller.verified)?.length || 0,
+      verified: customers?.filter((customer) => customer.enabled)?.length || 0,
+      pending: customers?.filter((customer) => !customer.enabled)?.length || 0,
     }),
-    [sellers, total],
+    [customers, total],
   );
 
   return {
     page,
     setPage,
-    sellers,
+    customers,
     loading,
     error,
     searchQuery,
@@ -93,9 +97,9 @@ const useSellerManager = () => {
     pageSize,
     stats,
     refresh: fetchSeller,
-    banSeller: handleBanSeller,
-    unbanSeller: handleUnbanSeller,
+    disableCustomer: handleDisableCustomer,
+    enableCustomer: handleEnableCustomer,
   };
 };
 
-export { useSellerManager };
+export { useCustomerManager };
