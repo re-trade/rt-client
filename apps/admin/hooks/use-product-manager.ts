@@ -87,6 +87,34 @@ const useProductManager = () => {
     [fetchProducts, page],
   );
 
+  const verifyProduct = useCallback(async (productId: string) => {
+    try {
+      const response = await productApi.verifyProduct(productId);
+      if (response.success) {
+        await fetchProducts(page);
+        return { success: true, message: 'Duyệt sản phẩm thành công' };
+      } else {
+        return { success: false, message: response.message || 'Duyệt sản phẩm thất bại' };
+      }
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Duyệt sản phẩm thất bại' };
+    }
+  }, [fetchProducts, page]);
+
+  const unverifyProduct = useCallback(async (productId: string) => {
+    try {
+      const response = await productApi.unverifyProduct(productId);
+      if (response.success) {
+        await fetchProducts(page);
+        return { success: true, message: 'Không duyệt sản phẩm thành công' };
+      } else {
+        return { success: false, message: response.message || 'Không duyệt sản phẩm thất bại' };
+      }
+    } catch (error: any) {
+      return { success: false, message: error.message || 'Không duyệt sản phẩm thất bại' };
+    }
+  }, [fetchProducts, page]);
+
   useEffect(() => {
     fetchProducts(1);
   }, []);
@@ -102,6 +130,8 @@ const useProductManager = () => {
     goToPage,
     searchProducts,
     deleteProduct,
+    verifyProduct,
+    unverifyProduct,
   };
 };
 

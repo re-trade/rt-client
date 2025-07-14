@@ -178,10 +178,14 @@ const ProductDetailModal = ({
   product,
   isOpen,
   onClose,
+  onVerify,
+  onReject,
 }: {
   product: any;
   isOpen: boolean;
   onClose: () => void;
+  onVerify?: (id: string) => void;
+  onReject?: (id: string) => void;
 }) => {
   if (!product) return null;
 
@@ -288,12 +292,6 @@ const ProductDetailModal = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Seller ID:</span>
-                <span className="text-sm text-muted-foreground">{product.sellerId}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
                 <span className="font-medium">Thương hiệu:</span>
                 <Badge variant="outline">{product.brand}</Badge>
               </div>
@@ -381,6 +379,28 @@ const ProductDetailModal = ({
           <h4 className="font-medium mb-2">Mô tả chi tiết:</h4>
           <p className="text-sm text-muted-foreground whitespace-pre-wrap">{product.description}</p>
         </div>
+
+        {/* Nút duyệt/không duyệt */}
+        {!product.verified && (
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              variant="outline"
+              className="text-green-600 border-green-600"
+              onClick={() => onVerify && onVerify(product.id)}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Duyệt
+            </Button>
+            <Button
+              variant="outline"
+              className="text-red-600 border-red-600"
+              onClick={() => onReject && onReject(product.id)}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Không duyệt
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -449,6 +469,8 @@ export default function ProductManagementPage() {
     goToPage,
     searchProducts,
     deleteProduct,
+    verifyProduct,
+    unverifyProduct,
   } = useProductManager();
 
   const handleSort = (field: string) => {
@@ -668,56 +690,20 @@ export default function ProductManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('name')}
-                      className="flex items-center gap-1"
-                    >
-                      Sản phẩm
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('price')}
-                      className="flex items-center gap-1"
-                    >
-                      Giá
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('stock')}
-                      className="flex items-center gap-1"
-                    >
-                      Tồn kho
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>Người bán</TableHead>
-                  <TableHead>Danh mục</TableHead>
-                  <TableHead>Trạng thái</TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('createdAt')}
-                      className="flex items-center gap-1"
-                    >
-                      Ngày tạo
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead className="text-right">Thao tác</TableHead>
+                  <TableHead className="min-w-[180px] max-w-[220px] truncate">Sản phẩm</TableHead>
+                  <TableHead className="min-w-[120px] max-w-[140px] text-right">Giá</TableHead>
+                  <TableHead className="min-w-[80px] max-w-[100px] text-center">Tồn kho</TableHead>
+                  <TableHead className="min-w-[120px] max-w-[160px]">Người bán</TableHead>
+                  <TableHead className="min-w-[120px] max-w-[160px]">Danh mục</TableHead>
+                  <TableHead className="min-w-[100px] max-w-[120px] text-center">Trạng thái</TableHead>
+                  <TableHead className="min-w-[120px] max-w-[140px] text-center">Ngày tạo</TableHead>
+                  <TableHead className="text-center min-w-[120px]">Thao tác</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredProducts.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="min-w-[180px] max-w-[220px] truncate">
                       <div className="flex items-center gap-2">
                         {product.thumbnail && (
                           <img
@@ -727,17 +713,17 @@ export default function ProductManagementPage() {
                           />
                         )}
                         <div>
-                          <div className="font-medium">{product.name}</div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="font-medium truncate max-w-[140px]">{product.name}</div>
+                          <div className="text-sm text-muted-foreground truncate max-w-[140px]">
                             {product.shortDescription}
                           </div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-xs text-muted-foreground truncate max-w-[140px]">
                             {product.brand} • {product.model}
                           </div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[120px] max-w-[140px] text-right">
                       <div className="font-medium">
                         {product.currentPrice.toLocaleString('vi-VN')} ₫
                       </div>
@@ -747,7 +733,7 @@ export default function ProductManagementPage() {
                         <div className="text-sm text-red-600">Hết hàng</div>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[80px] max-w-[100px] text-center">
                       <Badge
                         variant={
                           product.quantity > 10
@@ -760,13 +746,10 @@ export default function ProductManagementPage() {
                         {product.quantity}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm font-medium">{product.sellerShopName}</div>
-                      <div className="text-xs text-muted-foreground">
-                        ID: {product.sellerId.slice(0, 8)}...
-                      </div>
+                    <TableCell className="min-w-[120px] max-w-[160px]">
+                      <div className="text-sm font-medium truncate max-w-[120px]">{product.sellerShopName}</div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[120px] max-w-[160px]">
                       <div className="flex flex-wrap gap-1">
                         {product.categories.slice(0, 2).map((cat: any) => (
                           <Badge key={cat.id} variant="outline" className="text-xs">
@@ -780,7 +763,7 @@ export default function ProductManagementPage() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-[100px] max-w-[120px] text-center">
                       <Badge
                         variant={product.verified ? 'default' : 'secondary'}
                         className={
@@ -792,12 +775,22 @@ export default function ProductManagementPage() {
                         {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
                       </Badge>
                     </TableCell>
-                    <TableCell>{new Date(product.createdAt).toLocaleDateString('vi-VN')}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="min-w-[120px] max-w-[140px] text-center">
+                      {new Date(product.createdAt).toLocaleDateString('vi-VN')}
+                    </TableCell>
+                    <TableCell className="text-center min-w-[120px]">
                       <ProductActions
                         product={product}
-                        onVerify={handleVerify}
-                        onReject={handleReject}
+                        onVerify={async (id: string) => {
+                          const result = await verifyProduct(id);
+                          if (result.success) setDeleteSuccess(result.message);
+                          else setDeleteError(result.message);
+                        }}
+                        onReject={async (id: string) => {
+                          const result = await unverifyProduct(id);
+                          if (result.success) setDeleteSuccess(result.message);
+                          else setDeleteError(result.message);
+                        }}
                         onView={handleView}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
@@ -848,6 +841,22 @@ export default function ProductManagementPage() {
         onClose={() => {
           setIsDetailModalOpen(false);
           setSelectedProduct(null);
+        }}
+        onVerify={async (id: string) => {
+          const result = await verifyProduct(id);
+          if (result.success) setDeleteSuccess(result.message);
+          else setDeleteError(result.message);
+          setIsDetailModalOpen(false);
+          setSelectedProduct(null);
+          refetch();
+        }}
+        onReject={async (id: string) => {
+          const result = await unverifyProduct(id);
+          if (result.success) setDeleteSuccess(result.message);
+          else setDeleteError(result.message);
+          setIsDetailModalOpen(false);
+          setSelectedProduct(null);
+          refetch();
         }}
       />
     </div>

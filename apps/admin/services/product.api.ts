@@ -289,4 +289,64 @@ export const productApi = {
       };
     }
   },
+
+  async verifyProduct(id: string): Promise<IResponseObject<boolean>> {
+    const url = `https://dev.retrades.trade/api/main/v1/products/${id}/verify`;
+    const accessToken = localStorage.getItem('access-token');
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      const status = response.status;
+      const contentType = response.headers.get('content-type');
+      let errorData: any = {};
+      let errorText = '';
+
+      try {
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await response.json();
+        } else {
+          errorText = await response.text();
+          errorData = { message: errorText };
+        }
+      } catch (e) {
+        errorText = await response.text();
+        errorData = { message: errorText };
+      }
+
+      console.error('Verify product error:', {
+        status,
+        errorData,
+        errorText,
+        url: response.url,
+        method: 'PUT',
+      });
+
+      throw new Error(
+        errorData.message ||
+          `Duyệt sản phẩm thất bại (status: ${status})${errorText ? `: ${errorText}` : ''}`
+      );
+    }
+    return await response.json();
+  },
+
+  async unverifyProduct(id: string): Promise<IResponseObject<boolean>> {
+    const url = `https://dev.retrades.trade/api/main/v1/products/${id}/unverify`;
+    const accessToken = localStorage.getItem('access-token');
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) throw new Error('Không duyệt sản phẩm thất bại');
+    return await response.json();
+  },
 };
