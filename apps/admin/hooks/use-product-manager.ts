@@ -16,14 +16,9 @@ const useProductManager = () => {
     try {
       setLoading(true);
       setError(null);
-
-      // Tính toán page cho API (API sử dụng 0-based indexing)
       const apiPage = currentPage - 1;
-      const pageSize = 10; // 10 sản phẩm mỗi trang
-
-      // Sử dụng API mới getAllProducts với pagination và search
+      const pageSize = 10;
       const response = await productApi.getAllProducts(apiPage, pageSize, searchQuery);
-
       if (response.success) {
         setProducts(response.content || []);
         setTotalProducts(response.pagination?.totalElements || 0);
@@ -53,13 +48,40 @@ const useProductManager = () => {
 
   const searchProducts = useCallback(
     (query: string) => {
-      fetchProducts(1, query); // Reset về trang 1 khi search
+      fetchProducts(1, query);
     },
     [fetchProducts],
   );
 
+  const deleteProduct = useCallback(async (productId: string) => {
+    try {
+      const response = await productApi.deleteProduct(productId);
+      if (response.success) {
+        await fetchProducts(page);
+        return { success: true, message: 'Xóa sản phẩm thành công' };
+      } else {
+        return { success: false, message: response.message || 'Xóa sản phẩm thất bại' };
+      }
+    } catch (error: any) {
+      console.error('Error deleting product:', error);
+      let errorMessage = 'Có lỗi xảy ra khi xóa sản phẩm';
+      if (error.message?.includes('access token') || error.message?.includes('Token expired') || error.message?.includes('Phiên đăng nhập đã hết hạn')) {
+        errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.';
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 3000);
+      } else if (error.message?.includes('401')) {
+        errorMessage = 'Không có quyền thực hiện thao tác này. Vui lòng đăng nhập lại.';
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 3000);
+      }
+      return { success: false, message: errorMessage };
+    }
+  }, [fetchProducts, page]);
+
   useEffect(() => {
-    fetchProducts(1); // Load trang đầu tiên khi component mount
+    fetchProducts(1);
   }, []);
 
   return {
@@ -72,6 +94,7 @@ const useProductManager = () => {
     refetch: () => fetchProducts(page),
     goToPage,
     searchProducts,
+    deleteProduct,
   };
 };
 

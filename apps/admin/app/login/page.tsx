@@ -86,6 +86,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginInternal(formData);
+      // Redirect to dashboard after successful login
       router.push('/dashboard');
     } catch (err) {
       setError('Tên đăng nhập hoặc mật khẩu không đúng');

@@ -436,6 +436,8 @@ export default function ProductManagementPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
   const {
     products,
     page,
@@ -446,6 +448,7 @@ export default function ProductManagementPage() {
     refetch,
     goToPage,
     searchProducts,
+    deleteProduct,
   } = useProductManager();
 
   const handleSort = (field: string) => {
@@ -494,10 +497,26 @@ export default function ProductManagementPage() {
   };
 
   const handleDelete = async (productId: string) => {
-    // TODO: Implement delete product API
     if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      console.log('Delete product:', productId);
-      refetch();
+      try {
+        setDeleteError(null); // Clear previous errors
+        setDeleteSuccess(null); // Clear previous success
+        const result = await deleteProduct(productId);
+        if (result.success) {
+          // Show success message
+          setDeleteSuccess(result.message);
+          // Auto hide success message after 3 seconds
+          setTimeout(() => {
+            setDeleteSuccess(null);
+          }, 3000);
+        } else {
+          // Show error message in UI
+          setDeleteError(result.message);
+        }
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        setDeleteError('Có lỗi xảy ra khi xóa sản phẩm');
+      }
     }
   };
 
@@ -560,12 +579,54 @@ export default function ProductManagementPage() {
         </div>
       </div>
 
+      {/* Success Display */}
+      {deleteSuccess && (
+        <Card className="p-4 border-green-200 bg-green-50">
+          <div className="flex items-center gap-2 text-green-700">
+            <CheckCircle className="h-4 w-4" />
+            <div className="flex-1">
+              <span className="font-medium">Thành công:</span> {deleteSuccess}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setDeleteSuccess(null);
+              }}
+              className="text-green-600 hover:text-green-700"
+            >
+              <XCircle className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Error Display */}
-      {error && (
+      {(error || deleteError) && (
         <Card className="p-4 border-red-200 bg-red-50">
           <div className="flex items-center gap-2 text-red-700">
             <AlertCircle className="h-4 w-4" />
-            <span>{error}</span>
+            <div className="flex-1">
+              <span className="font-medium">Lỗi:</span> {error || deleteError}
+              {(error || deleteError)?.includes('đăng nhập') && (
+                <div className="mt-2 text-sm">
+                  <p>Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao tác này.</p>
+                  <p className="mt-1 text-xs text-red-600">
+                    <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3 giây.
+                  </p>
+                </div>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setDeleteError(null);
+              }}
+              className="text-red-600 hover:text-red-700"
+            >
+              <XCircle className="h-4 w-4" />
+            </Button>
           </div>
         </Card>
       )}
