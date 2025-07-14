@@ -29,7 +29,6 @@ import {
 import { useProductManager } from '@/hooks/use-product-manager';
 import {
   AlertCircle,
-  ArrowUpDown,
   BarChart3,
   Calendar,
   CheckCircle,
@@ -43,7 +42,6 @@ import {
   Store,
   Tag,
   Trash2,
-  User,
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -695,8 +693,12 @@ export default function ProductManagementPage() {
                   <TableHead className="min-w-[80px] max-w-[100px] text-center">Tồn kho</TableHead>
                   <TableHead className="min-w-[120px] max-w-[160px]">Người bán</TableHead>
                   <TableHead className="min-w-[120px] max-w-[160px]">Danh mục</TableHead>
-                  <TableHead className="min-w-[100px] max-w-[120px] text-center">Trạng thái</TableHead>
-                  <TableHead className="min-w-[120px] max-w-[140px] text-center">Ngày tạo</TableHead>
+                  <TableHead className="min-w-[100px] max-w-[120px] text-center">
+                    Trạng thái
+                  </TableHead>
+                  <TableHead className="min-w-[120px] max-w-[140px] text-center">
+                    Ngày tạo
+                  </TableHead>
                   <TableHead className="text-center min-w-[120px]">Thao tác</TableHead>
                 </TableRow>
               </TableHeader>
@@ -747,7 +749,9 @@ export default function ProductManagementPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="min-w-[120px] max-w-[160px]">
-                      <div className="text-sm font-medium truncate max-w-[120px]">{product.sellerShopName}</div>
+                      <div className="text-sm font-medium truncate max-w-[120px]">
+                        {product.sellerShopName}
+                      </div>
                     </TableCell>
                     <TableCell className="min-w-[120px] max-w-[160px]">
                       <div className="flex flex-wrap gap-1">

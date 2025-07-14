@@ -296,8 +296,8 @@ export const productApi = {
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
@@ -329,7 +329,7 @@ export const productApi = {
 
       throw new Error(
         errorData.message ||
-          `Duyệt sản phẩm thất bại (status: ${status})${errorText ? `: ${errorText}` : ''}`
+          `Duyệt sản phẩm thất bại (status: ${status})${errorText ? `: ${errorText}` : ''}`,
       );
     }
     return await response.json();
@@ -341,8 +341,8 @@ export const productApi = {
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
