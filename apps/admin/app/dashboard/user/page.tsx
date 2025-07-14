@@ -23,7 +23,7 @@ import { Loader2, Search, Shield, User } from 'lucide-react';
 
 const roleDisplayMap: Record<string, string> = {
   ROLE_ADMIN: 'Admin',
-  ROLE_CUSTOMER: 'User',
+  ROLE_CUSTOMER: 'Customer',
   ROLE_SELLER: 'Seller',
 };
 const roles = ['All', ...Object.keys(roleDisplayMap)];
@@ -114,17 +114,18 @@ export default function UserManagementPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Username</TableHead>
+                <TableHead>Username</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Shop</TableHead>
+                <TableHead>Trạng thái</TableHead>
                 <TableHead>Created At</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                {/* <TableHead>Actions</TableHead> */}
               </TableRow>
             </TableHeader>
             <TableBody>
               {accounts.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.id}</TableCell>
                   <TableCell className="font-medium">{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
@@ -148,7 +149,6 @@ export default function UserManagementPage() {
                       {user.enabled ? 'active' : 'banned'}
                     </span>
                   </TableCell>
-                  <TableCell>-</TableCell>
                   <TableCell>{new Date(user.joinInDate).toLocaleDateString('vi-VN')}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
