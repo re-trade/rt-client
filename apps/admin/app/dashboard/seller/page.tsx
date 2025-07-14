@@ -58,11 +58,9 @@ export default function ShopManagementPage() {
   };
 
   const handleToggleStatus = async (seller: TSellerProfile) => {
-    const success = seller.verified
-      ? await banSeller(seller.id) 
-      : await unbanSeller(seller.id); 
+    const success = seller.verified ? await banSeller(seller.id) : await unbanSeller(seller.id);
     if (success) {
-      setSelectedSeller(null); 
+      setSelectedSeller(null);
     }
   };
 
@@ -133,7 +131,12 @@ export default function ShopManagementPage() {
             <TableBody>
               {sellers?.map((seller) => (
                 <TableRow key={seller.id}>
-                  <TableCell className="font-medium w-[150px] max-w-[150px] truncate" title={seller.id}>{seller.id}</TableCell>
+                  <TableCell
+                    className="font-medium w-[150px] max-w-[150px] truncate"
+                    title={seller.id}
+                  >
+                    {seller.id}
+                  </TableCell>
                   <TableCell className="font-medium">{seller.shopName}</TableCell>
                   <TableCell>{seller.description}</TableCell>
                   <TableCell>
@@ -245,7 +248,6 @@ export default function ShopManagementPage() {
 
               {/* Action Buttons */}
               <DialogFooter>
-                
                 <Button
                   className={
                     selectedSeller.verified

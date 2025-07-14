@@ -10,7 +10,7 @@ export type TCustomerProfile = {
   username: string;
   email: string;
   gender: string;
-  enabled:boolean;
+  enabled: boolean;
   lastUpdate: string;
 };
 
@@ -20,13 +20,16 @@ const getCustomer = async (
   query?: string,
 ): Promise<IResponseObject<TCustomerProfile[]> | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TCustomerProfile[]>>(`/customers/customers-with-role`, {
-      params: {
-        page,
-        size,
-        ...(query ? { q: query } : {}),
+    const result = await authApi.default.get<IResponseObject<TCustomerProfile[]>>(
+      `/customers/customers-with-role`,
+      {
+        params: {
+          page,
+          size,
+          ...(query ? { q: query } : {}),
+        },
       },
-    });
+    );
     if (result.data.success && result.status === 200) {
       return result.data;
     }
@@ -36,17 +39,21 @@ const getCustomer = async (
 };
 
 const disableCustomer = async (id: string): Promise<IResponseObject<null> | undefined> => {
-  const result = await authApi.default.put<IResponseObject<null>>(`/customers/${id}/disable-customer`);
+  const result = await authApi.default.put<IResponseObject<null>>(
+    `/customers/${id}/disable-customer`,
+  );
   if (result.data.success) {
     return result.data;
   } else return undefined;
 };
 
 const enableCustomer = async (id: string): Promise<IResponseObject<null> | undefined> => {
-  const result = await authApi.default.put<IResponseObject<null>>(`/customers/${id}/enable-customer`);
+  const result = await authApi.default.put<IResponseObject<null>>(
+    `/customers/${id}/enable-customer`,
+  );
   if (result.data.success) {
     return result.data;
   } else return undefined;
 };
 
-export { getCustomer, enableCustomer, disableCustomer };
+export { disableCustomer, enableCustomer, getCustomer };

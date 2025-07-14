@@ -1,6 +1,11 @@
 'use client';
 
-import { getCustomer, enableCustomer, disableCustomer, TCustomerProfile } from '@/services/customer.api';
+import {
+  disableCustomer,
+  enableCustomer,
+  getCustomer,
+  TCustomerProfile,
+} from '@/services/customer.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const useCustomerManager = () => {
@@ -37,7 +42,7 @@ const useCustomerManager = () => {
       try {
         const result = await disableCustomer(id);
         if (result?.success) {
-          await fetchSeller(); 
+          await fetchSeller();
           return true;
         }
         setError('Failed to disable customer');
@@ -55,7 +60,7 @@ const useCustomerManager = () => {
       try {
         const result = await enableCustomer(id);
         if (result?.success) {
-          await fetchSeller(); 
+          await fetchSeller();
           return true;
         }
         setError('Failed to enable customer');
@@ -75,8 +80,8 @@ const useCustomerManager = () => {
   const stats = useMemo(
     () => ({
       total: total,
-       verified: customers?.filter((customer) => customer.enabled)?.length || 0,
-       pending: customers?.filter((customer) => !customer.enabled)?.length || 0,
+      verified: customers?.filter((customer) => customer.enabled)?.length || 0,
+      pending: customers?.filter((customer) => !customer.enabled)?.length || 0,
     }),
     [customers, total],
   );
