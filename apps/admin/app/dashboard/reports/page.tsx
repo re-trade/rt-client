@@ -1,247 +1,222 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  DollarSign,
-  ShoppingCart,
-  TrendingUp,
-  Users,
-} from 'lucide-react';
-import React from 'react';
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { useEffect, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { RefreshCw, Eye, AlertCircle, XCircle } from "lucide-react";
 
-// Dữ liệu mẫu cho biểu đồ doanh thu
-const revenueData = [
-  { name: 'T1', value: 4000 },
-  { name: 'T2', value: 3000 },
-  { name: 'T3', value: 2000 },
-  { name: 'T4', value: 2780 },
-  { name: 'T5', value: 1890 },
-  { name: 'T6', value: 2390 },
-  { name: 'T7', value: 3490 },
-  { name: 'T8', value: 4000 },
-  { name: 'T9', value: 3200 },
-  { name: 'T10', value: 2800 },
-  { name: 'T11', value: 3200 },
-  { name: 'T12', value: 3800 },
-];
+// Custom hook để fetch report
+function useReportManager() {
+  const [reports, setReports] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalReports, setTotalReports] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-// Dữ liệu mẫu cho biểu đồ đơn hàng
-const orderData = [
-  { name: 'T1', orders: 2400, revenue: 4000 },
-  { name: 'T2', orders: 1398, revenue: 3000 },
-  { name: 'T3', orders: 9800, revenue: 2000 },
-  { name: 'T4', orders: 3908, revenue: 2780 },
-  { name: 'T5', orders: 4800, revenue: 1890 },
-  { name: 'T6', orders: 3800, revenue: 2390 },
-];
+  const fetchReports = async (pageNum = page) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `https://dev.retrades.trade/api/main/v1/report-seller?page=${pageNum - 1}&size=${size}`,
+        {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            // Authorization nếu cần
+          },
+        }
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Lỗi khi lấy danh sách report");
+      }
+      const data = await res.json();
+      setReports(data.content || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalReports(data.totalElements || 0);
+    } catch (e: any) {
+      setError(e.message || "Lỗi không xác định");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// Dữ liệu mẫu cho biểu đồ phân bố người dùng
-const userDistributionData = [
-  { name: 'Người mua', value: 400 },
-  { name: 'Người bán', value: 300 },
-  { name: 'Admin', value: 100 },
-];
+  useEffect(() => {
+    fetchReports(page);
+    // eslint-disable-next-line
+  }, [page, size]);
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+  const goToPage = (p: number) => {
+    if (p >= 1 && p <= totalPages) setPage(p);
+  };
 
-// Dữ liệu mẫu cho biểu đồ xu hướng
-const trendData = [
-  { name: 'T1', users: 4000, products: 2400, shops: 1800 },
-  { name: 'T2', users: 3000, products: 1398, shops: 2210 },
-  { name: 'T3', users: 2000, products: 9800, shops: 2290 },
-  { name: 'T4', users: 2780, products: 3908, shops: 2000 },
-  { name: 'T5', users: 1890, products: 4800, shops: 2181 },
-  { name: 'T6', users: 2390, products: 3800, shops: 2500 },
-];
+  return {
+    reports,
+    page,
+    size,
+    totalPages,
+    totalReports,
+    loading,
+    error,
+    goToPage,
+    refetch: () => fetchReports(page),
+  };
+}
 
-const StatCard = ({
-  title,
-  value,
-  change,
-  icon: Icon,
-  trend = 'up',
-}: {
-  title: string;
-  value: string;
-  change: string;
-  icon: React.ElementType;
-  trend?: 'up' | 'down';
-}) => (
-  <Card>
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
-      <Icon className="h-4 w-4 text-gray-500" />
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="flex items-center text-xs mt-1">
-        {trend === 'up' ? (
-          <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
-        ) : (
-          <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
-        )}
-        <span className={trend === 'up' ? 'text-green-500' : 'text-red-500'}>{change}</span>
-      </div>
-    </CardContent>
-  </Card>
-);
+// Modal xem chi tiết report
+function ReportDetailModal({ report, isOpen, onClose }: { report: any; isOpen: boolean; onClose: () => void }) {
+  if (!report) return null;
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Chi tiết báo cáo</DialogTitle>
+          <DialogDescription>Mã báo cáo: {report.id}</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2">
+          <div><b>Người báo cáo:</b> {report.reporterName || report.reporter?.username || "-"}</div>
+          <div><b>Người bị báo cáo:</b> {report.sellerName || report.seller?.username || "-"}</div>
+          <div><b>Lý do:</b> {report.reason || "-"}</div>
+          <div><b>Nội dung:</b> {report.content || "-"}</div>
+          <div><b>Thời gian:</b> {report.createdAt ? new Date(report.createdAt).toLocaleString("vi-VN") : "-"}</div>
+          <div><b>Trạng thái:</b> {report.status || "-"}</div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-export default function ReportsPage() {
+export default function ReportManagementPage() {
+  const { reports, page, totalPages, totalReports, loading, error, goToPage, refetch } = useReportManager();
+  const [selectedReport, setSelectedReport] = useState<any>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const handleView = (report: any) => {
+    setSelectedReport(report);
+    setIsDetailModalOpen(true);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold">Báo cáo & Thống kê</h2>
-        <p className="text-muted-foreground">Phân tích và theo dõi hiệu suất hệ thống</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Quản lý báo cáo người bán</h1>
+          <p className="text-muted-foreground">Danh sách các báo cáo vi phạm từ người dùng</p>
+        </div>
+        <Button onClick={refetch} variant="outline" disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+          Làm mới
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Doanh thu tháng này"
-          value="1.2 tỷ"
-          change="+15% so với tháng trước"
-          icon={DollarSign}
-          trend="up"
-        />
-        <StatCard
-          title="Tổng đơn hàng"
-          value="2,450"
-          change="+8% so với tháng trước"
-          icon={ShoppingCart}
-          trend="up"
-        />
-        <StatCard
-          title="Người dùng mới"
-          value="1,250"
-          change="+12% so với tháng trước"
-          icon={Users}
-          trend="up"
-        />
-        <StatCard
-          title="Tỷ lệ tăng trưởng"
-          value="18.5%"
-          change="+3% so với tháng trước"
-          icon={TrendingUp}
-          trend="up"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Doanh thu theo tháng</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#8884d8"
-                    fill="#8884d8"
-                    fillOpacity={0.3}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+      {error && (
+        <Card className="p-4 border-red-200 bg-red-50">
+          <div className="flex items-center gap-2 text-red-700">
+            <AlertCircle className="h-4 w-4" />
+            <div className="flex-1">
+              <span className="font-medium">Lỗi:</span> {error}
             </div>
-          </CardContent>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={refetch}
+              className="text-red-600 hover:text-red-700"
+            >
+              <XCircle className="h-4 w-4" />
+            </Button>
+          </div>
         </Card>
+      )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Đơn hàng & Doanh thu</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={orderData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" />
-                  <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip />
-                  <Bar yAxisId="left" dataKey="orders" fill="#8884d8" />
-                  <Bar yAxisId="right" dataKey="revenue" fill="#82ca9d" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="p-6">
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+            <span>Đang tải báo cáo...</span>
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+            <AlertCircle className="h-12 w-12 mb-4" />
+            <p>Không tìm thấy báo cáo</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[120px]">Người báo cáo</TableHead>
+                <TableHead className="min-w-[120px]">Người bị báo cáo</TableHead>
+                <TableHead className="min-w-[120px]">Lý do</TableHead>
+                <TableHead className="min-w-[200px]">Nội dung</TableHead>
+                <TableHead className="min-w-[140px]">Thời gian</TableHead>
+                <TableHead className="min-w-[100px]">Trạng thái</TableHead>
+                <TableHead className="min-w-[80px] text-center">Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reports.map((report) => (
+                <TableRow key={report.id}>
+                  <TableCell>{report.reporterName || report.reporter?.username || "-"}</TableCell>
+                  <TableCell>{report.sellerName || report.seller?.username || "-"}</TableCell>
+                  <TableCell>{report.reason || "-"}</TableCell>
+                  <TableCell className="truncate max-w-[240px]">{report.content || "-"}</TableCell>
+                  <TableCell>{report.createdAt ? new Date(report.createdAt).toLocaleString("vi-VN") : "-"}</TableCell>
+                  <TableCell>{report.status || "-"}</TableCell>
+                  <TableCell className="text-center">
+                    <Button variant="ghost" size="icon" onClick={() => handleView(report)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Phân bố người dùng</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={userDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {userDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+        {/* Pagination */}
+        {!loading && reports.length > 0 && (
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Hiển thị {reports.length} báo cáo trên trang {page} / {totalPages} (Tổng cộng {totalReports} báo cáo)
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => goToPage(page - 1)}
+                disabled={page === 1}
+              >
+                Trước
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Trang {page} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => goToPage(page + 1)}
+                disabled={page === totalPages}
+              >
+                Sau
+              </Button>
+            </div>
+          </div>
+        )}
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Xu hướng phát triển</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="users" stroke="#8884d8" />
-                  <Line type="monotone" dataKey="products" stroke="#82ca9d" />
-                  <Line type="monotone" dataKey="shops" stroke="#ffc658" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Modal xem chi tiết report */}
+      <ReportDetailModal
+        report={selectedReport}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedReport(null);
+        }}
+      />
     </div>
   );
 }
