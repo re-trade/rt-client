@@ -13,12 +13,14 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/hooks/use-auth';
 import {
   AlertCircle,
   BarChart3,
   DollarSign,
   FileText,
   LayoutDashboard,
+  LogOut,
   Package,
   Settings,
   Store,
@@ -71,6 +73,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const { logout, account } = useAuth();
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
@@ -79,8 +82,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           <Sidebar>
             <SidebarContent>
               <div className="px-4 py-6">
-                <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
+                <h1 className="text-xl font-bold text-gray-900">ReTrade Admin</h1>
                 <p className="text-sm text-gray-500 mt-1">Quản lý hệ thống</p>
+                {account && (
+                  <div className="mt-3 p-2 bg-gray-100 rounded-lg">
+                    <p className="text-xs font-medium text-gray-700">{account.username}</p>
+                    <p className="text-xs text-gray-500">{account.email}</p>
+                  </div>
+                )}
               </div>
 
               {menuItems.map((group, index) => (
@@ -108,6 +117,17 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   </SidebarGroupContent>
                 </SidebarGroup>
               ))}
+
+              {/* Logout button */}
+              <div className="mt-auto px-4 py-4">
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>Đăng xuất</span>
+                </button>
+              </div>
             </SidebarContent>
           </Sidebar>
         </div>
