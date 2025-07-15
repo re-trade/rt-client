@@ -1,11 +1,24 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { RefreshCw, Eye, AlertCircle, XCircle } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { AlertCircle, Eye, RefreshCw, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 // Custom hook để fetch report
 function useReportManager() {
@@ -24,23 +37,23 @@ function useReportManager() {
       const res = await fetch(
         `https://dev.retrades.trade/api/main/v1/report-seller?page=${pageNum - 1}&size=${size}`,
         {
-          credentials: "include",
+          credentials: 'include',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             // Authorization nếu cần
           },
-        }
+        },
       );
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || "Lỗi khi lấy danh sách report");
+        throw new Error(text || 'Lỗi khi lấy danh sách report');
       }
       const data = await res.json();
       setReports(data.content || []);
       setTotalPages(data.totalPages || 1);
       setTotalReports(data.totalElements || 0);
     } catch (e: any) {
-      setError(e.message || "Lỗi không xác định");
+      setError(e.message || 'Lỗi không xác định');
     } finally {
       setLoading(false);
     }
@@ -69,7 +82,15 @@ function useReportManager() {
 }
 
 // Modal xem chi tiết report
-function ReportDetailModal({ report, isOpen, onClose }: { report: any; isOpen: boolean; onClose: () => void }) {
+function ReportDetailModal({
+  report,
+  isOpen,
+  onClose,
+}: {
+  report: any;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   if (!report) return null;
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -79,12 +100,25 @@ function ReportDetailModal({ report, isOpen, onClose }: { report: any; isOpen: b
           <DialogDescription>Mã báo cáo: {report.id}</DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
-          <div><b>Người báo cáo:</b> {report.reporterName || report.reporter?.username || "-"}</div>
-          <div><b>Người bị báo cáo:</b> {report.sellerName || report.seller?.username || "-"}</div>
-          <div><b>Lý do:</b> {report.reason || "-"}</div>
-          <div><b>Nội dung:</b> {report.content || "-"}</div>
-          <div><b>Thời gian:</b> {report.createdAt ? new Date(report.createdAt).toLocaleString("vi-VN") : "-"}</div>
-          <div><b>Trạng thái:</b> {report.status || "-"}</div>
+          <div>
+            <b>Người báo cáo:</b> {report.reporterName || report.reporter?.username || '-'}
+          </div>
+          <div>
+            <b>Người bị báo cáo:</b> {report.sellerName || report.seller?.username || '-'}
+          </div>
+          <div>
+            <b>Lý do:</b> {report.reason || '-'}
+          </div>
+          <div>
+            <b>Nội dung:</b> {report.content || '-'}
+          </div>
+          <div>
+            <b>Thời gian:</b>{' '}
+            {report.createdAt ? new Date(report.createdAt).toLocaleString('vi-VN') : '-'}
+          </div>
+          <div>
+            <b>Trạng thái:</b> {report.status || '-'}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -92,7 +126,8 @@ function ReportDetailModal({ report, isOpen, onClose }: { report: any; isOpen: b
 }
 
 export default function ReportManagementPage() {
-  const { reports, page, totalPages, totalReports, loading, error, goToPage, refetch } = useReportManager();
+  const { reports, page, totalPages, totalReports, loading, error, goToPage, refetch } =
+    useReportManager();
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
@@ -109,7 +144,7 @@ export default function ReportManagementPage() {
           <p className="text-muted-foreground">Danh sách các báo cáo vi phạm từ người dùng</p>
         </div>
         <Button onClick={refetch} variant="outline" disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Làm mới
         </Button>
       </div>
@@ -160,12 +195,14 @@ export default function ReportManagementPage() {
             <TableBody>
               {reports.map((report) => (
                 <TableRow key={report.id}>
-                  <TableCell>{report.reporterName || report.reporter?.username || "-"}</TableCell>
-                  <TableCell>{report.sellerName || report.seller?.username || "-"}</TableCell>
-                  <TableCell>{report.reason || "-"}</TableCell>
-                  <TableCell className="truncate max-w-[240px]">{report.content || "-"}</TableCell>
-                  <TableCell>{report.createdAt ? new Date(report.createdAt).toLocaleString("vi-VN") : "-"}</TableCell>
-                  <TableCell>{report.status || "-"}</TableCell>
+                  <TableCell>{report.reporterName || report.reporter?.username || '-'}</TableCell>
+                  <TableCell>{report.sellerName || report.seller?.username || '-'}</TableCell>
+                  <TableCell>{report.reason || '-'}</TableCell>
+                  <TableCell className="truncate max-w-[240px]">{report.content || '-'}</TableCell>
+                  <TableCell>
+                    {report.createdAt ? new Date(report.createdAt).toLocaleString('vi-VN') : '-'}
+                  </TableCell>
+                  <TableCell>{report.status || '-'}</TableCell>
                   <TableCell className="text-center">
                     <Button variant="ghost" size="icon" onClick={() => handleView(report)}>
                       <Eye className="h-4 w-4" />
@@ -181,7 +218,8 @@ export default function ReportManagementPage() {
         {!loading && reports.length > 0 && (
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Hiển thị {reports.length} báo cáo trên trang {page} / {totalPages} (Tổng cộng {totalReports} báo cáo)
+              Hiển thị {reports.length} báo cáo trên trang {page} / {totalPages} (Tổng cộng{' '}
+              {totalReports} báo cáo)
             </div>
             <div className="flex items-center space-x-2">
               <Button
