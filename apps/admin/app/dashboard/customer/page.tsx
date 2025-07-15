@@ -10,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -19,8 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useSellerManager } from '@/hooks/use-seller-manager';
-import { TSellerProfile } from '@/services/seller.api';
+import { useCustomerManager } from '@/hooks/use-customer-manager';
+import { TCustomerProfile } from '@/services/customer.api';
 import { AlertTriangle, Search, Store, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 
@@ -34,10 +33,10 @@ const statusColors: Record<string, string> = {
   false: 'bg-red-100 text-yellow-800',
 };
 
-export default function ShopManagementPage() {
-  const [selectedSeller, setSelectedSeller] = useState<TSellerProfile | null>(null);
+export default function CustomerManagementPage() {
+  const [selectedCustomer, setSelectedCustomer] = useState<TCustomerProfile | null>(null);
   const {
-    sellers,
+    customers,
     loading,
     error,
     page: currentPage,
@@ -46,35 +45,37 @@ export default function ShopManagementPage() {
     setSearchQuery,
     pageSize: itemsPerPage,
     stats,
-    banSeller,
-    unbanSeller,
-  } = useSellerManager();
+    disableCustomer,
+    enableCustomer,
+  } = useCustomerManager();
 
-  if (loading) return <div>Loading sellers...</div>;
+  if (loading) return <div>Loading customers...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const handleViewDetails = (seller: TSellerProfile) => {
-    setSelectedSeller(seller);
+  const handleViewDetails = (customer: TCustomerProfile) => {
+    setSelectedCustomer(customer);
   };
 
-  const handleToggleStatus = async (seller: TSellerProfile) => {
-    const success = seller.verified ? await banSeller(seller.id) : await unbanSeller(seller.id);
+  const handleToggleStatus = async (customer: TCustomerProfile) => {
+    const success = customer.enabled
+      ? await disableCustomer(customer.id)
+      : await enableCustomer(customer.id);
     if (success) {
-      setSelectedSeller(null);
+      setSelectedCustomer(null);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Quản lý cửa hàng</h1>
+        <h1 className="text-3xl font-bold">Quản lý khách hàng</h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Tổng số người bán</p>
+              <p className="text-sm font-medium text-muted-foreground">Tổng số khách hàng</p>
               <h2 className="text-2xl font-bold">{stats.total}</h2>
             </div>
             <Store className="h-8 w-8 text-blue-500" />
@@ -83,7 +84,7 @@ export default function ShopManagementPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Người bán đã xác thực</p>
+              <p className="text-sm font-medium text-muted-foreground"> Khách hàng hợp lệ</p>
               <h2 className="text-2xl font-bold">{stats.verified}</h2>
             </div>
             <TrendingUp className="h-8 w-8 text-green-500" />
@@ -92,7 +93,7 @@ export default function ShopManagementPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Người bán Đang chờ duyệt</p>
+              <p className="text-sm font-medium text-muted-foreground"> Khách hàng bị hạn chế</p>
               <h2 className="text-2xl font-bold">{stats.pending}</h2>
             </div>
             <AlertTriangle className="h-8 w-8 text-yellow-500" />
@@ -105,12 +106,12 @@ export default function ShopManagementPage() {
           <div className="flex flex-1 items-center space-x-2">
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Tìm kiếm cửa hàng..."
+              {/* <Input
+                placeholder="Tìm kiếm khách hàng..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8"
-              />
+              /> */}
             </div>
           </div>
         </div>
@@ -120,8 +121,9 @@ export default function ShopManagementPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>Người bán</TableHead>
-                <TableHead>Mô tả</TableHead>
+
+                <TableHead>Họ</TableHead>
+                <TableHead>Tên</TableHead>
                 <TableHead>Địa chỉ</TableHead>
                 <TableHead>Liên hệ</TableHead>
                 <TableHead>Trạng thái</TableHead>
@@ -129,39 +131,31 @@ export default function ShopManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sellers?.map((seller) => (
-                <TableRow key={seller.id}>
-                  <TableCell
-                    className="font-medium w-[150px] max-w-[150px] truncate"
-                    title={seller.id}
-                  >
-                    {seller.id}
-                  </TableCell>
-                  <TableCell className="font-medium">{seller.shopName}</TableCell>
-                  <TableCell>{seller.description}</TableCell>
+              {customers?.map((customer) => (
+                <TableRow key={customer.id}>
+                  <TableCell className="font-medium">{customer.id}</TableCell>
+
+                  <TableCell className="font-medium">{customer.firstName}</TableCell>
+                  <TableCell>{customer.lastName}</TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <div>{seller.addressLine}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {seller.ward}, {seller.district}, {seller.state}
-                      </div>
+                      <div>{customer.address}</div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <div>{seller.phoneNumber}</div>
-                      <div className="text-sm text-muted-foreground">{seller.email}</div>
+                      <div>{customer.phone}</div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(seller.verified)]}`}
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(customer.enabled)]}`}
                     >
-                      {statusLabels[String(seller.verified)]}
+                      {statusLabels[String(customer.enabled)]}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(seller)}>
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(customer)}>
                       Chi tiết
                     </Button>
                   </TableCell>
@@ -174,8 +168,8 @@ export default function ShopManagementPage() {
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Hiển thị {currentPage * itemsPerPage + 1} đến{' '}
-            {Math.min((currentPage + 1) * itemsPerPage, sellers.length)} trong tổng số{' '}
-            {sellers.length} cửa hàng
+            {Math.min((currentPage + 1) * itemsPerPage, customers.length)} trong tổng số{' '}
+            {customers.length} cửa hàng
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -198,65 +192,64 @@ export default function ShopManagementPage() {
         </div>
       </Card>
 
-      {selectedSeller && (
-        <Dialog open={!!selectedSeller} onOpenChange={() => setSelectedSeller(null)}>
+      {selectedCustomer && (
+        <Dialog open={!!selectedCustomer} onOpenChange={() => setSelectedCustomer(null)}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
-              <DialogTitle>Chi tiết người bán</DialogTitle>
-              <DialogDescription>Thông tin chi tiết của người bán</DialogDescription>
+              <DialogTitle>Chi tiết cửa hàng</DialogTitle>
+              <DialogDescription>Thông tin chi tiết của khách hàng</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6">
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">ID</p>
-                    <p>{selectedSeller.id}</p>
+                    <p>{selectedCustomer.id}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Tên người bán</p>
-                    <p>{selectedSeller.shopName}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Tên khách hàng</p>
+                    <p>{selectedCustomer.firstName + ' ' + selectedCustomer.lastName}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Mô tả</p>
-                    <p>{selectedSeller.description}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Giới tính</p>
+                    <p>{selectedCustomer.gender === '0' ? 'Nam' : 'Nữ'}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Địa chỉ</p>
-                    <p>{selectedSeller.addressLine}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedSeller.ward}, {selectedSeller.district}, {selectedSeller.state}
-                    </p>
+                    <p>{selectedCustomer.address}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Số điện thoại</p>
-                    <p>{selectedSeller.phoneNumber}</p>
+                    <p>{selectedCustomer.phone}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Email</p>
-                    <p>{selectedSeller.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Ngày tạo</p>
-                    <p>{new Date(selectedSeller.createdAt).toLocaleDateString('vi-VN')}</p>
+                    <p>{selectedCustomer.email}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                    <p>{new Date(selectedSeller.updatedAt).toLocaleDateString('vi-VN')}</p>
+                    <p>{new Date(selectedCustomer.lastUpdate).toLocaleDateString('vi-VN')}</p>
                   </div>
+                  {/* <div>
+                    <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
+                    <p>{new Date(selectedSeller.updatedAt).toLocaleDateString('vi-VN')}</p>
+                  </div> */}
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <DialogFooter>
+                {/* <Button variant="outline" onClick={() => setSelectedCustomer(null)}>
+                  Đóng
+                </Button> */}
                 <Button
                   className={
-                    selectedSeller.verified
+                    selectedCustomer.enabled
                       ? 'bg-red-600 hover:bg-red-700 text-white'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                   }
-                  onClick={() => handleToggleStatus(selectedSeller)}
+                  onClick={() => handleToggleStatus(selectedCustomer)}
                 >
-                  {selectedSeller.verified ? 'Vô hiệu hóa người bán' : 'Xác thực người bán'}
+                  {selectedCustomer.enabled ? 'Khóa tài khoản' : 'Kích hoạt tài khoản'}{' '}
                 </Button>
               </DialogFooter>
             </div>
