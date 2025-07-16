@@ -1,9 +1,8 @@
-import { Message as ModelMessage, Room as ModelRoom, User } from './model';
+import { ModelMessage, ModelRoom, ModelUser, ModelVideoSession } from './model';
 
-export type { User } from './model';
-
-export interface OnlineUser extends User {
+export interface OnlineUser extends ModelUser {
   isOnline: boolean;
+  name: string;
 }
 
 export interface Message extends ModelMessage {
@@ -16,6 +15,7 @@ export interface Room extends ModelRoom {
 
 export interface ServerToClientEvents {
   message: (message: Message) => void;
+  authSuccess: () => void;
   rooms: (rooms: Room[]) => void;
   roomCreated: (room: Room) => void;
   roomJoined: (room: Room) => void;
@@ -47,13 +47,13 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   authenticate: (userData: { token?: string; senderType: 'customer' | 'seller' }) => void;
-  getUserRooms: () => void;
-  sendMessage: (data: { content: string; roomId: string }) => void;
-  joinRoom: (roomId: string) => void;
-  leaveRoom: (roomId: string) => void;
+  getRooms: () => void;
+  sendMessage: (data: { content: string; receiverId: string }) => void;
+  joinRoom: (receiverId: string) => void;
+  leaveRoom: (receiverId: string) => void;
   createRoom: (data: { name: string }) => void;
 
-  typing: (data: { roomId: string; isTyping: boolean }) => void;
+  typing: (data: { receiverId: string; isTyping: boolean }) => void;
   markMessageRead: (data: { messageId: string; roomId: string }) => void;
 
   signal: (data: {
@@ -68,3 +68,18 @@ export interface ClientToServerEvents {
   rejectCall: (data: { callerId: string; reason?: string }) => void;
   endCall: (data: { roomId: string }) => void;
 }
+
+export interface InterServerEvents {
+  ping: () => void;
+}
+
+export interface SocketData {
+  user?: OnlineUser;
+  rooms: Set<string>;
+  activeCall?: ModelVideoSession;
+}
+
+export type ValidationError = {
+  field: string;
+  message: string;
+};
