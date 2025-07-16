@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { unAuthApi } from '@retrade/util/src/api/instance';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Camera, DeviceMobile, House, Laptop, SpeakerHigh, Tag, TShirt } from 'phosphor-react';
 import { useEffect, useState } from 'react';
@@ -25,7 +26,6 @@ interface Category {
   children?: Category[] | null;
 }
 
-// Helper function to get an icon and color based on category name
 const getIconForCategory = (name: string): { Icon: React.ElementType; color: string } => {
   const lowerCaseName = name.toLowerCase();
   if (
@@ -59,19 +59,18 @@ const getIconForCategory = (name: string): { Icon: React.ElementType; color: str
   ) {
     return { Icon: SpeakerHigh, color: '#facc15' };
   }
-  return { Icon: Tag, color: '#64748b' }; // Default icon
+  return { Icon: Tag, color: '#64748b' };
 };
 
-const fetchCategories = async (token: string): Promise<Category[]> => {
-  const res = await fetch('https://dev.retrades.trade/api/main/v1/categories?page=0&size=50', {
-    headers: {
-      accept: '*/*',
-      Authorization: `Bearer ${token}`,
-    },
-    cache: 'no-store',
-  });
-  const data = await res.json();
-  return data.content || [];
+const fetchCategories = async (): Promise<Category[]> => {
+  try {
+    const res = await unAuthApi.default.get('categories', {
+      params: { page: 0, size: 50 },
+    });
+    return res.data.content || [];
+  } catch (err) {
+    return [];
+  }
 };
 
 function TreeTableRow({
@@ -170,9 +169,8 @@ export default function CategoryPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     setLoading(true);
-    fetchCategories(token || '')
+    fetchCategories()
       .then((data) => setCategories(data))
       .catch(() => setError('Lỗi khi tải danh mục.'))
       .finally(() => setLoading(false));
