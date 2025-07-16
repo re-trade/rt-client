@@ -1,7 +1,7 @@
+import AuthWrapper from '@/components/auth/AuthWrapper';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Open_Sans } from 'next/font/google';
 import './globals.css';
-import AuthWrapper from '@/components/auth/AuthWrapper';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,9 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} ${openSans.className} antialiased`}
     >
       <body className="font-sans antialiased">
-        <AuthWrapper>
-            {children}
-        </AuthWrapper>
+        <AuthWrapper>{children}</AuthWrapper>
       </body>
     </html>
   );

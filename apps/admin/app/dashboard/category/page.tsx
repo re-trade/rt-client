@@ -1,9 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -11,8 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { ChevronDown, ChevronRight } from "lucide-react";
+} from '@/components/ui/table';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Category {
   id: string;
@@ -25,16 +25,13 @@ interface Category {
 }
 
 const fetchCategories = async (token: string): Promise<Category[]> => {
-  const res = await fetch(
-    "https://dev.retrades.trade/api/main/v1/categories?page=0&size=50",
-    {
-      headers: {
-        accept: "*/*",
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
-    }
-  );
+  const res = await fetch('https://dev.retrades.trade/api/main/v1/categories?page=0&size=50', {
+    headers: {
+      accept: '*/*',
+      Authorization: `Bearer ${token}`,
+    },
+    cache: 'no-store',
+  });
   const data = await res.json();
   return data.content || [];
 };
@@ -63,19 +60,23 @@ function TreeTableRow({
             size="icon"
             className={`mr-1 transition-colors ${hasChildren ? 'hover:bg-gray-200' : 'opacity-50 cursor-default'}`}
             onClick={hasChildren ? () => setExpanded((e) => !e) : undefined}
-            aria-label={expanded ? "Thu gọn" : "Mở rộng"}
+            aria-label={expanded ? 'Thu gọn' : 'Mở rộng'}
             disabled={!hasChildren}
             tabIndex={hasChildren ? 0 : -1}
           >
             {expanded ? (
-              <ChevronDown size={16} className={hasChildren ? "text-gray-700" : "text-gray-300"} />
+              <ChevronDown size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} />
             ) : (
-              <ChevronRight size={16} className={hasChildren ? "text-gray-700" : "text-gray-300"} />
+              <ChevronRight size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} />
             )}
           </Button>
-          <span className="font-medium group-hover:text-blue-600 transition-colors">{category.name}</span>
+          <span className="font-medium group-hover:text-blue-600 transition-colors">
+            {category.name}
+          </span>
         </TableCell>
-        <TableCell>{category.description || <span className="text-gray-400">(Không có)</span>}</TableCell>
+        <TableCell>
+          {category.description || <span className="text-gray-400">(Không có)</span>}
+        </TableCell>
         <TableCell>
           {category.visible ? (
             <span className="text-xs text-green-600 bg-green-100 rounded px-2">Hiện</span>
@@ -84,12 +85,19 @@ function TreeTableRow({
           )}
         </TableCell>
         <TableCell>
-          <Button size="sm" variant="outline" className="mr-2">Sửa</Button>
-          <Button size="sm" variant="destructive" className="mr-2">Xóa</Button>
-          <Button size="sm" variant="secondary">Thêm con</Button>
+          <Button size="sm" variant="outline" className="mr-2">
+            Sửa
+          </Button>
+          <Button size="sm" variant="destructive" className="mr-2">
+            Xóa
+          </Button>
+          <Button size="sm" variant="secondary">
+            Thêm con
+          </Button>
         </TableCell>
       </TableRow>
-      {hasChildren && expanded &&
+      {hasChildren &&
+        expanded &&
         category.children!.map((child) => (
           <TreeTableRow
             key={child.id}
@@ -108,11 +116,11 @@ export default function CategoryPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     setLoading(true);
-    fetchCategories(token || "")
+    fetchCategories(token || '')
       .then((data) => setCategories(data))
-      .catch(() => setError("Lỗi khi tải danh mục."))
+      .catch(() => setError('Lỗi khi tải danh mục.'))
       .finally(() => setLoading(false));
   }, []);
 

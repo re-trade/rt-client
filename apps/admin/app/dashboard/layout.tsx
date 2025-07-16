@@ -1,5 +1,6 @@
 'use client';
 
+import AuthWrapper from '@/components/auth/AuthWrapper';
 import {
   Sidebar,
   SidebarContent,
@@ -27,7 +28,6 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
-import AuthWrapper from '@/components/auth/AuthWrapper';
 
 const menuItems = [
   {
