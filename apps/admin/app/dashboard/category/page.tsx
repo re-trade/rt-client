@@ -11,16 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { 
-  Laptop,
-  DeviceMobile,
-  TShirt,
-  House,
-  Camera,
-  SpeakerHigh,
-  Tag,
-} from 'phosphor-react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { Camera, DeviceMobile, House, Laptop, SpeakerHigh, Tag, TShirt } from 'phosphor-react';
 import { useEffect, useState } from 'react';
 
 interface Category {
@@ -34,7 +26,7 @@ interface Category {
 }
 
 // Helper function to get an icon and color based on category name
-const getIconForCategory = (name: string): { Icon: React.ElementType, color: string } => {
+const getIconForCategory = (name: string): { Icon: React.ElementType; color: string } => {
   const lowerCaseName = name.toLowerCase();
   if (
     lowerCaseName.includes('electronic') ||
@@ -47,7 +39,11 @@ const getIconForCategory = (name: string): { Icon: React.ElementType, color: str
   if (lowerCaseName.includes('phone') || lowerCaseName.includes('mobile')) {
     return { Icon: DeviceMobile, color: '#06b6d4' };
   }
-  if (lowerCaseName.includes('fashion') || lowerCaseName.includes('apparel') || lowerCaseName.includes('clothing')) {
+  if (
+    lowerCaseName.includes('fashion') ||
+    lowerCaseName.includes('apparel') ||
+    lowerCaseName.includes('clothing')
+  ) {
     return { Icon: TShirt, color: '#f472b6' };
   }
   if (lowerCaseName.includes('home') || lowerCaseName.includes('appliances')) {
@@ -56,12 +52,15 @@ const getIconForCategory = (name: string): { Icon: React.ElementType, color: str
   if (lowerCaseName.includes('camera') || lowerCaseName.includes('photography')) {
     return { Icon: Camera, color: '#a78bfa' };
   }
-  if (lowerCaseName.includes('audio') || lowerCaseName.includes('music') || lowerCaseName.includes('speaker')) {
+  if (
+    lowerCaseName.includes('audio') ||
+    lowerCaseName.includes('music') ||
+    lowerCaseName.includes('speaker')
+  ) {
     return { Icon: SpeakerHigh, color: '#facc15' };
   }
   return { Icon: Tag, color: '#64748b' }; // Default icon
 };
-
 
 const fetchCategories = async (token: string): Promise<Category[]> => {
   const res = await fetch('https://dev.retrades.trade/api/main/v1/categories?page=0&size=50', {
@@ -107,18 +106,31 @@ function TreeTableRow({
               tabIndex={hasChildren ? 0 : -1}
             >
               {expanded ? (
-                <ChevronDown size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} />
+                <ChevronDown
+                  size={16}
+                  className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
+                />
               ) : (
-                <ChevronRight size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} />
+                <ChevronRight
+                  size={16}
+                  className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
+                />
               )}
             </Button>
-            <Icon size={20} weight="duotone" color={color} className="transition-colors group-hover:scale-110" />
+            <Icon
+              size={20}
+              weight="duotone"
+              color={color}
+              className="transition-colors group-hover:scale-110"
+            />
             <span className="font-medium group-hover:text-blue-600 transition-colors">
               {category.name}
             </span>
           </div>
         </TableCell>
-        <TableCell>{category.description || <span className="text-gray-400">(Không có)</span>}</TableCell>
+        <TableCell>
+          {category.description || <span className="text-gray-400">(Không có)</span>}
+        </TableCell>
         <TableCell>
           {category.visible ? (
             <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">Hiện</span>
