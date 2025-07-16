@@ -466,9 +466,9 @@ export default function ProductManagementPage() {
     refetch,
     goToPage,
     searchProducts,
-    deleteProduct,
-    verifyProduct,
-    unverifyProduct,
+    // deleteProduct,
+    // verifyProduct,
+    // unverifyProduct,
   } = useProductManager();
 
   const handleSort = (field: string) => {
@@ -521,18 +521,18 @@ export default function ProductManagementPage() {
       try {
         setDeleteError(null); // Clear previous errors
         setDeleteSuccess(null); // Clear previous success
-        const result = await deleteProduct(productId);
-        if (result.success) {
-          // Show success message
-          setDeleteSuccess(result.message);
-          // Auto hide success message after 3 seconds
-          setTimeout(() => {
-            setDeleteSuccess(null);
-          }, 3000);
-        } else {
-          // Show error message in UI
-          setDeleteError(result.message);
-        }
+        // const result = await deleteProduct(productId);
+        // if (result.success) {
+        //   // Show success message
+        //   setDeleteSuccess(result.message);
+        //   // Auto hide success message after 3 seconds
+        //   setTimeout(() => {
+        //     setDeleteSuccess(null);
+        //   }, 3000);
+        // } else {
+        //   // Show error message in UI
+        //   setDeleteError(result.message);
+        // }
       } catch (error) {
         console.error('Error deleting product:', error);
         setDeleteError('Có lỗi xảy ra khi xóa sản phẩm');
@@ -785,16 +785,16 @@ export default function ProductManagementPage() {
                     <TableCell className="text-center min-w-[120px]">
                       <ProductActions
                         product={product}
-                        onVerify={async (id: string) => {
-                          const result = await verifyProduct(id);
-                          if (result.success) setDeleteSuccess(result.message);
-                          else setDeleteError(result.message);
-                        }}
-                        onReject={async (id: string) => {
-                          const result = await unverifyProduct(id);
-                          if (result.success) setDeleteSuccess(result.message);
-                          else setDeleteError(result.message);
-                        }}
+                        // onVerify={async (id: string) => {
+                        //   const result = await verifyProduct(id);
+                        //   if (result.success) setDeleteSuccess(result.message);
+                        //   else setDeleteError(result.message);
+                        // }}
+                        // onReject={async (id: string) => {
+                        //   const result = await unverifyProduct(id);
+                        //   if (result.success) setDeleteSuccess(result.message);
+                        //   else setDeleteError(result.message);
+                        // }}
                         onView={handleView}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
@@ -846,22 +846,22 @@ export default function ProductManagementPage() {
           setIsDetailModalOpen(false);
           setSelectedProduct(null);
         }}
-        onVerify={async (id: string) => {
-          const result = await verifyProduct(id);
-          if (result.success) setDeleteSuccess(result.message);
-          else setDeleteError(result.message);
-          setIsDetailModalOpen(false);
-          setSelectedProduct(null);
-          refetch();
-        }}
-        onReject={async (id: string) => {
-          const result = await unverifyProduct(id);
-          if (result.success) setDeleteSuccess(result.message);
-          else setDeleteError(result.message);
-          setIsDetailModalOpen(false);
-          setSelectedProduct(null);
-          refetch();
-        }}
+        // onVerify={async (id: string) => {
+        //   const result = await verifyProduct(id);
+        //   if (result.success) setDeleteSuccess(result.message);
+        //   else setDeleteError(result.message);
+        //   setIsDetailModalOpen(false);
+        //   setSelectedProduct(null);
+        //   refetch();
+        // }}
+        // onReject={async (id: string) => {
+        //   const result = await unverifyProduct(id);
+        //   if (result.success) setDeleteSuccess(result.message);
+        //   else setDeleteError(result.message);
+        //   setIsDetailModalOpen(false);
+        //   setSelectedProduct(null);
+        //   refetch();
+        // }}
       />
     </div>
   );
