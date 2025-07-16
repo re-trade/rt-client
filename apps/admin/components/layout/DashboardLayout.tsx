@@ -33,9 +33,7 @@ import type React from 'react';
 const menuItems = [
   {
     group: 'Tổng quan',
-    items: [
-      { title: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-    ],
+    items: [{ title: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' }],
   },
   {
     group: 'Quản lý',

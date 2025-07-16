@@ -27,13 +27,12 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
+import AuthWrapper from '@/components/auth/AuthWrapper';
 
 const menuItems = [
   {
     group: 'Tổng quan',
-    items: [
-      { title: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-    ],
+    items: [{ title: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' }],
   },
   {
     group: 'Quản lý',
@@ -63,9 +62,11 @@ const menuItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-      <DashboardContent>{children}</DashboardContent>
-    </SidebarProvider>
+    <AuthWrapper>
+      <SidebarProvider>
+        <DashboardContent>{children}</DashboardContent>
+      </SidebarProvider>
+    </AuthWrapper>
   );
 }
 
