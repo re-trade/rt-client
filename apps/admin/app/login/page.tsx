@@ -11,12 +11,12 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/hooks/use-auth';
 import { loginInternal } from '@/services/auth.api';
 import Joi from 'joi';
 import { EyeIcon, EyeOffIcon, KeyIcon, LoaderIcon, UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
 
 interface LoginForm {
   username: string;

@@ -12,30 +12,37 @@ const useProductManager = () => {
   const [error, setError] = useState<string | null>(null);
   const pageSize = 10;
 
-  const fetchProducts = useCallback(async (searchQuery?: string, customPage?: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await productApi.getAllProducts((customPage ?? page) - 1, pageSize, searchQuery);
-      if (response.success) {
-        setProducts(response.content.content);
-        setMaxPage(response.content.totalPages);
-        setTotalProducts(response.content.totalElements);
-      } else {
+  const fetchProducts = useCallback(
+    async (searchQuery?: string, customPage?: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await productApi.getAllProducts(
+          (customPage ?? page) - 1,
+          pageSize,
+          searchQuery,
+        );
+        if (response.success) {
+          setProducts(response.content.content);
+          setMaxPage(response.content.totalPages);
+          setTotalProducts(response.content.totalElements);
+        } else {
+          setProducts([]);
+          setMaxPage(1);
+          setTotalProducts(0);
+          setError(response.message || 'Lỗi khi tải sản phẩm');
+        }
+      } catch (err) {
         setProducts([]);
         setMaxPage(1);
         setTotalProducts(0);
-        setError(response.message || 'Lỗi khi tải sản phẩm');
+        setError(err instanceof Error ? err.message : 'Lỗi khi tải sản phẩm');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setProducts([]);
-      setMaxPage(1);
-      setTotalProducts(0);
-      setError(err instanceof Error ? err.message : 'Lỗi khi tải sản phẩm');
-    } finally {
-      setLoading(false);
-    }
-  }, [page]);
+    },
+    [page],
+  );
 
   useEffect(() => {
     fetchProducts();

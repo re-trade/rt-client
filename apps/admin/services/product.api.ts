@@ -1,4 +1,4 @@
-import { IResponseObject, unAuthApi, IPaginationResponse } from '@retrade/util';
+import { IPaginationResponse, IResponseObject, unAuthApi } from '@retrade/util';
 
 export type TProduct = {
   id: string;
