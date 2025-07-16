@@ -1,5 +1,5 @@
 import { IPaginationResponse, IResponseObject } from '@retrade/util';
-import { unAuthApi } from '@retrade/util/src/api/instance';
+import { unAuthApi, authApi } from '@retrade/util/src/api/instance';
 
 export type TProduct = {
   id: string;
@@ -66,5 +66,15 @@ export const productApi = {
       return response.data.content;
     }
     throw new Error('Product not found');
+  },
+
+  async verifyProduct(id: string): Promise<IResponseObject<null>> {
+    const response = await authApi.default.put<IResponseObject<null>>(`/products/${id}/verify`);
+    return response.data;
+  },
+
+  async unverifyProduct(id: string): Promise<IResponseObject<null>> {
+    const response = await authApi.default.put<IResponseObject<null>>(`/products/${id}/unverify`);
+    return response.data;
   },
 };
