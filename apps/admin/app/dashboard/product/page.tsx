@@ -457,7 +457,7 @@ export default function ProductManagementPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
   const {
-    products,
+    products = [],
     page,
     maxPage,
     totalProducts,

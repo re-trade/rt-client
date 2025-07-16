@@ -23,9 +23,9 @@ const useProductManager = () => {
           searchQuery,
         );
         if (response.success) {
-          setProducts(response.content.content);
-          setMaxPage(response.content.totalPages);
-          setTotalProducts(response.content.totalElements);
+          setProducts(response.content as any);
+          setMaxPage(response.pagination?.totalPages ?? 1);
+          setTotalProducts(response.pagination?.totalElements ?? 0);
         } else {
           setProducts([]);
           setMaxPage(1);

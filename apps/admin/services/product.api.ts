@@ -1,4 +1,5 @@
-import { IPaginationResponse, IResponseObject, unAuthApi } from '@retrade/util';
+import { IPaginationResponse, IResponseObject } from '@retrade/util';
+import { unAuthApi } from '@retrade/util/src/api/instance';
 
 export type TProduct = {
   id: string;
@@ -46,13 +47,6 @@ export const productApi = {
       return {
         success: false,
         content: {
-          content: [],
-          page: 0,
-          size: size,
-          totalElements: 0,
-          totalPages: 0,
-        },
-        pagination: {
           content: [],
           page: 0,
           size: size,
