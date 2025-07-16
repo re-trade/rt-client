@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { Camera, DeviceMobile, House, Laptop, SpeakerHigh, Tag, TShirt } from 'phosphor-react';
 import { useEffect, useState } from 'react';
 
 interface Category {
@@ -23,6 +24,43 @@ interface Category {
   visible: boolean;
   children?: Category[] | null;
 }
+
+// Helper function to get an icon and color based on category name
+const getIconForCategory = (name: string): { Icon: React.ElementType; color: string } => {
+  const lowerCaseName = name.toLowerCase();
+  if (
+    lowerCaseName.includes('electronic') ||
+    lowerCaseName.includes('computer') ||
+    lowerCaseName.includes('laptop') ||
+    lowerCaseName.includes('computing')
+  ) {
+    return { Icon: Laptop, color: '#3b82f6' };
+  }
+  if (lowerCaseName.includes('phone') || lowerCaseName.includes('mobile')) {
+    return { Icon: DeviceMobile, color: '#06b6d4' };
+  }
+  if (
+    lowerCaseName.includes('fashion') ||
+    lowerCaseName.includes('apparel') ||
+    lowerCaseName.includes('clothing')
+  ) {
+    return { Icon: TShirt, color: '#f472b6' };
+  }
+  if (lowerCaseName.includes('home') || lowerCaseName.includes('appliances')) {
+    return { Icon: House, color: '#f59e42' };
+  }
+  if (lowerCaseName.includes('camera') || lowerCaseName.includes('photography')) {
+    return { Icon: Camera, color: '#a78bfa' };
+  }
+  if (
+    lowerCaseName.includes('audio') ||
+    lowerCaseName.includes('music') ||
+    lowerCaseName.includes('speaker')
+  ) {
+    return { Icon: SpeakerHigh, color: '#facc15' };
+  }
+  return { Icon: Tag, color: '#64748b' }; // Default icon
+};
 
 const fetchCategories = async (token: string): Promise<Category[]> => {
   const res = await fetch('https://dev.retrades.trade/api/main/v1/categories?page=0&size=50', {
@@ -47,41 +85,57 @@ function TreeTableRow({
 }) {
   const [expanded, setExpanded] = useState(false);
   const hasChildren = category.children && category.children.length > 0;
+  const { Icon, color } = getIconForCategory(category.name);
 
   if (!parentExpanded) return null;
 
   return (
     <>
       <TableRow className="transition-colors hover:bg-gray-50 group">
-        <TableCell style={{ paddingLeft: `${level * 24 + 8}px` }}>
-          {/* Mũi tên luôn hiển thị, nếu không có con thì disabled và màu xám nhạt */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`mr-1 transition-colors ${hasChildren ? 'hover:bg-gray-200' : 'opacity-50 cursor-default'}`}
-            onClick={hasChildren ? () => setExpanded((e) => !e) : undefined}
-            aria-label={expanded ? 'Thu gọn' : 'Mở rộng'}
-            disabled={!hasChildren}
-            tabIndex={hasChildren ? 0 : -1}
-          >
-            {expanded ? (
-              <ChevronDown size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} />
-            ) : (
-              <ChevronRight size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} />
-            )}
-          </Button>
-          <span className="font-medium group-hover:text-blue-600 transition-colors">
-            {category.name}
-          </span>
+        <TableCell style={{ paddingLeft: `${level * 24 + 16}px` }}>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 transition-colors ${
+                hasChildren ? 'hover:bg-gray-200' : 'opacity-50 cursor-default'
+              }`}
+              onClick={hasChildren ? () => setExpanded((e) => !e) : undefined}
+              aria-label={expanded ? 'Thu gọn' : 'Mở rộng'}
+              disabled={!hasChildren}
+              tabIndex={hasChildren ? 0 : -1}
+            >
+              {expanded ? (
+                <ChevronDown
+                  size={16}
+                  className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
+                />
+              ) : (
+                <ChevronRight
+                  size={16}
+                  className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
+                />
+              )}
+            </Button>
+            <Icon
+              size={20}
+              weight="duotone"
+              color={color}
+              className="transition-colors group-hover:scale-110"
+            />
+            <span className="font-medium group-hover:text-blue-600 transition-colors">
+              {category.name}
+            </span>
+          </div>
         </TableCell>
         <TableCell>
           {category.description || <span className="text-gray-400">(Không có)</span>}
         </TableCell>
         <TableCell>
           {category.visible ? (
-            <span className="text-xs text-green-600 bg-green-100 rounded px-2">Hiện</span>
+            <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">Hiện</span>
           ) : (
-            <span className="text-xs text-gray-500 bg-gray-100 rounded px-2">Ẩn</span>
+            <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-0.5">Ẩn</span>
           )}
         </TableCell>
         <TableCell>
@@ -131,11 +185,11 @@ export default function CategoryPage() {
       {loading && <div>Đang tải...</div>}
       {error && <div className="text-red-500">{error}</div>}
       {!loading && !error && (
-        <Card className="p-4">
+        <Card>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Tên danh mục</TableHead>
+                <TableHead className="w-2/5">Tên danh mục</TableHead>
                 <TableHead>Mô tả</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead>Thao tác</TableHead>

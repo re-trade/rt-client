@@ -46,7 +46,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// Thống kê sản phẩm
 const ProductStats = ({ products }: { products: any[] }) => {
   const totalProducts = products.length;
   const verifiedProducts = products.filter((p) => p.verified).length;
@@ -100,7 +99,6 @@ const ProductStats = ({ products }: { products: any[] }) => {
   );
 };
 
-// Filter nâng cao
 const AdvancedFilters = ({
   searchQuery,
   onSearch,
@@ -171,7 +169,6 @@ const AdvancedFilters = ({
   );
 };
 
-// Modal xem chi tiết sản phẩm
 const ProductDetailModal = ({
   product,
   isOpen,
@@ -251,7 +248,6 @@ const ProductDetailModal = ({
             )}
           </div>
 
-          {/* Thông tin sản phẩm */}
           <div className="space-y-4">
             <div>
               <h3 className="text-xl font-bold">{product.name}</h3>
@@ -404,7 +400,6 @@ const ProductDetailModal = ({
   );
 };
 
-// Actions cho sản phẩm
 const ProductActions = ({ product, onVerify, onReject, onView, onEdit, onDelete }: any) => {
   return (
     <div className="flex items-center space-x-2">
@@ -457,7 +452,7 @@ export default function ProductManagementPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
   const {
-    products,
+    products = [],
     page,
     maxPage,
     totalProducts,
@@ -466,9 +461,9 @@ export default function ProductManagementPage() {
     refetch,
     goToPage,
     searchProducts,
-    deleteProduct,
     verifyProduct,
     unverifyProduct,
+    // deleteProduct,
   } = useProductManager();
 
   const handleSort = (field: string) => {
@@ -494,16 +489,21 @@ export default function ProductManagementPage() {
   };
 
   const handleVerify = async (productId: string) => {
-    // TODO: Implement verify product API
-    console.log('Verify product:', productId);
-    // Sau khi verify thành công, refresh lại danh sách
-    refetch();
+    const result = await verifyProduct(productId);
+    if (result.success) {
+      setDeleteSuccess('Xác minh sản phẩm thành công!');
+    } else {
+      setDeleteError(result.message || 'Lỗi xác minh sản phẩm');
+    }
   };
 
   const handleReject = async (productId: string) => {
-    // TODO: Implement reject product API
-    console.log('Reject product:', productId);
-    refetch();
+    const result = await unverifyProduct(productId);
+    if (result.success) {
+      setDeleteSuccess('Hủy xác minh sản phẩm thành công!');
+    } else {
+      setDeleteError(result.message || 'Lỗi hủy xác minh sản phẩm');
+    }
   };
 
   const handleView = (product: any) => {
@@ -521,18 +521,18 @@ export default function ProductManagementPage() {
       try {
         setDeleteError(null); // Clear previous errors
         setDeleteSuccess(null); // Clear previous success
-        const result = await deleteProduct(productId);
-        if (result.success) {
-          // Show success message
-          setDeleteSuccess(result.message);
-          // Auto hide success message after 3 seconds
-          setTimeout(() => {
-            setDeleteSuccess(null);
-          }, 3000);
-        } else {
-          // Show error message in UI
-          setDeleteError(result.message);
-        }
+        // const result = await deleteProduct(productId);
+        // if (result.success) {
+        //   // Show success message
+        //   setDeleteSuccess(result.message);
+        //   // Auto hide success message after 3 seconds
+        //   setTimeout(() => {
+        //     setDeleteSuccess(null);
+        //   }, 3000);
+        // } else {
+        //   // Show error message in UI
+        //   setDeleteError(result.message);
+        // }
       } catch (error) {
         console.error('Error deleting product:', error);
         setDeleteError('Có lỗi xảy ra khi xóa sản phẩm');
@@ -541,11 +541,9 @@ export default function ProductManagementPage() {
   };
 
   const handleExport = () => {
-    // TODO: Export products to CSV/Excel
     console.log('Export products');
   };
 
-  // Filter products based on local filters (status, category, price)
   const filteredProducts = products.filter((product) => {
     const matchesStatus =
       selectedStatus === 'all' ||
@@ -785,16 +783,8 @@ export default function ProductManagementPage() {
                     <TableCell className="text-center min-w-[120px]">
                       <ProductActions
                         product={product}
-                        onVerify={async (id: string) => {
-                          const result = await verifyProduct(id);
-                          if (result.success) setDeleteSuccess(result.message);
-                          else setDeleteError(result.message);
-                        }}
-                        onReject={async (id: string) => {
-                          const result = await unverifyProduct(id);
-                          if (result.success) setDeleteSuccess(result.message);
-                          else setDeleteError(result.message);
-                        }}
+                        onVerify={handleVerify}
+                        onReject={handleReject}
                         onView={handleView}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
@@ -838,7 +828,6 @@ export default function ProductManagementPage() {
         )}
       </Card>
 
-      {/* Product Detail Modal */}
       <ProductDetailModal
         product={selectedProduct}
         isOpen={isDetailModalOpen}
@@ -848,16 +837,16 @@ export default function ProductManagementPage() {
         }}
         onVerify={async (id: string) => {
           const result = await verifyProduct(id);
-          if (result.success) setDeleteSuccess(result.message);
-          else setDeleteError(result.message);
+          if (result.success) setDeleteSuccess('Xác minh sản phẩm thành công!');
+          else setDeleteError(result.message || 'Lỗi xác minh sản phẩm');
           setIsDetailModalOpen(false);
           setSelectedProduct(null);
           refetch();
         }}
         onReject={async (id: string) => {
           const result = await unverifyProduct(id);
-          if (result.success) setDeleteSuccess(result.message);
-          else setDeleteError(result.message);
+          if (result.success) setDeleteSuccess('Hủy xác minh sản phẩm thành công!');
+          else setDeleteError(result.message || 'Lỗi hủy xác minh sản phẩm');
           setIsDetailModalOpen(false);
           setSelectedProduct(null);
           refetch();
