@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/hooks/use-auth';
 import { loginInternal } from '@/services/auth.api';
 import Joi from 'joi';
 import { EyeIcon, EyeOffIcon, KeyIcon, LoaderIcon, UserIcon } from 'lucide-react';
@@ -36,6 +37,7 @@ const loginSchema = Joi.object({
 
 export default function LoginPage() {
   const router = useRouter();
+  const { isAuth } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +88,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginInternal(formData);
-      // Redirect to dashboard after successful login
+      await isAuth();
       router.push('/dashboard');
     } catch (err) {
       setError('Tên đăng nhập hoặc mật khẩu không đúng');

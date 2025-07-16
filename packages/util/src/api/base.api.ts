@@ -1,4 +1,5 @@
-export interface IPaginationResponse {
+export interface IPaginationResponse<T = any> {
+  content: T[];
   page: number;
   size: number;
   totalPages: number;
@@ -61,6 +62,7 @@ export const unwrapPaginationWrapper = <T extends []>(
     code: options?.code ?? '200',
     success: options?.success ?? true,
     pagination: {
+      content: wrapper.data,
       page: wrapper.page,
       size: wrapper.size,
       totalPages: wrapper.totalPages,
