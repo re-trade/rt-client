@@ -35,7 +35,6 @@ const menuItems = [
     group: 'Tổng quan',
     items: [
       { title: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-      { title: 'Báo cáo & Thống kê', icon: BarChart3, href: '/dashboard/reports' },
     ],
   },
   {
@@ -44,6 +43,8 @@ const menuItems = [
       { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product' },
       { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user' },
       { title: 'Quản lý Seller', icon: Store, href: '/dashboard/seller' },
+      { title: 'Quản lý Category', icon: FileText, href: '/dashboard/category' },
+      { title: 'Báo cáo Seller', icon: BarChart3, href: '/dashboard/reports' },
     ],
   },
   {
