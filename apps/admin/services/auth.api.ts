@@ -1,5 +1,5 @@
 import { getDeviceInfo } from '@/lib/device-fingerprint';
-import { authApi, ETokenName, IResponseObject, unAuthApi } from '@retrade/util';
+import { ETokenName } from '@retrade/util';
 
 type TLocalLogin = {
   username: string;
@@ -28,32 +28,75 @@ type TAccountMeResponse = {
 
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
-  const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
-    '/auth/local',
-    { ...loginForm },
-    {
-      headers: {
-        'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
-        'x-device-name': encodeURIComponent(deviceInfo.deviceName),
-        'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
-        'x-location': encodeURIComponent(deviceInfo.location),
-      },
+
+  // Sử dụng URL đúng cho API
+  const url = 'https://dev.retrades.trade/api/main/v1/auth/local';
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
+      'x-device-name': encodeURIComponent(deviceInfo.deviceName),
+      'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
+      'x-location': encodeURIComponent(deviceInfo.location),
     },
-  );
-  if (result.data.success && result.status === 200) {
-    const { ACCESS_TOKEN } = result.data.content.tokens;
+    body: JSON.stringify(loginForm),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  if (result.success && response.status === 200) {
+    const { ACCESS_TOKEN, REFRESH_TOKEN } = result.content.tokens;
+
+    // Save to localStorage
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
+    localStorage.setItem(ETokenName.REFRESH_TOKEN, REFRESH_TOKEN);
+
+    // Save to cookies for middleware
+    if (typeof document !== 'undefined') {
+      document.cookie = `access-token=${ACCESS_TOKEN}; path=/; max-age=3600; SameSite=Strict`;
+      document.cookie = `refresh-token=${REFRESH_TOKEN}; path=/; max-age=86400; SameSite=Strict`;
+    }
+  } else {
+    throw new Error(result.message || 'Login failed');
   }
 };
 
 const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TAccountMeResponse>>('/accounts/me');
-    if (result.data.success && result.status === 200) {
-      const { content } = result.data;
-      return content;
+    // Lấy token từ localStorage
+    const accessToken = localStorage.getItem(ETokenName.ACCESS_TOKEN);
+    if (!accessToken) {
+      return undefined;
     }
-  } catch {
+
+    const url = 'https://dev.retrades.trade/api/main/v1/accounts/me';
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (result.success && response.status === 200) {
+      return result.content;
+    }
+  } catch (error) {
+    console.error('Error fetching account info:', error);
     return undefined;
   }
   return undefined;
