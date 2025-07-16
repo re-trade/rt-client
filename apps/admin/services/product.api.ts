@@ -1,5 +1,5 @@
 import { IPaginationResponse, IResponseObject } from '@retrade/util';
-import { unAuthApi, authApi } from '@retrade/util/src/api/instance';
+import { authApi, unAuthApi } from '@retrade/util/src/api/instance';
 
 export type TProduct = {
   id: string;

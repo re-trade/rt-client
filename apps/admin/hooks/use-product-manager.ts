@@ -58,7 +58,6 @@ const useProductManager = () => {
     fetchProducts(searchQuery, 1);
   };
 
-
   const verifyProduct = async (id: string) => {
     try {
       const result = await productApi.verifyProduct(id);
@@ -67,7 +66,10 @@ const useProductManager = () => {
       }
       return result;
     } catch (err) {
-      return { success: false, message: err instanceof Error ? err.message : 'Lỗi xác minh sản phẩm' };
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : 'Lỗi xác minh sản phẩm',
+      };
     }
   };
 
@@ -79,7 +81,10 @@ const useProductManager = () => {
       }
       return result;
     } catch (err) {
-      return { success: false, message: err instanceof Error ? err.message : 'Lỗi hủy xác minh sản phẩm' };
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : 'Lỗi hủy xác minh sản phẩm',
+      };
     }
   };
 

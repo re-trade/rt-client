@@ -828,8 +828,6 @@ export default function ProductManagementPage() {
         )}
       </Card>
 
-
-
       <ProductDetailModal
         product={selectedProduct}
         isOpen={isDetailModalOpen}
