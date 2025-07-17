@@ -1,16 +1,15 @@
 import {
+  createCategory,
+  deleteCategory,
   getCategoriesInternal,
   getCategoryByIdInternal,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-  getCategoryTree,
-  getCategoryParent,
   getCategoryByName,
   getCategoryByType,
+  getCategoryParent,
+  getCategoryTree,
   getRootCategories,
+  updateCategory,
   type Category,
-  type CategoriesResponse,
   type GetCategoriesParams,
 } from '@/services/category.api';
 import { useCallback, useState } from 'react';
@@ -68,51 +67,60 @@ export function useCategoryManager() {
   }, []);
 
   // Thêm mới
-  const handleCreate = useCallback(async (data: Partial<Category>) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await createCategory(data);
-      await fetchCategories();
-      return res;
-    } catch (err) {
-      setError('Lỗi khi thêm danh mục');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCategories]);
+  const handleCreate = useCallback(
+    async (data: Partial<Category>) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await createCategory(data);
+        await fetchCategories();
+        return res;
+      } catch (err) {
+        setError('Lỗi khi thêm danh mục');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchCategories],
+  );
 
   // Sửa
-  const handleUpdate = useCallback(async (id: string, data: Partial<Category>) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await updateCategory(id, data);
-      await fetchCategories();
-      return res;
-    } catch (err) {
-      setError('Lỗi khi cập nhật danh mục');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCategories]);
+  const handleUpdate = useCallback(
+    async (id: string, data: Partial<Category>) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await updateCategory(id, data);
+        await fetchCategories();
+        return res;
+      } catch (err) {
+        setError('Lỗi khi cập nhật danh mục');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchCategories],
+  );
 
   // Xóa
-  const handleDelete = useCallback(async (id: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await deleteCategory(id);
-      await fetchCategories();
-    } catch (err) {
-      setError('Lỗi khi xóa danh mục');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCategories]);
+  const handleDelete = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await deleteCategory(id);
+        await fetchCategories();
+      } catch (err) {
+        setError('Lỗi khi xóa danh mục');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchCategories],
+  );
 
   // Lấy parent
   const fetchParent = useCallback(async (id: string) => {
@@ -187,4 +195,4 @@ export function useCategoryManager() {
     fetchByType,
     checkExist,
   };
-} 
+}

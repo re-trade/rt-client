@@ -2,6 +2,9 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -11,14 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useCategoryManager } from '@/hooks/use-category-manager';
 import { unAuthApi } from '@retrade/util/src/api/instance';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Camera, DeviceMobile, House, Laptop, SpeakerHigh, Tag, TShirt } from 'phosphor-react';
 import { useEffect, useState } from 'react';
-import { useCategoryManager } from '@/hooks/use-category-manager';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 interface Category {
@@ -93,7 +93,12 @@ export default function CategoryPage() {
   // State cho dialog và form
   const [openDialog, setOpenDialog] = useState<null | 'create' | 'edit'>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [form, setForm] = useState<Partial<Category>>({ name: '', description: '', visible: true, parentId: null });
+  const [form, setForm] = useState<Partial<Category>>({
+    name: '',
+    description: '',
+    visible: true,
+    parentId: null,
+  });
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Category | null>(null);
 
@@ -107,7 +112,10 @@ export default function CategoryPage() {
     const { name, value, type } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' && 'checked' in e.target ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === 'checkbox' && 'checked' in e.target
+          ? (e.target as HTMLInputElement).checked
+          : value,
     }));
   };
 
@@ -192,7 +200,15 @@ export default function CategoryPage() {
     }
   };
 
-  function TreeTableRow({ category, level = 0, parentExpanded = true }: { category: Category; level?: number; parentExpanded?: boolean }) {
+  function TreeTableRow({
+    category,
+    level = 0,
+    parentExpanded = true,
+  }: {
+    category: Category;
+    level?: number;
+    parentExpanded?: boolean;
+  }) {
     const [expanded, setExpanded] = useState(false);
     const hasChildren = category.children && category.children.length > 0;
     const { Icon, color } = getIconForCategory(category.name);
@@ -211,23 +227,71 @@ export default function CategoryPage() {
                 disabled={!hasChildren}
                 tabIndex={hasChildren ? 0 : -1}
               >
-                {expanded ? <ChevronDown size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} /> : <ChevronRight size={16} className={hasChildren ? 'text-gray-700' : 'text-gray-300'} />}
+                {expanded ? (
+                  <ChevronDown
+                    size={16}
+                    className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={16}
+                    className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
+                  />
+                )}
               </Button>
-              <Icon size={20} weight="duotone" color={color} className="transition-colors group-hover:scale-110" />
-              <span className="font-medium group-hover:text-blue-600 transition-colors">{category.name}</span>
+              <Icon
+                size={20}
+                weight="duotone"
+                color={color}
+                className="transition-colors group-hover:scale-110"
+              />
+              <span className="font-medium group-hover:text-blue-600 transition-colors">
+                {category.name}
+              </span>
             </div>
           </TableCell>
-          <TableCell>{category.description || <span className="text-gray-400">(Không có)</span>}</TableCell>
-          <TableCell>{category.visible ? <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">Hiện</span> : <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-0.5">Ẩn</span>}</TableCell>
           <TableCell>
-            <Button size="sm" variant="outline" className="mr-2" onClick={() => openEditDialog(category)}>Sửa</Button>
-            <Button size="sm" variant="destructive" className="mr-2" onClick={() => setConfirmDelete(category)}>Xóa</Button>
-            <Button size="sm" variant="secondary" onClick={() => openCreateDialog(category.id)}>Thêm con</Button>
+            {category.description || <span className="text-gray-400">(Không có)</span>}
+          </TableCell>
+          <TableCell>
+            {category.visible ? (
+              <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">Hiện</span>
+            ) : (
+              <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-0.5">Ẩn</span>
+            )}
+          </TableCell>
+          <TableCell>
+            <Button
+              size="sm"
+              variant="outline"
+              className="mr-2"
+              onClick={() => openEditDialog(category)}
+            >
+              Sửa
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="mr-2"
+              onClick={() => setConfirmDelete(category)}
+            >
+              Xóa
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => openCreateDialog(category.id)}>
+              Thêm con
+            </Button>
           </TableCell>
         </TableRow>
-        {hasChildren && expanded && category.children!.map((child) => (
-          <TreeTableRow key={child.id} category={child} level={level + 1} parentExpanded={expanded} />
-        ))}
+        {hasChildren &&
+          expanded &&
+          category.children!.map((child) => (
+            <TreeTableRow
+              key={child.id}
+              category={child}
+              level={level + 1}
+              parentExpanded={expanded}
+            />
+          ))}
       </>
     );
   }
@@ -237,9 +301,15 @@ export default function CategoryPage() {
       <h2 className="text-xl font-bold mb-2">Quản lý Category</h2>
       <Separator className="mb-4" />
       <form onSubmit={handleSearch} className="flex gap-2 mb-4">
-        <Input placeholder="Tìm kiếm theo tên..." value={search} onChange={e => setSearch(e.target.value)} />
+        <Input
+          placeholder="Tìm kiếm theo tên..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <Button type="submit">Tìm kiếm</Button>
-        <Button type="button" variant="secondary" onClick={() => openCreateDialog()}>Thêm mới</Button>
+        <Button type="button" variant="secondary" onClick={() => openCreateDialog()}>
+          Thêm mới
+        </Button>
       </form>
       {loading && <div>Đang tải...</div>}
       {error && <div className="text-red-500">{error}</div>}
@@ -255,9 +325,11 @@ export default function CategoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.filter((cat) => cat.parentId === null).map((cat) => (
-                <TreeTableRow key={cat.id} category={cat} />
-              ))}
+              {categories
+                .filter((cat) => cat.parentId === null)
+                .map((cat) => (
+                  <TreeTableRow key={cat.id} category={cat} />
+                ))}
             </TableBody>
           </Table>
         </Card>
@@ -273,18 +345,28 @@ export default function CategoryPage() {
             </div>
             <div>
               <Label>Mô tả</Label>
-              <Input name="description" value={form.description || ''} onChange={handleFormChange} />
+              <Input
+                name="description"
+                value={form.description || ''}
+                onChange={handleFormChange}
+              />
             </div>
             <div>
               <Label>Trạng thái</Label>
-              <select name="visible" value={form.visible ? 'true' : 'false'} onChange={handleFormChange}>
+              <select
+                name="visible"
+                value={form.visible ? 'true' : 'false'}
+                onChange={handleFormChange}
+              >
                 <option value="true">Hiện</option>
                 <option value="false">Ẩn</option>
               </select>
             </div>
             <div className="flex gap-2 justify-end mt-4">
               <Button type="submit">Lưu</Button>
-              <Button type="button" variant="secondary" onClick={closeDialog}>Hủy</Button>
+              <Button type="button" variant="secondary" onClick={closeDialog}>
+                Hủy
+              </Button>
             </div>
           </form>
         </DialogContent>
@@ -295,8 +377,12 @@ export default function CategoryPage() {
           <DialogTitle>Xác nhận xóa</DialogTitle>
           <div>Bạn có chắc muốn xóa danh mục "{confirmDelete?.name}"?</div>
           <div className="flex gap-2 justify-end mt-4">
-            <Button variant="destructive" onClick={handleDeleteCategory}>Xóa</Button>
-            <Button variant="secondary" onClick={() => setConfirmDelete(null)}>Hủy</Button>
+            <Button variant="destructive" onClick={handleDeleteCategory}>
+              Xóa
+            </Button>
+            <Button variant="secondary" onClick={() => setConfirmDelete(null)}>
+              Hủy
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

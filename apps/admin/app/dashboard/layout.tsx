@@ -17,7 +17,6 @@ import {
 import {
   AlertCircle,
   BarChart3,
-  DollarSign,
   FileText,
   LayoutDashboard,
   Package,
