@@ -47,7 +47,7 @@ const menuItems = [
   {
     group: 'Tài chính',
     items: [
-      { title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue' },
+      //{ title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue' },
       { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial' },
     ],
   },
