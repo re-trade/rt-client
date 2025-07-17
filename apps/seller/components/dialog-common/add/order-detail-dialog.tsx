@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { OrderResponse } from '@/service/orders.api';
+import { TProduct, productApi } from '@/service/product.api';
 import { snipppetCode } from '@/service/snippetCode';
 import {
   AlertCircle,
@@ -34,6 +35,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
+import { ProductDetailsDialog } from '../view-update/view-detail-product';
 
 interface OrderDetailDialogProps {
   open: boolean;
@@ -214,6 +217,22 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
 
   const orderStatus = getStatusConfig(order.orderStatus);
   const paymentStatus = getPaymentStatusConfig(order.paymentStatus);
+  const [productDetails, setProductDetails] = useState<TProduct | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const handleDetailsProduct = async (productId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await productApi.getProduct(productId);
+      console.log('ahahhhaa', response);
+      setProductDetails(response as TProduct);
+      setIsDetailsOpen(true);
+    } catch (error) {
+      console.error('Failed to fetch product details:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -389,6 +408,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
               {order.items.map((item, index) => (
                 <div
                   key={item.productId}
+                  onClick={() => handleDetailsProduct(item.productId)}
                   className="flex items-center gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors"
                 >
                   <div className="relative">
@@ -480,6 +500,12 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
           </CardContent>
         </Card>
       </DialogContent>
+
+      <ProductDetailsDialog
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        product={productDetails}
+      />
     </Dialog>
   );
 }

@@ -3,6 +3,7 @@
 
 import { CreateProductDialog } from '@/components/dialog-common/add/create-product-dialog';
 import { EditProductDialog } from '@/components/dialog-common/view-update/edit-product-dialog';
+import { ProductDetailsDialog } from '@/components/dialog-common/view-update/view-detail-product';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -76,6 +77,7 @@ export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [productList, setProductList] = useState<TProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -224,6 +226,10 @@ export default function ProductManagement() {
   const handleEditProduct = (product: TProduct) => {
     setSelectedProduct(product);
     setIsEditOpen(true);
+  };
+  const handDetailsProduct = (product: TProduct) => {
+    setSelectedProduct(product);
+    setIsDetailsOpen(true);
   };
 
   const handleDeleteProduct = async (product: TProduct) => {
@@ -654,7 +660,7 @@ export default function ProductManagement() {
                               </DropdownMenuLabel>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={() => handleEditProduct(product)}
+                                onClick={() => handDetailsProduct(product)}
                                 className="hover:bg-blue-50 hover:text-blue-700"
                               >
                                 <Eye className="mr-2 h-4 w-4" />
@@ -748,9 +754,15 @@ export default function ProductManagement() {
 
         <EditProductDialog
           open={isEditOpen}
+          isEdit={true}
           onOpenChange={setIsEditOpen}
           product={selectedProduct}
           onUpdateProduct={handleUpdateProduct}
+        />
+        <ProductDetailsDialog
+          open={isDetailsOpen}
+          onOpenChange={setIsDetailsOpen}
+          product={selectedProduct}
         />
       </div>
     </div>
