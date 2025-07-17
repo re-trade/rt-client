@@ -9,6 +9,8 @@ export function useMessenger() {
   const [selectedContact, setSelectedContact] = useState<Room | null>(null);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSomeoneTyping, setIsSomeoneTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Room[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -106,6 +108,10 @@ export function useMessenger() {
     });
     socket.on('message', (msg) => setMessages((prev) => [...prev, msg]));
     socket.on('signal', (data) => handleSignalRef.current(data));
+    socket.on('typing', (data) => {
+      setIsSomeoneTyping(data.isTyping);
+      setTypingUser(data.isTyping ? data.username : null);
+    });
     return () => {
       socket.disconnect();
       socket.off('authSuccess', handleAuthSuccess);
@@ -113,6 +119,7 @@ export function useMessenger() {
       socket.off('roomJoined');
       socket.off('message');
       socket.off('signal');
+      socket.off('typing');
     };
   }, [router]);
 
@@ -152,6 +159,21 @@ export function useMessenger() {
       }
     }
   }, [selectedContact, router]);
+
+  const handleTyping = useCallback(
+    (isTyping: boolean) => {
+      if (!socketRef.current || !selectedContact) return;
+
+      const seller = selectedContact.participants.find((p) => p.senderRole === 'seller');
+      if (!seller) return;
+
+      socketRef.current.emit('typing', {
+        receiverId: seller.id,
+        isTyping,
+      });
+    },
+    [selectedContact],
+  );
 
   const startCamera = useCallback(
     async (withVideo: boolean) => {
@@ -284,7 +306,9 @@ export function useMessenger() {
     videoRef,
     remoteVideoRef,
     audioRef,
-
+    handleTyping,
+    isSomeoneTyping,
+    typingUser,
     isVideoCall,
     isAudioCall,
     isCalling,

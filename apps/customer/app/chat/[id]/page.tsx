@@ -6,7 +6,7 @@ import { ChatHeader } from '@components/chat/ChatHeader';
 import { MessageInput } from '@components/chat/MessageInput';
 import { MessagesList } from '@components/chat/MessagesList';
 import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function MessageDetailPage() {
   const params = useParams();
@@ -28,6 +28,7 @@ export default function MessageDetailPage() {
     setNewMessage,
     setSelectedChatId,
     handleSendMessage,
+    handleTyping,
     startVideoCall,
     startAudioCall,
     endCall,
@@ -38,11 +39,23 @@ export default function MessageDetailPage() {
     formatRecordingTime,
   } = useMessengerContext();
 
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (chatId) {
       setSelectedChatId(chatId);
     }
   }, [chatId, setSelectedChatId]);
+
+  const handleMessageChange = (value: string) => {
+    setNewMessage(value);
+    handleTyping(true);
+
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    typingTimeout.current = setTimeout(() => {
+      handleTyping(false);
+    }, 2000);
+  };
 
   if (chatId && !selectedContact) {
     return (
@@ -93,7 +106,7 @@ export default function MessageDetailPage() {
       <MessagesList messages={messages} />
       <MessageInput
         message={newMessage}
-        onMessageChange={setNewMessage}
+        onMessageChange={handleMessageChange}
         onSendMessage={handleSendMessage}
       />
     </div>
