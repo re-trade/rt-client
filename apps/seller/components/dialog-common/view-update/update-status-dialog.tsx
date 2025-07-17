@@ -17,6 +17,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { CreateOrderHistory, orderHistoryApi } from '@/service/orderHistory.api';
 import { OrderResponse } from '@/service/orders.api';
 import { OrderStatusResponse, orderStatusApi } from '@/service/orderStatus.api';
 import { snipppetCode } from '@/service/snippetCode';
@@ -42,7 +43,6 @@ import {
   Truck,
   TruckIcon,
   User,
-  X,
   XCircle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -70,6 +70,7 @@ export function UpdateStatusDialog({
   const [notes, setNotes] = useState('');
   const [orderStatuses, setOrderStatuses] = useState<OrderStatusResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [dataUpdtaeStatus, setDataupdateStatus] = useState<CreateOrderHistory>();
 
   useEffect(() => {
     if (order) {
@@ -102,14 +103,8 @@ export function UpdateStatusDialog({
       PENDING: {
         color: 'bg-amber-50 text-amber-700 border-amber-200',
         icon: <Clock className="h-4 w-4" />,
-        text: 'Chờ xác nhận',
+        text: 'Chờ xử lý',
         bgColor: 'bg-amber-500',
-      },
-      CONFIRMED: {
-        color: 'bg-sky-50 text-sky-700 border-sky-200',
-        icon: <CheckCheck className="h-4 w-4" />,
-        text: 'Đã xác nhận',
-        bgColor: 'bg-sky-500',
       },
       PREPARING: {
         color: 'bg-violet-50 text-violet-700 border-violet-200',
@@ -206,6 +201,7 @@ export function UpdateStatusDialog({
       }
     );
   };
+  console.log('dsjhgfdjfgjds', order);
 
   const requiresTrackingNumber = (status: OrderResponse['orderStatus']) => {
     return ['DELIVERING', 'DELIVERED'].includes(status.code);
@@ -220,6 +216,12 @@ export function UpdateStatusDialog({
     setIsLoading(true);
     try {
       await onUpdateStatus(order.comboId, newStatus, trackingNumber, notes);
+      const updateStatus = {
+        orderComboId: order.comboId,
+        notes: notes,
+        newStatusId: newStatus.id,
+      };
+      const response = await orderHistoryApi.updateStatusOrder(updateStatus);
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to update status:', error);
@@ -236,6 +238,10 @@ export function UpdateStatusDialog({
       .toUpperCase()
       .slice(0, 2);
   };
+  const isFormValid =
+    newStatus.code !== order.orderStatus.code &&
+    notes.trim() !== '' &&
+    (!requiresTrackingNumber(newStatus) || trackingNumber.trim() !== '');
 
   const currentStatusConfig = getStatusConfig(order.orderStatus);
   const newStatusConfig = getStatusConfig(newStatus);
@@ -437,24 +443,25 @@ export function UpdateStatusDialog({
           <div className="flex gap-3 pt-4">
             <Button
               onClick={handleSubmit}
-              disabled={isLoading}
-              className="flex-1 h-12 text-base font-medium"
+              disabled={!isFormValid || isLoading}
+              className={cn(
+                'flex-1 h-12 text-base font-medium',
+                isFormValid
+                  ? 'bg-primary text-white hover:bg-primary/90'
+                  : 'bg-muted text-muted-foreground cursor-not-allowed',
+              )}
             >
               {isLoading ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Đang cập nhật...
+                </>
               ) : (
-                <Save className="h-4 w-4 mr-2" />
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Cập nhật trạng thái
+                </>
               )}
-              {isLoading ? 'Đang cập nhật...' : 'Cập nhật trạng thái'}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-              className="h-12 px-6"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Hủy
             </Button>
           </div>
         </div>
