@@ -52,12 +52,6 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
         text: 'Chờ xác nhận',
         pulse: true,
       },
-      CONFIRMED: {
-        color: 'bg-sky-50 text-sky-700 border-sky-200 shadow-sky-100',
-        icon: <CheckCheck className="h-4 w-4" />,
-        text: 'Đã xác nhận',
-        pulse: false,
-      },
       PREPARING: {
         color: 'bg-violet-50 text-violet-700 border-violet-200 shadow-violet-100',
         icon: <Package className="h-4 w-4" />,
