@@ -101,14 +101,46 @@ export default function Home() {
   );
 }
 */
-import Link from 'next/link';
+'use client';
+
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function Home() {
+  const { auth, loading, checkAdminRole } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading) {
+      if (auth && checkAdminRole()) {
+        // User is authenticated and has admin role, redirect to dashboard
+        router.push('/dashboard');
+      } else {
+        // User is not authenticated or doesn't have admin role, redirect to login
+        router.push('/login');
+      }
+    }
+  }, [auth, loading, checkAdminRole, router]);
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center space-x-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="text-gray-600">Đang kiểm tra quyền truy cập...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Link href="/admin" className="text-xl text-[#4A4039] hover:underline">
-        Go to Admin Dashboard
-      </Link>
+      <div className="flex items-center space-x-2">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="text-gray-600">Đang chuyển hướng...</span>
+      </div>
     </div>
   );
 }
