@@ -38,7 +38,9 @@ export function ContactsList({
 
       <div className="flex-1 overflow-y-auto">
         {contacts.map((contact) => {
-          const otherParticipant = contact.participants?.[0];
+          const otherParticipant = contact.participants
+            .filter((item) => item.senderRole === 'seller')
+            .pop();
           return (
             <div
               key={contact.id}

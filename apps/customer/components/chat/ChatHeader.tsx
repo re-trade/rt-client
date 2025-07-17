@@ -10,7 +10,9 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ contact, onAudioCall, onVideoCall }: ChatHeaderProps) {
-  const otherParticipant = contact?.participants?.[0];
+  const otherParticipant = contact?.participants
+    ?.filter((item) => item.senderRole === 'seller')
+    ?.pop();
 
   return (
     <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">

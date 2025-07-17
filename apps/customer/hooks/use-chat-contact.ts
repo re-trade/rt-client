@@ -142,6 +142,15 @@ export function useMessenger() {
     setNewMessage('');
   };
 
+  useEffect(() => {
+    if (selectedContact) {
+      const seller = selectedContact.participants.filter((p) => p.senderRole === 'seller').pop();
+      if (seller) {
+        router.push(`/chat/${seller.id}`);
+      }
+    }
+  }, [selectedContact, router]);
+
   const startCamera = useCallback(
     async (withVideo: boolean) => {
       const stream = await navigator.mediaDevices.getUserMedia({
