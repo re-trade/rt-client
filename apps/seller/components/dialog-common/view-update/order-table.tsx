@@ -61,12 +61,6 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
         text: 'Chờ xác nhận',
         pulse: true,
       },
-      CONFIRMED: {
-        color: 'bg-sky-50 text-sky-700 border-sky-200 shadow-sky-100',
-        icon: <CheckCheck className="h-3.5 w-3.5" />,
-        text: 'Đã xác nhận',
-        pulse: false,
-      },
       PREPARING: {
         color: 'bg-violet-50 text-violet-700 border-violet-200 shadow-violet-100',
         icon: <Package className="h-3.5 w-3.5" />,
@@ -359,26 +353,6 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
 
                     <TableCell className="py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onViewDetail(order)}
-                          className="h-8 w-8 p-0 border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-
-                        {canUpdateStatus(order.orderStatus) && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onUpdateStatus(order)}
-                            className="h-8 w-8 p-0 border-gray-200 hover:bg-green-50 hover:border-green-300 hover:text-green-600 transition-colors"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        )}
-
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
