@@ -44,7 +44,6 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
     }
     return 'Không xác định';
   };
-  
 
   // Helper function to get condition label
   const getConditionLabel = (condition: string): { label: string; color: string } => {
