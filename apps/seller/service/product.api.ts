@@ -23,6 +23,7 @@ export type TProduct = {
   verified: boolean;
   condition: string;
   status: string;
+  avgVote: number;
   createdAt: string;
   updatedAt: string;
 };

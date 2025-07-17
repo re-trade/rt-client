@@ -18,6 +18,7 @@ interface EditProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: TProduct | null;
+  isEdit: boolean; // New prop to control editability
   onUpdateProduct: (
     product: Omit<
       TProduct,
@@ -30,6 +31,7 @@ export function EditProductDialog({
   open,
   onOpenChange,
   product,
+  isEdit,
   onUpdateProduct,
 }: EditProductDialogProps) {
   const [formData, setFormData] = useState({
@@ -112,14 +114,19 @@ export function EditProductDialog({
   }, [imagePreviews, thumbnailPreview]);
 
   const handleFormChange = (field: keyof typeof formData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (isEdit) {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleChooseFiles = () => {
-    fileInputRef.current?.click();
+    if (isEdit) {
+      fileInputRef.current?.click();
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEdit) return;
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
@@ -130,6 +137,7 @@ export function EditProductDialog({
   };
 
   const handleRemoveImage = (index: number) => {
+    if (!isEdit) return;
     const preview = imagePreviews[index];
     if (preview.startsWith('blob:')) {
       URL.revokeObjectURL(preview);
@@ -139,10 +147,13 @@ export function EditProductDialog({
   };
 
   const handleChooseThumbnail = () => {
-    thumbnailInputRef.current?.click();
+    if (isEdit) {
+      thumbnailInputRef.current?.click();
+    }
   };
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEdit) return;
     const file = e.target.files?.[0];
     if (file) {
       if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
@@ -157,6 +168,7 @@ export function EditProductDialog({
   };
 
   const handleRemoveThumbnail = () => {
+    if (!isEdit) return;
     if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
       URL.revokeObjectURL(thumbnailPreview);
     }
@@ -166,7 +178,7 @@ export function EditProductDialog({
   };
 
   const isFormChanged = (): boolean => {
-    if (!initialFormData) return false;
+    if (!isEdit || !initialFormData) return false;
     return (
       JSON.stringify(formData) !== JSON.stringify(initialFormData) ||
       selectedFiles.length > 0 ||
@@ -175,6 +187,8 @@ export function EditProductDialog({
   };
 
   const handleSubmit = async () => {
+    if (!isEdit) return;
+
     if (!formData.name.trim()) {
       toast.error('Vui lòng nhập tên sản phẩm');
       return;
@@ -256,7 +270,7 @@ export function EditProductDialog({
         <DialogHeader className="pb-6 border-b">
           <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Package className="w-6 h-6 text-blue-600" />
-            Chỉnh sửa sản phẩm
+            {isEdit ? 'Chỉnh sửa sản phẩm' : 'Xem sản phẩm'}
           </DialogTitle>
         </DialogHeader>
 
@@ -279,6 +293,7 @@ export function EditProductDialog({
                   onChange={(e) => handleFormChange('name', e.target.value)}
                   className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Nhập tên sản phẩm"
+                  disabled={!isEdit}
                 />
               </div>
 
@@ -290,6 +305,7 @@ export function EditProductDialog({
                   value={formData.brandId}
                   currentBrandId={formData.brandId}
                   onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
+                  disabled={!isEdit}
                 />
               </div>
 
@@ -306,6 +322,7 @@ export function EditProductDialog({
                   onChange={(e) => handleFormChange('currentPrice', e.target.value)}
                   className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="0"
+                  disabled={!isEdit}
                 />
               </div>
 
@@ -321,6 +338,7 @@ export function EditProductDialog({
                   onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
                   className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="0"
+                  disabled={!isEdit}
                 />
               </div>
 
@@ -334,6 +352,7 @@ export function EditProductDialog({
                   onChange={(e) => handleFormChange('model', e.target.value)}
                   className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Nhập model sản phẩm"
+                  disabled={!isEdit}
                 />
               </div>
 
@@ -346,6 +365,7 @@ export function EditProductDialog({
                   value={formData.condition}
                   onChange={(e) => handleFormChange('condition', e.target.value)}
                   className="w-full h-11 p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  disabled={!isEdit}
                 >
                   <option value="NEW">Mới</option>
                   <option value="LIKE_NEW">Như mới</option>
@@ -380,6 +400,7 @@ export function EditProductDialog({
                   value={formData.warrantyExpiryDate}
                   onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
                   className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={!isEdit}
                 />
               </div>
 
@@ -397,6 +418,7 @@ export function EditProductDialog({
                   onChange={(e) => handleFormChange('tags', e.target.value)}
                   className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Ngăn cách bằng dấu phẩy"
+                  disabled={!isEdit}
                 />
               </div>
             </div>
@@ -409,6 +431,7 @@ export function EditProductDialog({
                 value={formData.categoryIds}
                 currentCategoryId={product?.categories}
                 onChange={(selected) => handleFormChange('categoryIds', selected)}
+                disabled={!isEdit}
               />
             </div>
           </div>
@@ -432,6 +455,7 @@ export function EditProductDialog({
                   rows={3}
                   className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Nhập mô tả ngắn gọn về sản phẩm"
+                  disabled={!isEdit}
                 />
               </div>
 
@@ -446,6 +470,7 @@ export function EditProductDialog({
                   rows={4}
                   className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Nhập mô tả chi tiết về sản phẩm"
+                  disabled={!isEdit}
                 />
               </div>
             </div>
@@ -465,15 +490,17 @@ export function EditProductDialog({
                   <Label className="text-sm font-medium text-gray-700 mb-3 block">
                     Ảnh đại diện
                   </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleChooseThumbnail}
-                    className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Chọn ảnh
-                  </Button>
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleChooseThumbnail}
+                      className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Chọn ảnh
+                    </Button>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -492,13 +519,15 @@ export function EditProductDialog({
                         fill
                         className="rounded-lg object-cover border-2 border-gray-200"
                       />
-                      <button
-                        type="button"
-                        onClick={handleRemoveThumbnail}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      {isEdit && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveThumbnail}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-100">
@@ -519,15 +548,17 @@ export function EditProductDialog({
                   <Label className="text-sm font-medium text-gray-700 mb-3 block">
                     Ảnh sản phẩm chi tiết
                   </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleChooseFiles}
-                    className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Chọn nhiều ảnh
-                  </Button>
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleChooseFiles}
+                      className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Chọn nhiều ảnh
+                    </Button>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -550,13 +581,15 @@ export function EditProductDialog({
                               fill
                               className="rounded-lg object-cover border-2 border-gray-200"
                             />
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveImage(index)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
+                            {isEdit && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImage(index)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -575,23 +608,16 @@ export function EditProductDialog({
 
         {/* Action Buttons */}
         <div className="flex gap-4 pt-6 border-t bg-gray-50 -mx-6 -mb-6 px-6 py-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isSubmitting}
-            className="flex-1"
-          >
-            Hủy
-          </Button>
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting || !isFormChanged()}
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
-          >
-            {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật sản phẩm'}
-          </Button>
+          {isEdit && (
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !isFormChanged()}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
+            >
+              {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật sản phẩm'}
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

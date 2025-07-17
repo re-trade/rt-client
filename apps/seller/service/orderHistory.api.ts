@@ -1,9 +1,9 @@
-import { authApi,IResponseObject,unAuthApi } from "@retrade/util";
-export type CreateOrderHistory={
+import { authApi, IResponseObject } from '@retrade/util';
+export type CreateOrderHistory = {
   orderComboId: string;
   notes: string;
-  newStatusId: string
-}
+  newStatusId: string;
+};
 export type OrderHistoryResponse = {
   id: string;
   orderComboId: string;
@@ -21,16 +21,16 @@ export type OrderHistoryResponse = {
   };
   sellerId: string;
   notes: string;
-  createdAt: string; 
+  createdAt: string;
   updatedAt: string;
 };
 
-export const orderHistoryApi ={
-async updateStatusOrder(orderHistory: CreateOrderHistory): Promise<OrderHistoryResponse | null> {
-  const response = await authApi.default.post<IResponseObject<OrderHistoryResponse>>(
-    `/order-history`,
-    orderHistory 
-  );
-  return response.data.success ? response.data.content : null;
-}
-}
+export const orderHistoryApi = {
+  async updateStatusOrder(orderHistory: CreateOrderHistory): Promise<OrderHistoryResponse | null> {
+    const response = await authApi.default.post<IResponseObject<OrderHistoryResponse>>(
+      `/order-history`,
+      orderHistory,
+    );
+    return response.data.success ? response.data.content : null;
+  },
+};
