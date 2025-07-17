@@ -30,7 +30,7 @@ export function MessageInput({ message, onMessageChange, onSendMessage }: Messag
             type="text"
             value={message}
             onChange={(e) => onMessageChange(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyUp={handleKeyPress}
             placeholder="Nhập tin nhắn..."
             className="w-full px-4 py-2 border text-gray-600 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
           />

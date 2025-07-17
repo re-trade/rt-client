@@ -135,9 +135,11 @@ export function useMessenger() {
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedContact || !socketRef.current) return;
+    const seller = selectedContact.participants.filter((p) => p.senderRole === 'seller').pop();
+    if (!seller) return;
     socketRef.current.emit('sendMessage', {
       content: newMessage,
-      receiverId: selectedContact.id,
+      receiverId: seller.id,
     });
     setNewMessage('');
   };
