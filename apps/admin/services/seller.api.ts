@@ -38,31 +38,18 @@ const getSellers = async (
   }
 };
 
-const banSeller = async (
-  id: string
-): Promise<IResponseObject<null> | undefined> => {
-  
-    const result = await authApi.default.put<IResponseObject<null>>(
-      `/sellers/${id}/ban-seller`
-    );
-    if (result.data.success) {
-      return result.data;
-    }
-    else
-      return undefined;
+const banSeller = async (id: string): Promise<IResponseObject<null> | undefined> => {
+  const result = await authApi.default.put<IResponseObject<null>>(`/sellers/${id}/ban-seller`);
+  if (result.data.success) {
+    return result.data;
+  } else return undefined;
 };
 
-const unbanSeller = async (
-  id: string
-): Promise<IResponseObject<TSe> | undefined> => {
-    const result = await authApi.default.put<IResponseObject<null>>(
-      `/sellers/${id}/unban-seller`
-    );
-    if (result.data.success) {
-      return result.data;
-    }
-  else
-      return undefined;
+const unbanSeller = async (id: string): Promise<IResponseObject<TSe> | undefined> => {
+  const result = await authApi.default.put<IResponseObject<null>>(`/sellers/${id}/unban-seller`);
+  if (result.data.success) {
+    return result.data;
+  } else return undefined;
 };
 
-export { getSellers , banSeller, unbanSeller};
+export { banSeller, getSellers, unbanSeller };
