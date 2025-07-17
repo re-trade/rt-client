@@ -38,17 +38,16 @@ const formatDate = (date: Date | string) => {
 };
 
 export function ReviewDetailDialog({ open, onOpenChange, review }: ReviewDetailDialogProps) {
+  const [productDetails, setProductDetails] = useState<TProduct | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     // Nếu review không hợp lệ thì tự động đóng dialog
     if (!review || !review.product || !review.author) {
       onOpenChange(false);
     }
   }, [review, onOpenChange]);
-
-  // Không render nếu thiếu dữ liệu
-  if (!review || !review.product || !review.author) {
-    return null;
-  }
 
   const renderStars = (vote: number) => {
     return (
@@ -62,10 +61,6 @@ export function ReviewDetailDialog({ open, onOpenChange, review }: ReviewDetailD
       </div>
     );
   };
-
-  const [productDetails, setProductDetails] = useState<TProduct | null>(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleDetailsProduct = async (productId: string) => {
     try {
@@ -86,6 +81,23 @@ export function ReviewDetailDialog({ open, onOpenChange, review }: ReviewDetailD
     if (vote >= 3) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     return 'bg-red-100 text-red-800 border-red-200';
   };
+
+  // Nếu thiếu dữ liệu, trả về dialog rỗng thay vì return null
+  if (!review || !review.product || !review.author) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto sm:p-6 p-4">
+          <DialogHeader className="pb-4">
+            <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+              <MessageSquare className="h-6 w-6 text-blue-600" />
+              Chi tiết đánh giá
+            </DialogTitle>
+          </DialogHeader>
+          <div className="text-center text-gray-500">Không có dữ liệu đánh giá để hiển thị.</div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
