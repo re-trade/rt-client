@@ -36,6 +36,8 @@ const statusColors: Record<string, string> = {
 
 export default function ShopManagementPage() {
   const [selectedSeller, setSelectedSeller] = useState<TSellerProfile | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+
   const {
     sellers,
     loading,
@@ -67,7 +69,7 @@ export default function ShopManagementPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Quản lý cửa hàng</h1>
+        <h1 className="text-3xl font-bold">Quản lý người bán</h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -106,7 +108,7 @@ export default function ShopManagementPage() {
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Tìm kiếm cửa hàng..."
+                placeholder="Tìm kiếm người bán..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8"
@@ -175,7 +177,7 @@ export default function ShopManagementPage() {
           <div className="text-sm text-muted-foreground">
             Hiển thị {currentPage * itemsPerPage + 1} đến{' '}
             {Math.min((currentPage + 1) * itemsPerPage, sellers.length)} trong tổng số{' '}
-            {sellers.length} cửa hàng
+            {sellers.length} người bán
           </div>
           <div className="flex items-center space-x-2">
             <Button

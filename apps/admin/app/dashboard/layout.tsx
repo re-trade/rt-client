@@ -16,9 +16,11 @@ import {
 } from '@/components/ui/sidebar';
 import {
   AlertCircle,
+  Banknote,
   BarChart3,
   DollarSign,
   FileText,
+  Flag,
   LayoutDashboard,
   Package,
   Settings,
@@ -39,9 +41,12 @@ const menuItems = [
     items: [
       { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product' },
       { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user' },
-      { title: 'Quản lý Seller', icon: Store, href: '/dashboard/seller' },
+      { title: 'Quản lý khách hàng', icon: User, href: '/dashboard/customer' },
+      { title: 'Quản lý người bán', icon: Store, href: '/dashboard/seller' },
+      { title: 'Quản lý tố cáo', icon: Flag, href: '/dashboard/report-seller' },
+      { title: 'Yêu cầu rút tiền', icon: Banknote, href: '/dashboard/withdraw' },
       { title: 'Quản lý Category', icon: FileText, href: '/dashboard/category' },
-      { title: 'Báo cáo Seller', icon: BarChart3, href: '/dashboard/reports' },
+
     ],
   },
   {
