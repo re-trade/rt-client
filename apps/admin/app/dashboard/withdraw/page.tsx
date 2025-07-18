@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -22,7 +21,8 @@ import {
 } from '@/components/ui/table';
 import { useWithdrawManager } from '@/hooks/use-withdraw-manager';
 import { TWithdrawProfile } from '@/services/withdraw.api';
-import { AlertTriangle, Search, Store, Check, PauseCircle } from 'lucide-react';
+import { AlertTriangle, Check, PauseCircle, Search, Store } from 'lucide-react';
+import { useState } from 'react';
 
 const statusLabels: Record<string, string> = {
   true: 'Đang hoạt động',
@@ -142,7 +142,7 @@ export default function ShopManagementPage() {
                   </TableCell>
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
                   <TableCell>{withdraw.status}</TableCell>
-                  <TableCell>{withdraw.timestamp}</TableCell>                  
+                  <TableCell>{withdraw.timestamp}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => handleViewDetails(withdraw)}>
                       Chi tiết
@@ -212,31 +212,30 @@ export default function ShopManagementPage() {
                     <p>{new Date(selectedWithdraw.bankName).toLocaleDateString('vi-VN')}</p>
                   </div>
                 </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                    <p>{new Date(selectedWithdraw.bankUrl).toLocaleDateString('vi-VN')}</p>
-                  </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
+                  <p>{new Date(selectedWithdraw.bankUrl).toLocaleDateString('vi-VN')}</p>
                 </div>
               </div>
+            </div>
 
-              <DialogFooter>
-        {!selectedWithdraw.status && (
-          <Button
-  onClick={async () => {
-    if (selectedWithdraw) {
-      await handleApprove(selectedWithdraw.id);
-      setSelectedWithdraw(null); // Close dialog after approval
-    }
-  }}
->
-  Xác nhận
-</Button>
-        )}
-        
-     </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
-      </div>
-    );
+            <DialogFooter>
+              {!selectedWithdraw.status && (
+                <Button
+                  onClick={async () => {
+                    if (selectedWithdraw) {
+                      await handleApprove(selectedWithdraw.id);
+                      setSelectedWithdraw(null); // Close dialog after approval
+                    }
+                  }}
+                >
+                  Xác nhận
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
+  );
 }

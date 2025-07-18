@@ -15,17 +15,17 @@ import {
 } from '@/components/ui/sidebar';
 import {
   AlertCircle,
+  Banknote,
   BarChart3,
   DollarSign,
   FileText,
+  Flag,
   LayoutDashboard,
   Package,
   Settings,
   Store,
   User,
   Users,
-  Flag,
-  Banknote
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -48,8 +48,6 @@ const menuItems = [
       { title: 'Quản lý người bán', icon: Store, href: '/dashboard/seller' },
       { title: 'Quản lý tố cáo', icon: Flag, href: '/dashboard/report-seller' },
       { title: 'Yêu cầu rút tiền', icon: Banknote, href: '/dashboard/withdraw' },
-
-
     ],
   },
   {

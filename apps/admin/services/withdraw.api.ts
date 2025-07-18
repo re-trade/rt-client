@@ -6,7 +6,6 @@ export type TBankProfile = {
   code: string;
   bin: string;
   url: string;
-
 };
 
 export type TWithdrawProfile = {
@@ -17,7 +16,6 @@ export type TWithdrawProfile = {
   bankBin: string;
   bankName: string;
   bankUrl: string;
-
 };
 
 const getWithdraws = async (
@@ -26,13 +24,16 @@ const getWithdraws = async (
   query?: string,
 ): Promise<IResponseObject<TWithdrawProfile[]> | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TWithdrawProfile[]>>(`/wallets/me/withdraw`, {
-      params: {
-        page,
-        size,
-        ...(query ? { q: query } : {}),
+    const result = await authApi.default.get<IResponseObject<TWithdrawProfile[]>>(
+      `/wallets/me/withdraw`,
+      {
+        params: {
+          page,
+          size,
+          ...(query ? { q: query } : {}),
+        },
       },
-    });
+    );
     if (result.data.success && result.status === 200) {
       return result.data;
     }
@@ -62,12 +63,12 @@ const getBanks = async (
   }
 };
 const approveWithdraw = async (id: string): Promise<IResponseObject<null> | undefined> => {
-  const result = await authApi.default.put<IResponseObject<null>>(`/wallets/withdraw/${id}/approve`);
+  const result = await authApi.default.put<IResponseObject<null>>(
+    `/wallets/withdraw/${id}/approve`,
+  );
   if (result.data.success) {
     return result.data;
   } else return undefined;
 };
 
-
-
-export { getWithdraws, getBanks, approveWithdraw };
+export { approveWithdraw, getBanks, getWithdraws };

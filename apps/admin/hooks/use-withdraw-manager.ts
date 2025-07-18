@@ -1,6 +1,6 @@
 'use client';
 
-import { TWithdrawProfile, getWithdraws, approveWithdraw } from '@/services/withdraw.api';
+import { TWithdrawProfile, approveWithdraw, getWithdraws } from '@/services/withdraw.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const useWithdrawManager = () => {
@@ -37,7 +37,7 @@ const useWithdrawManager = () => {
       try {
         const result = await approveWithdraw(id);
         if (result?.success) {
-          await fethWithdraw(); 
+          await fethWithdraw();
           return true;
         }
         setError('Failed approve withdraw');
@@ -50,23 +50,22 @@ const useWithdrawManager = () => {
     [fethWithdraw],
   );
 
-
   useEffect(() => {
     fethWithdraw();
   }, [fethWithdraw]);
 
   const stats = useMemo(() => {
-  const verified = withdraws?.filter((withdraw) => withdraw.status === 'COMPLETED')?.length || 0;
-  const pending = withdraws?.filter((withdraw) => withdraw.status === 'PENDING')?.length || 0;
-  const rejected = withdraws?.filter((withdraw) => withdraw.status === 'REJECTED')?.length || 0;
+    const verified = withdraws?.filter((withdraw) => withdraw.status === 'COMPLETED')?.length || 0;
+    const pending = withdraws?.filter((withdraw) => withdraw.status === 'PENDING')?.length || 0;
+    const rejected = withdraws?.filter((withdraw) => withdraw.status === 'REJECTED')?.length || 0;
 
-  return {
-    total,
-    verified,
-    pending,
-    rejected,
-  };
-}, [withdraws, total]);
+    return {
+      total,
+      verified,
+      pending,
+      rejected,
+    };
+  }, [withdraws, total]);
 
   return {
     page,

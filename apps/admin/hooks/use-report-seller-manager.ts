@@ -1,6 +1,6 @@
 'use client';
 
-import { getReports, acceptReport, TReportSellerProfile } from '@/services/report.seller.api';
+import { acceptReport, getReports, TReportSellerProfile } from '@/services/report.seller.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const useReportSellerManager = () => {
@@ -32,30 +32,30 @@ const useReportSellerManager = () => {
     }
   }, [page, searchQuery]);
 
-//   const handleBanSeller = useCallback(
-//     async (id: string) => {
-//       try {
-//         const result = await appro(id);
-//         if (result?.success) {
-//           await fetchSeller();
-//           return true;
-//         }
-//         setError('Failed to ban seller');
-//         return false;
-//       } catch (err) {
-//         setError(err instanceof Error ? err.message : 'Failed to ban seller');
-//         return false;
-//       }
-//     },
-//      [fetchReport],
-//   );
+  //   const handleBanSeller = useCallback(
+  //     async (id: string) => {
+  //       try {
+  //         const result = await appro(id);
+  //         if (result?.success) {
+  //           await fetchSeller();
+  //           return true;
+  //         }
+  //         setError('Failed to ban seller');
+  //         return false;
+  //       } catch (err) {
+  //         setError(err instanceof Error ? err.message : 'Failed to ban seller');
+  //         return false;
+  //       }
+  //     },
+  //      [fetchReport],
+  //   );
 
   const handleApproveReport = useCallback(
     async (id: string) => {
       try {
         const result = await acceptReport(id);
         if (result?.success) {
-          await fetchReport(); 
+          await fetchReport();
           return true;
         }
         setError('Failed to unban seller');
@@ -73,14 +73,14 @@ const useReportSellerManager = () => {
   }, [fetchReport]);
 
   const stats = useMemo(
-  () => ({
-    total: total, 
-    accepted: reports?.filter((report) => report.resolutionStatus === 'ACCEPT')?.length || 0,
-    rejected: reports?.filter((report) => report.resolutionStatus === 'REJECT')?.length || 0,
-    pending: reports?.filter((report) => report.resolutionStatus === null)?.length || 0, 
-  }),
-  [reports, total] 
-);
+    () => ({
+      total: total,
+      accepted: reports?.filter((report) => report.resolutionStatus === 'ACCEPT')?.length || 0,
+      rejected: reports?.filter((report) => report.resolutionStatus === 'REJECT')?.length || 0,
+      pending: reports?.filter((report) => report.resolutionStatus === null)?.length || 0,
+    }),
+    [reports, total],
+  );
 
   return {
     page,

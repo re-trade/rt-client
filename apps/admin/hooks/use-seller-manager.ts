@@ -37,7 +37,7 @@ const useSellerManager = () => {
       try {
         const result = await banSeller(id);
         if (result?.success) {
-          await fetchSeller(); 
+          await fetchSeller();
           return true;
         }
         setError('Failed to ban seller');
@@ -55,7 +55,7 @@ const useSellerManager = () => {
       try {
         const result = await unbanSeller(id);
         if (result?.success) {
-          await fetchSeller(); 
+          await fetchSeller();
           return true;
         }
         setError('Failed to unban seller');

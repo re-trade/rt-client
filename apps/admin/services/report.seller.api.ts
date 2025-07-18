@@ -22,13 +22,16 @@ const getReports = async (
   query?: string,
 ): Promise<IResponseObject<TReportSellerProfile[]> | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TReportSellerProfile[]>>(`/report-seller`, {
-      params: {
-        page,
-        size,
-        ...(query ? { q: query } : {}),
+    const result = await authApi.default.get<IResponseObject<TReportSellerProfile[]>>(
+      `/report-seller`,
+      {
+        params: {
+          page,
+          size,
+          ...(query ? { q: query } : {}),
+        },
       },
-    });
+    );
     if (result.data.success && result.status === 200) {
       return result.data;
     }
@@ -44,6 +47,4 @@ const acceptReport = async (id: string): Promise<IResponseObject<null> | undefin
   } else return undefined;
 };
 
-
-
-export { getReports, acceptReport };
+export { acceptReport, getReports };

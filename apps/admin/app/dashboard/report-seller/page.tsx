@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -153,7 +152,6 @@ export default function ReportSellerManagementPage() {
                   <TableCell className="font-medium">{report.content}</TableCell>
                   <TableCell className="font-medium">{report.resolutionStatus}</TableCell>
 
-                  
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => handleViewDetails(report)}>
                       Chi tiết
@@ -214,7 +212,7 @@ export default function ReportSellerManagementPage() {
                     <p className="text-sm font-medium text-muted-foreground">Mô tả</p>
                     <p>{selectedReport.productId}</p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Số điện thoại</p>
                     <p>{selectedReport.orderId}</p>
@@ -242,7 +240,8 @@ export default function ReportSellerManagementPage() {
                       ? 'bg-red-600 hover:bg-red-700 text-white'
                       : 'bg-green-600 hover:bg-green-700 text-white'
                   }
-onClick={() => console.log('clicked')}                >
+                  onClick={() => console.log('clicked')}
+                >
                   {selectedReport.resolutionStatus ? 'Vô hiệu hóa người bán' : 'Xác thực người bán'}
                 </Button>
               </DialogFooter>
