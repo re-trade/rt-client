@@ -1,6 +1,6 @@
 'use client';
+import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/hooks/use-auth';
 import { IconLogout, IconPackage, IconShoppingCart, IconUser } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';

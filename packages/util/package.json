@@ -18,12 +18,13 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@retrade/typescript-config": "*",
     "@types/node": "^20",
     "eslint": "^9.27.0",
-    "typescript": "^5.5.4",
-    "@retrade/typescript-config": "*"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "axios": "^1.6.7"
+    "axios": "^1.6.7",
+    "socket.io-client": "^4.8.1"
   }
 }

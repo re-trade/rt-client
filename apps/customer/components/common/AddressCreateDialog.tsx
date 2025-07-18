@@ -2,7 +2,7 @@
 
 import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
 import { Check, MapPin, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   open: boolean;
@@ -46,12 +46,33 @@ export default function AddressCreateDialog({
   onFieldBlur,
 }: Props) {
   const [validationTriggered, setValidationTriggered] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
       setValidationTriggered(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node) && open) {
+        onClose();
+      }
+    };
+    window.addEventListener('mousedown', handleClickOutside);
+    return () => window.removeEventListener('mousedown', handleClickOutside);
+  }, [open, onClose]);
 
   const handleCreate = async () => {
     try {
@@ -63,15 +84,11 @@ export default function AddressCreateDialog({
       const hasErrors = fields.some((field) => {
         const key = field.key as keyof AddressFormData;
         const value = formData[key];
-        if (typeof value === 'string' && !value.trim()) {
-          return true;
-        }
-        return false;
+        return typeof value === 'string' && !value.trim();
       });
 
-      if (hasErrors) {
-        return;
-      }
+      if (hasErrors) return;
+
       const success = await onCreate();
       if (success) {
         onClose();
@@ -177,8 +194,11 @@ export default function AddressCreateDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div
+        ref={modalRef}
+        className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden"
+      >
         <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <MapPin className="w-5 h-5 mr-2 text-[#121212]" />

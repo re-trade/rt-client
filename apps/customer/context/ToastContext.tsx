@@ -9,9 +9,9 @@ type ToastContextType = ReturnType<typeof useToastHook>;
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
-  const cartData = useToastHook();
+  const toastHook = useToastHook();
 
-  return <ToastContext.Provider value={cartData}>{children}</ToastContext.Provider>;
+  return <ToastContext.Provider value={toastHook}>{children}</ToastContext.Provider>;
 };
 
 export const useToast = () => {

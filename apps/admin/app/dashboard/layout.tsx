@@ -17,7 +17,6 @@ import {
 import {
   AlertCircle,
   Banknote,
-  BarChart3,
   DollarSign,
   FileText,
   Flag,
@@ -46,7 +45,6 @@ const menuItems = [
       { title: 'Quản lý người bán', icon: Store, href: '/dashboard/seller' },
       { title: 'Quản lý tố cáo', icon: Flag, href: '/dashboard/report-seller' },
       { title: 'Quản lý Category', icon: FileText, href: '/dashboard/category' },
-
     ],
   },
   {
@@ -55,7 +53,6 @@ const menuItems = [
       { title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue' },
       { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial' },
       { title: 'Yêu cầu rút tiền', icon: Banknote, href: '/dashboard/withdraw' },
-
     ],
   },
   {

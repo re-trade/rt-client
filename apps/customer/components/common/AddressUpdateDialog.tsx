@@ -2,7 +2,7 @@
 
 import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
 import { Check, MapPin, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   open: boolean;
@@ -46,6 +46,7 @@ export default function AddressUpdateDialog({
   onFieldBlur,
 }: Props) {
   const [validationTriggered, setValidationTriggered] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -53,55 +54,58 @@ export default function AddressUpdateDialog({
     }
   }, [open]);
 
-  // Additional effect to monitor loading state changes
+  // ESC key handler
   useEffect(() => {
-    console.log('Update dialog loading state:', loading);
-    console.log('Current form data:', formData);
-  }, [loading, formData]);
-
-  const handleUpdate = async () => {
-    try {
-      console.log('Attempting to update with form data:', formData);
-      setValidationTriggered(true);
-
-      // Trigger validation for all fields
-      fields.forEach((field) => {
-        onFieldBlur(field.key as keyof AddressFormData);
-      });
-
-      // Check for empty required fields
-      const hasEmptyFields = fields.some((field) => {
-        const key = field.key as keyof AddressFormData;
-        const value = formData[key];
-        if (typeof value === 'string' && !value.trim()) {
-          console.log(`Field ${key} is empty`);
-          return true;
-        }
-        return false;
-      });
-
-      if (hasEmptyFields) {
-        console.log('Validation failed: some fields are empty');
-        return;
-      }
-
-      // Check if location fields are properly set
-      if (!formData.country || !formData.district || !formData.ward) {
-        console.log('Location fields not properly set:', {
-          country: formData.country,
-          district: formData.district,
-          ward: formData.ward,
-        });
-        return;
-      }
-
-      console.log('Validation passed, calling onUpdate()');
-      const success = await onUpdate();
-      if (success) {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
         onClose();
       }
-    } catch (error) {
-      console.error('Error updating address:', error);
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+  }, [open, onClose]);
+
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node) && open) {
+        onClose();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('mousedown', handleClickOutside);
+      }
+    };
+  }, [open, onClose]);
+
+  const handleUpdate = async () => {
+    setValidationTriggered(true);
+    fields.forEach((field) => {
+      onFieldBlur(field.key as keyof AddressFormData);
+    });
+
+    const hasEmptyFields = fields.some((field) => {
+      const key = field.key as keyof AddressFormData;
+      const value = formData[key];
+      return typeof value === 'string' && !value.trim();
+    });
+
+    if (hasEmptyFields) return;
+    if (!formData.country || !formData.district || !formData.ward) return;
+
+    const success = await onUpdate();
+    if (success) {
+      onClose();
     }
   };
 
@@ -190,8 +194,11 @@ export default function AddressUpdateDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div
+        ref={modalRef}
+        className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden"
+      >
         <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <MapPin className="w-5 h-5 mr-2 text-[#121212]" />
@@ -261,11 +268,6 @@ export default function AddressUpdateDialog({
                     <>
                       <span className="mr-2 h-4 w-4 border-2 border-[#121212] border-t-transparent rounded-full animate-spin"></span>
                       Đang cập nhật...
-                    </>
-                  ) : loading ? (
-                    <>
-                      <span className="mr-2 h-4 w-4 border-2 border-[#121212] border-t-transparent rounded-full animate-spin"></span>
-                      Đang tải...
                     </>
                   ) : (
                     <>

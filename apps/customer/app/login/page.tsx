@@ -1,8 +1,7 @@
 'use client';
 
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { loginInternal } from '@/services/auth.api';
 import Joi from 'joi';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -28,7 +27,7 @@ export default function Login() {
 
   const router = useRouter();
   const { showToast } = useToast();
-  const { isAuth } = useAuth();
+  const { isAuth, login } = useAuth();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -48,7 +47,7 @@ export default function Login() {
         showToast(validation.error.details[0].message, 'error');
         return;
       }
-      await loginInternal(formData);
+      await login(formData);
       await isAuth();
       showToast('Đăng nhập thành công!', 'success');
       setTimeout(() => router.push('/'), 500);
