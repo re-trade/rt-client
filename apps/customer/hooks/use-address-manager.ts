@@ -5,6 +5,7 @@ import { contactApi, TAddress } from '@/services/contact.api';
 import axios from 'axios';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
+
 export interface Address {
   id: string;
   name: string;
@@ -47,6 +48,7 @@ export interface AddressFormData {
   isDefault: boolean;
   type: number;
 }
+
 const PROVINCES_API_URL = 'https://provinces.open-api.vn/api/p/';
 
 const addressSchema = Joi.object({
@@ -98,6 +100,17 @@ const initialFormData: AddressFormData = {
   type: 0,
 };
 
+function validateAllFields(data: AddressFormData): Record<string, string> {
+  const { error } = addressSchema.validate(data, { abortEarly: false });
+  if (!error) return {};
+  const newErrors: Record<string, string> = {};
+  error.details.forEach((detail) => {
+    const key = detail.path[0] as string;
+    newErrors[key] = detail.message;
+  });
+  return newErrors;
+}
+
 export function useAddressManager() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -116,24 +129,22 @@ export function useAddressManager() {
     try {
       setLoading(true);
       const response = await contactApi.getContacts(0, 10);
-      if (!response) {
-        setAddresses([]);
-      } else {
-        const mapped: Address[] = response.map((item) => ({
-          id: item.id,
-          name: item.name,
-          customerName: item.customerName,
-          phoneNumber: item.phone,
-          state: item.state,
-          country: item.country,
-          district: item.district,
-          ward: item.ward,
-          addressLine: item.addressLine,
-          type: item.type,
-          isDefault: item.defaulted,
-        }));
-        setAddresses(mapped);
-      }
+      const mapped: Address[] = response
+        ? response.map((item) => ({
+            id: item.id,
+            name: item.name,
+            customerName: item.customerName,
+            phoneNumber: item.phone,
+            state: item.state,
+            country: item.country,
+            district: item.district,
+            ward: item.ward,
+            addressLine: item.addressLine,
+            type: item.type,
+            isDefault: item.defaulted,
+          }))
+        : [];
+      setAddresses(mapped);
     } catch {
       setErrors({ general: 'Không thể tải danh sách địa chỉ' });
     } finally {
@@ -159,7 +170,6 @@ export function useAddressManager() {
       setWards([]);
       return;
     }
-
     try {
       setLoading(true);
       const response = await axios.get(`${PROVINCES_API_URL}${provinceCode}?depth=2`);
@@ -224,11 +234,10 @@ export function useAddressManager() {
         ['customerName', 'phoneNumber', 'addressLine', 'name'].includes(key)
       ) {
         const handler = getInputHandler(key);
-        const sanitized = handler(value);
-        setFormData((prev) => ({ ...prev, [key]: sanitized }));
-      } else {
-        setFormData((prev) => ({ ...prev, [key]: value }));
+        value = handler(value);
       }
+
+      setFormData((prev) => ({ ...prev, [key]: value }));
 
       if (key === 'country') {
         setFormData((prev) => ({ ...prev, district: '', ward: '' }));
@@ -237,7 +246,10 @@ export function useAddressManager() {
       }
 
       if (typeof value === 'string' && touched[key]) {
-        setErrors((prev) => ({ ...prev, [key]: validateField(key, value) }));
+        setErrors((prev) => ({
+          ...prev,
+          [key]: validateField(key, value) || '',
+        }));
       }
     },
     [touched, validateField],
@@ -248,7 +260,10 @@ export function useAddressManager() {
       setTouched((prev) => ({ ...prev, [key]: true }));
       const value = formData[key];
       if (typeof value === 'string') {
-        setErrors((prev) => ({ ...prev, [key]: validateField(key, value) }));
+        setErrors((prev) => ({
+          ...prev,
+          [key]: validateField(key, value) || '',
+        }));
       }
     },
     [formData, validateField],
@@ -287,21 +302,20 @@ export function useAddressManager() {
     try {
       setLoading(true);
       const provinceResponse = await axios.get(PROVINCES_API_URL);
-      const allProvinces = provinceResponse.data;
-      setProvinces(allProvinces);
-      const province = allProvinces.find((p: Province) => p.name === address.country);
+      setProvinces(provinceResponse.data);
+      const province = provinceResponse.data.find((p: Province) => p.name === address.country);
       if (province) {
         const districtResponse = await axios.get(`${PROVINCES_API_URL}${province.code}?depth=2`);
-        const provinceDistricts = districtResponse.data.districts || [];
-        setDistricts(provinceDistricts);
-        const district = provinceDistricts.find((d: District) => d.name === address.district);
+        setDistricts(districtResponse.data.districts || []);
+        const district = districtResponse.data.districts.find(
+          (d: District) => d.name === address.district,
+        );
         if (district) {
           const wardResponse = await axios.get(
             `https://provinces.open-api.vn/api/d/${district.code}?depth=2`,
           );
-          const districtWards = wardResponse.data.wards || [];
-          setWards(districtWards);
-          const ward = districtWards.find((w: Ward) => w.name === address.ward);
+          setWards(wardResponse.data.wards || []);
+          const ward = wardResponse.data.wards.find((w: Ward) => w.name === address.ward);
           setFormData((prev) => ({
             ...prev,
             country: province.code.toString(),
@@ -326,14 +340,8 @@ export function useAddressManager() {
   }, [resetForm]);
 
   const createAddress = useCallback(async () => {
-    const { error } = addressSchema.validate(formData, { abortEarly: false });
-
-    if (error) {
-      const newErrors: Record<string, string> = {};
-      error.details.forEach((detail) => {
-        const key = detail.path[0] as string;
-        newErrors[key] = detail.message;
-      });
+    const newErrors = validateAllFields(formData);
+    if (Object.keys(newErrors).length) {
       setErrors(newErrors);
       setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
       return false;
@@ -341,7 +349,6 @@ export function useAddressManager() {
 
     try {
       setSubmitting(true);
-
       const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
       const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
       const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
@@ -375,8 +382,7 @@ export function useAddressManager() {
       closeDialogs();
       return true;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Không thể tạo địa chỉ mới';
-      setErrors({ general: errorMessage });
+      setErrors({ general: error.response?.data?.message || 'Không thể tạo địa chỉ mới' });
       return false;
     } finally {
       setSubmitting(false);
@@ -385,14 +391,9 @@ export function useAddressManager() {
 
   const updateAddress = useCallback(async () => {
     if (!selectedAddress) return false;
-    const { error } = addressSchema.validate(formData, { abortEarly: false });
 
-    if (error) {
-      const newErrors: Record<string, string> = {};
-      error.details.forEach((detail) => {
-        const key = detail.path[0] as string;
-        newErrors[key] = detail.message;
-      });
+    const newErrors = validateAllFields(formData);
+    if (Object.keys(newErrors).length) {
       setErrors(newErrors);
       setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
       return false;
@@ -400,13 +401,11 @@ export function useAddressManager() {
 
     try {
       setSubmitting(true);
-
       const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
       const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
       const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
       if (!selectedProvince || !selectedDistrict || !selectedWard) {
-        const errorMsg = 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã';
-        setErrors({ general: errorMsg });
+        setErrors({ general: 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã' });
         return false;
       }
 
@@ -422,16 +421,17 @@ export function useAddressManager() {
         type: formData.type,
         defaulted: formData.isDefault,
       };
+
       const response = await contactApi.updateContact(selectedAddress.id, addressData);
       if (!response) {
         throw new Error('Không thể cập nhật địa chỉ');
       }
+
       await fetchAddresses();
       closeDialogs();
       return true;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Không thể cập nhật địa chỉ';
-      setErrors({ general: errorMessage });
+      setErrors({ general: error.response?.data?.message || 'Không thể cập nhật địa chỉ' });
       return false;
     } finally {
       setSubmitting(false);
@@ -439,20 +439,14 @@ export function useAddressManager() {
   }, [selectedAddress, formData, provinces, districts, wards, closeDialogs, fetchAddresses]);
 
   const deleteAddress = useCallback(async (id: string) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
-      return;
-    }
-
+    if (!window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) return;
     try {
       setLoading(true);
       const response = await contactApi.removeContact(id);
-      if (!response) {
-        throw new Error('Không thể xóa địa chỉ');
-      }
+      if (!response) throw new Error('Không thể xóa địa chỉ');
       setAddresses((prev) => prev.filter((addr) => addr.id !== id));
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Không thể xóa địa chỉ';
-      setErrors({ general: errorMessage });
+      setErrors({ general: error.response?.data?.message || 'Không thể xóa địa chỉ' });
     } finally {
       setLoading(false);
     }
