@@ -13,17 +13,17 @@ import {
 } from '@/components/ui/table';
 import { OrderResponse } from '@/service/orders.api';
 import {
+  AlertCircle,
   CheckCheck,
   CheckCircle,
   Clock,
+  CreditCard,
   Edit,
   Eye,
   Package,
   RefreshCw,
   Truck,
   XCircle,
-  CreditCard,
-  AlertCircle
 } from 'lucide-react';
 
 interface OrderTableProps {
@@ -138,7 +138,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
         return 'Không xác định';
     }
   };
-const getStatusIcon = (status: OrderResponse['orderStatus']) => {
+  const getStatusIcon = (status: OrderResponse['orderStatus']) => {
     switch (status.code) {
       case 'PENDING':
         return <Clock className="h-4 w-4 text-yellow-600" />;

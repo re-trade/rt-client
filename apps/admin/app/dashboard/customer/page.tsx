@@ -230,17 +230,12 @@ export default function CustomerManagementPage() {
                     <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
                     <p>{new Date(selectedCustomer.lastUpdate).toLocaleDateString('vi-VN')}</p>
                   </div>
-                  {/* <div>
-                    <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                    <p>{new Date(selectedSeller.updatedAt).toLocaleDateString('vi-VN')}</p>
-                  </div> */}
+                  
                 </div>
               </div>
 
               <DialogFooter>
-                {/* <Button variant="outline" onClick={() => setSelectedCustomer(null)}>
-                  Đóng
-                </Button> */}
+                
                 <Button
                   className={
                     selectedCustomer.enabled

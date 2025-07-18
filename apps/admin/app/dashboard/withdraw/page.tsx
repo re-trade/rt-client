@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -19,10 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useSellerManager } from '@/hooks/use-seller-manager';
-import { TSellerProfile } from '@/services/seller.api';
-import { AlertTriangle, Search, Store, TrendingUp } from 'lucide-react';
-import { useState } from 'react';
+import { useWithdrawManager } from '@/hooks/use-withdraw-manager';
+import { TWithdrawProfile } from '@/services/withdraw.api';
+import { AlertTriangle, Search, Store, Check, PauseCircle } from 'lucide-react';
 
 const statusLabels: Record<string, string> = {
   true: 'Đang hoạt động',
@@ -35,11 +35,9 @@ const statusColors: Record<string, string> = {
 };
 
 export default function ShopManagementPage() {
-  const [selectedSeller, setSelectedSeller] = useState<TSellerProfile | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-
+  const [selectedWithdraw, setSelectedWithdraw] = useState<TWithdrawProfile | null>(null);
   const {
-    sellers,
+    withdraws,
     loading,
     error,
     page: currentPage,
@@ -48,24 +46,19 @@ export default function ShopManagementPage() {
     setSearchQuery,
     pageSize: itemsPerPage,
     stats,
-    banSeller,
-    unbanSeller,
-  } = useSellerManager();
+    approveWithdraw,
+  } = useWithdrawManager();
 
-  if (loading) return <div>Loading sellers...</div>;
+  if (loading) return <div>Loading withdraws...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const handleViewDetails = (seller: TSellerProfile) => {
-    setSelectedSeller(seller);
+  const handleViewDetails = (withdraw: TWithdrawProfile) => {
+    setSelectedWithdraw(withdraw);
   };
 
-  const handleToggleStatus = async (seller: TSellerProfile) => {
-    const success = seller.verified ? await banSeller(seller.id) : await unbanSeller(seller.id);
-    if (success) {
-      setSelectedSeller(null);
-    }
+  const handleApprove = async (productId: string) => {
+    await approveWithdraw(productId);
   };
-
 
   return (
     <div className="space-y-6">
@@ -77,7 +70,7 @@ export default function ShopManagementPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Tổng số người bán</p>
+              <p className="text-sm font-medium text-muted-foreground">Tổng số yêu cầu</p>
               <h2 className="text-2xl font-bold">{stats.total}</h2>
             </div>
             <Store className="h-8 w-8 text-blue-500" />
@@ -86,19 +79,28 @@ export default function ShopManagementPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Người bán đã xác thực</p>
+              <p className="text-sm font-medium text-muted-foreground">Yêu cầu đã thực hiện</p>
               <h2 className="text-2xl font-bold">{stats.verified}</h2>
             </div>
-            <TrendingUp className="h-8 w-8 text-green-500" />
+            <Check className="h-8 w-8 text-green-500" />
           </div>
         </Card>
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Người bán Đang chờ duyệt</p>
+              <p className="text-sm font-medium text-muted-foreground">Yêu cầu bị từ chối</p>
+              <h2 className="text-2xl font-bold">{stats.rejected}</h2>
+            </div>
+            <AlertTriangle className="h-8 w-8 text-red-500" />
+          </div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Yêu cầu đang chờ duyệt</p>
               <h2 className="text-2xl font-bold">{stats.pending}</h2>
             </div>
-            <AlertTriangle className="h-8 w-8 text-yellow-500" />
+            <PauseCircle className="h-8 w-8 text-yellow-500" />
           </div>
         </Card>
       </div>
@@ -109,7 +111,7 @@ export default function ShopManagementPage() {
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Tìm kiếm người bán..."
+                placeholder="Tìm kiếm cửa hàng..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8"
@@ -123,48 +125,26 @@ export default function ShopManagementPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>Người bán</TableHead>
-                <TableHead>Mô tả</TableHead>
-                <TableHead>Địa chỉ</TableHead>
-                <TableHead>Liên hệ</TableHead>
+                <TableHead>Số tiền</TableHead>
                 <TableHead>Trạng thái</TableHead>
+                <TableHead>Thời gian tạo</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sellers?.map((seller) => (
-                <TableRow key={seller.id}>
+              {withdraws?.map((withdraw) => (
+                <TableRow key={withdraw.id}>
                   <TableCell
                     className="font-medium w-[150px] max-w-[150px] truncate"
-                    title={seller.id}
+                    title={withdraw.id}
                   >
-                    {seller.id}
+                    {withdraw.id}
                   </TableCell>
-                  <TableCell className="font-medium">{seller.shopName}</TableCell>
-                  <TableCell>{seller.description}</TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div>{seller.addressLine}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {seller.ward}, {seller.district}, {seller.state}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div>{seller.phoneNumber}</div>
-                      <div className="text-sm text-muted-foreground">{seller.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(seller.verified)]}`}
-                    >
-                      {statusLabels[String(seller.verified)]}
-                    </span>
-                  </TableCell>
+                  <TableCell className="font-medium">{withdraw.amount}</TableCell>
+                  <TableCell>{withdraw.status}</TableCell>
+                  <TableCell>{withdraw.timestamp}</TableCell>                  
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(seller)}>
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(withdraw)}>
                       Chi tiết
                     </Button>
                   </TableCell>
@@ -177,8 +157,8 @@ export default function ShopManagementPage() {
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Hiển thị {currentPage * itemsPerPage + 1} đến{' '}
-            {Math.min((currentPage + 1) * itemsPerPage, sellers.length)} trong tổng số{' '}
-            {sellers.length} người bán
+            {Math.min((currentPage + 1) * itemsPerPage, withdraws.length)} trong tổng số{' '}
+            {withdraws.length} yêu cầu
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -201,8 +181,8 @@ export default function ShopManagementPage() {
         </div>
       </Card>
 
-      {selectedSeller && (
-        <Dialog open={!!selectedSeller} onOpenChange={() => setSelectedSeller(null)}>
+      {selectedWithdraw && (
+        <Dialog open={!!selectedWithdraw} onOpenChange={() => setSelectedWithdraw(null)}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>Chi tiết người bán</DialogTitle>
@@ -213,59 +193,50 @@ export default function ShopManagementPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">ID</p>
-                    <p>{selectedSeller.id}</p>
+                    <p>{selectedWithdraw.id}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Tên người bán</p>
-                    <p>{selectedSeller.shopName}</p>
+                    <p>{selectedWithdraw.amount}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Mô tả</p>
-                    <p>{selectedSeller.description}</p>
+                    <p>{selectedWithdraw.status}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Địa chỉ</p>
-                    <p>{selectedSeller.addressLine}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedSeller.ward}, {selectedSeller.district}, {selectedSeller.state}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Số điện thoại</p>
-                    <p>{selectedSeller.phoneNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Email</p>
-                    <p>{selectedSeller.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Ngày tạo</p>
-                    <p>{new Date(selectedSeller.createdAt).toLocaleDateString('vi-VN')}</p>
+                    <p>{selectedWithdraw.timestamp}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                    <p>{new Date(selectedSeller.updatedAt).toLocaleDateString('vi-VN')}</p>
+                    <p>{new Date(selectedWithdraw.bankName).toLocaleDateString('vi-VN')}</p>
+                  </div>
+                </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
+                    <p>{new Date(selectedWithdraw.bankUrl).toLocaleDateString('vi-VN')}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <DialogFooter>
-                <Button
-                  className={
-                    selectedSeller.verified
-                      ? 'bg-red-600 hover:bg-red-700 text-white'
-                      : 'bg-green-600 hover:bg-green-700 text-white'
-                  }
-                  onClick={() => handleToggleStatus(selectedSeller)}
-                >
-                  {selectedSeller.verified ? 'Vô hiệu hóa người bán' : 'Xác thực người bán'}
-                </Button>
-              </DialogFooter>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-    </div>
-  );
+        {!selectedWithdraw.status && (
+          <Button
+  onClick={async () => {
+    if (selectedWithdraw) {
+      await handleApprove(selectedWithdraw.id);
+      setSelectedWithdraw(null); // Close dialog after approval
+    }
+  }}
+>
+  Xác nhận
+</Button>
+        )}
+        
+     </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+    );
 }
