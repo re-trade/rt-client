@@ -8,18 +8,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CreateProductDto, productApi } from '@/service/product.api';
-import { storageApi } from '@/service/storage.api'; // Added missing import
-import { Image as ImageIcon } from 'lucide-react';
+import { storageApi } from '@/service/storage.api';
+import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 interface CreateProductDialogProps {
   open: boolean;
+  onSuccess: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogProps) {
+export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreateProductDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
     shortDescription: '',
@@ -37,15 +38,15 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
     tags: '',
     status: 'DRAFT' as const,
   });
-  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(['react', 'angular']);
+
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [thumbnailFile, setThumbnailFile] = useState<File | undefined>(); // Added missing state
+  const [thumbnailFile, setThumbnailFile] = useState<File | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
-  // Clean up URLs on unmount or when previews change
   useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -68,7 +69,7 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
     const newPreviews = files.map((file) => URL.createObjectURL(file));
     setSelectedFiles((prev) => [...prev, ...files]);
     setImagePreviews((prev) => [...prev, ...newPreviews]);
-    event.target.value = ''; // Reset input
+    event.target.value = '';
   };
 
   const handleRemoveImage = (index: number) => {
@@ -87,10 +88,10 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
       if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
       const imageUrl = URL.createObjectURL(file);
       setThumbnailPreview(imageUrl);
-      setThumbnailFile(file); // Store the actual file
+      setThumbnailFile(file);
       setFormData((prev) => ({ ...prev, thumbnail: imageUrl }));
     }
-    e.target.value = ''; // Reset input
+    e.target.value = '';
   };
 
   const handleRemoveThumbnail = () => {
@@ -103,7 +104,6 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
   };
 
   const handleSubmit = async () => {
-    // Basic validation
     if (!formData.name.trim()) {
       toast.error('Vui lòng nhập tên sản phẩm');
       return;
@@ -124,7 +124,9 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
       return;
     }
 
+    setIsSubmitting(true);
     toast.loading('Đang tạo sản phẩm...');
+
     try {
       let thumbnailUrl = '';
       let productImageUrls: string[] = [];
@@ -159,16 +161,15 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
           .filter(Boolean),
       };
 
-      const created = await productApi.createProduct(productData);
+      await productApi.createProduct(productData);
       toast.success('Tạo sản phẩm thành công');
-      // Chỉ đóng dialog khi tạo thành công
       onOpenChange(false);
       resetForm();
     } catch (error) {
       console.error('Error creating product:', error);
       toast.error('Không thể tạo sản phẩm. Vui lòng thử lại.');
-      // Không đóng dialog khi có lỗi để user có thể sửa và thử lại
     } finally {
+      setIsSubmitting(false);
       toast.dismiss();
     }
   };
@@ -199,229 +200,343 @@ export function CreateProductDialog({ open, onOpenChange }: CreateProductDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Tạo sản phẩm mới</DialogTitle>
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-6 border-b">
+          <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Package className="w-6 h-6 text-blue-600" />
+            Tạo sản phẩm mới
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="name">Tên sản phẩm *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => handleFormChange('name', e.target.value)}
-              required
-            />
-          </div>
+        <div className="space-y-8 pt-6">
+          {/* Basic Information Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
+              <Package className="w-5 h-5 text-blue-600" />
+              Thông tin cơ bản
+            </h3>
 
-          <div>
-            <Label htmlFor="brand">Thương hiệu *</Label>
-            <SelectBrand
-              value={formData.brandId}
-              onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="currentPrice">Giá sản phẩm *</Label>
-            <Input
-              id="currentPrice"
-              type="number"
-              min="0"
-              step="0.01"
-              value={formData.currentPrice}
-              onChange={(e) => handleFormChange('currentPrice', e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="quantity">Số lượng</Label>
-            <Input
-              type="number"
-              id="quantity"
-              min="0"
-              value={formData.quantity}
-              onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="model">Model</Label>
-            <Input
-              id="model"
-              value={formData.model}
-              onChange={(e) => handleFormChange('model', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="warrantyExpiryDate">Ngày hết hạn bảo hành</Label>
-            <Input
-              id="warrantyExpiryDate"
-              type="date"
-              value={formData.warrantyExpiryDate}
-              onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="condition">Tình trạng sản phẩm</Label>
-            <select
-              id="condition"
-              value={formData.condition}
-              onChange={(e) => handleFormChange('condition', e.target.value)}
-              className="w-full p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="NEW">Mới</option>
-              <option value="LIKE_NEW">Như mới</option>
-              <option value="USED_GOOD">Đã qua sử dụng - Tốt</option>
-              <option value="USED_FAIR">Đã qua sử dụng - Trung bình</option>
-              <option value="BROKEN">Hỏng</option>
-              <option value="DAMAGED">Hư hại</option>
-            </select>
-          </div>
-
-          <div>
-            <Label htmlFor="tags">Tags</Label>
-            <Input
-              id="tags"
-              value={formData.tags}
-              onChange={(e) => handleFormChange('tags', e.target.value)}
-              placeholder="Ngăn cách bằng dấu phẩy"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <Label htmlFor="categoryIds">Danh mục *</Label>
-            {/* <MultiSelectCategory
-              value={formData.categoryIds}
-              onChange={(selected) => handleFormChange('categoryIds', selected)}
-            /> */}
-            <FancyMultiSelect
-              value={formData.categoryIds}
-              onChange={(selected) => handleFormChange('categoryIds', selected)}
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <Label htmlFor="shortDescription">Mô tả ngắn</Label>
-            <Textarea
-              id="shortDescription"
-              value={formData.shortDescription}
-              onChange={(e) => handleFormChange('shortDescription', e.target.value)}
-              rows={3}
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <Label htmlFor="description">Mô tả chi tiết</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleFormChange('description', e.target.value)}
-              rows={4}
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <div className="flex flex-row items-start">
-              <div className="flex flex-col items-start space-y-2">
-                <Label>Ảnh đại diện</Label>
-                <Button
-                  type="button"
-                  className="py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-500"
-                  variant="outline"
-                  onClick={handleChooseThumbnail}
-                >
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Chọn ảnh
-                </Button>
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={thumbnailInputRef}
-                  onChange={handleThumbnailChange}
-                  className="hidden"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  Tên sản phẩm <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleFormChange('name', e.target.value)}
+                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Nhập tên sản phẩm"
                 />
               </div>
-              <div className="flex-1 flex justify-center ml-8">
-                {thumbnailPreview && (
-                  <div className="relative w-36 h-36">
-                    <Image
-                      src={thumbnailPreview}
-                      alt="Thumbnail"
-                      fill
-                      className="rounded-lg object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveThumbnail}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
+
+              <div className="space-y-2">
+                <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
+                  Thương hiệu <span className="text-red-500">*</span>
+                </Label>
+                <SelectBrand
+                  value={formData.brandId}
+                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="currentPrice" className="text-sm font-medium text-gray-700">
+                  Giá sản phẩm <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="currentPrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formData.currentPrice}
+                  onChange={(e) => handleFormChange('currentPrice', e.target.value)}
+                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="quantity" className="text-sm font-medium text-gray-700">
+                  Số lượng
+                </Label>
+                <Input
+                  type="number"
+                  id="quantity"
+                  min="0"
+                  value={formData.quantity}
+                  onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
+                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="model" className="text-sm font-medium text-gray-700">
+                  Model
+                </Label>
+                <Input
+                  id="model"
+                  value={formData.model}
+                  onChange={(e) => handleFormChange('model', e.target.value)}
+                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Nhập model sản phẩm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="condition" className="text-sm font-medium text-gray-700">
+                  Tình trạng sản phẩm
+                </Label>
+                <select
+                  id="condition"
+                  value={formData.condition}
+                  onChange={(e) => handleFormChange('condition', e.target.value)}
+                  className="w-full h-11 p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="NEW">Mới</option>
+                  <option value="LIKE_NEW">Như mới</option>
+                  <option value="USED_GOOD">Đã qua sử dụng - Tốt</option>
+                  <option value="USED_FAIR">Đã qua sử dụng - Trung bình</option>
+                  <option value="BROKEN">Hỏng</option>
+                  <option value="DAMAGED">Hư hại</option>
+                </select>
               </div>
             </div>
           </div>
 
-          <div className="md:col-span-2">
-            <div className="flex flex-row items-start">
-              <div className="flex flex-col items-start space-y-2">
-                <Label htmlFor="productImages">Ảnh sản phẩm chi tiết</Label>
-                <Button
-                  type="button"
-                  className="py-2 px-4 bg-gray-600 text-white rounded-lg hover:bg-gray-500"
-                  variant="outline"
-                  onClick={handleChooseFiles}
-                >
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Chọn ảnh
-                </Button>
+          {/* Additional Information Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
+              <Tag className="w-5 h-5 text-green-600" />
+              Thông tin bổ sung
+            </h3>
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="warrantyExpiryDate"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Ngày hết hạn bảo hành
+                </Label>
+                <Input
+                  id="warrantyExpiryDate"
+                  type="date"
+                  value={formData.warrantyExpiryDate}
+                  onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
+                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
-              <div className="flex-1 flex justify-center ml-4">
-                {imagePreviews.length > 0 && (
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative w-36 h-36">
-                        <Image
-                          src={preview}
-                          alt={`Preview ${index + 1}`}
-                          fill
-                          className="rounded-lg object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(index)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
-                        >
-                          ✕
-                        </button>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="tags"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <Tag className="w-4 h-4" />
+                  Tags
+                </Label>
+                <Input
+                  id="tags"
+                  value={formData.tags}
+                  onChange={(e) => handleFormChange('tags', e.target.value)}
+                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Ngăn cách bằng dấu phẩy"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Danh mục <span className="text-red-500">*</span>
+              </Label>
+              <FancyMultiSelect
+                value={formData.categoryIds}
+                onChange={(selected) => handleFormChange('categoryIds', selected)}
+              />
+            </div>
+          </div>
+
+          {/* Description Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
+              <Shield className="w-5 h-5 text-purple-600" />
+              Mô tả sản phẩm
+            </h3>
+
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="shortDescription" className="text-sm font-medium text-gray-700">
+                  Mô tả ngắn
+                </Label>
+                <Textarea
+                  id="shortDescription"
+                  value={formData.shortDescription}
+                  onChange={(e) => handleFormChange('shortDescription', e.target.value)}
+                  rows={3}
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Nhập mô tả ngắn gọn về sản phẩm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                  Mô tả chi tiết
+                </Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleFormChange('description', e.target.value)}
+                  rows={4}
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Nhập mô tả chi tiết về sản phẩm"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Images Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
+              <ImageIcon className="w-5 h-5 text-orange-600" />
+              Hình ảnh sản phẩm
+            </h3>
+
+            {/* Thumbnail */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex-shrink-0">
+                  <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                    Ảnh đại diện
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleChooseThumbnail}
+                    className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Chọn ảnh
+                  </Button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={thumbnailInputRef}
+                    onChange={handleThumbnailChange}
+                    className="hidden"
+                  />
+                </div>
+
+                <div className="flex-1 flex justify-center">
+                  {thumbnailPreview ? (
+                    <div className="relative w-40 h-40 group">
+                      <Image
+                        src={thumbnailPreview}
+                        alt="Thumbnail"
+                        fill
+                        className="rounded-lg object-cover border-2 border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveThumbnail}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-100">
+                      <div className="text-center">
+                        <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">Chưa có ảnh</p>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Product Images */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex-shrink-0">
+                  <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                    Ảnh sản phẩm chi tiết
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleChooseFiles}
+                    className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Chọn nhiều ảnh
+                  </Button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  {imagePreviews.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative group">
+                          <div className="w-full h-32 relative">
+                            <Image
+                              src={preview}
+                              alt={`Preview ${index + 1}`}
+                              fill
+                              className="rounded-lg object-cover border-2 border-gray-200"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-100">
+                      <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">Chưa có ảnh chi tiết</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex gap-4 mt-6">
-          <Button type="button" onClick={handleSubmit} className="flex-1">
-            Tạo sản phẩm
+        {/* Action Buttons */}
+        <div className="flex gap-4 pt-6 border-t bg-gray-50 -mx-6 -mb-6 px-6 py-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+            className="flex-1"
+          >
+            Hủy
+          </Button>
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="flex-1 bg-blue-600 hover:bg-blue-700"
+          >
+            {isSubmitting ? 'Đang tạo...' : 'Tạo sản phẩm'}
           </Button>
         </div>
       </DialogContent>

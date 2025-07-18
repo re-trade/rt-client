@@ -1,12 +1,16 @@
 'use client';
 
-import { ClientToServerEvents, Message, Room, ServerToClientEvents } from '@/types/chat';
-import { SignalData } from '@/types/webrtc';
-import { useEffect, useRef, useState } from 'react';
+import { ClientToServerEvents, Message, Room, ServerToClientEvents } from '@/types/chat/chat';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 export function useMessenger() {
   const [selectedContact, setSelectedContact] = useState<Room | null>(null);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSomeoneTyping, setIsSomeoneTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Room[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -29,46 +33,102 @@ export function useMessenger() {
   const streamRef = useRef<MediaStream | null>(null);
   const remoteStreamRef = useRef<MediaStream | null>(null);
 
+  const router = useRouter();
+
+  const handleSignal = useCallback(
+    async (data: {
+      from: string;
+      type: 'signal' | 'offer' | 'answer' | 'ice-candidate';
+      data: any;
+      roomId: string;
+    }) => {
+      const { type, data: signalData } = data;
+      const peer = peerRef.current;
+      if (!peer) return;
+
+      if (type === 'offer') {
+        await startCamera(true);
+        await peer.setRemoteDescription(new RTCSessionDescription(signalData));
+        const answer = await peer.createAnswer();
+        await peer.setLocalDescription(answer);
+
+        if (socketRef.current && selectedContact) {
+          socketRef.current.emit('signal', {
+            to: selectedContact.id,
+            type: 'answer',
+            data: answer,
+            roomId: selectedContact.id,
+          });
+        }
+      } else if (type === 'answer') {
+        await peer.setRemoteDescription(new RTCSessionDescription(signalData));
+      } else if (type === 'ice-candidate') {
+        try {
+          await peer.addIceCandidate(new RTCIceCandidate(signalData));
+        } catch {}
+      }
+    },
+    [selectedContact],
+  );
+
+  const handleSignalRef = useRef(handleSignal);
+  handleSignalRef.current = handleSignal;
   useEffect(() => {
-    const socket = io('http://localhost:3001', {
+    const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:3001', {
       transports: ['websocket'],
       withCredentials: true,
     });
 
     socketRef.current = socket;
 
-    socket.on('connect', () => {
-      socket.emit('authenticate', {
-        token: localStorage.getItem('access-token'),
-        senderType: 'customer',
-      });
-      socket.emit('');
-    });
-
-    socket.on('message', (msg: Message) => {
-      setMessages((prev) => [...prev, msg]);
-    });
-
-    socket.on('signal', async (data: SignalData) => {
-      await handleSignal(data);
-    });
-
-    return () => {
+    const token = localStorage.getItem('access-token');
+    if (!token) {
       socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (selectedContact && socketRef.current) {
-      socketRef.current.emit('joinRoom', selectedContact.id);
+      router.push('/login');
+      return;
     }
 
-    return () => {
-      if (selectedContact && socketRef.current) {
-        socketRef.current.emit('leaveRoom', selectedContact.id);
-      }
+    socket.on('connect', () => {
+      socket.emit('authenticate', {
+        token,
+        senderType: 'customer',
+      });
+    });
+
+    const handleAuthSuccess = () => {
+      setIsAuthenticated(true);
+      socket.emit('getRooms');
     };
-  }, [selectedContact]);
+
+    socket.on('authSuccess', handleAuthSuccess);
+    socket.on('rooms', (rooms) => setContacts(rooms));
+    socket.on('roomJoined', (room) => {
+      setSelectedContact(room);
+      setMessages(room.messages || []);
+    });
+    socket.on('message', (msg) => setMessages((prev) => [...prev, msg]));
+    socket.on('signal', (data) => handleSignalRef.current(data));
+    socket.on('typing', (data) => {
+      setIsSomeoneTyping(data.isTyping);
+      setTypingUser(data.isTyping ? data.username : null);
+    });
+    return () => {
+      socket.disconnect();
+      socket.off('authSuccess', handleAuthSuccess);
+      socket.off('rooms');
+      socket.off('roomJoined');
+      socket.off('message');
+      socket.off('signal');
+      socket.off('typing');
+    };
+  }, [router]);
+
+  useEffect(() => {
+    if (!socketRef.current) return;
+    if (!selectedChatId) return;
+    if (!isAuthenticated) return;
+    socketRef.current.emit('joinRoom', selectedChatId);
+  }, [selectedChatId, isAuthenticated]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -77,61 +137,87 @@ export function useMessenger() {
     } else {
       setRecordingTime(0);
     }
-
     return () => clearInterval(interval);
   }, [isRecording]);
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedContact || !socketRef.current) return;
-
+    const seller = selectedContact.participants.filter((p) => p.senderRole === 'seller').pop();
+    if (!seller) return;
     socketRef.current.emit('sendMessage', {
       content: newMessage,
-      roomId: selectedContact.id,
+      receiverId: seller.id,
     });
-
     setNewMessage('');
   };
 
-  const startCamera = async (withVideo: boolean) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: withVideo,
-      audio: true,
-    });
-    streamRef.current = stream;
-    if (videoRef.current && withVideo) videoRef.current.srcObject = stream;
-
-    const remoteStream = new MediaStream();
-    remoteStreamRef.current = remoteStream;
-    if (remoteVideoRef.current && withVideo) {
-      remoteVideoRef.current.srcObject = remoteStream;
-    }
-
-    const peer = new RTCPeerConnection();
-    peerRef.current = peer;
-
-    stream.getTracks().forEach((track) => {
-      peer.addTrack(track, stream);
-    });
-
-    peer.ontrack = (event) => {
-      event.streams[0].getTracks().forEach((track) => {
-        remoteStream.addTrack(track);
-      });
-    };
-
-    peer.onicecandidate = (event) => {
-      if (event.candidate && socketRef.current && selectedContact) {
-        socketRef.current.emit('signal', {
-          to: selectedContact.id,
-          type: 'ice-candidate',
-          data: event.candidate,
-          roomId: selectedContact.id,
-        });
+  useEffect(() => {
+    if (selectedContact) {
+      const seller = selectedContact.participants.filter((p) => p.senderRole === 'seller').pop();
+      if (seller) {
+        router.push(`/chat/${seller.id}`);
       }
-    };
+    }
+  }, [selectedContact, router]);
 
-    return peer;
-  };
+  const handleTyping = useCallback(
+    (isTyping: boolean) => {
+      if (!socketRef.current || !selectedContact) return;
+
+      const seller = selectedContact.participants.find((p) => p.senderRole === 'seller');
+      if (!seller) return;
+
+      socketRef.current.emit('typing', {
+        receiverId: seller.id,
+        isTyping,
+      });
+    },
+    [selectedContact],
+  );
+
+  const startCamera = useCallback(
+    async (withVideo: boolean) => {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: withVideo,
+        audio: true,
+      });
+      streamRef.current = stream;
+      if (videoRef.current && withVideo) videoRef.current.srcObject = stream;
+
+      const remoteStream = new MediaStream();
+      remoteStreamRef.current = remoteStream;
+      if (remoteVideoRef.current && withVideo) {
+        remoteVideoRef.current.srcObject = remoteStream;
+      }
+
+      const peer = new RTCPeerConnection();
+      peerRef.current = peer;
+
+      stream.getTracks().forEach((track) => {
+        peer.addTrack(track, stream);
+      });
+
+      peer.ontrack = (event) => {
+        event.streams[0]?.getTracks().forEach((track) => {
+          remoteStream.addTrack(track);
+        });
+      };
+
+      peer.onicecandidate = (event) => {
+        if (event.candidate && socketRef.current && selectedContact) {
+          socketRef.current.emit('signal', {
+            to: selectedContact.id,
+            type: 'ice-candidate',
+            data: event.candidate,
+            roomId: selectedContact.id,
+          });
+        }
+      };
+
+      return peer;
+    },
+    [selectedContact],
+  );
 
   const startVideoCall = async () => {
     setIsVideoCall(true);
@@ -140,12 +226,14 @@ export function useMessenger() {
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
 
-    socketRef.current?.emit('signal', {
-      to: selectedContact?.id || '',
-      type: 'offer',
-      data: offer,
-      roomId: selectedContact?.id || '',
-    });
+    if (socketRef.current && selectedContact) {
+      socketRef.current.emit('signal', {
+        to: selectedContact.id,
+        type: 'offer',
+        data: offer,
+        roomId: selectedContact.id,
+      });
+    }
   };
 
   const startAudioCall = async () => {
@@ -155,37 +243,13 @@ export function useMessenger() {
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
 
-    socketRef.current?.emit('signal', {
-      to: selectedContact?.id || '',
-      type: 'offer',
-      data: offer,
-      roomId: selectedContact?.id || '',
-    });
-  };
-
-  const handleSignal = async (data: SignalData) => {
-    const { type, data: signalData } = data;
-    const peer = peerRef.current;
-    if (!peer) return;
-
-    if (type === 'offer') {
-      await startCamera(true);
-      await peer.setRemoteDescription(new RTCSessionDescription(signalData));
-      const answer = await peer.createAnswer();
-      await peer.setLocalDescription(answer);
-
-      socketRef.current?.emit('signal', {
-        to: selectedContact?.id || '',
-        type: 'answer',
-        data: answer,
-        roomId: selectedContact?.id || '',
+    if (socketRef.current && selectedContact) {
+      socketRef.current.emit('signal', {
+        to: selectedContact.id,
+        type: 'offer',
+        data: offer,
+        roomId: selectedContact.id,
       });
-    } else if (type === 'answer') {
-      await peer.setRemoteDescription(new RTCSessionDescription(signalData));
-    } else if (type === 'ice-candidate') {
-      try {
-        await peer.addIceCandidate(new RTCIceCandidate(signalData));
-      } catch (err) {}
     }
   };
 
@@ -235,13 +299,16 @@ export function useMessenger() {
     messages,
     newMessage,
     setNewMessage,
+    setSelectedChatId,
     searchQuery,
     setSearchQuery,
     handleSendMessage,
     videoRef,
     remoteVideoRef,
     audioRef,
-
+    handleTyping,
+    isSomeoneTyping,
+    typingUser,
     isVideoCall,
     isAudioCall,
     isCalling,

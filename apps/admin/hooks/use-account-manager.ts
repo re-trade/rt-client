@@ -29,8 +29,8 @@ const useAccountManager = () => {
     try {
       const result = await getAccounts(page, pageSize, searchQuery);
       if (result?.success) {
-        setAccounts(result.content || []);
-        setTotal(result.content?.length || 0);
+        setAccounts(result.content?.content ?? []);
+        setTotal(result.content?.totalElements ?? 0);
       } else {
         setAccounts([]);
         setTotal(0);
