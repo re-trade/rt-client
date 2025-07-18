@@ -67,12 +67,14 @@ export const reviewApi = {
     return response.data.content;
   },
 
-  getAllreviewsBySeller: async (
+  getAllReviewsBySeller: async (
     page: number = 0,
     size: number = 10,
     vote?: number,
-    q?: string,
+    keyword?: string,
+    isReply?: 'REPLY' | 'NO_REPLY' | null,
   ): Promise<ReviewResponse[]> => {
+    const q = keyword ? `keyword=${encodeURIComponent(keyword)}` : undefined;
     const response = await authApi.default.get<IResponseObject<ReviewResponse[]>>(
       `/product-review/search`,
       {
@@ -81,6 +83,7 @@ export const reviewApi = {
           size,
           vote,
           q,
+          isReply,
         },
       },
     );
