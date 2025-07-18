@@ -13,7 +13,11 @@ import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'l
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import dynamic from "next/dynamic";
 
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 interface EditProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -444,34 +448,46 @@ export function EditProductDialog({
             </h3>
 
             <div className="space-y-6">
+              {/* Mô tả ngắn */}
               <div className="space-y-2">
                 <Label htmlFor="shortDescription" className="text-sm font-medium text-gray-700">
                   Mô tả ngắn
                 </Label>
-                <Textarea
-                  id="shortDescription"
-                  value={formData.shortDescription}
-                  onChange={(e) => handleFormChange('shortDescription', e.target.value)}
-                  rows={3}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Nhập mô tả ngắn gọn về sản phẩm"
-                  disabled={!isEdit}
-                />
+                <div className="rounded-md shadow-sm border border-gray-300">
+                  <MDEditor
+                    id="shortDescription"
+                    value={formData.shortDescription}
+                    onChange={(value) => handleFormChange('shortDescription', value || '')}
+                    preview="edit"
+                    height={150}
+                    data-color-mode="light"
+                    textareaProps={{
+                      disabled: !isEdit,
+                      placeholder: "Nhập mô tả ngắn gọn về sản phẩm",
+                    }}
+                  />
+                </div>
               </div>
 
+              {/* Mô tả chi tiết */}
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium text-gray-700">
                   Mô tả chi tiết
                 </Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleFormChange('description', e.target.value)}
-                  rows={4}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Nhập mô tả chi tiết về sản phẩm"
-                  disabled={!isEdit}
-                />
+                <div className="rounded-md shadow-sm border border-gray-300">
+                  <MDEditor
+                    id="description"
+                    value={formData.description}
+                    onChange={(value) => handleFormChange('description', value || '')}
+                    preview="edit"
+                    height={200}
+                    data-color-mode="light"
+                    textareaProps={{
+                      disabled: !isEdit,
+                      placeholder: "Nhập mô tả chi tiết về sản phẩm",
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

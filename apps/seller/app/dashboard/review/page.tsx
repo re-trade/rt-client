@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select';
 import { ReviewResponse, reviewApi } from '@/service/review.api';
 import { Filter, MessageSquare, RotateCcw, Search, Star } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function ReviewsPage() {
   const [selectedReview, setSelectedReview] = useState<ReviewResponse | null>(null);
@@ -26,36 +26,74 @@ export default function ReviewsPage() {
   const [ratingFilter, setRatingFilter] = useState<string>('all');
   const [replyFilter, setReplyFilter] = useState<string>('all');
   const [productReviews, setProductReviews] = useState<ReviewResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isSearching, setIsSearching] = useState(false);
+  const [loading, setLoading] = useState(true); // Chỉ cho initial load
+  const [isSearching, setIsSearching] = useState(false); // Cho search button
+  const [isFiltering, setIsFiltering] = useState(false); // Cho filter changes
 
-  const fetchReviews = async (vote?: number, q?: string, reply?: string) => {
+  const fetchReviews = async (
+    vote?: number, 
+    q?: string, 
+    reply?: string, 
+    loadingType: 'initial' | 'search' | 'filter' = 'search'
+  ) => {
     try {
-      setIsSearching(true);
-      const reviews = await reviewApi.getAllreviewsBySeller(0, 10, vote, q);
-      console.log('Fetched reviews:', reviews);
-      setProductReviews(reviews);
+      // Set loading state dựa trên loại action
+      switch (loadingType) {
+        case 'initial':
+          setLoading(true);
+          break;
+        case 'search':
+          setIsSearching(true);
+          break;
+        case 'filter':
+          setIsFiltering(true);
+          break;
+      }
+
+      const trimmedQ = q?.trim();
+      const isReply = reply?.trim() === 'REPLY' || reply?.trim() === 'NO_REPLY' ? reply.trim() as 'REPLY' | 'NO_REPLY' : null;
+      const reviews = await reviewApi.getAllReviewsBySeller(0, 10, vote, trimmedQ, isReply);
+      
+      if (Array.isArray(reviews)) {
+        setProductReviews(reviews);
+        console.log('Fetched reviews:', reviews);
+      } else {
+        console.warn('Unexpected reviews data:', reviews);
+        setProductReviews([]);
+      }
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
+      setProductReviews([]);
     } finally {
+      // Reset tất cả loading states
       setLoading(false);
       setIsSearching(false);
+      setIsFiltering(false);
     }
   };
 
-  // Fetch reviews on initial load and when ratingFilter or replyFilter changes
+  
+  // Initial load khi component mount
   useEffect(() => {
+    fetchReviews(undefined, undefined, undefined, 'initial');
+  }, []);
+
+  // Filter changes - không reload page, chỉ hiển thị loading indicator nhỏ
+  useEffect(() => {
+    // Skip nếu đang trong initial load
+    if (loading) return;
+    
     const vote = ratingFilter === 'all' ? undefined : Number(ratingFilter);
     const q = searchTerm || undefined;
     const reply = replyFilter === 'all' ? undefined : replyFilter;
-    fetchReviews(vote, q, reply);
+    fetchReviews(vote, q, reply, 'filter');
   }, [ratingFilter, replyFilter]);
 
   const handleSearch = () => {
     const vote = ratingFilter === 'all' ? undefined : Number(ratingFilter);
     const q = searchTerm || undefined;
     const reply = replyFilter === 'all' ? undefined : replyFilter;
-    fetchReviews(vote, q, reply);
+    fetchReviews(vote, q, reply, 'search');
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -68,7 +106,8 @@ export default function ReviewsPage() {
     setSearchTerm('');
     setRatingFilter('all');
     setReplyFilter('all');
-    fetchReviews();
+    // Gọi API với tất cả filter = default
+    fetchReviews(undefined, undefined, undefined, 'search');
   };
 
   const handleViewDetail = (review: ReviewResponse) => {
@@ -102,6 +141,7 @@ export default function ReviewsPage() {
     replyFilter !== 'all' ? 1 : 0,
   ].reduce((sum, count) => sum + count, 0);
 
+  // Chỉ hiển thị full page skeleton khi initial load
   if (loading) {
     return (
       <div className="space-y-6">
@@ -167,6 +207,13 @@ export default function ReviewsPage() {
                 {activeFiltersCount} bộ lọc
               </span>
             )}
+            {/* Hiển thị loading indicator nhỏ khi đang filter */}
+            {isFiltering && (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                <span>Đang tải...</span>
+              </div>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
@@ -180,11 +227,16 @@ export default function ReviewsPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleKeyPress}
                 className="pl-10 h-10"
+                disabled={isFiltering}
               />
             </div>
 
             {/* Rating Filter */}
-            <Select value={ratingFilter} onValueChange={setRatingFilter}>
+            <Select 
+              value={ratingFilter} 
+              onValueChange={setRatingFilter}
+              disabled={isFiltering}
+            >
               <SelectTrigger className="w-full lg:w-48 h-10">
                 <SelectValue placeholder="Lọc theo sao" />
               </SelectTrigger>
@@ -219,19 +271,23 @@ export default function ReviewsPage() {
             </Select>
 
             {/* Reply Filter */}
-            <Select value={replyFilter} onValueChange={setReplyFilter}>
+            <Select 
+              value={replyFilter} 
+              onValueChange={setReplyFilter}
+              disabled={isFiltering}
+            >
               <SelectTrigger className="w-full lg:w-48 h-10">
                 <SelectValue placeholder="Lọc theo phản hồi" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tất cả phản hồi</SelectItem>
-                <SelectItem value="replied">
+                <SelectItem value="REPLY">
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4 text-green-600" />
                     Đã phản hồi
                   </div>
                 </SelectItem>
-                <SelectItem value="unreplied">
+                <SelectItem value="NO_REPLY">
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4 text-yellow-600" />
                     Chưa phản hồi
@@ -244,7 +300,7 @@ export default function ReviewsPage() {
             <div className="flex gap-2">
               <Button
                 onClick={handleSearch}
-                disabled={isSearching}
+                disabled={isSearching || isFiltering}
                 className="h-10 bg-blue-600 hover:bg-blue-700"
               >
                 {isSearching ? (
@@ -261,7 +317,12 @@ export default function ReviewsPage() {
               </Button>
 
               {activeFiltersCount > 0 && (
-                <Button variant="outline" onClick={handleReset} className="h-10 hover:bg-gray-50">
+                <Button 
+                  variant="outline" 
+                  onClick={handleReset} 
+                  className="h-10 hover:bg-gray-50"
+                  disabled={isSearching || isFiltering}
+                >
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Đặt lại
                 </Button>
@@ -283,8 +344,20 @@ export default function ReviewsPage() {
         </div>
       )}
 
-      {/* Review Table */}
-      <ReviewTable reviews={productReviews} onViewDetail={handleViewDetail} onReply={handleReply} />
+      {/* Review Table với overlay loading khi đang filter */}
+      <div className="relative">
+        {/* Overlay loading khi đang filter */}
+        {isFiltering && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-lg">
+              <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+              <span className="text-sm font-medium text-gray-700">Đang tải kết quả...</span>
+            </div>
+          </div>
+        )}
+        
+        <ReviewTable reviews={productReviews} onViewDetail={handleViewDetail} onReply={handleReply} />
+      </div>
 
       {/* Dialogs */}
       <ReviewDetailDialog
