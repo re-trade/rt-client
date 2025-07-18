@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select';
 import { ReviewResponse, reviewApi } from '@/service/review.api';
 import { Filter, MessageSquare, RotateCcw, Search, Star } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ReviewsPage() {
   const [selectedReview, setSelectedReview] = useState<ReviewResponse | null>(null);
@@ -31,10 +31,10 @@ export default function ReviewsPage() {
   const [isFiltering, setIsFiltering] = useState(false); // Cho filter changes
 
   const fetchReviews = async (
-    vote?: number, 
-    q?: string, 
-    reply?: string, 
-    loadingType: 'initial' | 'search' | 'filter' = 'search'
+    vote?: number,
+    q?: string,
+    reply?: string,
+    loadingType: 'initial' | 'search' | 'filter' = 'search',
   ) => {
     try {
       // Set loading state dựa trên loại action
@@ -51,9 +51,12 @@ export default function ReviewsPage() {
       }
 
       const trimmedQ = q?.trim();
-      const isReply = reply?.trim() === 'REPLY' || reply?.trim() === 'NO_REPLY' ? reply.trim() as 'REPLY' | 'NO_REPLY' : null;
+      const isReply =
+        reply?.trim() === 'REPLY' || reply?.trim() === 'NO_REPLY'
+          ? (reply.trim() as 'REPLY' | 'NO_REPLY')
+          : null;
       const reviews = await reviewApi.getAllReviewsBySeller(0, 10, vote, trimmedQ, isReply);
-      
+
       if (Array.isArray(reviews)) {
         setProductReviews(reviews);
         console.log('Fetched reviews:', reviews);
@@ -72,7 +75,6 @@ export default function ReviewsPage() {
     }
   };
 
-  
   // Initial load khi component mount
   useEffect(() => {
     fetchReviews(undefined, undefined, undefined, 'initial');
@@ -82,7 +84,7 @@ export default function ReviewsPage() {
   useEffect(() => {
     // Skip nếu đang trong initial load
     if (loading) return;
-    
+
     const vote = ratingFilter === 'all' ? undefined : Number(ratingFilter);
     const q = searchTerm || undefined;
     const reply = replyFilter === 'all' ? undefined : replyFilter;
@@ -232,11 +234,7 @@ export default function ReviewsPage() {
             </div>
 
             {/* Rating Filter */}
-            <Select 
-              value={ratingFilter} 
-              onValueChange={setRatingFilter}
-              disabled={isFiltering}
-            >
+            <Select value={ratingFilter} onValueChange={setRatingFilter} disabled={isFiltering}>
               <SelectTrigger className="w-full lg:w-48 h-10">
                 <SelectValue placeholder="Lọc theo sao" />
               </SelectTrigger>
@@ -271,11 +269,7 @@ export default function ReviewsPage() {
             </Select>
 
             {/* Reply Filter */}
-            <Select 
-              value={replyFilter} 
-              onValueChange={setReplyFilter}
-              disabled={isFiltering}
-            >
+            <Select value={replyFilter} onValueChange={setReplyFilter} disabled={isFiltering}>
               <SelectTrigger className="w-full lg:w-48 h-10">
                 <SelectValue placeholder="Lọc theo phản hồi" />
               </SelectTrigger>
@@ -317,9 +311,9 @@ export default function ReviewsPage() {
               </Button>
 
               {activeFiltersCount > 0 && (
-                <Button 
-                  variant="outline" 
-                  onClick={handleReset} 
+                <Button
+                  variant="outline"
+                  onClick={handleReset}
                   className="h-10 hover:bg-gray-50"
                   disabled={isSearching || isFiltering}
                 >
@@ -355,8 +349,12 @@ export default function ReviewsPage() {
             </div>
           </div>
         )}
-        
-        <ReviewTable reviews={productReviews} onViewDetail={handleViewDetail} onReply={handleReply} />
+
+        <ReviewTable
+          reviews={productReviews}
+          onViewDetail={handleViewDetail}
+          onReply={handleReply}
+        />
       </div>
 
       {/* Dialogs */}

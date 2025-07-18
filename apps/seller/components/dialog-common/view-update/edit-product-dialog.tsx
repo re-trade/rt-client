@@ -6,18 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { productApi, TProduct, UpdateProductDto } from '@/service/product.api';
 import { storageApi } from '@/service/storage.api';
+import '@uiw/react-markdown-preview/markdown.css';
+import '@uiw/react-md-editor/markdown-editor.css';
 import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import "@uiw/react-md-editor/markdown-editor.css";
-import "@uiw/react-markdown-preview/markdown.css";
-import dynamic from "next/dynamic";
 
-const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 interface EditProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -463,7 +462,7 @@ export function EditProductDialog({
                     data-color-mode="light"
                     textareaProps={{
                       disabled: !isEdit,
-                      placeholder: "Nhập mô tả ngắn gọn về sản phẩm",
+                      placeholder: 'Nhập mô tả ngắn gọn về sản phẩm',
                     }}
                   />
                 </div>
@@ -484,7 +483,7 @@ export function EditProductDialog({
                     data-color-mode="light"
                     textareaProps={{
                       disabled: !isEdit,
-                      placeholder: "Nhập mô tả chi tiết về sản phẩm",
+                      placeholder: 'Nhập mô tả chi tiết về sản phẩm',
                     }}
                   />
                 </div>

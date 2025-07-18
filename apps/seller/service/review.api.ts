@@ -72,7 +72,7 @@ export const reviewApi = {
     size: number = 10,
     vote?: number,
     keyword?: string,
-    isReply?: 'REPLY' | 'NO_REPLY'|null,
+    isReply?: 'REPLY' | 'NO_REPLY' | null,
   ): Promise<ReviewResponse[]> => {
     const q = keyword ? `keyword=${encodeURIComponent(keyword)}` : undefined;
     const response = await authApi.default.get<IResponseObject<ReviewResponse[]>>(
@@ -82,10 +82,10 @@ export const reviewApi = {
           page,
           size,
           vote,
-          q, 
+          q,
           isReply,
         },
-      }
+      },
     );
     return response.data.content;
   },

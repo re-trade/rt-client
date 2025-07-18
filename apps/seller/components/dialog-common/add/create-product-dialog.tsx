@@ -6,18 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { CreateProductDto, productApi } from '@/service/product.api';
 import { storageApi } from '@/service/storage.api';
+import '@uiw/react-markdown-preview/markdown.css';
+import '@uiw/react-md-editor/markdown-editor.css';
 import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import "@uiw/react-md-editor/markdown-editor.css";
-import "@uiw/react-markdown-preview/markdown.css";
-import dynamic from "next/dynamic";
 
-const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 interface CreateProductDialogProps {
   open: boolean;
   onSuccess: boolean;
@@ -384,8 +383,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   preview="edit"
                   data-color-mode="light"
                   textareaProps={{
-
-                    placeholder: "Nhập mô tả ngắn gọn về sản phẩm",
+                    placeholder: 'Nhập mô tả ngắn gọn về sản phẩm',
                   }}
                 />
               </div>
@@ -396,7 +394,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   Mô tả chi tiết
                 </Label>
                 <MDEditor
-
                   id="description"
                   value={formData.description}
                   onChange={(value) => handleFormChange('description', value || '')}
@@ -404,13 +401,11 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   preview="edit"
                   data-color-mode="light"
                   textareaProps={{
-
-                    placeholder: "Nhập mô tả ngắn gọn về sản phẩm",
+                    placeholder: 'Nhập mô tả ngắn gọn về sản phẩm',
                   }}
                 />
               </div>
             </div>
-
           </div>
 
           {/* Images Section */}
