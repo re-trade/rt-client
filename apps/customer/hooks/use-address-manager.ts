@@ -214,7 +214,7 @@ export function useAddressManager() {
 
   const validateField = useCallback((key: string, value: string) => {
     const { error } = addressSchema.extract(key).validate(value);
-    return error ? error.details[0].message : '';
+    return error ? error.details[0]?.message : '';
   }, []);
 
   const handleFieldChange = useCallback(

@@ -1,9 +1,9 @@
 'use client';
 
-import { ClientToServerEvents, Message, Room, ServerToClientEvents } from '@/types/chat/chat';
+import { ClientToServerEvents, Message, Room, ServerToClientEvents, socket } from '@retrade/util';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
 export function useMessenger() {
   const [selectedContact, setSelectedContact] = useState<Room | null>(null);
@@ -74,11 +74,6 @@ export function useMessenger() {
   const handleSignalRef = useRef(handleSignal);
   handleSignalRef.current = handleSignal;
   useEffect(() => {
-    const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:3001', {
-      transports: ['websocket'],
-      withCredentials: true,
-    });
-
     socketRef.current = socket;
 
     const token = localStorage.getItem('access-token');
