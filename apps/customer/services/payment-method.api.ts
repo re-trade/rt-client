@@ -21,7 +21,6 @@ export interface BankAccountResponse {
   bankName: string;
   accountNumber: string;
   userBankName: string;
-  isDefault?: boolean;
   addedDate?: string;
 }
 
@@ -54,6 +53,13 @@ const getBanks = async (
   return response.data;
 };
 
+const getBankByBin = async (bin: string): Promise<BankResponse | undefined> => {
+  const response = await unAuthApi.default.get<IResponseObject<BankResponse>>(
+    `/wallets/banks/${bin}`,
+  );
+  return response.data.content;
+};
+
 const insertBankAccount = async (
   payload: BankAccountRequest,
 ): Promise<IResponseObject<BankAccountResponse> | undefined> => {
@@ -72,4 +78,4 @@ const updateBankAccount = async (payload: BankAccountRequest, id: string) => {
   return response.data;
 };
 
-export { getBanks, getUserBankAccounts, insertBankAccount, updateBankAccount };
+export { getBankByBin, getBanks, getUserBankAccounts, insertBankAccount, updateBankAccount };
