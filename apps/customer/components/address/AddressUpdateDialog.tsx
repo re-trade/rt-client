@@ -1,6 +1,7 @@
 'use client';
 
 import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
+import { AddressField } from '@components/address/AddressField';
 import { Check, MapPin, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -54,7 +55,6 @@ export default function AddressUpdateDialog({
     }
   }, [open]);
 
-  // ESC key handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && open) {
@@ -109,88 +109,6 @@ export default function AddressUpdateDialog({
     }
   };
 
-  const renderField = (field: (typeof fields)[0]) => {
-    const { key, label, type } = field;
-    const value = formData[key as keyof AddressFormData];
-    const hasError = (touched[key] || validationTriggered) && errors[key];
-
-    if (type === 'dropdown') {
-      let options: { value: string; label: string }[] = [];
-      let isDisabled = false;
-
-      if (key === 'country') {
-        options = provinces.map((p) => ({ value: p.code.toString(), label: p.name }));
-      } else if (key === 'district') {
-        options = districts.map((d) => ({ value: d.code.toString(), label: d.name }));
-        isDisabled = !formData.country;
-      } else if (key === 'ward') {
-        options = wards.map((w) => ({ value: w.code.toString(), label: w.name }));
-        isDisabled = !formData.district;
-      }
-
-      return (
-        <div className="form-control w-full items-start" key={key}>
-          <label className="text-sm font-semibold text-[#121212] mb-1">{label}</label>
-          <div className="relative w-full">
-            <select
-              className={`select w-full px-4 py-2.5 border ${
-                hasError ? 'border-red-500' : 'border-[#525252]/20'
-              } text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all appearance-none`}
-              value={value as string}
-              onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
-              onBlur={() => onFieldBlur(key as keyof AddressFormData)}
-              disabled={isDisabled || loading || submitting}
-            >
-              <option value="">Chọn {label}</option>
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-[#525252]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                ></path>
-              </svg>
-            </div>
-          </div>
-          <div className="min-h-[22px] mt-1">
-            {hasError && <span className="text-red-500 text-xs font-medium">{errors[key]}</span>}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="form-control w-full items-start" key={key}>
-        <label className="text-sm font-semibold text-[#121212] mb-1">{label}</label>
-        <input
-          type="text"
-          className={`input w-full px-4 py-2.5 border ${
-            hasError ? 'border-red-500' : 'border-[#525252]/20'
-          } text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all`}
-          value={value as string}
-          onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
-          onBlur={() => onFieldBlur(key as keyof AddressFormData)}
-          disabled={submitting}
-        />
-        <div className="min-h-[22px] mt-1">
-          {hasError && <span className="text-red-500 text-xs font-medium">{errors[key]}</span>}
-        </div>
-      </div>
-    );
-  };
-
   if (!open) return null;
 
   return (
@@ -214,7 +132,23 @@ export default function AddressUpdateDialog({
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {fields.map(renderField)}
+            {fields.map((field) => (
+              <AddressField
+                key={field.key}
+                field={field}
+                formData={formData}
+                errors={errors}
+                touched={touched}
+                provinces={provinces}
+                districts={districts}
+                wards={wards}
+                loading={loading}
+                submitting={submitting}
+                validationTriggered={validationTriggered}
+                onFieldChange={onFieldChange}
+                onFieldBlur={onFieldBlur}
+              />
+            ))}
 
             <div className="form-control col-span-1 md:col-span-2 flex flex-col gap-4 mt-2 border-t border-[#525252]/20 pt-4">
               <div className="flex flex-col gap-2 w-full">
