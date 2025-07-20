@@ -20,6 +20,7 @@ export default function BankAccountsPage() {
     setForm,
     isModalOpen,
     setIsModalOpen,
+    updateUserBankAccount,
   } = usePaymentMethod();
   const { messages } = useToast();
 
@@ -49,11 +50,23 @@ export default function BankAccountsPage() {
   const handleDelete = async (id: string) => {};
 
   const handleSave = async () => {
-    await createBankAccount({
-      userBankName: form.userBankName,
-      accountNumber: form.accountNumber,
-      selectedBankBin: form.selectedBankBin,
-    });
+    if (!form.id) {
+      await createBankAccount({
+        userBankName: form.userBankName,
+        accountNumber: form.accountNumber,
+        selectedBankBin: form.selectedBankBin,
+      });
+    } else {
+      await updateUserBankAccount(
+        {
+          userBankName: form.userBankName,
+          accountNumber: form.accountNumber,
+          selectedBankBin: form.selectedBankBin,
+        },
+        form.id,
+      );
+    }
+
     closeModal();
   };
 

@@ -71,7 +71,7 @@ const insertBankAccount = async (
 };
 
 const updateBankAccount = async (payload: BankAccountRequest, id: string) => {
-  const response = await authApi.default.post<IResponseObject<BankAccountResponse>>(
+  const response = await authApi.default.put<IResponseObject<BankAccountResponse>>(
     `/customers/me/bank-info/${id}`,
     payload,
   );

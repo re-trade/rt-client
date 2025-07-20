@@ -6,6 +6,7 @@ import {
   getBanks,
   getUserBankAccounts,
   insertBankAccount,
+  updateBankAccount,
 } from '@services/payment-method.api';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -79,6 +80,35 @@ export function usePaymentMethod() {
     [],
   );
 
+  const updateUserBankAccount = useCallback(
+    async (
+      data: { accountNumber: string; selectedBankBin: string; userBankName: string },
+      id: string,
+    ) => {
+      const response = await updateBankAccount(
+        {
+          accountNumber: data.accountNumber,
+          bankBin: data.selectedBankBin,
+          bankName: data.userBankName,
+          userBankName: data.userBankName,
+        },
+        id,
+      );
+      if (!response) {
+        showToast('Update Bank Account Failed', 'warning');
+        return;
+      }
+      if (response.success) {
+        setBankAccounts([...bankAccounts, response.content]);
+        setPage(response.pagination?.page ?? 0);
+        showToast('Update Bank Account Success', 'success');
+        return;
+      }
+      showToast('Update Bank Account Failed', 'warning');
+    },
+    [],
+  );
+
   useEffect(() => {
     fetchBankAccounts();
     fetchBanks();
@@ -94,6 +124,7 @@ export function usePaymentMethod() {
     editingAccount,
     setEditingAccount,
     createBankAccount,
+    updateUserBankAccount,
     isModalOpen,
     setIsModalOpen,
     form,
