@@ -59,7 +59,12 @@ const getCategoryByIdInternal = async (id: string): Promise<Category> => {
   }
 };
 
-const createCategory = async (data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean }): Promise<Category> => {
+const createCategory = async (data: {
+  name: string;
+  description?: string;
+  categoryParentId?: string | null;
+  visible: boolean;
+}): Promise<Category> => {
   try {
     const response = await unAuthApi.default.post('/categories', data, { withCredentials: true });
     return response.data;
@@ -68,9 +73,14 @@ const createCategory = async (data: { name: string; description?: string; catego
   }
 };
 
-const updateCategory = async (id: string, data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean }): Promise<Category> => {
+const updateCategory = async (
+  id: string,
+  data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean },
+): Promise<Category> => {
   try {
-    const response = await unAuthApi.default.put(`/categories/${id}`, data, { withCredentials: true });
+    const response = await unAuthApi.default.put(`/categories/${id}`, data, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -78,10 +88,10 @@ const updateCategory = async (id: string, data: { name: string; description?: st
 };
 
 export {
+  createCategory,
   getAllCategories,
   getCategoriesInternal,
   getCategoryByIdInternal,
-  createCategory,
   updateCategory,
   type CategoriesResponse,
   type Category,

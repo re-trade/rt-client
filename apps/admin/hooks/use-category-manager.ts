@@ -1,6 +1,6 @@
 import {
-  getAllCategories,
   createCategory,
+  getAllCategories,
   updateCategory,
   type Category,
 } from '@/services/category.api';
@@ -36,46 +36,68 @@ export function useCategoryManager() {
   }, []);
 
   // Thêm mới
-  const handleCreate = useCallback(async (data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean }) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await createCategory(data);
-      await fetchCategories();
-      return res;
-    } catch (err) {
-      setError('Lỗi khi thêm danh mục');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCategories]);
+  const handleCreate = useCallback(
+    async (data: {
+      name: string;
+      description?: string;
+      categoryParentId?: string | null;
+      visible: boolean;
+    }) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await createCategory(data);
+        await fetchCategories();
+        return res;
+      } catch (err) {
+        setError('Lỗi khi thêm danh mục');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchCategories],
+  );
 
   // Sửa
-  const handleUpdate = useCallback(async (id: string, data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean }) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await updateCategory(id, data);
-      await fetchCategories();
-      return res;
-    } catch (err) {
-      setError('Lỗi khi cập nhật danh mục');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCategories]);
+  const handleUpdate = useCallback(
+    async (
+      id: string,
+      data: {
+        name: string;
+        description?: string;
+        categoryParentId?: string | null;
+        visible: boolean;
+      },
+    ) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await updateCategory(id, data);
+        await fetchCategories();
+        return res;
+      } catch (err) {
+        setError('Lỗi khi cập nhật danh mục');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchCategories],
+  );
 
   // Toggle visible (ẩn/hiện)
-  const handleToggleVisible = useCallback(async (cat: Category) => {
-    return handleUpdate(cat.id, {
-      name: cat.name,
-      description: cat.description,
-      categoryParentId: cat.categoryParentId,
-      visible: !cat.visible,
-    });
-  }, [handleUpdate]);
+  const handleToggleVisible = useCallback(
+    async (cat: Category) => {
+      return handleUpdate(cat.id, {
+        name: cat.name,
+        description: cat.description,
+        categoryParentId: cat.categoryParentId,
+        visible: !cat.visible,
+      });
+    },
+    [handleUpdate],
+  );
 
   return {
     categories,
@@ -86,4 +108,4 @@ export function useCategoryManager() {
     handleUpdate,
     handleToggleVisible,
   };
-} 
+}
