@@ -92,12 +92,8 @@ export default function CategoryPage() {
   // State cho dialog và form
   const [openDialog, setOpenDialog] = useState<null | 'create' | 'edit'>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [form, setForm] = useState<{
-    name: string;
-    description?: string;
-    categoryParentId?: string | null;
-    visible: boolean;
-  }>({ name: '', description: '', categoryParentId: null, visible: true });
+  const [form, setForm] = useState<{ name: string; description?: string; categoryParentId?: string | null; visible: boolean }>({ name: '', description: '', categoryParentId: null, visible: true });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load danh mục ban đầu
   useEffect(() => {
@@ -150,6 +146,7 @@ export default function CategoryPage() {
   // Submit form thêm/sửa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const payload = {
       name: form.name,
       description: form.description ?? undefined,
@@ -159,15 +156,16 @@ export default function CategoryPage() {
     try {
       if (openDialog === 'create') {
         await handleCreate(payload);
-        toast.success('Thêm danh mục thành công!');
+        toast.success('Thêm danh mục thành công!', { position: 'top-right' });
       } else if (openDialog === 'edit' && editingCategory) {
         await handleUpdate(editingCategory.id, payload);
-        toast.success('Cập nhật danh mục thành công!');
+        toast.success('Cập nhật danh mục thành công!', { position: 'top-right' });
       }
-      closeDialog();
-      fetchCategories();
     } catch (err) {
-      toast.error('Có lỗi xảy ra!');
+      toast.error('Có lỗi xảy ra!', { position: 'top-right' });
+    } finally {
+      setIsSubmitting(false);
+      closeDialog();
     }
   };
 
@@ -287,11 +285,46 @@ export default function CategoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories
-                .filter((cat) => !cat.categoryParentId)
-                .map((cat) => (
-                  <TreeTableRow key={cat.id} category={cat} />
-                ))}
+              {categories.map(cat => (
+                <TableRow key={cat.id}>
+                  <TableCell>
+                    {cat.categoryParentId ? <span style={{ marginLeft: 24 }}>↳ {cat.name}</span> : <b>{cat.name}</b>}
+                  </TableCell>
+                  <TableCell>
+                    {cat.parentName || '(root)'}
+                  </TableCell>
+                  <TableCell>
+                    {cat.description || <span className="text-gray-400">(Không có)</span>}
+                  </TableCell>
+                  <TableCell>
+                    {cat.visible ? (
+                      <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">Hiện</span>
+                    ) : (
+                      <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-0.5">Ẩn</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mr-2"
+                      onClick={() => openEditDialog(cat)}
+                    >
+                      Sửa
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={cat.visible ? 'destructive' : 'secondary'}
+                      onClick={() => handleToggleVisible(normalizeCategory(cat))}
+                    >
+                      {cat.visible ? 'Ẩn' : 'Hiện'}
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={() => openCreateDialog(cat.id)}>
+                      Thêm con
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </Card>
@@ -325,10 +358,10 @@ export default function CategoryPage() {
               </select>
             </div>
             <div className="flex gap-2 justify-end mt-4">
-              <Button type="submit">Lưu</Button>
-              <Button type="button" variant="secondary" onClick={closeDialog}>
-                Hủy
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Đang lưu...' : 'Lưu'}
               </Button>
+              <Button type="button" variant="secondary" onClick={closeDialog} disabled={isSubmitting}>Hủy</Button>
             </div>
           </form>
         </DialogContent>
