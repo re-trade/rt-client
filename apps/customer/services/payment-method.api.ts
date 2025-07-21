@@ -43,11 +43,13 @@ const getUserBankAccounts = async (
 const getBanks = async (
   page: number = 0,
   size: number = 10,
+  query?: string,
 ): Promise<IResponseObject<BankResponse[]> | undefined> => {
   const response = await unAuthApi.default.get<IResponseObject<BankResponse[]>>('/wallets/banks', {
     params: {
       page,
       size,
+      ...(query ? { q: query } : {}),
     },
   });
   return response.data;

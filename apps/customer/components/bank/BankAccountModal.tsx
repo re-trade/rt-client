@@ -27,7 +27,7 @@ export default function BankAccountModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
       <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
         <div
           className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
@@ -59,6 +59,7 @@ export default function BankAccountModal({
               <label className="block text-sm font-medium text-gray-700 mb-2">Số tài khoản</label>
               <input
                 type="text"
+                inputMode="numeric"
                 placeholder="1234567890"
                 value={form.accountNumber}
                 onChange={(e) => onChange('accountNumber', e.target.value)}

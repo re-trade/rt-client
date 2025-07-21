@@ -3,6 +3,7 @@ import { useToast } from '@/context/ToastContext';
 import {
   BankAccountResponse,
   BankResponse,
+  getBankByBin,
   getBanks,
   getUserBankAccounts,
   insertBankAccount,
@@ -59,10 +60,15 @@ export function usePaymentMethod() {
 
   const createBankAccount = useCallback(
     async (data: { accountNumber: string; selectedBankBin: string; userBankName: string }) => {
+      const bank = await getBankByBin(data.selectedBankBin);
+      if (!bank) {
+        showToast('Bank not found', 'warning');
+        return;
+      }
       const response = await insertBankAccount({
         accountNumber: data.accountNumber,
         bankBin: data.selectedBankBin,
-        bankName: data.userBankName,
+        bankName: bank.code,
         userBankName: data.userBankName,
       });
       if (!response) {
@@ -85,11 +91,16 @@ export function usePaymentMethod() {
       data: { accountNumber: string; selectedBankBin: string; userBankName: string },
       id: string,
     ) => {
+      const bank = await getBankByBin(data.selectedBankBin);
+      if (!bank) {
+        showToast('Bank not found', 'warning');
+        return;
+      }
       const response = await updateBankAccount(
         {
           accountNumber: data.accountNumber,
           bankBin: data.selectedBankBin,
-          bankName: data.userBankName,
+          bankName: bank.code,
           userBankName: data.userBankName,
         },
         id,
