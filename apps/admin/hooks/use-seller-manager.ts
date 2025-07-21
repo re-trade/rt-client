@@ -37,7 +37,7 @@ const useSellerManager = () => {
       try {
         const result = await banSeller(id);
         if (result?.success) {
-          await fetchSeller(); // Refresh the seller list
+          await fetchSeller();
           return true;
         }
         setError('Failed to ban seller');
@@ -50,13 +50,12 @@ const useSellerManager = () => {
     [fetchSeller],
   );
 
-  // Unban a seller
   const handleUnbanSeller = useCallback(
     async (id: string) => {
       try {
         const result = await unbanSeller(id);
         if (result?.success) {
-          await fetchSeller(); // Refresh the seller list
+          await fetchSeller();
           return true;
         }
         setError('Failed to unban seller');

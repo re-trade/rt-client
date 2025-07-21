@@ -16,12 +16,15 @@ import {
 } from '@/components/ui/sidebar';
 import {
   AlertCircle,
+  Banknote,
   BarChart3,
   FileText,
+  Flag,
   LayoutDashboard,
   Package,
   Settings,
   Store,
+  User,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -38,9 +41,11 @@ const menuItems = [
     items: [
       { title: 'Quản lý sản phẩm', icon: Package, href: '/dashboard/product' },
       { title: 'Quản lý người dùng', icon: Users, href: '/dashboard/user' },
-      { title: 'Quản lý Seller', icon: Store, href: '/dashboard/seller' },
+      { title: 'Quản lý khách hàng', icon: User, href: '/dashboard/customer' },
+      { title: 'Quản lý người bán', icon: Store, href: '/dashboard/seller' },
+      { title: 'Quản lý tố cáo', icon: Flag, href: '/dashboard/report-seller' },
       { title: 'Quản lý Category', icon: FileText, href: '/dashboard/category' },
-      { title: 'Báo cáo Seller', icon: BarChart3, href: '/dashboard/reports' },
+
     ],
   },
   {
@@ -48,6 +53,8 @@ const menuItems = [
     items: [
       //{ title: 'Doanh thu hệ thống', icon: DollarSign, href: '/dashboard/revenue' },
       { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial' },
+      { title: 'Yêu cầu rút tiền', icon: Banknote, href: '/dashboard/withdraw' },
+
     ],
   },
   {

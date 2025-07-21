@@ -1,6 +1,6 @@
 'use client';
 
-import type { Contact } from '@/hooks/use-chat-contact';
+import type { Room } from '@/types/chat/chat';
 import {
   IconMicrophone,
   IconMicrophoneOff,
@@ -11,7 +11,7 @@ import {
 import type { RefObject } from 'react';
 
 interface CallInterfaceProps {
-  contact: Contact;
+  contact: Room | null;
   isVideoCall: boolean;
   isAudioCall: boolean;
   isCalling: boolean;
@@ -19,8 +19,8 @@ interface CallInterfaceProps {
   isAudioEnabled: boolean;
   isRecording: boolean;
   recordingTime: number;
-  videoRef: RefObject<HTMLVideoElement>;
-  remoteVideoRef: RefObject<HTMLVideoElement>;
+  videoRef: RefObject<HTMLVideoElement | null>;
+  remoteVideoRef: RefObject<HTMLVideoElement | null>;
   onToggleVideo: () => void;
   onToggleAudio: () => void;
   onStartRecording: () => void;
@@ -51,9 +51,7 @@ export function CallInterface({
     <div className="flex-1 bg-gray-900 relative flex items-center justify-center">
       {isVideoCall && (
         <>
-          {/* Remote video */}
           <video ref={remoteVideoRef} className="w-full h-full object-cover" autoPlay playsInline />
-          {/* Local video */}
           <video
             ref={videoRef}
             className="absolute top-4 right-4 w-48 h-36 bg-gray-800 rounded-lg object-cover"
@@ -67,11 +65,13 @@ export function CallInterface({
       {isAudioCall && (
         <div className="text-center">
           <img
-            src={contact.avatar || '/placeholder.svg'}
-            alt={contact.name}
+            src={contact?.participants?.[0]?.avatarUrl || '/placeholder.svg'}
+            alt={contact?.participants?.[0]?.name || 'Contact'}
             className="w-32 h-32 rounded-full mx-auto mb-4"
           />
-          <h2 className="text-white text-2xl font-semibold mb-2">{contact.name}</h2>
+          <h2 className="text-white text-2xl font-semibold mb-2">
+            {contact?.participants?.[0]?.name}
+          </h2>
           <p className="text-gray-300">{isCalling ? 'Đang gọi...' : 'Đang trong cuộc gọi'}</p>
         </div>
       )}
@@ -80,11 +80,13 @@ export function CallInterface({
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="text-center">
             <img
-              src={contact.avatar || '/placeholder.svg'}
-              alt={contact.name}
+              src={contact?.participants?.[0]?.avatarUrl || '/placeholder.svg'}
+              alt={contact?.participants?.[0]?.name || 'Contact'}
               className="w-32 h-32 rounded-full mx-auto mb-4"
             />
-            <h2 className="text-white text-2xl font-semibold mb-2">{contact.name}</h2>
+            <h2 className="text-white text-2xl font-semibold mb-2">
+              {contact?.participants?.[0]?.name}
+            </h2>
             <p className="text-gray-300 mb-8">Đang gọi...</p>
             <div className="flex justify-center">
               <button
@@ -98,7 +100,6 @@ export function CallInterface({
         </div>
       )}
 
-      {/* Recording Indicator Overlay */}
       {isRecording && (
         <div className="absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
           <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
@@ -108,7 +109,6 @@ export function CallInterface({
         </div>
       )}
 
-      {/* Call Controls */}
       {!isCalling && (
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4">
           <button

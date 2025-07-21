@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -18,9 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useCustomerManager } from '@/hooks/use-customer-manager';
-import { TCustomerProfile } from '@/services/customer.api';
-import { AlertTriangle, Search, Store, TrendingUp } from 'lucide-react';
+import { useWithdrawManager } from '@/hooks/use-withdraw-manager';
+import { TWithdrawProfile } from '@/services/withdraw.api';
+import { AlertTriangle, Check, PauseCircle, Search, Store } from 'lucide-react';
 import { useState } from 'react';
 
 const statusLabels: Record<string, string> = {
@@ -33,10 +34,10 @@ const statusColors: Record<string, string> = {
   false: 'bg-red-100 text-yellow-800',
 };
 
-export default function CustomerManagementPage() {
-  const [selectedCustomer, setSelectedCustomer] = useState<TCustomerProfile | null>(null);
+export default function ShopManagementPage() {
+  const [selectedWithdraw, setSelectedWithdraw] = useState<TWithdrawProfile | null>(null);
   const {
-    customers,
+    withdraws,
     loading,
     error,
     page: currentPage,
@@ -45,37 +46,31 @@ export default function CustomerManagementPage() {
     setSearchQuery,
     pageSize: itemsPerPage,
     stats,
-    disableCustomer,
-    enableCustomer,
-  } = useCustomerManager();
+    approveWithdraw,
+  } = useWithdrawManager();
 
-  if (loading) return <div>Loading customers...</div>;
+  if (loading) return <div>Loading withdraws...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const handleViewDetails = (customer: TCustomerProfile) => {
-    setSelectedCustomer(customer);
+  const handleViewDetails = (withdraw: TWithdrawProfile) => {
+    setSelectedWithdraw(withdraw);
   };
 
-  const handleToggleStatus = async (customer: TCustomerProfile) => {
-    const success = customer.enabled
-      ? await disableCustomer(customer.id)
-      : await enableCustomer(customer.id);
-    if (success) {
-      setSelectedCustomer(null);
-    }
+  const handleApprove = async (productId: string) => {
+    await approveWithdraw(productId);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Quản lý khách hàng</h1>
+        <h1 className="text-3xl font-bold">Quản lý người bán</h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Tổng số khách hàng</p>
+              <p className="text-sm font-medium text-muted-foreground">Tổng số yêu cầu</p>
               <h2 className="text-2xl font-bold">{stats.total}</h2>
             </div>
             <Store className="h-8 w-8 text-blue-500" />
@@ -84,19 +79,28 @@ export default function CustomerManagementPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground"> Khách hàng hợp lệ</p>
+              <p className="text-sm font-medium text-muted-foreground">Yêu cầu đã thực hiện</p>
               <h2 className="text-2xl font-bold">{stats.verified}</h2>
             </div>
-            <TrendingUp className="h-8 w-8 text-green-500" />
+            <Check className="h-8 w-8 text-green-500" />
           </div>
         </Card>
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground"> Khách hàng bị hạn chế</p>
+              <p className="text-sm font-medium text-muted-foreground">Yêu cầu bị từ chối</p>
+              <h2 className="text-2xl font-bold">{stats.rejected}</h2>
+            </div>
+            <AlertTriangle className="h-8 w-8 text-red-500" />
+          </div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Yêu cầu đang chờ duyệt</p>
               <h2 className="text-2xl font-bold">{stats.pending}</h2>
             </div>
-            <AlertTriangle className="h-8 w-8 text-yellow-500" />
+            <PauseCircle className="h-8 w-8 text-yellow-500" />
           </div>
         </Card>
       </div>
@@ -106,12 +110,12 @@ export default function CustomerManagementPage() {
           <div className="flex flex-1 items-center space-x-2">
             <div className="relative flex-1">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              {/* <Input
-                placeholder="Tìm kiếm khách hàng..."
+              <Input
+                placeholder="Tìm kiếm cửa hàng..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8"
-              /> */}
+              />
             </div>
           </div>
         </div>
@@ -121,41 +125,26 @@ export default function CustomerManagementPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-
-                <TableHead>Họ</TableHead>
-                <TableHead>Tên</TableHead>
-                <TableHead>Địa chỉ</TableHead>
-                <TableHead>Liên hệ</TableHead>
+                <TableHead>Số tiền</TableHead>
                 <TableHead>Trạng thái</TableHead>
+                <TableHead>Thời gian tạo</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers?.map((customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell className="font-medium">{customer.id}</TableCell>
-
-                  <TableCell className="font-medium">{customer.firstName}</TableCell>
-                  <TableCell>{customer.lastName}</TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div>{customer.address}</div>
-                    </div>
+              {withdraws?.map((withdraw) => (
+                <TableRow key={withdraw.id}>
+                  <TableCell
+                    className="font-medium w-[150px] max-w-[150px] truncate"
+                    title={withdraw.id}
+                  >
+                    {withdraw.id}
                   </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div>{customer.phone}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(customer.enabled)]}`}
-                    >
-                      {statusLabels[String(customer.enabled)]}
-                    </span>
-                  </TableCell>
+                  <TableCell className="font-medium">{withdraw.amount}</TableCell>
+                  <TableCell>{withdraw.status}</TableCell>
+                  <TableCell>{withdraw.timestamp}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(customer)}>
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(withdraw)}>
                       Chi tiết
                     </Button>
                   </TableCell>
@@ -168,8 +157,8 @@ export default function CustomerManagementPage() {
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Hiển thị {currentPage * itemsPerPage + 1} đến{' '}
-            {Math.min((currentPage + 1) * itemsPerPage, customers.length)} trong tổng số{' '}
-            {customers.length} cửa hàng
+            {Math.min((currentPage + 1) * itemsPerPage, withdraws.length)} trong tổng số{' '}
+            {withdraws.length} yêu cầu
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -192,60 +181,58 @@ export default function CustomerManagementPage() {
         </div>
       </Card>
 
-      {selectedCustomer && (
-        <Dialog open={!!selectedCustomer} onOpenChange={() => setSelectedCustomer(null)}>
+      {selectedWithdraw && (
+        <Dialog open={!!selectedWithdraw} onOpenChange={() => setSelectedWithdraw(null)}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
-              <DialogTitle>Chi tiết cửa hàng</DialogTitle>
-              <DialogDescription>Thông tin chi tiết của khách hàng</DialogDescription>
+              <DialogTitle>Chi tiết người bán</DialogTitle>
+              <DialogDescription>Thông tin chi tiết của người bán</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6">
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">ID</p>
-                    <p>{selectedCustomer.id}</p>
+                    <p>{selectedWithdraw.id}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Tên khách hàng</p>
-                    <p>{selectedCustomer.firstName + ' ' + selectedCustomer.lastName}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Tên người bán</p>
+                    <p>{selectedWithdraw.amount}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Giới tính</p>
-                    <p>{selectedCustomer.gender === '0' ? 'Nam' : 'Nữ'}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Mô tả</p>
+                    <p>{selectedWithdraw.status}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Địa chỉ</p>
-                    <p>{selectedCustomer.address}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Số điện thoại</p>
-                    <p>{selectedCustomer.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Email</p>
-                    <p>{selectedCustomer.email}</p>
+                    <p>{selectedWithdraw.timestamp}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                    <p>{new Date(selectedCustomer.lastUpdate).toLocaleDateString('vi-VN')}</p>
+                    <p>{new Date(selectedWithdraw.bankName).toLocaleDateString('vi-VN')}</p>
                   </div>
                 </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
+                  <p>{new Date(selectedWithdraw.bankUrl).toLocaleDateString('vi-VN')}</p>
+                </div>
               </div>
-
-              <DialogFooter>
-                <Button
-                  className={
-                    selectedCustomer.enabled
-                      ? 'bg-red-600 hover:bg-red-700 text-white'
-                      : 'bg-green-600 hover:bg-green-700 text-white'
-                  }
-                  onClick={() => handleToggleStatus(selectedCustomer)}
-                >
-                  {selectedCustomer.enabled ? 'Khóa tài khoản' : 'Kích hoạt tài khoản'}{' '}
-                </Button>
-              </DialogFooter>
             </div>
+
+            <DialogFooter>
+              {!selectedWithdraw.status && (
+                <Button
+                  onClick={async () => {
+                    if (selectedWithdraw) {
+                      await handleApprove(selectedWithdraw.id);
+                      setSelectedWithdraw(null); // Close dialog after approval
+                    }
+                  }}
+                >
+                  Xác nhận
+                </Button>
+              )}
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
