@@ -1,3 +1,4 @@
+// components/dialog-common/view-update/RevenueDetailDialog.tsx
 'use client';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -6,65 +7,70 @@ interface RevenueData {
   id: string;
   date: string;
   orderId: string;
+  productName: string;
+  buyer: string;
   amount: number;
   commission: number;
   netRevenue: number;
-  status: 'completed' | 'pending';
+  status: string;
+  category: string;
 }
 
 interface RevenueDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  data: RevenueData | null;
+  revenue?: RevenueData | null;
 }
 
-export function RevenueDetailDialog({ open, onOpenChange, data }: RevenueDetailDialogProps) {
-  if (!data) return null;
-
+export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDetailDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Chi tiết doanh thu</DialogTitle>
+          <DialogTitle>Chi tiết giao dịch</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Mã đơn hàng</p>
-              <p className="font-medium">{data.orderId}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Ngày</p>
-              <p className="font-medium">{new Date(data.date).toLocaleDateString('vi-VN')}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Tổng tiền</p>
-              <p className="font-medium">{data.amount.toLocaleString('vi-VN')}đ</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Hoa hồng (10%)</p>
-              <p className="font-medium text-red-600">{data.commission.toLocaleString('vi-VN')}đ</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Doanh thu thực</p>
-              <p className="font-medium text-green-600">
-                {data.netRevenue.toLocaleString('vi-VN')}đ
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Trạng thái</p>
-              <span
-                className={`px-2 py-1 rounded-full text-xs ${
-                  data.status === 'completed'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}
-              >
-                {data.status === 'completed' ? 'Hoàn thành' : 'Đang xử lý'}
-              </span>
+        {revenue && (
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Mã đơn hàng:</span>
+                <span className="font-medium">{revenue.orderId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Ngày:</span>
+                <span className="font-medium">
+                  {new Date(revenue.date).toLocaleDateString('vi-VN')}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Sản phẩm:</span>
+                <span className="font-medium text-right flex-1 ml-2">{revenue.productName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Người mua:</span>
+                <span className="font-medium">{revenue.buyer}</span>
+              </div>
+              <div className="border-t pt-3 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Tổng tiền:</span>
+                  <span className="font-medium">{revenue.amount.toLocaleString('vi-VN')}₫</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Phí dịch vụ (5%):</span>
+                  <span className="font-medium text-red-600">
+                    -{revenue.commission.toLocaleString('vi-VN')}₫
+                  </span>
+                </div>
+                <div className="flex justify-between text-lg font-bold">
+                  <span className="text-gray-900">Thực nhận:</span>
+                  <span className="text-green-600">
+                    {revenue.netRevenue.toLocaleString('vi-VN')}₫
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );
