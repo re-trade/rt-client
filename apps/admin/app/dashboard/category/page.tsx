@@ -92,7 +92,12 @@ export default function CategoryPage() {
   // State cho dialog và form
   const [openDialog, setOpenDialog] = useState<null | 'create' | 'edit'>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [form, setForm] = useState<{ name: string; description?: string; categoryParentId?: string | null; visible: boolean }>({ name: '', description: '', categoryParentId: null, visible: true });
+  const [form, setForm] = useState<{
+    name: string;
+    description?: string;
+    categoryParentId?: string | null;
+    visible: boolean;
+  }>({ name: '', description: '', categoryParentId: null, visible: true });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load danh mục ban đầu
@@ -285,22 +290,28 @@ export default function CategoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <TableRow key={cat.id}>
                   <TableCell>
-                    {cat.categoryParentId ? <span style={{ marginLeft: 24 }}>↳ {cat.name}</span> : <b>{cat.name}</b>}
+                    {cat.categoryParentId ? (
+                      <span style={{ marginLeft: 24 }}>↳ {cat.name}</span>
+                    ) : (
+                      <b>{cat.name}</b>
+                    )}
                   </TableCell>
-                  <TableCell>
-                    {cat.parentName || '(root)'}
-                  </TableCell>
+                  <TableCell>{cat.parentName || '(root)'}</TableCell>
                   <TableCell>
                     {cat.description || <span className="text-gray-400">(Không có)</span>}
                   </TableCell>
                   <TableCell>
                     {cat.visible ? (
-                      <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">Hiện</span>
+                      <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">
+                        Hiện
+                      </span>
                     ) : (
-                      <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-0.5">Ẩn</span>
+                      <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-0.5">
+                        Ẩn
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -361,7 +372,14 @@ export default function CategoryPage() {
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Đang lưu...' : 'Lưu'}
               </Button>
-              <Button type="button" variant="secondary" onClick={closeDialog} disabled={isSubmitting}>Hủy</Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={closeDialog}
+                disabled={isSubmitting}
+              >
+                Hủy
+              </Button>
             </div>
           </form>
         </DialogContent>
