@@ -1,8 +1,9 @@
 'use client';
 
 import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
+import { AddressField } from '@components/address/AddressField';
 import { Check, MapPin, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   open: boolean;
@@ -46,12 +47,33 @@ export default function AddressCreateDialog({
   onFieldBlur,
 }: Props) {
   const [validationTriggered, setValidationTriggered] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
       setValidationTriggered(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node) && open) {
+        onClose();
+      }
+    };
+    window.addEventListener('mousedown', handleClickOutside);
+    return () => window.removeEventListener('mousedown', handleClickOutside);
+  }, [open, onClose]);
 
   const handleCreate = async () => {
     try {
@@ -63,15 +85,11 @@ export default function AddressCreateDialog({
       const hasErrors = fields.some((field) => {
         const key = field.key as keyof AddressFormData;
         const value = formData[key];
-        if (typeof value === 'string' && !value.trim()) {
-          return true;
-        }
-        return false;
+        return typeof value === 'string' && !value.trim();
       });
 
-      if (hasErrors) {
-        return;
-      }
+      if (hasErrors) return;
+
       const success = await onCreate();
       if (success) {
         onClose();
@@ -81,104 +99,14 @@ export default function AddressCreateDialog({
     }
   };
 
-  const renderField = (field: (typeof fields)[0]) => {
-    const { key, label, type } = field;
-    const value = formData[key as keyof AddressFormData];
-    const hasError = (touched[key] || validationTriggered) && errors[key];
-
-    if (type === 'dropdown') {
-      let options: { value: string; label: string }[] = [];
-      let isDisabled = false;
-
-      if (key === 'country') {
-        options = provinces.map((p) => ({ value: p.code.toString(), label: p.name }));
-      } else if (key === 'district') {
-        options = districts.map((d) => ({ value: d.code.toString(), label: d.name }));
-        isDisabled = !formData.country;
-      } else if (key === 'ward') {
-        options = wards.map((w) => ({ value: w.code.toString(), label: w.name }));
-        isDisabled = !formData.district;
-      }
-
-      return (
-        <div className="form-control w-full items-start" key={key}>
-          <label className="text-sm font-semibold text-[#121212] mb-1 font-['Reddit_Sans']">
-            {label}
-          </label>
-          <div className="relative w-full">
-            <select
-              className={`select w-full px-4 py-2.5 border ${
-                hasError ? 'border-red-500' : 'border-[#525252]/20'
-              } text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all appearance-none`}
-              value={value as string}
-              onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
-              onBlur={() => onFieldBlur(key as keyof AddressFormData)}
-              disabled={isDisabled || loading}
-            >
-              <option value="">Chọn {label}</option>
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-[#525252]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                ></path>
-              </svg>
-            </div>
-          </div>
-          <div className="min-h-[22px] mt-1">
-            {hasError && (
-              <span className="text-red-500 text-xs font-medium font-['Reddit_Sans']">
-                {errors[key]}
-              </span>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="form-control w-full items-start" key={key}>
-        <label className="text-sm font-semibold text-[#121212] mb-1 font-['Reddit_Sans']">
-          {label}
-        </label>
-        <input
-          type="text"
-          className={`input w-full px-4 py-2.5 border ${
-            hasError ? 'border-red-500' : 'border-[#525252]/20'
-          } text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all`}
-          value={value as string}
-          onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
-          onBlur={() => onFieldBlur(key as keyof AddressFormData)}
-        />
-        <div className="min-h-[22px] mt-1">
-          {hasError && (
-            <span className="text-red-500 text-xs font-medium font-['Reddit_Sans']">
-              {errors[key]}
-            </span>
-          )}
-        </div>
-      </div>
-    );
-  };
-
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div
+        ref={modalRef}
+        className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden"
+      >
         <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <MapPin className="w-5 h-5 mr-2 text-[#121212]" />
@@ -194,7 +122,23 @@ export default function AddressCreateDialog({
 
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {fields.map(renderField)}
+            {fields.map((field) => (
+              <AddressField
+                key={field.key}
+                field={field}
+                formData={formData}
+                errors={errors}
+                touched={touched}
+                provinces={provinces}
+                districts={districts}
+                wards={wards}
+                loading={loading}
+                submitting={submitting}
+                validationTriggered={validationTriggered}
+                onFieldChange={onFieldChange}
+                onFieldBlur={onFieldBlur}
+              />
+            ))}
 
             <div className="form-control col-span-1 md:col-span-2 flex flex-col gap-4 mt-2 border-t border-[#525252]/20 pt-4">
               <div className="flex items-center">

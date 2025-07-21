@@ -1,4 +1,6 @@
+import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { ToastProvider } from '@/context/ToastContext';
 import { CookieConsent } from '@components/common/CookieConsent';
 import Footer from '@components/common/Footer';
 import Header from '@components/header/Header';
@@ -13,16 +15,20 @@ const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
       <body>
-        <CartProvider>
-          <Suspense>
-            <Header />
-          </Suspense>
-          <div className="min-h-screen bg-gray-100">
-            <Suspense>{children}</Suspense>
-          </div>
-          <Footer />
-          <CookieConsent />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Suspense>
+              <Header />
+            </Suspense>
+            <div className="min-h-screen bg-gray-100">
+              <ToastProvider>
+                <Suspense>{children}</Suspense>
+              </ToastProvider>
+            </div>
+            <Footer />
+            <CookieConsent />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

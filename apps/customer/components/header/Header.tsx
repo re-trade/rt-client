@@ -1,6 +1,6 @@
 'use client';
+import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/hooks/use-auth';
 import MobileMenu from '@components/header/MobileHeaderMenu';
 import SearchBar from '@components/header/SearchBar';
 import UserDropdown from '@components/header/UserHeaderDropdown';
