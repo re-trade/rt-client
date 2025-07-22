@@ -1,6 +1,7 @@
 'use client';
 import { WithdrawDialog } from '@/components/common/WithdrawDialog';
 import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
@@ -19,6 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { revenueApi, RevenueResponse, RevenueStatsResponse } from '@/service/revenue.api';
+import { snipppetCode } from '@/service/snippetCode';
+import { walletApi, WalletResponse } from '@/service/wallet.api';
 import {
   ArrowUpRight,
   Banknote,
@@ -29,18 +33,13 @@ import {
   Download,
   Eye,
   Filter,
+  Package,
   ShoppingCart,
   TrendingUp,
   Wallet,
   XCircle,
-  Package,
-
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { RevenueResponse, revenueApi, RevenueStatsResponse } from '@/service/revenue.api';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { walletApi,WalletResponse } from '@/service/wallet.api';
-import { snipppetCode } from '@/service/snippetCode';
+import { useEffect, useState } from 'react';
 
 interface WithdrawData {
   id: string;
@@ -71,7 +70,7 @@ export default function RevenueManagement() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [revenue, stats, withdraws,wallet] = await Promise.all([
+        const [revenue, stats, withdraws, wallet] = await Promise.all([
           revenueApi.getRevenueBySeller(),
           revenueApi.getRevenuStatsBySeller(),
           walletApi.getWithdrawHistory?.() || Promise.resolve([]), // Adjust based on actual walletApi
@@ -91,7 +90,7 @@ export default function RevenueManagement() {
 
     fetchData();
   }, []);
-    const getCustomerInitials = (name: string) => {
+  const getCustomerInitials = (name: string) => {
     return name
       .split(' ')
       .map((word) => word.charAt(0))
@@ -105,9 +104,7 @@ export default function RevenueManagement() {
     revenueData
       .filter((item) => item.status.code === 'completed')
       .reduce((sum, item) => sum + item.netAmount, 0) -
-    withdrawHistory
-      .filter((w) => w.status === 'completed')
-      .reduce((sum, w) => sum + w.amount, 0);
+    withdrawHistory.filter((w) => w.status === 'completed').reduce((sum, w) => sum + w.amount, 0);
 
   const openDetailDialog = (revenue: RevenueResponse) => {
     setSelectedRevenue(revenue);
@@ -155,7 +152,6 @@ export default function RevenueManagement() {
     });
   };
 
-
   const filteredRevenue =
     filterStatus === 'all'
       ? revenueData
@@ -194,7 +190,9 @@ export default function RevenueManagement() {
               <DollarSign className="h-5 w-5 text-blue-200" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{revenueStats.totalRevenue.toLocaleString('vi-VN')}₫</div>
+              <div className="text-2xl font-bold">
+                {revenueStats.totalRevenue.toLocaleString('vi-VN')}₫
+              </div>
               <div className="flex items-center mt-1">
                 <ArrowUpRight className="h-4 w-4 mr-1" />
                 <span className="text-sm text-blue-100">+20.1% so với tháng trước</span>
@@ -231,7 +229,9 @@ export default function RevenueManagement() {
 
           <Card className="border-0 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Tổng sản phẩm đã bán</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Tổng sản phẩm đã bán
+              </CardTitle>
               <Package className="h-5 w-5 text-orange-600" />
             </CardHeader>
             <CardContent>
@@ -249,7 +249,9 @@ export default function RevenueManagement() {
               <TrendingUp className="h-5 w-5 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{revenueStats.averageOrderValue.toLocaleString('vi-VN')}₫</div>
+              <div className="text-2xl font-bold">
+                {revenueStats.averageOrderValue.toLocaleString('vi-VN')}₫
+              </div>
               <div className="flex items-center mt-1">
                 <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
                 <span className="text-sm text-gray-500">+5.2% so với tháng trước</span>
@@ -264,19 +266,21 @@ export default function RevenueManagement() {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('revenue')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'revenue'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'revenue'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Chi tiết doanh thu
               </button>
               <button
                 onClick={() => setActiveTab('withdraw')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'withdraw'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'withdraw'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Lịch sử rút tiền
               </button>
@@ -329,9 +333,7 @@ export default function RevenueManagement() {
                     <TableBody>
                       {filteredRevenue.map((revenue) => (
                         <TableRow key={revenue.orderComboId} className="hover:bg-gray-50">
-                          <TableCell>
-                            {formatDate(revenue.createdDate)}
-                          </TableCell>
+                          <TableCell>{formatDate(revenue.createdDate)}</TableCell>
                           <TableCell className="font-medium text-blue-600">
                             {snipppetCode.cutCode(revenue.orderComboId)}
                           </TableCell>
@@ -339,7 +341,9 @@ export default function RevenueManagement() {
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
                                 <Package className="h-4 w-4 text-gray-400" />
-                                <span className="text-sm font-medium">{revenue.items.length} sản phẩm</span>
+                                <span className="text-sm font-medium">
+                                  {revenue.items.length} sản phẩm
+                                </span>
                               </div>
                               <div className="text-xs text-gray-500 max-w-[190px] line-clamp-2">
                                 {revenue.items[0]?.itemName || 'Không có tên sản phẩm'}
@@ -363,7 +367,9 @@ export default function RevenueManagement() {
                                 <div className="font-medium text-gray-900">
                                   {revenue.destination.customerName}
                                 </div>
-                                <div className="text-sm text-gray-500">{revenue.destination.phone}</div>
+                                <div className="text-sm text-gray-500">
+                                  {revenue.destination.phone}
+                                </div>
                               </div>
                             </div>
                           </TableCell>
@@ -374,7 +380,7 @@ export default function RevenueManagement() {
                             {revenue.feePercent.toFixed(2)}%
                           </TableCell>
                           <TableCell className="text-right text-red-600">
-                            -{(revenue.feeAmount).toLocaleString('vi-VN')}₫
+                            -{revenue.feeAmount.toLocaleString('vi-VN')}₫
                           </TableCell>
                           <TableCell className="text-right font-bold text-green-600">
                             {revenue.netAmount.toLocaleString('vi-VN')}₫
