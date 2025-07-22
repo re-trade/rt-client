@@ -211,7 +211,12 @@ export default function CategoryPage() {
             >
               {category.visible ? 'Ẩn' : 'Hiện'}
             </Button>
-            <Button size="sm" variant="secondary" className="hover:border-blue-400 hover:text-blue-700" onClick={() => openCreateDialog(category.id)}>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="hover:border-blue-400 hover:text-blue-700"
+              onClick={() => openCreateDialog(category.id)}
+            >
               Thêm con
             </Button>
           </TableCell>
