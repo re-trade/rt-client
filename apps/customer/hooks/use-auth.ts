@@ -1,6 +1,7 @@
 'use client';
-import { accountMe, TAccountMeResponse } from '@/services/auth.api';
+import { accountMe, loginInternal, TAccountMeResponse, TLocalLogin } from '@/services/auth.api';
 import { useCallback, useEffect, useState } from 'react';
+
 function useAuth() {
   const [auth, setIsAuth] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
@@ -25,8 +26,19 @@ function useAuth() {
     localStorage.removeItem('access-token');
     window.location.reload();
   }, []);
+
+  const login = useCallback(
+    async (data: TLocalLogin) => {
+      try {
+        await loginInternal(data);
+        await isAuth();
+      } catch {}
+    },
+    [isAuth],
+  );
   return {
     logout,
+    login,
     roles,
     isAuth,
     auth,

@@ -11,6 +11,7 @@ import {
   Shield,
   ShoppingBag,
   User,
+  Wallet,
   X,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -87,6 +88,11 @@ export default function UserLayout({ children }: UserLayoutProps) {
       name: 'Đơn Mua',
       icon: <ShoppingBag className="w-5 h-5" />,
       path: 'purchase',
+    },
+    {
+      name: 'Ví của tôi',
+      icon: <Wallet className="w-5 h-5" />,
+      path: 'wallet',
     },
   ];
 

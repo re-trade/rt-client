@@ -4,15 +4,11 @@ interface Category {
   id: string;
   name: string;
   description: string;
-  parentId: string | null;
+  categoryParentId: string | null;
   parentName: string | null;
-  sellerId: string | null;
-  sellerShopName: string | null;
   visible: boolean;
-  type: string;
   children: Category[] | null;
-  createdAt: string;
-  updatedAt: string;
+  // Các trường khác giữ nguyên nếu backend trả về
 }
 
 interface CategoriesResponse {
@@ -20,7 +16,7 @@ interface CategoriesResponse {
   messages: string[];
   code: string;
   success: boolean;
-  pagination: {
+  pagination?: {
     page: number;
     size: number;
     totalPages: number;
@@ -31,15 +27,18 @@ interface CategoriesResponse {
 interface GetCategoriesParams {
   page?: number;
   size?: number;
-  parentId?: string;
-  sellerId?: string;
+  name?: string;
   visible?: boolean;
-  type?: string;
 }
+
+const getAllCategories = async (): Promise<Category[]> => {
+  const response = await unAuthApi.default.get('/categories/all', { withCredentials: true });
+  return response.data.content;
+};
 
 const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<CategoriesResponse> => {
   try {
-    const response = await unAuthApi.default.get('/categories', {
+    const response = await unAuthApi.default.get('/categories/search', {
       params,
       withCredentials: true,
     });
@@ -60,9 +59,40 @@ const getCategoryByIdInternal = async (id: string): Promise<Category> => {
   }
 };
 
+const createCategory = async (data: {
+  name: string;
+  description?: string;
+  categoryParentId?: string | null;
+  visible: boolean;
+}): Promise<Category> => {
+  try {
+    const response = await unAuthApi.default.post('/categories', data, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateCategory = async (
+  id: string,
+  data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean },
+): Promise<Category> => {
+  try {
+    const response = await unAuthApi.default.put(`/categories/${id}`, data, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export {
+  createCategory,
+  getAllCategories,
   getCategoriesInternal,
   getCategoryByIdInternal,
+  updateCategory,
   type CategoriesResponse,
   type Category,
   type GetCategoriesParams,

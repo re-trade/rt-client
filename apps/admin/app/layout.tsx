@@ -1,4 +1,5 @@
 import AuthWrapper from '@/components/auth/AuthWrapper';
+import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Open_Sans } from 'next/font/google';
 import './globals.css';
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="font-sans antialiased">
         <AuthWrapper>{children}</AuthWrapper>
+        <Toaster />
       </body>
     </html>
   );
