@@ -17,7 +17,7 @@ import {
 import { useCategoryManager } from '@/hooks/use-category-manager';
 import type { Category } from '@/services/category.api';
 import { unAuthApi } from '@retrade/util/src/api/instance';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Camera, DeviceMobile, House, Laptop, SpeakerHigh, Tag, TShirt } from 'phosphor-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -203,17 +203,16 @@ export default function CategoryPage() {
                 disabled={!hasChildren}
                 tabIndex={hasChildren ? 0 : -1}
               >
-                <span className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}>
+                <span
+                  className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+                >
                   {hasChildren ? (
                     <ChevronRight
                       size={16}
                       className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
                     />
                   ) : (
-                    <ChevronRight
-                      size={16}
-                      className="text-gray-300"
-                    />
+                    <ChevronRight size={16} className="text-gray-300" />
                   )}
                 </span>
               </Button>
@@ -223,7 +222,9 @@ export default function CategoryPage() {
                 color={color}
                 className="transition-colors group-hover:scale-110"
               />
-              <span className={`font-medium group-hover:text-blue-600 transition-colors ${level > 0 ? 'text-sm text-blue-700' : 'text-base'}`}>
+              <span
+                className={`font-medium group-hover:text-blue-600 transition-colors ${level > 0 ? 'text-sm text-blue-700' : 'text-base'}`}
+              >
                 {category.name}
               </span>
             </div>
@@ -296,8 +297,8 @@ export default function CategoryPage() {
             </TableHeader>
             <TableBody>
               {categories
-                .filter(cat => !cat.parentId)
-                .map(cat => (
+                .filter((cat) => !cat.parentId)
+                .map((cat) => (
                   <TreeTableRow key={cat.id} category={cat} />
                 ))}
             </TableBody>
