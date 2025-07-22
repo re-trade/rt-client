@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useCategoryManager } from '@/hooks/use-category-manager';
 import type { Category } from '@/services/category.api';
 import { unAuthApi } from '@retrade/util/src/api/instance';
@@ -243,7 +244,32 @@ export default function CategoryPage() {
       <Button type="button" variant="secondary" className="mb-4" onClick={() => openCreateDialog()}>
         Thêm mới
       </Button>
-      {loading && <div>Đang tải...</div>}
+      {loading && (
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-2/5">Tên danh mục</TableHead>
+                <TableHead>Mô tả</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead>Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(6)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-24" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
       {error && <div className="text-red-500">{error}</div>}
       {!loading && !error && (
         <Card>
