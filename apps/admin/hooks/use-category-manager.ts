@@ -10,7 +10,7 @@ import { useCallback, useState } from 'react';
 const normalizeCategory = (cat: any): Category => ({
   ...cat,
   description: typeof cat.description === 'string' ? cat.description : '',
-  categoryParentId: cat.categoryParentId ?? null,
+  categoryParentId: cat.parentId ?? null,
   parentName: cat.parentName ?? null,
   children: Array.isArray(cat.children) ? cat.children.map(normalizeCategory) : null,
 });
@@ -40,7 +40,7 @@ export function useCategoryManager() {
     async (data: {
       name: string;
       description?: string;
-      categoryParentId?: string | null;
+      parentId?: string | null;
       visible: boolean;
     }) => {
       setLoading(true);
@@ -66,7 +66,7 @@ export function useCategoryManager() {
       data: {
         name: string;
         description?: string;
-        categoryParentId?: string | null;
+        parentId?: string | null;
         visible: boolean;
       },
     ) => {
@@ -92,7 +92,7 @@ export function useCategoryManager() {
       return handleUpdate(cat.id, {
         name: cat.name,
         description: cat.description,
-        categoryParentId: cat.categoryParentId,
+        parentId: cat.parentId,
         visible: !cat.visible,
       });
     },

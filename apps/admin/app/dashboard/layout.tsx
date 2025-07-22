@@ -17,7 +17,6 @@ import {
 import {
   AlertCircle,
   Banknote,
-  DollarSign,
   FileText,
   Flag,
   LayoutDashboard,

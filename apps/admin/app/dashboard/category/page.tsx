@@ -17,7 +17,7 @@ import {
 import { useCategoryManager } from '@/hooks/use-category-manager';
 import type { Category } from '@/services/category.api';
 import { unAuthApi } from '@retrade/util/src/api/instance';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Camera, DeviceMobile, House, Laptop, SpeakerHigh, Tag, TShirt } from 'phosphor-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -58,11 +58,10 @@ const getIconForCategory = (name: string): { Icon: React.ElementType; color: str
   return { Icon: Tag, color: '#64748b' };
 };
 
-// Sửa lại normalizeCategory để trả về object chuẩn, không ép type Category
 const normalizeCategory = (cat: any): Category => ({
   ...cat,
   description: typeof cat.description === 'string' ? cat.description : '',
-  categoryParentId: cat.categoryParentId ?? null,
+  parentId: cat.parentId ?? null,
   parentName: cat.parentName ?? null,
   children: Array.isArray(cat.children) ? cat.children.map(normalizeCategory) : null,
 });
@@ -95,9 +94,9 @@ export default function CategoryPage() {
   const [form, setForm] = useState<{
     name: string;
     description?: string;
-    categoryParentId?: string | null;
+    parentId?: string | null;
     visible: boolean;
-  }>({ name: '', description: '', categoryParentId: null, visible: true });
+  }>({ name: '', description: '', parentId: null, visible: true });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load danh mục ban đầu
@@ -122,7 +121,7 @@ export default function CategoryPage() {
     setForm({
       name: '',
       description: '',
-      categoryParentId: categoryParentId ?? null,
+      parentId: categoryParentId ?? null,
       visible: true,
     });
     setEditingCategory(null);
@@ -134,7 +133,7 @@ export default function CategoryPage() {
     setForm({
       name: cat.name,
       description: cat.description ?? '',
-      categoryParentId: cat.categoryParentId ?? null,
+      parentId: cat.parentId ?? null,
       visible: cat.visible,
     });
     setEditingCategory(cat);
@@ -145,7 +144,7 @@ export default function CategoryPage() {
   const closeDialog = () => {
     setOpenDialog(null);
     setEditingCategory(null);
-    setForm({ name: '', description: '', categoryParentId: null, visible: true });
+    setForm({ name: '', description: '', parentId: null, visible: true });
   };
 
   // Submit form thêm/sửa
@@ -155,7 +154,7 @@ export default function CategoryPage() {
     const payload = {
       name: form.name,
       description: form.description ?? undefined,
-      categoryParentId: form.categoryParentId ?? null,
+      parentId: form.parentId ?? null,
       visible: form.visible,
     };
     try {
@@ -179,39 +178,42 @@ export default function CategoryPage() {
     level = 0,
     parentExpanded = true,
   }: {
-    category: Category;
+    category: Category & { children?: Category[] | null };
     level?: number;
     parentExpanded?: boolean;
   }) {
     const [expanded, setExpanded] = useState(false);
-    const hasChildren = category.children && category.children.length > 0;
+    const hasChildren = Array.isArray(category.children) && category.children.length > 0;
     const { Icon, color } = getIconForCategory(category.name);
     if (!parentExpanded) return null;
     return (
       <>
-        <TableRow className="transition-colors hover:bg-gray-50 group">
-          <TableCell style={{ paddingLeft: `${level * 24 + 16}px` }}>
+        <TableRow
+          className={`transition-colors hover:bg-gray-50 group ${level > 0 ? 'border-l-4 border-blue-100 bg-blue-50/30' : ''}`}
+        >
+          <TableCell style={{ paddingLeft: `${level * 32 + 16}px` }}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className={`h-8 w-8 transition-colors ${hasChildren ? 'hover:bg-gray-200' : 'opacity-50 cursor-default'}`}
+                className={`h-8 w-8 transition-colors ${hasChildren ? 'hover:bg-blue-100' : 'opacity-50 cursor-default'}`}
                 onClick={hasChildren ? () => setExpanded((e) => !e) : undefined}
                 aria-label={expanded ? 'Thu gọn' : 'Mở rộng'}
                 disabled={!hasChildren}
                 tabIndex={hasChildren ? 0 : -1}
               >
-                {expanded ? (
-                  <ChevronDown
-                    size={16}
-                    className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
-                  />
-                ) : (
-                  <ChevronRight
-                    size={16}
-                    className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
-                  />
-                )}
+                <span
+                  className={`transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+                >
+                  {hasChildren ? (
+                    <ChevronRight
+                      size={16}
+                      className={hasChildren ? 'text-gray-700' : 'text-gray-300'}
+                    />
+                  ) : (
+                    <ChevronRight size={16} className="text-gray-300" />
+                  )}
+                </span>
               </Button>
               <Icon
                 size={20}
@@ -219,7 +221,9 @@ export default function CategoryPage() {
                 color={color}
                 className="transition-colors group-hover:scale-110"
               />
-              <span className="font-medium group-hover:text-blue-600 transition-colors">
+              <span
+                className={`font-medium group-hover:text-blue-600 transition-colors ${level > 0 ? 'text-sm text-blue-700' : 'text-base'}`}
+              >
                 {category.name}
               </span>
             </div>
@@ -257,10 +261,11 @@ export default function CategoryPage() {
         </TableRow>
         {hasChildren &&
           expanded &&
-          category.children!.map((child) => (
+          Array.isArray(category.children) &&
+          category.children.map((child) => (
             <TreeTableRow
               key={child.id}
-              category={child}
+              category={child as Category & { children?: Category[] | null }}
               level={level + 1}
               parentExpanded={expanded}
             />
@@ -290,52 +295,11 @@ export default function CategoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((cat) => (
-                <TableRow key={cat.id}>
-                  <TableCell>
-                    {cat.categoryParentId ? (
-                      <span style={{ marginLeft: 24 }}>↳ {cat.name}</span>
-                    ) : (
-                      <b>{cat.name}</b>
-                    )}
-                  </TableCell>
-                  <TableCell>{cat.parentName || '(root)'}</TableCell>
-                  <TableCell>
-                    {cat.description || <span className="text-gray-400">(Không có)</span>}
-                  </TableCell>
-                  <TableCell>
-                    {cat.visible ? (
-                      <span className="text-xs text-green-600 bg-green-100 rounded px-2 py-0.5">
-                        Hiện
-                      </span>
-                    ) : (
-                      <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-0.5">
-                        Ẩn
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="mr-2"
-                      onClick={() => openEditDialog(cat)}
-                    >
-                      Sửa
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={cat.visible ? 'destructive' : 'secondary'}
-                      onClick={() => handleToggleVisible(normalizeCategory(cat))}
-                    >
-                      {cat.visible ? 'Ẩn' : 'Hiện'}
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={() => openCreateDialog(cat.id)}>
-                      Thêm con
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {categories
+                .filter((cat) => !cat.parentId)
+                .map((cat) => (
+                  <TreeTableRow key={cat.id} category={cat} />
+                ))}
             </TableBody>
           </Table>
         </Card>

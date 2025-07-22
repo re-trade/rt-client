@@ -2,8 +2,8 @@
 
 import {
   disableCustomer,
-  getCustomers,
   enableCustomer,
+  getCustomers,
   TCustomerProfile,
 } from '@/services/customer.api';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,11 +22,7 @@ const useCustomerManager = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await getCustomers(
-          (customPage ?? page) - 1,
-          pageSize,
-          searchQuery,
-        );
+        const response = await getCustomers((customPage ?? page) - 1, pageSize, searchQuery);
 
         if (response && response.success) {
           setCustomers(response.content || []);
