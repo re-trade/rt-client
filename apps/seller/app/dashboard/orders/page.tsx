@@ -48,6 +48,7 @@ export default function OrdersPage() {
     const fetchOrders = async () => {
       try {
         const response = await ordersApi.getAllOrdersBySeller();
+        console.log('Fetched orders:', response);
         setOrders(response);
       } catch (error) {
         console.error('Failed to fetch orders:', error);

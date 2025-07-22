@@ -299,8 +299,8 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
                           <Package className="h-4 w-4 text-gray-400" />
                           <span className="text-sm font-medium">{order.items.length} sản phẩm</span>
                         </div>
-                        <div className="text-xs text-gray-500 line-clamp-2">
-                          {order.items[0]?.productName || 'Không có tên sản phẩm'}
+                        <div className="text-xs text-gray-500 max-w-[190px] line-clamp-2">
+                          {order.items[0]?.itemName || 'Không có tên sản phẩm'}
                           {order.items.length > 1 && (
                             <span className="ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-xs">
                               +{order.items.length - 1} khác
@@ -311,7 +311,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
                     </TableCell>
 
                     <TableCell className="py-4">
-                      <div className="text-right">
+                      <div className="text-left">
                         <div className="text-lg font-bold text-gray-900">
                           {formatCurrency(order.grandPrice)}
                         </div>
