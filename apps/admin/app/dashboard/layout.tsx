@@ -15,7 +15,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
-  AlertCircle,
   Banknote,
   FileText,
   Flag,
@@ -49,7 +48,7 @@ const menuItems = [
   {
     group: 'Tài chính',
     items: [
-     // { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial' },
+      // { title: 'Báo cáo tài chính', icon: FileText, href: '/dashboard/financial' },
       { title: 'Yêu cầu rút tiền', icon: Banknote, href: '/dashboard/withdraw' },
     ],
   },
