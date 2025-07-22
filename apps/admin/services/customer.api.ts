@@ -14,14 +14,14 @@ export type TCustomerProfile = {
   lastUpdate: string;
 };
 
-const getCustomer = async (
+const getCustomers = async (
   page: number = 0,
   size: number = 10,
   query?: string,
 ): Promise<IResponseObject<TCustomerProfile[]> | undefined> => {
   try {
     const result = await authApi.default.get<IResponseObject<TCustomerProfile[]>>(
-      `/customers/customers-with-role`,
+      `/customers`,
       {
         params: {
           page,
@@ -56,4 +56,4 @@ const enableCustomer = async (id: string): Promise<IResponseObject<null> | undef
   } else return undefined;
 };
 
-export { disableCustomer, enableCustomer, getCustomer };
+export { disableCustomer, enableCustomer, getCustomers };

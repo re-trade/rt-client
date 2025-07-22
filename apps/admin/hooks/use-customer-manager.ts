@@ -2,103 +2,116 @@
 
 import {
   disableCustomer,
+  getCustomers,
   enableCustomer,
-  getCustomer,
   TCustomerProfile,
 } from '@/services/customer.api';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const useCustomerManager = () => {
   const [customers, setCustomers] = useState<TCustomerProfile[]>([]);
-  const [page, setPage] = useState<number>(0);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
+  const [maxPage, setMaxPage] = useState<number>(1);
+  const [totalCustomers, setTotalCustomers] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState<number>(0);
   const pageSize = 10;
 
-  const fetchSeller = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await getCustomer(page, pageSize, searchQuery);
-      if (result?.success) {
-        setCustomers(result.content || []);
-        setTotal(result.content?.length || 0);
-      } else {
-        setCustomers([]);
-        setTotal(0);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch customer');
-      setCustomers([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, searchQuery]);
+  const fetchCustomers = useCallback(
+    async (searchQuery?: string, customPage?: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getCustomers(
+          (customPage ?? page) - 1,
+          pageSize,
+          searchQuery,
+        );
 
-  const handleDisableCustomer = useCallback(
+        if (response && response.success) {
+          setCustomers(response.content || []);
+          setMaxPage(response.pagination?.totalPages ?? 1);
+          setTotalCustomers(response.pagination?.totalElements ?? response.content?.length ?? 0);
+        } else {
+          setCustomers([]);
+          setMaxPage(1);
+          setTotalCustomers(0);
+          setError(response?.message || 'Failed to get customers');
+        }
+      } catch (err) {
+        setCustomers([]);
+        setMaxPage(1);
+        setTotalCustomers(0);
+        setError(err instanceof Error ? err.message : 'Failed to get customers');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page],
+  );
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
+
+  const refetch = () => fetchCustomers();
+  const goToPage = (newPage: number, searchQuery?: string) => {
+    setPage(newPage);
+    fetchCustomers(searchQuery, newPage);
+  };
+  const searchCustomers = (searchQuery: string) => {
+    setPage(1);
+    fetchCustomers(searchQuery, 1);
+  };
+
+  const handleBanCustomer = useCallback(
     async (id: string) => {
       try {
         const result = await disableCustomer(id);
         if (result?.success) {
-          await fetchSeller();
+          await fetchCustomers();
           return true;
         }
-        setError('Failed to disable customer');
+        setError('Failed to ban customer');
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to disable customer');
+        setError(err instanceof Error ? err.message : 'Failed to ban customer');
         return false;
       }
     },
-    [fetchSeller],
+    [fetchCustomers],
   );
 
-  const handleEnableCustomer = useCallback(
+  const handleUnbanCustomer = useCallback(
     async (id: string) => {
       try {
         const result = await enableCustomer(id);
         if (result?.success) {
-          await fetchSeller();
+          await fetchCustomers();
           return true;
         }
-        setError('Failed to enable customer');
+        setError('Failed to unban customer');
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to enable customer');
+        setError(err instanceof Error ? err.message : 'Failed to unban customer');
         return false;
       }
     },
-    [fetchSeller],
-  );
-
-  useEffect(() => {
-    fetchSeller();
-  }, [fetchSeller]);
-
-  const stats = useMemo(
-    () => ({
-      total: total,
-      verified: customers?.filter((customer) => customer.enabled)?.length || 0,
-      pending: customers?.filter((customer) => !customer.enabled)?.length || 0,
-    }),
-    [customers, total],
+    [fetchCustomers],
   );
 
   return {
-    page,
-    setPage,
     customers,
+    page,
+    maxPage,
+    totalCustomers,
     loading,
     error,
-    searchQuery,
-    setSearchQuery,
-    pageSize,
-    stats,
-    refresh: fetchSeller,
-    disableCustomer: handleDisableCustomer,
-    enableCustomer: handleEnableCustomer,
+    refetch,
+    goToPage,
+    searchCustomers,
+    handleBanCustomer,
+    handleUnbanCustomer,
   };
 };
 
