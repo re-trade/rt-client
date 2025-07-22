@@ -8,7 +8,6 @@ interface Category {
   parentName: string | null;
   visible: boolean;
   children: Category[] | null;
-  // Các trường khác giữ nguyên nếu backend trả về
 }
 
 interface CategoriesResponse {
