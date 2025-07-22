@@ -5,39 +5,62 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const useSellerManager = () => {
   const [sellers, setSellers] = useState<TSellerProfile[]>([]);
-  const [page, setPage] = useState<number>(0);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState<number>(0);
-  const pageSize = 10;
-
-  const fetchSeller = useCallback(async () => {
+    const [page, setPage] = useState<number>(1);
+    const [maxPage, setMaxPage] = useState<number>(1);
+    const [totalSellers, setTotalSellers] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const pageSize = 10;
+  
+    const fetchSellers = useCallback(
+  async (searchQuery?: string, customPage?: number) => {
     setLoading(true);
     setError(null);
     try {
-      const result = await getSellers(page, pageSize, searchQuery);
-      if (result?.success) {
-        setSellers(result.content || []);
-        setTotal(result.content?.length || 0);
+      const response = await getSellers((customPage ?? page) - 1, pageSize, searchQuery);
+
+      if (response && response.success) {
+        setSellers(response.content || []);
+        setMaxPage(response.pagination?.totalPages ?? 1);
+        setTotalSellers(response.pagination?.totalElements ?? response.content?.length ?? 0);
       } else {
         setSellers([]);
-        setTotal(0);
+        setMaxPage(1);
+        setTotalSellers(0);
+        setError(response?.message || 'Fail to get sellers');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch sellers');
       setSellers([]);
+      setMaxPage(1);
+      setTotalSellers(0);
+      setError(err instanceof Error ? err.message : 'Fail to get sellers');
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery]);
-
-  const handleBanSeller = useCallback(
+  },
+  [page],
+);
+  
+    useEffect(() => {
+      fetchSellers();
+    }, [fetchSellers]);
+  
+    const refetch = () => fetchSellers();
+    const goToPage = (newPage: number, searchQuery?: string) => {
+      setPage(newPage);
+      fetchSellers(searchQuery, newPage);
+    };
+    const searchSellers = (searchQuery: string) => {
+      setPage(1);
+      fetchSellers(searchQuery, 1);
+    };
+  
+    const handleBanSeller = useCallback(
     async (id: string) => {
       try {
         const result = await banSeller(id);
         if (result?.success) {
-          await fetchSeller();
+          await fetchSellers();
           return true;
         }
         setError('Failed to ban seller');
@@ -47,15 +70,15 @@ const useSellerManager = () => {
         return false;
       }
     },
-    [fetchSeller],
+    [fetchSellers],
   );
-
-  const handleUnbanSeller = useCallback(
+  
+    const handleUnbanSeller = useCallback(
     async (id: string) => {
       try {
         const result = await unbanSeller(id);
         if (result?.success) {
-          await fetchSeller();
+          await fetchSellers();
           return true;
         }
         setError('Failed to unban seller');
@@ -65,36 +88,23 @@ const useSellerManager = () => {
         return false;
       }
     },
-    [fetchSeller],
+    [fetchSellers],
   );
-
-  useEffect(() => {
-    fetchSeller();
-  }, [fetchSeller]);
-
-  const stats = useMemo(
-    () => ({
-      total: total,
-      verified: sellers?.filter((seller) => seller.verified)?.length || 0,
-      pending: sellers?.filter((seller) => !seller.verified)?.length || 0,
-    }),
-    [sellers, total],
-  );
-
-  return {
-    page,
-    setPage,
-    sellers,
-    loading,
-    error,
-    searchQuery,
-    setSearchQuery,
-    pageSize,
-    stats,
-    refresh: fetchSeller,
-    banSeller: handleBanSeller,
-    unbanSeller: handleUnbanSeller,
+  
+    return {
+      sellers,
+      page,
+      maxPage,
+      totalSellers,
+      loading,
+      error,
+      refetch,
+      goToPage,
+      searchSellers,
+      handleBanSeller,
+      handleUnbanSeller,
+    };
   };
-};
-
-export { useSellerManager };
+  
+  export { useSellerManager };
+  

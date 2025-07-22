@@ -38,6 +38,15 @@ const getSellers = async (
   }
 };
 
+const getSeller = async (id: string): Promise<IResponseObject<TSellerProfile> > => {
+  const result = await authApi.default.get<IResponseObject<TSellerProfile>>(`/sellers/${id}`);
+  if (result.data.success) {
+    return result.data;
+  } 
+  throw new Error('Seller not found');
+
+};
+
 const banSeller = async (id: string): Promise<IResponseObject<null> | undefined> => {
   const result = await authApi.default.put<IResponseObject<null>>(`/sellers/${id}/ban-seller`);
   if (result.data.success) {
@@ -52,4 +61,4 @@ const unbanSeller = async (id: string): Promise<IResponseObject<null> | undefine
   } else return undefined;
 };
 
-export { banSeller, getSellers, unbanSeller };
+export { banSeller, getSellers, unbanSeller , getSeller};
