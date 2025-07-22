@@ -58,7 +58,6 @@ const getIconForCategory = (name: string): { Icon: React.ElementType; color: str
   return { Icon: Tag, color: '#64748b' };
 };
 
-
 const normalizeCategory = (cat: any): Category => ({
   ...cat,
   description: typeof cat.description === 'string' ? cat.description : '',
