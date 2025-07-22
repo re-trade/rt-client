@@ -1,21 +1,16 @@
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { 
-  CalendarIcon, 
-  PackageIcon, 
-  UserIcon, 
-  CreditCardIcon,
-  MapPinIcon,
-  PhoneIcon,
-  HashIcon,
-  TrendingUpIcon,
-  MinusCircleIcon
-} from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { RevenueResponse } from '@/service/revenue.api';
+import {
+  CreditCardIcon,
+  HashIcon,
+  MinusCircleIcon,
+  PackageIcon,
+  TrendingUpIcon,
+  UserIcon,
+} from 'lucide-react';
 
 interface RevenueDetailDialogProps {
   open: boolean;
@@ -29,7 +24,7 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(amount);
   };
 
@@ -39,7 +34,7 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     }).format(new Date(dateString));
   };
 
@@ -87,16 +82,20 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
                   </div>
                   <h3 className="font-semibold text-sm text-gray-900">Thông tin đơn hàng</h3>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-2">
                   <div className="p-2 bg-gray-50 rounded">
                     <p className="text-xs text-gray-500">Mã đơn hàng</p>
-                    <p className="font-medium text-sm text-gray-900 truncate">{revenue.orderComboId}</p>
+                    <p className="font-medium text-sm text-gray-900 truncate">
+                      {revenue.orderComboId}
+                    </p>
                   </div>
-                  
+
                   <div className="p-2 bg-gray-50 rounded">
                     <p className="text-xs text-gray-500">Thời gian</p>
-                    <p className="font-medium text-sm text-gray-900">{new Date(revenue.createdDate).toLocaleDateString('vi-VN')}</p>
+                    <p className="font-medium text-sm text-gray-900">
+                      {new Date(revenue.createdDate).toLocaleDateString('vi-VN')}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -111,19 +110,21 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
                   </div>
                   <h3 className="font-semibold text-sm text-gray-900">Thông tin khách hàng</h3>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-2">
                   <div className="p-2 bg-gray-50 rounded">
                     <p className="text-xs text-gray-500">Tên khách hàng</p>
-                    <p className="font-medium text-sm text-gray-900 truncate">{revenue.destination.customerName}</p>
+                    <p className="font-medium text-sm text-gray-900 truncate">
+                      {revenue.destination.customerName}
+                    </p>
                   </div>
-                  
+
                   <div className="p-2 bg-gray-50 rounded">
                     <p className="text-xs text-gray-500">Số điện thoại</p>
                     <p className="font-medium text-sm text-gray-900">{revenue.destination.phone}</p>
                   </div>
                 </div>
-                
+
                 <div className="mt-2 p-2 bg-gray-50 rounded">
                   <p className="text-xs text-gray-500">Địa chỉ</p>
                   <p className="font-medium text-sm text-gray-900 line-clamp-2">
@@ -131,8 +132,10 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
                       revenue.destination.addressLine,
                       revenue.destination.ward,
                       revenue.destination.district,
-                      revenue.destination.state
-                    ].filter(Boolean).join(', ')}
+                      revenue.destination.state,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')}
                   </p>
                 </div>
               </CardContent>
@@ -148,21 +151,23 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
                 </div>
                 <h3 className="font-semibold text-sm text-gray-900">Danh sách sản phẩm</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2 overflow-y-auto flex-1">
                 {revenue.items.map((item, index) => (
                   <div key={item.itemId} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
                     {item.itemThumbnail && (
                       <div className="w-8 h-8 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                        <img 
-                          src={item.itemThumbnail} 
+                        <img
+                          src={item.itemThumbnail}
                           alt={item.itemName}
                           className="w-full h-full object-cover"
                         />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-xs text-gray-900 truncate">{item.itemName}</h4>
+                      <h4 className="font-medium text-xs text-gray-900 truncate">
+                        {item.itemName}
+                      </h4>
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span>SL: {item.quantity}</span>
                         <span>Giá: {formatCurrency(item.basePrice)}</span>
@@ -183,7 +188,7 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
                 </div>
                 <h3 className="font-semibold text-sm text-gray-900">Tổng quan tài chính</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="p-3 bg-white rounded-lg border">
                   <div className="flex items-center gap-2 mb-1">
@@ -192,23 +197,28 @@ export function RevenueDetailDialog({ open, onOpenChange, revenue }: RevenueDeta
                   </div>
                   <span className="font-bold text-sm">{formatCurrency(revenue.totalPrice)}</span>
                 </div>
-                
+
                 <div className="p-3 bg-white rounded-lg border">
                   <div className="flex items-center gap-2 mb-1">
                     <MinusCircleIcon className="h-3 w-3 text-red-500" />
-                    <span className="text-xs text-gray-600">Phí dịch vụ ({revenue.feePercent}%)</span>
+                    <span className="text-xs text-gray-600">
+                      Phí dịch vụ ({revenue.feePercent}%)
+                    </span>
                   </div>
-                  <span className="font-bold text-sm text-red-600">-{formatCurrency(revenue.feeAmount)}</span>
+                  <span className="font-bold text-sm text-red-600">
+                    -{formatCurrency(revenue.feeAmount)}
+                  </span>
                 </div>
-                
+
                 <div className="p-3 bg-green-100 rounded-lg border-2 border-green-200">
                   <div className="flex items-center gap-2 mb-1">
                     <CreditCardIcon className="h-3 w-3 text-green-600" />
                     <span className="text-xs text-green-700 font-medium">Thực nhận</span>
                   </div>
-                  <span className="font-bold text-lg text-green-700">{formatCurrency(revenue.netAmount)}</span>
+                  <span className="font-bold text-lg text-green-700">
+                    {formatCurrency(revenue.netAmount)}
+                  </span>
                 </div>
-                
               </div>
             </CardContent>
           </Card>
