@@ -33,21 +33,14 @@ import {
   TrendingUp,
   Wallet,
   XCircle,
-} from 'lucide-react';
-import { useState } from 'react';
+  Package,
 
-interface RevenueData {
-  id: string;
-  date: string;
-  orderId: string;
-  productName: string;
-  buyer: string;
-  amount: number;
-  commission: number;
-  netRevenue: number;
-  status: 'completed' | 'pending' | 'cancelled';
-  category: string;
-}
+} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { RevenueResponse, revenueApi, RevenueStatsResponse } from '@/service/revenue.api';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { walletApi,WalletResponse } from '@/service/wallet.api';
+import { snipppetCode } from '@/service/snippetCode';
 
 interface WithdrawData {
   id: string;
@@ -58,132 +51,81 @@ interface WithdrawData {
   bankInfo?: string;
 }
 
-const mockRevenueData: RevenueData[] = [
-  {
-    id: '1',
-    date: '2024-07-21',
-    orderId: 'ORD001',
-    productName: 'iPhone 12 Pro Max đã qua sử dụng',
-    buyer: 'Nguyễn Văn A',
-    amount: 15900000,
-    commission: 795000,
-    netRevenue: 15105000,
-    status: 'completed',
-    category: 'Điện thoại',
-  },
-  {
-    id: '2',
-    date: '2024-07-20',
-    orderId: 'ORD002',
-    productName: 'Laptop Dell XPS 13 cũ',
-    buyer: 'Trần Thị B',
-    amount: 12500000,
-    commission: 625000,
-    netRevenue: 11875000,
-    status: 'completed',
-    category: 'Laptop',
-  },
-  {
-    id: '3',
-    date: '2024-07-19',
-    orderId: 'ORD003',
-    productName: 'Apple Watch Series 7',
-    buyer: 'Lê Minh C',
-    amount: 6800000,
-    commission: 340000,
-    netRevenue: 6460000,
-    status: 'pending',
-    category: 'Smartwatch',
-  },
-  {
-    id: '4',
-    date: '2024-07-18',
-    orderId: 'ORD004',
-    productName: 'Máy ảnh Canon EOS 5D Mark IV',
-    buyer: 'Phạm Thị D',
-    amount: 22000000,
-    commission: 1100000,
-    netRevenue: 20900000,
-    status: 'completed',
-    category: 'Máy ảnh',
-  },
-];
-
-const mockWithdrawHistory: WithdrawData[] = [
-  {
-    id: 'WD001',
-    date: '2024-07-15',
-    amount: 10000000,
-    method: 'bank',
-    status: 'completed',
-    bankInfo: 'VCB - **** 1234',
-  },
-  {
-    id: 'WD002',
-    date: '2024-07-10',
-    amount: 5000000,
-    method: 'momo',
-    status: 'completed',
-  },
-  {
-    id: 'WD003',
-    date: '2024-07-08',
-    amount: 3000000,
-    method: 'bank',
-    status: 'pending',
-    bankInfo: 'VCB - **** 1234',
-  },
-];
-
 export default function RevenueManagement() {
-  const [selectedRevenue, setSelectedRevenue] = useState<RevenueData | null>(null);
+  const [revenueData, setRevenueData] = useState<RevenueResponse[]>([]);
+  const [withdrawHistory, setWithdrawHistory] = useState<WithdrawData[]>([]);
+  const [revenueStats, setRevenueStats] = useState<RevenueStatsResponse>({
+    totalRevenue: 0,
+    totalOrder: 0,
+    totalItemsSold: 0,
+    averageOrderValue: 0,
+  });
+  const [selectedRevenue, setSelectedRevenue] = useState<RevenueResponse | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [withdrawMethod, setWithdrawMethod] = useState('');
-  const [bankInfo, setBankInfo] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [activeTab, setActiveTab] = useState('revenue');
+  const [wallet, setWallet] = useState<WalletResponse>();
 
-  // Tính toán thống kê
-  const totalRevenue = mockRevenueData.reduce((sum, item) => sum + item.netRevenue, 0);
-  const pendingAmount = mockRevenueData
-    .filter((item) => item.status === 'pending')
-    .reduce((sum, item) => sum + item.netRevenue, 0);
-  const completedAmount = mockRevenueData
-    .filter((item) => item.status === 'completed')
-    .reduce((sum, item) => sum + item.netRevenue, 0);
-  const totalOrders = mockRevenueData.length;
-  const avgOrderValue = totalRevenue / totalOrders;
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [revenue, stats, withdraws,wallet] = await Promise.all([
+          revenueApi.getRevenueBySeller(),
+          revenueApi.getRevenuStatsBySeller(),
+          walletApi.getWithdrawHistory?.() || Promise.resolve([]), // Adjust based on actual walletApi
+          walletApi.getWalletBySeller(),
+        ]);
+        console.log('Revenue Data:', revenue);
+        console.log('Revenue Stats:', stats);
+        console.log('Withdraw History:', wallet);
+        setWallet(wallet);
+        setRevenueData(revenue);
+        setRevenueStats(stats);
+        //setWithdrawHistory(withdraws);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-  // Số dư có thể rút (chỉ từ các đơn hoàn thành)
+    fetchData();
+  }, []);
+    const getCustomerInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Calculate available balance
   const availableBalance =
-    completedAmount -
-    mockWithdrawHistory
+    revenueData
+      .filter((item) => item.status.code === 'completed')
+      .reduce((sum, item) => sum + item.netAmount, 0) -
+    withdrawHistory
       .filter((w) => w.status === 'completed')
       .reduce((sum, w) => sum + w.amount, 0);
 
-  const openDetailDialog = (revenue: RevenueData) => {
+  const openDetailDialog = (revenue: RevenueResponse) => {
     setSelectedRevenue(revenue);
     setIsDetailOpen(true);
   };
 
-  const handleWithdraw = () => {
-    console.log('Rút tiền:', { withdrawAmount, withdrawMethod, bankInfo });
+  const handleWithdraw = (amount: number, method: string, bankInfo?: string) => {
+    console.log('Rút tiền:', { amount, method, bankInfo });
     setIsWithdrawOpen(false);
-    setWithdrawAmount('');
-    setWithdrawMethod('');
-    setBankInfo('');
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'COMPLETED':
         return 'bg-green-100 text-green-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
       case 'failed':
         return 'bg-red-100 text-red-800';
       default:
@@ -193,7 +135,7 @@ export default function RevenueManagement() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'COMPLETED':
         return <CheckCircle className="h-4 w-4" />;
       case 'pending':
         return <Clock className="h-4 w-4" />;
@@ -205,10 +147,19 @@ export default function RevenueManagement() {
     }
   };
 
+  const formatDate = (createdDate: string) => {
+    return new Date(createdDate).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
+
+
   const filteredRevenue =
     filterStatus === 'all'
-      ? mockRevenueData
-      : mockRevenueData.filter((item) => item.status === filterStatus);
+      ? revenueData
+      : revenueData.filter((item) => item.status.code === filterStatus);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -236,14 +187,14 @@ export default function RevenueManagement() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-blue-100">Tổng doanh thu</CardTitle>
               <DollarSign className="h-5 w-5 text-blue-200" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalRevenue.toLocaleString('vi-VN')}₫</div>
+              <div className="text-2xl font-bold">{revenueStats.totalRevenue.toLocaleString('vi-VN')}₫</div>
               <div className="flex items-center mt-1">
                 <ArrowUpRight className="h-4 w-4 mr-1" />
                 <span className="text-sm text-blue-100">+20.1% so với tháng trước</span>
@@ -258,7 +209,7 @@ export default function RevenueManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {availableBalance.toLocaleString('vi-VN')}₫
+                {wallet?.balance.toLocaleString('vi-VN')}₫
               </div>
               <p className="text-xs text-gray-500 mt-1">Có thể rút ngay</p>
             </CardContent>
@@ -270,7 +221,21 @@ export default function RevenueManagement() {
               <ShoppingCart className="h-5 w-5 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalOrders}</div>
+              <div className="text-2xl font-bold">{revenueStats.totalOrder}</div>
+              <div className="flex items-center mt-1">
+                <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
+                <span className="text-sm text-gray-500">+15% so với tháng trước</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-600">Tổng sản phẩm đã bán</CardTitle>
+              <Package className="h-5 w-5 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{revenueStats.totalOrder}</div>
               <div className="flex items-center mt-1">
                 <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
                 <span className="text-sm text-gray-500">+15% so với tháng trước</span>
@@ -284,7 +249,7 @@ export default function RevenueManagement() {
               <TrendingUp className="h-5 w-5 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{avgOrderValue.toLocaleString('vi-VN')}₫</div>
+              <div className="text-2xl font-bold">{revenueStats.averageOrderValue.toLocaleString('vi-VN')}₫</div>
               <div className="flex items-center mt-1">
                 <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
                 <span className="text-sm text-gray-500">+5.2% so với tháng trước</span>
@@ -299,21 +264,19 @@ export default function RevenueManagement() {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('revenue')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'revenue'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'revenue'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Chi tiết doanh thu
               </button>
               <button
                 onClick={() => setActiveTab('withdraw')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'withdraw'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'withdraw'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Lịch sử rút tiền
               </button>
@@ -342,7 +305,7 @@ export default function RevenueManagement() {
                     </div>
                   </div>
                   <div className="text-sm text-gray-500">
-                    Hiển thị {filteredRevenue.length} trên {mockRevenueData.length} giao dịch
+                    Hiển thị {filteredRevenue.length} trên {revenueData.length} giao dịch
                   </div>
                 </div>
 
@@ -356,7 +319,8 @@ export default function RevenueManagement() {
                         <TableHead className="font-semibold">Sản phẩm</TableHead>
                         <TableHead className="font-semibold">Người mua</TableHead>
                         <TableHead className="font-semibold text-right">Tổng tiền</TableHead>
-                        <TableHead className="font-semibold text-right">Phí (5%)</TableHead>
+                        <TableHead className="font-semibold text-right">Phí(%)</TableHead>
+                        <TableHead className="font-semibold text-right">Tiền phí</TableHead>
                         <TableHead className="font-semibold text-right">Thực nhận</TableHead>
                         <TableHead className="font-semibold text-center">Trạng thái</TableHead>
                         <TableHead className="font-semibold text-center">Thao tác</TableHead>
@@ -364,48 +328,69 @@ export default function RevenueManagement() {
                     </TableHeader>
                     <TableBody>
                       {filteredRevenue.map((revenue) => (
-                        <TableRow key={revenue.id} className="hover:bg-gray-50">
+                        <TableRow key={revenue.orderComboId} className="hover:bg-gray-50">
                           <TableCell>
-                            {new Date(revenue.date).toLocaleDateString('vi-VN')}
+                            {formatDate(revenue.createdDate)}
                           </TableCell>
                           <TableCell className="font-medium text-blue-600">
-                            {revenue.orderId}
+                            {snipppetCode.cutCode(revenue.orderComboId)}
                           </TableCell>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium text-sm">{revenue.productName}</p>
-                              <p className="text-xs text-gray-500">{revenue.category}</p>
+                          <TableCell className="py-4">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Package className="h-4 w-4 text-gray-400" />
+                                <span className="text-sm font-medium">{revenue.items.length} sản phẩm</span>
+                              </div>
+                              <div className="text-xs text-gray-500 max-w-[190px] line-clamp-2">
+                                {revenue.items[0]?.itemName || 'Không có tên sản phẩm'}
+                                {revenue.items.length > 1 && (
+                                  <span className="ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-xs">
+                                    +{revenue.items.length - 1} khác
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </TableCell>
-                          <TableCell>{revenue.buyer}</TableCell>
+
+                          <TableCell className="py-4">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
+                                <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                                  {getCustomerInitials(revenue.destination.customerName)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="font-medium text-gray-900">
+                                  {revenue.destination.customerName}
+                                </div>
+                                <div className="text-sm text-gray-500">{revenue.destination.phone}</div>
+                              </div>
+                            </div>
+                          </TableCell>
                           <TableCell className="text-right font-medium">
-                            {revenue.amount.toLocaleString('vi-VN')}₫
+                            {revenue.totalPrice.toLocaleString('vi-VN')}₫
                           </TableCell>
                           <TableCell className="text-right text-red-600">
-                            -{revenue.commission.toLocaleString('vi-VN')}₫
+                            {revenue.feePercent.toFixed(2)}%
+                          </TableCell>
+                          <TableCell className="text-right text-red-600">
+                            -{(revenue.feeAmount).toLocaleString('vi-VN')}₫
                           </TableCell>
                           <TableCell className="text-right font-bold text-green-600">
-                            {revenue.netRevenue.toLocaleString('vi-VN')}₫
+                            {revenue.netAmount.toLocaleString('vi-VN')}₫
                           </TableCell>
                           <TableCell className="text-center">
                             <div className="flex items-center justify-center gap-1">
                               <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(revenue.status)}`}
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(revenue.status.code)}`}
                               >
                                 <span className="flex items-center gap-1">
-                                  {getStatusIcon(revenue.status)}
-                                  <span>
-                                    {revenue.status === 'completed'
-                                      ? 'Hoàn thành'
-                                      : revenue.status === 'pending'
-                                        ? 'Đang xử lý'
-                                        : 'Đã hủy'}
-                                  </span>
+                                  {getStatusIcon(revenue.status.code)}
+                                  <span>{revenue.status.name}</span>
                                 </span>
                               </span>
                             </div>
                           </TableCell>
-
                           <TableCell className="text-center">
                             <Button
                               variant="outline"
@@ -442,7 +427,7 @@ export default function RevenueManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {mockWithdrawHistory.map((withdraw) => (
+                      {withdrawHistory.map((withdraw) => (
                         <TableRow key={withdraw.id} className="hover:bg-gray-50">
                           <TableCell className="font-medium text-blue-600">{withdraw.id}</TableCell>
                           <TableCell>
@@ -496,9 +481,7 @@ export default function RevenueManagement() {
           open={isWithdrawOpen}
           onOpenChange={setIsWithdrawOpen}
           availableBalance={availableBalance}
-          onWithdraw={(amount, method, bankInfo) => {
-            console.log('Rút tiền:', { amount, method, bankInfo });
-          }}
+          onWithdraw={handleWithdraw}
         />
       </div>
     </div>
