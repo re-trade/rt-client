@@ -4,7 +4,7 @@ interface Category {
   id: string;
   name: string;
   description: string;
-  categoryParentId: string | null;
+  parentId: string | null;
   parentName: string | null;
   visible: boolean;
   children: Category[] | null;
@@ -62,7 +62,7 @@ const getCategoryByIdInternal = async (id: string): Promise<Category> => {
 const createCategory = async (data: {
   name: string;
   description?: string;
-  categoryParentId?: string | null;
+  parentId?: string | null;
   visible: boolean;
 }): Promise<Category> => {
   try {
@@ -75,7 +75,7 @@ const createCategory = async (data: {
 
 const updateCategory = async (
   id: string,
-  data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean },
+  data: { name: string; description?: string; parentId?: string | null; visible: boolean },
 ): Promise<Category> => {
   try {
     const response = await unAuthApi.default.put(`/categories/${id}`, data, {
