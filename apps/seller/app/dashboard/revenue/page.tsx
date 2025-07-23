@@ -31,6 +31,7 @@ import {
   CreateBankInfor,
   walletApi,
   WalletResponse,
+  WithdrawHistoryResponse,
 } from '@/service/wallet.api';
 import {
   ArrowUpRight,
@@ -53,7 +54,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
+import { RevenueTableActiveTab } from '@/components/common/RevenueTableActiveTab'; 
 interface WithdrawData {
   id: string;
   date: string;
@@ -497,131 +498,7 @@ export default function RevenueManagement() {
           </div>
 
           <div className="p-6">
-            {activeTab === 'revenue' && (
-              <div className="space-y-4">
-                {/* Filters */}
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Filter className="h-4 w-4 text-gray-500" />
-                      <Select value={filterStatus} onValueChange={setFilterStatus}>
-                        <SelectTrigger className="w-[150px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tất cả</SelectItem>
-                          <SelectItem value="completed">Hoàn thành</SelectItem>
-                          <SelectItem value="pending">Đang xử lý</SelectItem>
-                          <SelectItem value="cancelled">Đã hủy</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Hiển thị {filteredRevenue.length} trên {revenueData.length} giao dịch
-                  </div>
-                </div>
-
-                {/* Revenue Table */}
-                <div className="border rounded-lg overflow-hidden">
-                  <Table>
-                    <TableHeader className="bg-gray-50">
-                      <TableRow>
-                        <TableHead className="font-semibold">Ngày</TableHead>
-                        <TableHead className="font-semibold">Đơn hàng</TableHead>
-                        <TableHead className="font-semibold">Sản phẩm</TableHead>
-                        <TableHead className="font-semibold">Người mua</TableHead>
-                        <TableHead className="font-semibold text-right">Tổng tiền</TableHead>
-                        <TableHead className="font-semibold text-right">Phí(%)</TableHead>
-                        <TableHead className="font-semibold text-right">Tiền phí</TableHead>
-                        <TableHead className="font-semibold text-right">Thực nhận</TableHead>
-                        <TableHead className="font-semibold text-center">Trạng thái</TableHead>
-                        <TableHead className="font-semibold text-center">Thao tác</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredRevenue.map((revenue) => (
-                        <TableRow key={revenue.orderComboId} className="hover:bg-gray-50">
-                          <TableCell>{formatDate(revenue.createdDate)}</TableCell>
-                          <TableCell className="font-medium text-blue-600">
-                            {snipppetCode.cutCode(revenue.orderComboId)}
-                          </TableCell>
-                          <TableCell className="py-4">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <Package className="h-4 w-4 text-gray-400" />
-                                <span className="text-sm font-medium">
-                                  {revenue.items.length} sản phẩm
-                                </span>
-                              </div>
-                              <div className="text-xs text-gray-500 max-w-[190px] line-clamp-2">
-                                {revenue.items[0]?.itemName || 'Không có tên sản phẩm'}
-                                {revenue.items.length > 1 && (
-                                  <span className="ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-xs">
-                                    +{revenue.items.length - 1} khác
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-
-                          <TableCell className="py-4">
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                                <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                                  {getCustomerInitials(revenue.destination.customerName)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <div className="font-medium text-gray-900">
-                                  {revenue.destination.customerName}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {revenue.destination.phone}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right font-medium">
-                            {revenue.totalPrice.toLocaleString('vi-VN')}₫
-                          </TableCell>
-                          <TableCell className="text-right text-red-600">
-                            {revenue.feePercent.toFixed(2)}%
-                          </TableCell>
-                          <TableCell className="text-right text-red-600">
-                            -{revenue.feeAmount.toLocaleString('vi-VN')}₫
-                          </TableCell>
-                          <TableCell className="text-right font-bold text-green-600">
-                            {revenue.netAmount.toLocaleString('vi-VN')}₫
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(revenue.status.code)}`}
-                              >
-                                <span className="flex items-center gap-1">
-                                  {getStatusIcon(revenue.status.code)}
-                                  <span>{revenue.status.name}</span>
-                                </span>
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openDetailDialog(revenue)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            )}
+            <RevenueTableActiveTab/>
 
             {activeTab === 'bank' && (
               <div className="space-y-6">
@@ -694,68 +571,75 @@ export default function RevenueManagement() {
 
                 {/* Bank Accounts List */}
                 <div className="grid gap-4">
-                  {bankAccounts.map((bank) => (
-                    // <Card key={bank.id} className={`border transition-all hover:shadow-md ${bank.isDefault ? 'border-blue-500 bg-blue-50/30' : ''}`}>
-                    <Card key={bank.id} className={`border transition-all hover:shadow-md`}>
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-start gap-4">
-                            <div className="flex-shrink-0">
-                              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                <Building2 className="h-6 w-6 text-white" />
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <h4 className="text-lg font-semibold text-gray-900">
-                                  {bank.bankName}
-                                </h4>
-                                {/* {bank.isDefault && (
-                                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                                    Mặc định
-                                  </span>
-                                )} */}
-                              </div>
-                              <div className="space-y-1 text-sm text-gray-600">
-                                <div className="flex items-center gap-2">
-                                  <CreditCard className="h-4 w-4" />
-                                  <span className="font-mono">{bank.accountNumber}</span>
+                  {bankAccounts
+                    .filter((bank) => !editingBank || bank.id !== editingBank.id)
+                    .map((bank) => (
+                      <Card
+                        key={bank.id}
+                        className={`border transition-all hover:shadow-md ${
+                          // bank.isDefault ? 'border-blue-500 bg-blue-50/30' : ''
+                          ''
+                        }`}
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex justify-between items-start">
+                            <div className="flex items-start gap-4">
+                              <div className="flex-shrink-0">
+                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                  <Building2 className="h-6 w-6 text-white" />
                                 </div>
-                                <div className="font-medium text-gray-900">{bank.userBankName}</div>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-lg font-semibold text-gray-900">
+                                    {bank.bankName}
+                                  </h4>
+                                  {/* {bank.isDefault && (
+                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                      Mặc định
+                                    </span>
+                                  )} */}
+                                </div>
+                                <div className="space-y-1 text-sm text-gray-600">
+                                  <div className="flex items-center gap-2">
+                                    <CreditCard className="h-4 w-4" />
+                                    <span className="font-mono">{bank.accountNumber}</span>
+                                  </div>
+                                  <div className="font-medium text-gray-900">{bank.userBankName}</div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {/* {!bank.isDefault && (
+                            <div className="flex items-center gap-2">
+                              {/* {!bank.isDefault && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleSetDefault(bank.id)}
+                                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                >
+                                  Đặt mặc định
+                                </Button>
+                              )} */}
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleSetDefault(bank.id)}
-                                className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                onClick={() => handleEditBank(bank)}
                               >
-                                Đặt mặc định
+                                <Edit className="h-4 w-4" />
                               </Button>
-                            )} */}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditBank(bank)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteBank(bank.id)}
-                              className="text-red-600 border-red-200 hover:bg-red-50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteBank(bank.id)}
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    ))}
 
                   {bankAccounts.length === 0 && !isAddingBank && (
                     <Card className="border-dashed border-2 border-gray-300">

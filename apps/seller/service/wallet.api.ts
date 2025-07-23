@@ -103,4 +103,51 @@ export const walletApi = {
       throw error;
     }
   },
+  async updateBankInfor(
+    id: string,
+    bankInfor: CreateBankInfor,
+  ): Promise<BankInfor> {
+    const response = await authApi.default.put<IResponseObject<BankInfor>>(
+      `/customers/me/bank-info/${id}`,
+      bankInfor,
+    );
+    try {
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Product not found');
+    } catch (error) {
+      throw error;
+    }
+  },
+  async deleteBankInfor(id: string): Promise<BankInfor> {
+    const response = await authApi.default.delete<IResponseObject<BankInfor>>(
+      `/customers/me/bank-info/${id}`,
+    );
+    try {
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Product not found');
+    } catch (error) {
+      throw error;
+    }
+  },
+  async setIsDefaultBankInfor(
+    id: string,
+    isDefault: boolean,
+  ): Promise<BankInfor> {
+    const response = await authApi.default.put<IResponseObject<BankInfor>>(
+      `/customers/me/bank-info/${id}/default`,
+      { isDefault },
+    );
+    try {
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Product not found');
+    } catch (error) {
+      throw error;
+    }
+  },
 };
