@@ -1,9 +1,9 @@
 'use client';
 
 import { useWallet } from '@/hooks/use-wallet';
-import { BankResponse, getBanks } from '@/services/payment-method.api';
+import { BankResponse } from '@/services/payment-method.api';
 import { CreateWithdrawalRequest } from '@/services/wallet.api';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useWalletManager = () => {
   const {
@@ -27,7 +27,6 @@ export const useWalletManager = () => {
   const [selectedBank, setSelectedBank] = useState<BankResponse | null>(null);
   const [processingWithdrawal, setProcessingWithdrawal] = useState(false);
 
-  const [banks, setBanks] = useState<BankResponse[]>([]);
   const [bankSearch, setBankSearch] = useState('');
   const [bankModalOpen, setBankModalOpen] = useState(false);
 
@@ -46,25 +45,7 @@ export const useWalletManager = () => {
     });
   };
 
-  const fetchBanks = useCallback(async () => {
-    try {
-      const response = await getBanks(0, 100, bankSearch);
-      if (response?.success) {
-        setBanks(
-          response.content.map((bank) => ({
-            ...bank,
-            logo: bank.url,
-          })) || [],
-        );
-      }
-    } catch (error) {
-      console.error('Failed to fetch banks:', error);
-    }
-  }, [bankSearch]);
-
-  useEffect(() => {
-    fetchBanks();
-  }, [fetchBanks]);
+  // Bank selection is now handled directly in the BankSelectionModal component
 
   const handleWithdrawalSubmit = useCallback(
     async (data: CreateWithdrawalRequest) => {
@@ -91,6 +72,7 @@ export const useWalletManager = () => {
   }, []);
 
   return {
+    // Data
     balance,
     withdrawals,
     loading,
@@ -98,8 +80,8 @@ export const useWalletManager = () => {
     page,
     totalItems,
     size,
-    banks,
 
+    // Withdrawal modal state
     isModalOpen,
     setIsModalOpen,
     withdrawAmount,
@@ -117,9 +99,9 @@ export const useWalletManager = () => {
     bankSearch,
     setBankSearch,
 
+    // Actions
     setPage,
     refresh,
-    fetchBanks,
     handleWithdrawalSubmit,
     cancelWithdrawal,
     openWithdrawalModal,

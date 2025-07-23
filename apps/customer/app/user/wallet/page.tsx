@@ -15,7 +15,6 @@ export default function WalletPage() {
     page,
     totalItems,
     size,
-    banks,
 
     isModalOpen,
     setIsModalOpen,
@@ -106,7 +105,6 @@ export default function WalletPage() {
         setBankModalOpen={setBankModalOpen}
         bankSearch={bankSearch}
         setBankSearch={setBankSearch}
-        banks={banks}
         balance={balance}
         processingWithdrawal={processingWithdrawal}
         onSubmit={handleWithdrawalSubmit}
