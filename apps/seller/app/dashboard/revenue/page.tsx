@@ -1,13 +1,11 @@
 'use client';
+import { BankInfoActiveTab } from '@/components/common/BankInfoActiveTab';
 import { RevenueTableActiveTab } from '@/components/common/RevenueTableActiveTab';
-import { SelectBank } from '@/components/common/SelectBank';
 import { WithdrawDialog } from '@/components/common/WithdrawDialog';
 import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -33,11 +31,8 @@ import {
   CreditCard,
   DollarSign,
   Download,
-  Edit,
   Package,
-  Plus,
   ShoppingCart,
-  Trash2,
   TrendingUp,
   Wallet,
   XCircle,
@@ -490,161 +485,7 @@ export default function RevenueManagement() {
 
             {activeTab === 'bank' && (
               <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Thông tin ngân hàng</h3>
-                  <Button onClick={() => setIsAddingBank(true)} className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Thêm tài khoản
-                  </Button>
-                </div>
-
-                {/* Add/Edit Bank Form */}
-                {isAddingBank && (
-                  <Card className="border-dashed border-2 border-blue-300 bg-blue-50/50">
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <Building2 className="h-5 w-5" />
-                        {editingBank
-                          ? 'Chỉnh sửa tài khoản ngân hàng'
-                          : 'Thêm tài khoản ngân hàng mới'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="bankName">Tên ngân hàng *</Label>
-                          <SelectBank value={newBankInfo.bankBin} onChange={handleBankSelect} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="accountNumber">Số tài khoản *</Label>
-                          <Input
-                            id="accountNumber"
-                            placeholder="Ví dụ: 1234567890"
-                            value={newBankInfo.accountNumber}
-                            onChange={(e) =>
-                              setNewBankInfo({ ...newBankInfo, accountNumber: e.target.value })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="userBankName">Tên chủ tài khoản *</Label>
-                          <Input
-                            id="userBankName"
-                            placeholder="Ví dụ: NGUYEN VAN A"
-                            value={newBankInfo.userBankName}
-                            onChange={(e) =>
-                              setNewBankInfo({
-                                ...newBankInfo,
-                                userBankName: e.target.value.toUpperCase(),
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div className="flex gap-3 pt-4">
-                        <Button
-                          onClick={editingBank ? handleUpdateBank : handleAddBank}
-                          className="flex items-center gap-2"
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                          {editingBank ? 'Cập nhật' : 'Thêm tài khoản'}
-                        </Button>
-                        <Button variant="outline" onClick={cancelBankForm}>
-                          Hủy
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Bank Accounts List */}
-                <div className="grid gap-4">
-                  {bankAccounts
-                    .filter((bank) => !editingBank || bank.id !== editingBank.id)
-                    .map((bank) => (
-                      <Card
-                        key={bank.id}
-                        className={`border transition-all hover:shadow-md ${
-                          // bank.isDefault ? 'border-blue-500 bg-blue-50/30' : ''
-                          ''
-                        }`}
-                      >
-                        <CardContent className="p-6">
-                          <div className="flex justify-between items-start">
-                            <div className="flex items-start gap-4">
-                              <div className="flex-shrink-0">
-                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                  <Building2 className="h-6 w-6 text-white" />
-                                </div>
-                              </div>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <h4 className="text-lg font-semibold text-gray-900">
-                                    {bank.bankName}
-                                  </h4>
-                                  {/* {bank.isDefault && (
-                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                                      Mặc định
-                                    </span>
-                                  )} */}
-                                </div>
-                                <div className="space-y-1 text-sm text-gray-600">
-                                  <div className="flex items-center gap-2">
-                                    <CreditCard className="h-4 w-4" />
-                                    <span className="font-mono">{bank.accountNumber}</span>
-                                  </div>
-                                  <div className="font-medium text-gray-900">
-                                    {bank.userBankName}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {/* {!bank.isDefault && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleSetDefault(bank.id)}
-                                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                                >
-                                  Đặt mặc định
-                                </Button>
-                              )} */}
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditBank(bank)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleDeleteBank(bank.id)}
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-
-                  {bankAccounts.length === 0 && !isAddingBank && (
-                    <Card className="border-dashed border-2 border-gray-300">
-                      <CardContent className="p-12 text-center">
-                        <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          Chưa có tài khoản ngân hàng
-                        </h3>
-                        <p className="text-gray-500 mb-4">
-                          Thêm tài khoản ngân hàng để có thể rút tiền dễ dàng hơn
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
+                <BankInfoActiveTab />
               </div>
             )}
 
