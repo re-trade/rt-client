@@ -484,8 +484,8 @@ function ShippingPolicyContent() {
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Phương thức giao hàng</h3>
           <p className="text-gray-600 leading-relaxed mb-6">
-            Trên ReTrade, người bán chịu trách nhiệm giao hàng trực tiếp đến người mua.
-            Điều này giúp tạo ra sự linh hoạt và tiết kiệm chi phí cho cả hai bên:
+            Trên ReTrade, người bán chịu trách nhiệm giao hàng trực tiếp đến người mua. Điều này
+            giúp tạo ra sự linh hoạt và tiết kiệm chi phí cho cả hai bên:
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
@@ -493,30 +493,39 @@ function ShippingPolicyContent() {
                 <Truck className="w-6 h-6 text-white" />
               </div>
               <h4 className="font-semibold text-gray-800 mb-2">Giao hàng tận nơi</h4>
-              <p className="text-gray-600 text-sm">Người bán giao hàng trực tiếp đến địa chỉ của bạn</p>
+              <p className="text-gray-600 text-sm">
+                Người bán giao hàng trực tiếp đến địa chỉ của bạn
+              </p>
             </div>
             <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
               <div className="w-12 h-12 bg-green-500 rounded-lg mx-auto mb-3 flex items-center justify-center">
                 <Truck className="w-6 h-6 text-white" />
               </div>
               <h4 className="font-semibold text-gray-800 mb-2">Hẹn gặp trực tiếp</h4>
-              <p className="text-gray-600 text-sm">Thỏa thuận địa điểm gặp mặt thuận tiện cho cả hai bên</p>
+              <p className="text-gray-600 text-sm">
+                Thỏa thuận địa điểm gặp mặt thuận tiện cho cả hai bên
+              </p>
             </div>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 text-center">
               <div className="w-12 h-12 bg-orange-500 rounded-lg mx-auto mb-3 flex items-center justify-center">
                 <Truck className="w-6 h-6 text-white" />
               </div>
               <h4 className="font-semibold text-gray-800 mb-2">Dịch vụ ship</h4>
-              <p className="text-gray-600 text-sm">Người bán có thể sử dụng dịch vụ ship theo thỏa thuận</p>
+              <p className="text-gray-600 text-sm">
+                Người bán có thể sử dụng dịch vụ ship theo thỏa thuận
+              </p>
             </div>
           </div>
         </section>
 
         <section>
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">2. Thời gian và phí giao hàng</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            2. Thời gian và phí giao hàng
+          </h3>
           <p className="text-gray-600 leading-relaxed mb-6">
             Thời gian và phí giao hàng được thỏa thuận trực tiếp giữa người mua và người bán.
-            ReTrade khuyến khích các bên thảo luận rõ ràng về các điều khoản này trước khi hoàn tất giao dịch.
+            ReTrade khuyến khích các bên thảo luận rõ ràng về các điều khoản này trước khi hoàn tất
+            giao dịch.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -540,8 +549,9 @@ function ShippingPolicyContent() {
           </div>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
             <p className="text-yellow-800 text-sm">
-              <strong>💡 Lưu ý:</strong> ReTrade khuyến khích người mua và người bán thỏa thuận rõ ràng về
-              thời gian, địa điểm và phí giao hàng trước khi xác nhận đơn hàng để tránh hiểu lầm.
+              <strong>💡 Lưu ý:</strong> ReTrade khuyến khích người mua và người bán thỏa thuận rõ
+              ràng về thời gian, địa điểm và phí giao hàng trước khi xác nhận đơn hàng để tránh hiểu
+              lầm.
             </p>
           </div>
         </section>
