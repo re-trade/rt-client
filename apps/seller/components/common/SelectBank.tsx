@@ -9,10 +9,10 @@ import {
 } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, Building2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import type * as React from 'react';
 import { BankResponse, walletApi } from '@/service/wallet.api';
+import { Building2, Check, ChevronsUpDown } from 'lucide-react';
+import type * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface SelectBankProps {
   value: string;
@@ -55,9 +55,10 @@ export function SelectBank({ value, currentBankId, onChange }: SelectBankProps) 
     if (!inputValue.trim()) {
       setFilteredBanks(banks);
     } else {
-      const filtered = banks.filter((bank) =>
-        bank.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-        bank.code.toLowerCase().includes(inputValue.toLowerCase())
+      const filtered = banks.filter(
+        (bank) =>
+          bank.name.toLowerCase().includes(inputValue.toLowerCase()) ||
+          bank.code.toLowerCase().includes(inputValue.toLowerCase()),
       );
       setFilteredBanks(filtered);
     }
@@ -119,7 +120,7 @@ export function SelectBank({ value, currentBankId, onChange }: SelectBankProps) 
       id: bank.id,
       name: bank.name,
       code: bank.code,
-      bin: bank.bin
+      bin: bank.bin,
     });
     setInputValue(bank.name);
     setOpen(false);
@@ -171,10 +172,7 @@ export function SelectBank({ value, currentBankId, onChange }: SelectBankProps) 
             onKeyDown={handleKeyDown}
             placeholder={loading ? 'Đang tải...' : 'Chọn hoặc tìm ngân hàng...'}
             disabled={loading}
-            className={cn(
-              "pr-8",
-              selectedBank ? "pl-12" : "pl-3"
-            )}
+            className={cn('pr-8', selectedBank ? 'pl-12' : 'pl-3')}
             autoComplete="off"
           />
         </div>

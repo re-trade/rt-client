@@ -1,5 +1,4 @@
 import { authApi, IResponseObject } from '@retrade/util';
-import { create } from 'domain';
 
 export type WalletResponse = {
   accountId: string;
@@ -21,7 +20,7 @@ export type WithdrawHistoryResponse = {
   status: string;
   processedDate: string;
 };
-export type CreateBankInfor  = {
+export type CreateBankInfor = {
   bankName: string;
   userBankName: string;
   accountNumber: string;
@@ -36,7 +35,7 @@ export type BankInfor = {
   bankBin: string;
   // isDefault: boolean;
   addedDate: string;
-}
+};
 export const walletApi = {
   async getWalletBySeller(): Promise<WalletResponse> {
     const response =
@@ -70,9 +69,7 @@ export const walletApi = {
     );
     return response.data.success ? response.data.content : [];
   },
-  async createBankInfor(
-    bankInfor: CreateBankInfor,
-  ): Promise<BankInfor> {
+  async createBankInfor(bankInfor: CreateBankInfor): Promise<BankInfor> {
     const response = await authApi.default.post<IResponseObject<BankInfor>>(
       `/customers/me/bank-info`,
       bankInfor,
@@ -86,11 +83,7 @@ export const walletApi = {
       throw error;
     }
   },
-  async getBankInfos(
-    page: number = 0,
-    size: number = 15,
-    query?: string,
-  ): Promise<BankInfor[]> {
+  async getBankInfos(page: number = 0, size: number = 15, query?: string): Promise<BankInfor[]> {
     const response = await authApi.default.get<IResponseObject<BankInfor[]>>(
       `customers/me/bank-info`,
       {
@@ -110,5 +103,4 @@ export const walletApi = {
       throw error;
     }
   },
-
 };
