@@ -1,20 +1,11 @@
 'use client';
-import { SelectBank } from '@/components/common/SelectBank';
+import { BankInfoActiveTab } from '@/components/common/BankInfoActiveTab';
+import { RevenueTableActiveTab } from '@/components/common/RevenueTableActiveTab';
 import { WithdrawDialog } from '@/components/common/WithdrawDialog';
 import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -24,14 +15,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { revenueApi, RevenueResponse, RevenueStatsResponse } from '@/service/revenue.api';
-import { snipppetCode } from '@/service/snippetCode';
 import {
   BankInfor,
   BankResponse,
   CreateBankInfor,
   walletApi,
   WalletResponse,
-  WithdrawHistoryResponse,
 } from '@/service/wallet.api';
 import {
   ArrowUpRight,
@@ -42,20 +31,13 @@ import {
   CreditCard,
   DollarSign,
   Download,
-  Edit,
-  Eye,
-  Filter,
   Package,
-  Plus,
   ShoppingCart,
-  Trash2,
   TrendingUp,
   Wallet,
   XCircle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { RevenueTableActiveTab } from '@/components/common/RevenueTableActiveTab';
-import { BankInfoActiveTab } from '@/components/common/BankInfoActiveTab';
 interface WithdrawData {
   id: string;
   date: string;
@@ -467,28 +449,31 @@ export default function RevenueManagement() {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('revenue')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'revenue'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'revenue'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Chi tiết doanh thu
               </button>
               <button
                 onClick={() => setActiveTab('bank')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'bank'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'bank'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Thông tin ngân hàng
               </button>
               <button
                 onClick={() => setActiveTab('withdraw')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'withdraw'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'withdraw'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Lịch sử rút tiền
               </button>
