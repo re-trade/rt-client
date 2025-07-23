@@ -103,10 +103,7 @@ export const walletApi = {
       throw error;
     }
   },
-  async updateBankInfor(
-    id: string,
-    bankInfor: CreateBankInfor,
-  ): Promise<BankInfor> {
+  async updateBankInfor(id: string, bankInfor: CreateBankInfor): Promise<BankInfor> {
     const response = await authApi.default.put<IResponseObject<BankInfor>>(
       `/customers/me/bank-info/${id}`,
       bankInfor,
@@ -133,10 +130,7 @@ export const walletApi = {
       throw error;
     }
   },
-  async setIsDefaultBankInfor(
-    id: string,
-    isDefault: boolean,
-  ): Promise<BankInfor> {
+  async setIsDefaultBankInfor(id: string, isDefault: boolean): Promise<BankInfor> {
     const response = await authApi.default.put<IResponseObject<BankInfor>>(
       `/customers/me/bank-info/${id}/default`,
       { isDefault },
