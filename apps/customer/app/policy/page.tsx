@@ -365,27 +365,27 @@ function ReturnPolicyContent() {
           <h3 className="text-xl font-semibold text-gray-800 mb-4">3. Quy trình đổi trả</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-lg p-6">
-              <h4 className="font-semibold text-gray-800 mb-3">Bước 1: Tạo yêu cầu</h4>
+              <h4 className="font-semibold text-gray-800 mb-3">Bước 1: Liên hệ người bán</h4>
               <p className="text-gray-600 text-sm">
-                Truy cập "Đơn hàng của tôi" và chọn "Yêu cầu đổi trả" cho sản phẩm tương ứng.
+                Liên hệ trực tiếp với người bán qua tin nhắn để thông báo vấn đề và yêu cầu đổi trả.
               </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-6">
-              <h4 className="font-semibold text-gray-800 mb-3">Bước 2: Cung cấp thông tin</h4>
+              <h4 className="font-semibold text-gray-800 mb-3">Bước 2: Cung cấp bằng chứng</h4>
               <p className="text-gray-600 text-sm">
-                Mô tả lý do đổi trả và cung cấp hình ảnh minh chứng nếu cần thiết.
+                Gửi hình ảnh và mô tả chi tiết vấn đề của sản phẩm cho người bán.
               </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-6">
-              <h4 className="font-semibold text-gray-800 mb-3">Bước 3: Chờ xác nhận</h4>
+              <h4 className="font-semibold text-gray-800 mb-3">Bước 3: Thỏa thuận giải pháp</h4>
               <p className="text-gray-600 text-sm">
-                Đội ngũ hỗ trợ sẽ xem xét và phản hồi trong vòng 24-48 giờ.
+                Thảo luận với người bán về cách thức đổi trả, hoàn tiền hoặc giải pháp khác.
               </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-6">
-              <h4 className="font-semibold text-gray-800 mb-3">Bước 4: Gửi trả hàng</h4>
+              <h4 className="font-semibold text-gray-800 mb-3">Bước 4: Thực hiện đổi trả</h4>
               <p className="text-gray-600 text-sm">
-                Sau khi được chấp thuận, gửi sản phẩm về địa chỉ được cung cấp.
+                Thực hiện đổi trả theo thỏa thuận. Nếu không thể giải quyết, liên hệ ReTrade hỗ trợ.
               </p>
             </div>
           </div>
@@ -413,9 +413,9 @@ function ReturnPolicyContent() {
                   </td>
                 </tr>
                 <tr className="bg-gray-50">
-                  <td className="border border-gray-300 px-4 py-3">Hư hỏng do vận chuyển</td>
+                  <td className="border border-gray-300 px-4 py-3">Hư hỏng do giao hàng</td>
                   <td className="border border-gray-300 px-4 py-3 text-green-600 font-medium">
-                    Miễn phí
+                    Người bán chịu trách nhiệm
                   </td>
                 </tr>
                 <tr>
@@ -482,101 +482,89 @@ function ShippingPolicyContent() {
 
       <div className="space-y-8">
         <section>
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Đối tác vận chuyển</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Phương thức giao hàng</h3>
           <p className="text-gray-600 leading-relaxed mb-6">
-            ReTrade hợp tác với các đơn vị vận chuyển uy tín để đảm bảo hàng hóa được giao đến tay
-            bạn một cách an toàn và nhanh chóng:
+            Trên ReTrade, người bán chịu trách nhiệm giao hàng trực tiếp đến người mua.
+            Điều này giúp tạo ra sự linh hoạt và tiết kiệm chi phí cho cả hai bên:
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
               <div className="w-12 h-12 bg-blue-500 rounded-lg mx-auto mb-3 flex items-center justify-center">
                 <Truck className="w-6 h-6 text-white" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Giao Hàng Nhanh</h4>
-              <p className="text-gray-600 text-sm">Giao hàng trong ngày tại TP.HCM và Hà Nội</p>
+              <h4 className="font-semibold text-gray-800 mb-2">Giao hàng tận nơi</h4>
+              <p className="text-gray-600 text-sm">Người bán giao hàng trực tiếp đến địa chỉ của bạn</p>
             </div>
             <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
               <div className="w-12 h-12 bg-green-500 rounded-lg mx-auto mb-3 flex items-center justify-center">
                 <Truck className="w-6 h-6 text-white" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Viettel Post</h4>
-              <p className="text-gray-600 text-sm">Phủ sóng toàn quốc, giao hàng tận nơi</p>
+              <h4 className="font-semibold text-gray-800 mb-2">Hẹn gặp trực tiếp</h4>
+              <p className="text-gray-600 text-sm">Thỏa thuận địa điểm gặp mặt thuận tiện cho cả hai bên</p>
             </div>
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 text-center">
               <div className="w-12 h-12 bg-orange-500 rounded-lg mx-auto mb-3 flex items-center justify-center">
                 <Truck className="w-6 h-6 text-white" />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">J&T Express</h4>
-              <p className="text-gray-600 text-sm">Giao hàng nhanh chóng, theo dõi realtime</p>
+              <h4 className="font-semibold text-gray-800 mb-2">Dịch vụ ship</h4>
+              <p className="text-gray-600 text-sm">Người bán có thể sử dụng dịch vụ ship theo thỏa thuận</p>
             </div>
           </div>
         </section>
 
         <section>
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">2. Thời gian giao hàng</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300 rounded-lg">
-              <thead>
-                <tr className="bg-orange-50">
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">
-                    Khu vực
-                  </th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">
-                    Thời gian giao hàng
-                  </th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">
-                    Phí vận chuyển
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-gray-300 px-4 py-3">Nội thành TP.HCM, Hà Nội</td>
-                  <td className="border border-gray-300 px-4 py-3">1-2 ngày</td>
-                  <td className="border border-gray-300 px-4 py-3 text-green-600 font-medium">
-                    15,000 - 25,000đ
-                  </td>
-                </tr>
-                <tr className="bg-gray-50">
-                  <td className="border border-gray-300 px-4 py-3">Các tỉnh thành khác</td>
-                  <td className="border border-gray-300 px-4 py-3">2-4 ngày</td>
-                  <td className="border border-gray-300 px-4 py-3 text-orange-600 font-medium">
-                    20,000 - 35,000đ
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-gray-300 px-4 py-3">Vùng sâu, vùng xa</td>
-                  <td className="border border-gray-300 px-4 py-3">3-7 ngày</td>
-                  <td className="border border-gray-300 px-4 py-3 text-red-600 font-medium">
-                    30,000 - 50,000đ
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p className="text-gray-500 text-sm mt-4">
-            * Thời gian giao hàng có thể thay đổi tùy thuộc vào điều kiện thời tiết và tình hình
-            giao thông.
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">2. Thời gian và phí giao hàng</h3>
+          <p className="text-gray-600 leading-relaxed mb-6">
+            Thời gian và phí giao hàng được thỏa thuận trực tiếp giữa người mua và người bán.
+            ReTrade khuyến khích các bên thảo luận rõ ràng về các điều khoản này trước khi hoàn tất giao dịch.
           </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h4 className="font-semibold text-blue-800 mb-3">⏰ Thời gian giao hàng</h4>
+              <ul className="text-blue-700 space-y-2 text-sm">
+                <li>• Được thỏa thuận giữa người mua và người bán</li>
+                <li>• Thường từ 1-3 ngày tùy theo khoảng cách</li>
+                <li>• Có thể giao ngay nếu gặp trực tiếp</li>
+                <li>• Linh hoạt theo lịch trình của cả hai bên</li>
+              </ul>
+            </div>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+              <h4 className="font-semibold text-green-800 mb-3">💰 Phí giao hàng</h4>
+              <ul className="text-green-700 space-y-2 text-sm">
+                <li>• Miễn phí nếu gặp trực tiếp</li>
+                <li>• Chi phí ship thực tế nếu sử dụng dịch vụ</li>
+                <li>• Có thể thỏa thuận chia sẻ chi phí</li>
+                <li>• Hiển thị rõ ràng trong thông tin sản phẩm</li>
+              </ul>
+            </div>
+          </div>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
+            <p className="text-yellow-800 text-sm">
+              <strong>💡 Lưu ý:</strong> ReTrade khuyến khích người mua và người bán thỏa thuận rõ ràng về
+              thời gian, địa điểm và phí giao hàng trước khi xác nhận đơn hàng để tránh hiểu lầm.
+            </p>
+          </div>
         </section>
 
         <section>
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">3. Phí vận chuyển</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">3. Trách nhiệm của các bên</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-              <h4 className="font-semibold text-green-800 mb-3">🎉 Miễn phí vận chuyển</h4>
+              <h4 className="font-semibold text-green-800 mb-3">👤 Trách nhiệm người bán</h4>
               <ul className="text-green-700 space-y-2 text-sm">
-                <li>• Đơn hàng từ 500,000đ trở lên</li>
-                <li>• Thành viên VIP (mua từ 10 đơn hàng)</li>
-                <li>• Các chương trình khuyến mãi đặc biệt</li>
+                <li>• Đóng gói sản phẩm cẩn thận, an toàn</li>
+                <li>• Giao hàng đúng thời gian đã thỏa thuận</li>
+                <li>• Thông báo kịp thời nếu có thay đổi</li>
+                <li>• Đảm bảo sản phẩm đúng như mô tả</li>
               </ul>
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h4 className="font-semibold text-blue-800 mb-3">💰 Phí vận chuyển tiêu chuẩn</h4>
+              <h4 className="font-semibold text-blue-800 mb-3">� Trách nhiệm người mua</h4>
               <ul className="text-blue-700 space-y-2 text-sm">
-                <li>• Tính theo khoảng cách và trọng lượng</li>
-                <li>• Hiển thị rõ ràng trước khi thanh toán</li>
-                <li>• Có thể thay đổi tùy theo khuyến mãi</li>
+                <li>• Cung cấp địa chỉ nhận hàng chính xác</li>
+                <li>• Có mặt tại thời gian đã hẹn</li>
+                <li>• Kiểm tra hàng hóa khi nhận</li>
+                <li>• Thanh toán đúng số tiền đã thỏa thuận</li>
               </ul>
             </div>
           </div>
@@ -592,7 +580,7 @@ function ShippingPolicyContent() {
               <div>
                 <h5 className="font-semibold text-gray-800">Xác nhận đơn hàng</h5>
                 <p className="text-gray-600 text-sm">
-                  Người bán xác nhận và chuẩn bị hàng trong vòng 24 giờ
+                  Người bán xác nhận đơn hàng và thỏa thuận thời gian, địa điểm giao hàng
                 </p>
               </div>
             </div>
@@ -601,9 +589,9 @@ function ShippingPolicyContent() {
                 2
               </div>
               <div>
-                <h5 className="font-semibold text-gray-800">Bàn giao vận chuyển</h5>
+                <h5 className="font-semibold text-gray-800">Chuẩn bị hàng hóa</h5>
                 <p className="text-gray-600 text-sm">
-                  Hàng được bàn giao cho đơn vị vận chuyển và bạn nhận mã tracking
+                  Người bán đóng gói cẩn thận và chuẩn bị giao hàng theo thỏa thuận
                 </p>
               </div>
             </div>
@@ -612,9 +600,9 @@ function ShippingPolicyContent() {
                 3
               </div>
               <div>
-                <h5 className="font-semibold text-gray-800">Theo dõi đơn hàng</h5>
+                <h5 className="font-semibold text-gray-800">Giao hàng</h5>
                 <p className="text-gray-600 text-sm">
-                  Theo dõi tình trạng giao hàng realtime qua app hoặc website
+                  Người bán giao hàng trực tiếp hoặc qua dịch vụ ship đã thỏa thuận
                 </p>
               </div>
             </div>
@@ -625,7 +613,7 @@ function ShippingPolicyContent() {
               <div>
                 <h5 className="font-semibold text-gray-800">Nhận hàng và xác nhận</h5>
                 <p className="text-gray-600 text-sm">
-                  Kiểm tra hàng hóa và xác nhận hoàn thành đơn hàng
+                  Người mua kiểm tra hàng hóa và xác nhận hoàn thành giao dịch
                 </p>
               </div>
             </div>
@@ -636,11 +624,12 @@ function ShippingPolicyContent() {
           <h3 className="text-xl font-semibold text-gray-800 mb-4">5. Lưu ý quan trọng</h3>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
             <ul className="text-yellow-800 space-y-2">
-              <li>• Vui lòng cung cấp địa chỉ giao hàng chính xác và đầy đủ</li>
-              <li>• Đảm bảo có người nhận hàng trong khung giờ giao hàng</li>
-              <li>• Kiểm tra kỹ hàng hóa trước khi ký nhận</li>
-              <li>• Liên hệ ngay với ReTrade nếu có vấn đề về giao hàng</li>
-              <li>• Lưu giữ biên lai giao hàng để đối chiếu khi cần thiết</li>
+              <li>• Thỏa thuận rõ ràng về thời gian, địa điểm và phí giao hàng trước khi mua</li>
+              <li>• Cung cấp thông tin liên hệ chính xác để người bán có thể liên lạc</li>
+              <li>• Kiểm tra kỹ hàng hóa ngay khi nhận và báo ngay nếu có vấn đề</li>
+              <li>• Giữ liên lạc với người bán trong suốt quá trình giao dịch</li>
+              <li>• Liên hệ ReTrade nếu gặp tranh chấp không thể giải quyết</li>
+              <li>• Đánh giá trung thực về người bán sau khi hoàn thành giao dịch</li>
             </ul>
           </div>
         </section>
