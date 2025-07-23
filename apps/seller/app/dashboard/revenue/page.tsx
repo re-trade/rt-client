@@ -1,10 +1,13 @@
 'use client';
+import { SelectBank } from '@/components/common/SelectBank';
 import { WithdrawDialog } from '@/components/common/WithdrawDialog';
 import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -20,37 +23,36 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Input,
-} from '@/components/ui/input';
-import {
-  Label,
-} from '@/components/ui/label';
 import { revenueApi, RevenueResponse, RevenueStatsResponse } from '@/service/revenue.api';
 import { snipppetCode } from '@/service/snippetCode';
-import { walletApi, WalletResponse, BankResponse, CreateBankInfor, BankInfor } from '@/service/wallet.api';
+import {
+  BankInfor,
+  BankResponse,
+  CreateBankInfor,
+  walletApi,
+  WalletResponse,
+} from '@/service/wallet.api';
 import {
   ArrowUpRight,
   Banknote,
+  Building2,
   CheckCircle,
   Clock,
   CreditCard,
   DollarSign,
   Download,
+  Edit,
   Eye,
   Filter,
   Package,
+  Plus,
   ShoppingCart,
+  Trash2,
   TrendingUp,
   Wallet,
   XCircle,
-  Plus,
-  Edit,
-  Trash2,
-  Building2,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { SelectBank } from '@/components/common/SelectBank';
 
 interface WithdrawData {
   id: string;
@@ -60,7 +62,6 @@ interface WithdrawData {
   status: 'pending' | 'completed' | 'failed';
   bankInfo?: string;
 }
-
 
 export default function RevenueManagement() {
   const [revenueData, setRevenueData] = useState<RevenueResponse[]>([]);
@@ -189,7 +190,6 @@ export default function RevenueManagement() {
   const handleAddBank = async () => {
     if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
       try {
-
         const addedBank = await walletApi.createBankInfor(newBankInfo);
         if (addedBank) {
           setBankAccounts((prev) => [
@@ -224,7 +224,7 @@ export default function RevenueManagement() {
 
         setBankAccounts([...bankAccounts, newBank]);
         // setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '', isDefault: false });
-         setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: ''});
+        setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
         setIsAddingBank(false);
       } catch (error) {
         console.error('Error adding bank:', error);
@@ -245,16 +245,21 @@ export default function RevenueManagement() {
   };
 
   const handleUpdateBank = async () => {
-    if (editingBank && newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
+    if (
+      editingBank &&
+      newBankInfo.bankName &&
+      newBankInfo.accountNumber &&
+      newBankInfo.userBankName
+    ) {
       try {
         // Call API to update bank
         // await walletApi.updateBankInfo(editingBank.id, newBankInfo);
 
-        setBankAccounts(bankAccounts.map(bank =>
-          bank.id === editingBank.id
-            ? { ...bank, ...newBankInfo }
-            : bank
-        ));
+        setBankAccounts(
+          bankAccounts.map((bank) =>
+            bank.id === editingBank.id ? { ...bank, ...newBankInfo } : bank,
+          ),
+        );
         setEditingBank(null);
         // setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', isDefault: false, bankBin: '' });
         setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
@@ -270,7 +275,7 @@ export default function RevenueManagement() {
       // Call API to delete bank
       // await walletApi.deleteBankInfo(bankId);
 
-      setBankAccounts(bankAccounts.filter(bank => bank.id !== bankId));
+      setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankId));
     } catch (error) {
       console.error('Error deleting bank:', error);
     }
@@ -281,10 +286,12 @@ export default function RevenueManagement() {
       // Call API to set default bank
       // await walletApi.setDefaultBank(bankId);
 
-      setBankAccounts(bankAccounts.map(bank => ({
-        ...bank,
-        // isDefault: bank.id === bankId,
-      })));
+      setBankAccounts(
+        bankAccounts.map((bank) => ({
+          ...bank,
+          // isDefault: bank.id === bankId,
+        })),
+      );
     } catch (error) {
       console.error('Error setting default bank:', error);
     }
@@ -294,18 +301,20 @@ export default function RevenueManagement() {
     setIsAddingBank(false);
     setEditingBank(null);
     // setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', isDefault: false, bankBin: '' });
-    setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '',  bankBin: '' });
+    setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
   };
 
-  const handleBankSelect = (selectedBank: { id: string; name: string; code: string; bin: string } | null) => {
+  const handleBankSelect = (
+    selectedBank: { id: string; name: string; code: string; bin: string } | null,
+  ) => {
     if (selectedBank) {
-      setNewBankInfo(prev => ({
+      setNewBankInfo((prev) => ({
         ...prev,
         bankName: selectedBank.name,
         bankBin: selectedBank.bin,
       }));
     } else {
-      setNewBankInfo(prev => ({
+      setNewBankInfo((prev) => ({
         ...prev,
         bankName: '',
         bankBin: '',
@@ -456,28 +465,31 @@ export default function RevenueManagement() {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('revenue')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'revenue'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'revenue'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Chi tiết doanh thu
               </button>
               <button
                 onClick={() => setActiveTab('bank')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'bank'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'bank'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Thông tin ngân hàng
               </button>
               <button
                 onClick={() => setActiveTab('withdraw')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'withdraw'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'withdraw'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Lịch sử rút tiền
               </button>
@@ -615,10 +627,7 @@ export default function RevenueManagement() {
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold">Thông tin ngân hàng</h3>
-                  <Button
-                    onClick={() => setIsAddingBank(true)}
-                    className="flex items-center gap-2"
-                  >
+                  <Button onClick={() => setIsAddingBank(true)} className="flex items-center gap-2">
                     <Plus className="h-4 w-4" />
                     Thêm tài khoản
                   </Button>
@@ -630,17 +639,16 @@ export default function RevenueManagement() {
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Building2 className="h-5 w-5" />
-                        {editingBank ? 'Chỉnh sửa tài khoản ngân hàng' : 'Thêm tài khoản ngân hàng mới'}
+                        {editingBank
+                          ? 'Chỉnh sửa tài khoản ngân hàng'
+                          : 'Thêm tài khoản ngân hàng mới'}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="bankName">Tên ngân hàng *</Label>
-                          <SelectBank
-                            value={newBankInfo.bankBin}
-                            onChange={handleBankSelect}
-                          />
+                          <SelectBank value={newBankInfo.bankBin} onChange={handleBankSelect} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="accountNumber">Số tài khoản *</Label>
@@ -648,7 +656,9 @@ export default function RevenueManagement() {
                             id="accountNumber"
                             placeholder="Ví dụ: 1234567890"
                             value={newBankInfo.accountNumber}
-                            onChange={(e) => setNewBankInfo({ ...newBankInfo, accountNumber: e.target.value })}
+                            onChange={(e) =>
+                              setNewBankInfo({ ...newBankInfo, accountNumber: e.target.value })
+                            }
                           />
                         </div>
                         <div className="space-y-2">
@@ -657,7 +667,12 @@ export default function RevenueManagement() {
                             id="userBankName"
                             placeholder="Ví dụ: NGUYEN VAN A"
                             value={newBankInfo.userBankName}
-                            onChange={(e) => setNewBankInfo({ ...newBankInfo, userBankName: e.target.value.toUpperCase() })}
+                            onChange={(e) =>
+                              setNewBankInfo({
+                                ...newBankInfo,
+                                userBankName: e.target.value.toUpperCase(),
+                              })
+                            }
                           />
                         </div>
                       </div>
@@ -692,7 +707,9 @@ export default function RevenueManagement() {
                             </div>
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
-                                <h4 className="text-lg font-semibold text-gray-900">{bank.bankName}</h4>
+                                <h4 className="text-lg font-semibold text-gray-900">
+                                  {bank.bankName}
+                                </h4>
                                 {/* {bank.isDefault && (
                                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                                     Mặc định
@@ -829,7 +846,6 @@ export default function RevenueManagement() {
                 )}
               </div>
             )}
-
           </div>
         </div>
 
