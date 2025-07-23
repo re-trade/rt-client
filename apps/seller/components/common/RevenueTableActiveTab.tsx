@@ -20,6 +20,7 @@ import { revenueApi, RevenueResponse } from '@/service/revenue.api';
 import { snipppetCode } from '@/service/snippetCode';
 import { CheckCircle, Clock, Eye, Filter, Package, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
 
 export function RevenueTableActiveTab() {
   const [revenueData, setRevenueData] = useState<RevenueResponse[]>([]);
@@ -211,6 +212,11 @@ export function RevenueTableActiveTab() {
             ))}
           </TableBody>
         </Table>
+                <RevenueDetailDialog
+                  open={isDetailOpen}
+                  onOpenChange={setIsDetailOpen}
+                  revenue={selectedRevenue}
+                />
       </div>
     </div>
   );
