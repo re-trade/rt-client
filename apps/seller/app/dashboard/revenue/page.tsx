@@ -2,43 +2,23 @@
 import { BankInfoActiveTab } from '@/components/common/BankInfoActiveTab';
 import { RevenueTableActiveTab } from '@/components/common/RevenueTableActiveTab';
 import { WithdrawDialog } from '@/components/common/WithdrawDialog';
-import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
+import { WithdrawHistoryActiveTab } from '@/components/common/WithdrawHistoryActivetab';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { revenueApi, RevenueResponse, RevenueStatsResponse } from '@/service/revenue.api';
-import {
-  BankInfor,
-  BankResponse,
-  CreateBankInfor,
-  walletApi,
-  WalletResponse,
-} from '@/service/wallet.api';
+import { revenueApi, RevenueStatsResponse } from '@/service/revenue.api';
+import { walletApi, WalletResponse } from '@/service/wallet.api';
 import {
   ArrowUpRight,
   Banknote,
-  Building2,
-  CheckCircle,
-  Clock,
-  CreditCard,
   DollarSign,
   Download,
   Package,
   ShoppingCart,
   TrendingUp,
   Wallet,
-  XCircle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { WithdrawHistoryActiveTab } from '@/components/common/WithdrawHistoryActivetab';
 
 export default function RevenueManagement() {
   const [revenueStats, setRevenueStats] = useState<RevenueStatsResponse>({
@@ -52,16 +32,13 @@ export default function RevenueManagement() {
   const [activeTab, setActiveTab] = useState('revenue');
   const [wallet, setWallet] = useState<WalletResponse>();
 
-
-
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [stats, wallet,] = await Promise.all([
+        const [stats, wallet] = await Promise.all([
           revenueApi.getRevenuStatsBySeller(),
           walletApi.getWalletBySeller(),
-
         ]);
         setWallet(wallet);
         setRevenueStats(stats);
@@ -72,7 +49,6 @@ export default function RevenueManagement() {
 
     fetchData();
   }, []);
-
 
   const handleWithdraw = (amount: number, method: string, bankInfo?: string) => {
     console.log('Rút tiền:', { amount, method, bankInfo });
@@ -188,28 +164,31 @@ export default function RevenueManagement() {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('revenue')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'revenue'
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'revenue'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                }`}
               >
                 Chi tiết doanh thu
               </button>
               <button
                 onClick={() => setActiveTab('bank')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'bank'
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'bank'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                }`}
               >
                 Thông tin ngân hàng
               </button>
               <button
                 onClick={() => setActiveTab('withdraw')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'withdraw'
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'withdraw'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                }`}
               >
                 Lịch sử rút tiền
               </button>
