@@ -1,4 +1,5 @@
 'use client';
+import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -211,6 +212,11 @@ export function RevenueTableActiveTab() {
             ))}
           </TableBody>
         </Table>
+        <RevenueDetailDialog
+          open={isDetailOpen}
+          onOpenChange={setIsDetailOpen}
+          revenue={selectedRevenue}
+        />
       </div>
     </div>
   );
