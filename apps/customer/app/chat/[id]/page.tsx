@@ -5,11 +5,12 @@ import { CallInterface } from '@components/chat/CallInterface';
 import { ChatHeader } from '@components/chat/ChatHeader';
 import { MessageInput } from '@components/chat/MessageInput';
 import { MessagesList } from '@components/chat/MessagesList';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
 export default function MessageDetailPage() {
   const params = useParams();
+  const pathname = usePathname();
   const chatId = params.id as string;
 
   const {
@@ -96,14 +97,20 @@ export default function MessageDetailPage() {
     );
   }
 
+  const isOnSpecificChatPage = pathname.startsWith('/chat/') && pathname !== '/chat';
+
   return (
-    <div className="flex-1 flex flex-col">
+    <div
+      className={`${isOnSpecificChatPage ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-white h-full`}
+    >
       <ChatHeader
         contact={selectedContact}
         onAudioCall={startAudioCall}
         onVideoCall={startVideoCall}
       />
-      <MessagesList messages={messages} />
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <MessagesList messages={messages} />
+      </div>
       <MessageInput
         message={newMessage}
         onMessageChange={handleMessageChange}
