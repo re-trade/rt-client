@@ -127,17 +127,6 @@ const CustomerDetailModal = ({
 }) => {
   if (!customer) return null;
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'true':
-        return 'Hoạt động';
-      case 'false':
-        return 'Không hoạt động';
-      default:
-        return status;
-    }
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
