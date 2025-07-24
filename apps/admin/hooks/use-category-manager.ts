@@ -33,7 +33,6 @@ export function useCategoryManager() {
     }
   }, []);
 
-
   const handleCreate = useCallback(
     async (data: {
       name: string;
