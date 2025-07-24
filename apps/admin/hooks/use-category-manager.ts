@@ -6,11 +6,10 @@ import {
 } from '@/services/category.api';
 import { useCallback, useState } from 'react';
 
-// Đảm bảo mọi trường của Category đều đúng type, đặc biệt là description luôn là string
 const normalizeCategory = (cat: any): Category => ({
   ...cat,
   description: typeof cat.description === 'string' ? cat.description : '',
-  categoryParentId: cat.parentId ?? null,
+  parentId: cat.parentId ?? null,
   parentName: cat.parentName ?? null,
   children: Array.isArray(cat.children) ? cat.children.map(normalizeCategory) : null,
 });
@@ -20,7 +19,6 @@ export function useCategoryManager() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Lấy toàn bộ danh mục (bao gồm cả visible=false)
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -35,7 +33,7 @@ export function useCategoryManager() {
     }
   }, []);
 
-  // Thêm mới
+
   const handleCreate = useCallback(
     async (data: {
       name: string;
