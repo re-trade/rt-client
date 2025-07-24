@@ -401,40 +401,11 @@ const ProductDetailModal = ({
   );
 };
 
-const ProductActions = ({ product, onVerify, onReject, onView, onEdit, onDelete }: any) => {
+const ProductActions = ({ product, onView }: any) => {
   return (
     <div className="flex items-center space-x-2">
       <Button variant="ghost" size="icon" onClick={() => onView(product)}>
         <Eye className="h-4 w-4" />
-      </Button>
-
-      {!product.verified && (
-        <>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onVerify(product.id)}
-            className="text-green-600 hover:text-green-700"
-          >
-            <CheckCircle className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onReject(product.id)}
-            className="text-red-600 hover:text-red-700"
-          >
-            <XCircle className="h-4 w-4" />
-          </Button>
-        </>
-      )}
-
-      <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>
-        <Edit className="h-4 w-4" />
-      </Button>
-
-      <Button variant="ghost" size="icon" onClick={() => onDelete(product.id)}>
-        <Trash2 className="h-4 w-4" />
       </Button>
     </div>
   );
@@ -834,14 +805,7 @@ export default function ProductManagementPage() {
                       {new Date(product.createdAt).toLocaleDateString('vi-VN')}
                     </TableCell>
                     <TableCell className="text-center min-w-[120px]">
-                      <ProductActions
-                        product={product}
-                        onVerify={handleVerify}
-                        onReject={handleReject}
-                        onView={handleView}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                      />
+                      <ProductActions product={product} onView={handleView} />
                     </TableCell>
                   </TableRow>
                 ))}

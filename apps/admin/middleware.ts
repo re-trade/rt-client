@@ -7,7 +7,6 @@ export function middleware(request: NextRequest) {
 
   if (!token || role !== 'ROLE_ADMIN') {
 
-
   }
 
   return NextResponse.next();
