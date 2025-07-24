@@ -20,16 +20,13 @@ const getCustomers = async (
   query?: string,
 ): Promise<IResponseObject<TCustomerProfile[]> | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TCustomerProfile[]>>(
-      `/customers`,
-      {
-        params: {
-          page,
-          size,
-          ...(query ? { q: query } : {}),
-        },
+    const result = await authApi.default.get<IResponseObject<TCustomerProfile[]>>(`/customers`, {
+      params: {
+        page,
+        size,
+        ...(query ? { q: query } : {}),
       },
-    );
+    });
     if (result.data.success && result.status === 200) {
       return result.data;
     }

@@ -1,100 +1,109 @@
 'use client';
 
-import { acceptReport, getReports, TReportSellerProfile } from '@/services/report.seller.api';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TReportSellerProfile, getReports, acceptReport, rejectReport } from '@/services/report.seller.api';
+import { useCallback, useEffect, useState } from 'react';
 
-const useReportSellerManager = () => {
+const useReportSeller = () => {
   const [reports, setReports] = useState<TReportSellerProfile[]>([]);
-  const [page, setPage] = useState<number>(0);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
+  const [maxPage, setMaxPage] = useState<number>(1);
+  const [totalReports, setTotalReports] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState<number>(0);
   const pageSize = 10;
 
-  const fetchReport = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await getReports(page, pageSize, searchQuery);
-      if (result?.success) {
-        setReports(result.content || []);
-        setTotal(result.content?.length || 0);
-      } else {
+  const fethReports = useCallback(
+    async (searchQuery?: string, customPage?: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getReports((customPage ?? page) - 1, pageSize, searchQuery);
+
+        if (response && response.success) {
+          setReports(response.content || []);
+          setMaxPage(response.pagination?.totalPages ?? 1);
+          setTotalReports(response.pagination?.totalElements ?? response.content?.length ?? 0);
+        } else {
+          setReports([]);
+          setMaxPage(1);
+          setTotalReports(0);
+          setError(response?.message || 'Fail to get reports');
+        }
+      } catch (err) {
         setReports([]);
-        setTotal(0);
+        setMaxPage(1);
+        setTotalReports(0);
+        setError(err instanceof Error ? err.message : 'Fail to get reports');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch reports');
-      setReports([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, searchQuery]);
+    },
+    [page],
+  );
 
-  //   const handleBanSeller = useCallback(
-  //     async (id: string) => {
-  //       try {
-  //         const result = await appro(id);
-  //         if (result?.success) {
-  //           await fetchSeller();
-  //           return true;
-  //         }
-  //         setError('Failed to ban seller');
-  //         return false;
-  //       } catch (err) {
-  //         setError(err instanceof Error ? err.message : 'Failed to ban seller');
-  //         return false;
-  //       }
-  //     },
-  //      [fetchReport],
-  //   );
+  useEffect(() => {
+    fethReports();
+  }, [fethReports]);
 
-  const handleApproveReport = useCallback(
+  const refetch = () => fethReports();
+  const goToPage = (newPage: number, searchQuery?: string) => {
+    setPage(newPage);
+    fethReports(searchQuery, newPage);
+  };
+  const searchReports = (searchQuery: string) => {
+    setPage(1);
+    fethReports(searchQuery, 1);
+  };
+
+  const handleAccept = useCallback(
     async (id: string) => {
       try {
         const result = await acceptReport(id);
         if (result?.success) {
-          await fetchReport();
+          await fethReports();
           return true;
         }
-        setError('Failed to unban seller');
+        setError('Failed to accept report');
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to unban seller');
+        setError(err instanceof Error ? err.message : 'Failed to accept report');
         return false;
       }
     },
-    [fetchReport],
+    [fethReports],
   );
 
-  useEffect(() => {
-    fetchReport();
-  }, [fetchReport]);
-
-  const stats = useMemo(
-    () => ({
-      total: total,
-      accepted: reports?.filter((report) => report.resolutionStatus === 'ACCEPT')?.length || 0,
-      rejected: reports?.filter((report) => report.resolutionStatus === 'REJECT')?.length || 0,
-      pending: reports?.filter((report) => report.resolutionStatus === null)?.length || 0,
-    }),
-    [reports, total],
+  const handleReject = useCallback(
+    async (id: string) => {
+      try {
+        const result = await rejectReport(id);
+        if (result?.success) {
+          await fethReports();
+          return true;
+        }
+        setError('Failed to reject report');
+        return false;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to reject report');
+        return false;
+      }
+    },
+    [fethReports],
   );
 
   return {
-    page,
-    setPage,
     reports,
+    page,
+    maxPage,
+    totalReports,
     loading,
     error,
-    searchQuery,
-    setSearchQuery,
-    pageSize,
-    stats,
-    refresh: fetchReport,
-    approveReport: handleApproveReport,
+    refetch,
+    goToPage,
+    searchReports,
+    acceptReport,
+    rejectReport,
   };
 };
 
-export { useReportSellerManager };
+export { useReportSeller };

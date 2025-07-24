@@ -127,16 +127,6 @@ const CustomerDetailModal = ({
 }) => {
   if (!customer) return null;
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'true':
-        return 'Hoạt động';
-      case 'false':
-        return 'Không hoạt động';
-      default:
-        return status;
-    }
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -417,48 +407,47 @@ export default function CustomerManagementPage() {
           ) : (
             <Table>
               <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Họ</TableHead>
-                <TableHead>Tên</TableHead>
-                <TableHead>Địa chỉ</TableHead>
-                <TableHead>Liên hệ</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead className="text-right">Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Họ</TableHead>
+                  <TableHead>Tên</TableHead>
+                  <TableHead>Địa chỉ</TableHead>
+                  <TableHead>Liên hệ</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead className="text-right">Thao tác</TableHead>
+                </TableRow>
+              </TableHeader>
 
               <TableBody>
                 {filteredCustomers.map((customer) => (
-                   <TableRow key={customer.id}>
-                  <TableCell className="font-medium">{customer.id}</TableCell>
+                  <TableRow key={customer.id}>
+                    <TableCell className="font-medium">{customer.id}</TableCell>
 
-                  <TableCell className="font-medium">{customer.firstName}</TableCell>
-                  <TableCell>{customer.lastName}</TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div>{customer.address}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div>{customer.phone}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(customer.enabled)]}`}
-                    >
-                      {statusLabels[String(customer.enabled)]}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm" onClick={() => handleView(customer)}>
-                      Chi tiết
-                    </Button>
-                  </TableCell>
-                </TableRow>
-
+                    <TableCell className="font-medium">{customer.firstName}</TableCell>
+                    <TableCell>{customer.lastName}</TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div>{customer.address}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div>{customer.phone}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(customer.enabled)]}`}
+                      >
+                        {statusLabels[String(customer.enabled)]}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" onClick={() => handleView(customer)}>
+                        Chi tiết
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>

@@ -1,7 +1,7 @@
 import { authApi, IResponseObject } from '@retrade/util';
 
 export type TReportSellerProfile = {
-  id: string;
+  reportSellerId: string;
   customerId: string;
   productId: string;
   orderId: string;
@@ -40,11 +40,14 @@ const getReports = async (
   }
 };
 
-const acceptReport = async (id: string): Promise<IResponseObject<null> | undefined> => {
-  const result = await authApi.default.put<IResponseObject<null>>(`/report-seller/${id}`);
-  if (result.data.success) {
-    return result.data;
-  } else return undefined;
-};
+  const acceptReport = async (id: string): Promise<IResponseObject<null>> => {
+    const response = await authApi.default.patch<IResponseObject<null>>(`/report-seller/accept/${id}`);
+    return response.data;
+  };
 
-export { acceptReport, getReports };
+ const rejectReport = async (id: string): Promise<IResponseObject<null>> => {
+    const response = await authApi.default.patch<IResponseObject<null>>(`/report-seller/reject/${id}`);
+    return response.data;
+  };
+
+export { acceptReport, getReports, rejectReport };

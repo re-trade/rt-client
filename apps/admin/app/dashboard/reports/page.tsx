@@ -61,7 +61,6 @@ function useReportManager() {
 
   useEffect(() => {
     fetchReports(page);
-    // eslint-disable-next-line
   }, [page, size]);
 
   const goToPage = (p: number) => {
@@ -81,7 +80,6 @@ function useReportManager() {
   };
 }
 
-// Modal xem chi tiết report
 function ReportDetailModal({
   report,
   isOpen,
