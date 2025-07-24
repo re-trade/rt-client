@@ -395,7 +395,7 @@ export default function ReportManagementPage() {
           ) : reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
               <Package className="h-12 w-12 mb-4" />
-              <p>Không tìm thấy tố csaso</p>
+              <p>Không tìm thấy tố cáo</p>
               <p className="text-sm">Thử điều chỉnh bộ lọc hoặc tìm kiếm</p>
             </div>
           ) : (
