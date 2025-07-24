@@ -11,8 +11,10 @@ RUN turbo prune @retrade/rt-client-seller --docker
 FROM base AS installer
 WORKDIR /installer
 ARG API_BASE_URL
+ARG SOCKET_URL
 ARG NODE_ENV
 ENV NEXT_PUBLIC_API_BASE_URL=${API_BASE_URL}
+ENV NEXT_PUBLIC_SOCKET_URL=${SOCKET_URL}
 ENV NEXT_PUBLIC_NODE_ENV=${NODE_ENV}
 COPY --from=builder /build/out/json/ ./
 RUN yarn install --production=false
