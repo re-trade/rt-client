@@ -1,8 +1,8 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { BankInfor, BankResponse, walletApi } from '@/service/wallet.api';
 import { Building2, CreditCard, Plus } from 'lucide-react';
-import { walletApi, BankInfor, BankResponse } from '@/service/wallet.api';
 import { useEffect, useState } from 'react';
 
 interface SelectBankInfoProps {
@@ -101,9 +101,7 @@ export function SelectBankInfo({ onCloseWithdrawDialog, onOpenAddBankForm }: Sel
         <Card className="border-dashed border-2 border-gray-300">
           <CardContent className="p-12 text-center">
             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Chưa có tài khoản ngân hàng
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Chưa có tài khoản ngân hàng</h3>
             <p className="text-gray-500 mb-4">
               Thêm tài khoản ngân hàng để có thể rút tiền dễ dàng hơn
             </p>

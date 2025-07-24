@@ -171,28 +171,31 @@ export default function RevenueManagement() {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('revenue')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'revenue'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'revenue'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Chi tiết doanh thu
               </button>
               <button
                 onClick={() => setActiveTab('bank')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'bank'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'bank'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Thông tin ngân hàng
               </button>
               <button
                 onClick={() => setActiveTab('withdraw')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'withdraw'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'withdraw'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
               >
                 Lịch sử rút tiền
               </button>
@@ -218,7 +221,6 @@ export default function RevenueManagement() {
               </div>
             )}
           </div>
-
         </div>
 
         <WithdrawDialog
