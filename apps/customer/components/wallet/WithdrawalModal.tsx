@@ -1,4 +1,4 @@
-import BankSelectionModal from '@components/wallet/BankSelectionModal';
+import BankSelectionModal from '@/components/wallet/BankSelectionModal';
 import { BankResponse } from '@services/payment-method.api';
 import { CreateWithdrawalRequest } from '@services/wallet.api';
 import { FormEvent } from 'react';
@@ -18,7 +18,6 @@ interface WithdrawalModalProps {
   setBankModalOpen: (open: boolean) => void;
   bankSearch: string;
   setBankSearch: (search: string) => void;
-  banks: BankResponse[];
   balance: number;
   processingWithdrawal: boolean;
   onSubmit: (data: CreateWithdrawalRequest) => Promise<boolean>;
@@ -40,7 +39,6 @@ const WithdrawalModal = ({
   setBankModalOpen,
   bankSearch,
   setBankSearch,
-  banks,
   balance,
   processingWithdrawal,
   onSubmit,
@@ -119,9 +117,9 @@ const WithdrawalModal = ({
               >
                 {selectedBank ? (
                   <div className="flex items-center">
-                    {(selectedBank.logo || selectedBank.url) && (
+                    {selectedBank.url && (
                       <img
-                        src={selectedBank.logo || selectedBank.url}
+                        src={selectedBank.url}
                         alt={selectedBank.name}
                         className="w-6 h-6 mr-2 object-contain"
                       />
@@ -232,7 +230,6 @@ const WithdrawalModal = ({
         setBankSearch={setBankSearch}
         selectedBank={selectedBank}
         setSelectedBank={setSelectedBank}
-        banks={banks}
       />
     </>
   );
