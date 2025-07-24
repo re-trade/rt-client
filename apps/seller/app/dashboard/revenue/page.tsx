@@ -31,7 +31,8 @@ export default function RevenueManagement() {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('revenue');
   const [wallet, setWallet] = useState<WalletResponse>();
-
+  // Trong RevenueManagement
+  console.log('Active tab:', activeTab);
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +54,12 @@ export default function RevenueManagement() {
   const handleWithdraw = (amount: number, method: string, bankInfo?: string) => {
     console.log('Rút tiền:', { amount, method, bankInfo });
     setIsWithdrawOpen(false);
+  };
+  const [isAddingBank, setIsAddingBank] = useState(false);
+  const handleOpenAddBankForm = () => {
+    setIsWithdrawOpen(false); // Đóng WithdrawDialog
+    setActiveTab('bank'); // Chuyển sang tab "Thông tin ngân hàng"
+    setIsAddingBank(true); // Mở form thêm tài khoản
   };
 
   return (
@@ -164,31 +171,28 @@ export default function RevenueManagement() {
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('revenue')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'revenue'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'revenue'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Chi tiết doanh thu
               </button>
               <button
                 onClick={() => setActiveTab('bank')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'bank'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'bank'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Thông tin ngân hàng
               </button>
               <button
                 onClick={() => setActiveTab('withdraw')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'withdraw'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'withdraw'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Lịch sử rút tiền
               </button>
@@ -196,11 +200,15 @@ export default function RevenueManagement() {
           </div>
 
           <div className="p-6">
-            <RevenueTableActiveTab />
+            {activeTab === 'revenue' && (
+              <div className="space-y-6">
+                <RevenueTableActiveTab />
+              </div>
+            )}
 
             {activeTab === 'bank' && (
               <div className="space-y-6">
-                <BankInfoActiveTab />
+                <BankInfoActiveTab isAddingBank={isAddingBank} setIsAddingBank={setIsAddingBank} />
               </div>
             )}
 
@@ -210,6 +218,7 @@ export default function RevenueManagement() {
               </div>
             )}
           </div>
+
         </div>
 
         <WithdrawDialog
