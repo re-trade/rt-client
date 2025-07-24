@@ -31,7 +31,8 @@ export default function RevenueManagement() {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('revenue');
   const [wallet, setWallet] = useState<WalletResponse>();
-
+  // Trong RevenueManagement
+  console.log('Active tab:', activeTab);
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +54,12 @@ export default function RevenueManagement() {
   const handleWithdraw = (amount: number, method: string, bankInfo?: string) => {
     console.log('Rút tiền:', { amount, method, bankInfo });
     setIsWithdrawOpen(false);
+  };
+  const [isAddingBank, setIsAddingBank] = useState(false);
+  const handleOpenAddBankForm = () => {
+    setIsWithdrawOpen(false); // Đóng WithdrawDialog
+    setActiveTab('bank'); // Chuyển sang tab "Thông tin ngân hàng"
+    setIsAddingBank(true); // Mở form thêm tài khoản
   };
 
   return (
@@ -196,11 +203,15 @@ export default function RevenueManagement() {
           </div>
 
           <div className="p-6">
-            <RevenueTableActiveTab />
+            {activeTab === 'revenue' && (
+              <div className="space-y-6">
+                <RevenueTableActiveTab />
+              </div>
+            )}
 
             {activeTab === 'bank' && (
               <div className="space-y-6">
-                <BankInfoActiveTab />
+                <BankInfoActiveTab isAddingBank={isAddingBank} setIsAddingBank={setIsAddingBank} />
               </div>
             )}
 

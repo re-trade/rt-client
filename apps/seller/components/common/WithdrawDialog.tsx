@@ -13,12 +13,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useState } from 'react';
+import { SelectBankInfo } from './SelectBankInfo';
 
 interface WithdrawDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   availableBalance: number;
   onWithdraw: (amount: string, method: string, bankInfo?: string) => void;
+  onOpenAddBankForm: () => void;
 }
 
 export function WithdrawDialog({
@@ -26,6 +28,7 @@ export function WithdrawDialog({
   onOpenChange,
   availableBalance,
   onWithdraw,
+  onOpenAddBankForm,
 }: WithdrawDialogProps) {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [withdrawMethod, setWithdrawMethod] = useState('');
@@ -85,11 +88,15 @@ export function WithdrawDialog({
           {withdrawMethod === 'bank' && (
             <div>
               <Label htmlFor="bankInfo">Thông tin tài khoản ngân hàng</Label>
-              <Input
+              {/* <Input
                 id="bankInfo"
                 placeholder="Số tài khoản - Tên ngân hàng"
                 value={bankInfo}
                 onChange={(e) => setBankInfo(e.target.value)}
+              /> */}
+              <SelectBankInfo
+                onCloseWithdrawDialog={() => onOpenChange(false)} // Đóng dialog
+                onOpenAddBankForm={onOpenAddBankForm} // Mở form thêm tài khoản
               />
             </div>
           )}
