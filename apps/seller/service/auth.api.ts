@@ -79,6 +79,18 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
   return undefined;
 };
 
+const logout = async (): Promise<boolean> => {
+  try {
+    const result = await authApi.default.get<IResponseObject<TAccountMeResponse>>('/auth/logout');
+    if (result.data.success && result.status === 200) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+};
+
 export const AuthSellerApi = {
   async register(): Promise<TSeller> {
     const response = await authApi.default.post<TSeller>('/auth/seller/register');
@@ -103,4 +115,4 @@ export const AuthSellerApi = {
   },
 };
 
-export { accountMe, loginInternal };
+export { accountMe, loginInternal, logout };

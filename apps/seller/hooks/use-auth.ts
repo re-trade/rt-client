@@ -1,26 +1,33 @@
 'use client';
-import { accountMe, loginInternal, TAccountMeResponse, TLocalLogin } from '@/service/auth.api';
+import {
+  accountMe,
+  loginInternal,
+  logout,
+  TAccountMeResponse,
+  TLocalLogin,
+} from '@/service/auth.api';
 import { ETokenName } from '@retrade/util';
 import { useCallback, useEffect, useState } from 'react';
 
 function useAuth() {
-  const [auth, setIsAuth] = useState<boolean | null>(null); // null = loading, false = not auth, true = auth
+  const [auth, setIsAuth] = useState<boolean | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [account, setAccount] = useState<TAccountMeResponse>();
 
   const checkAuth = useCallback(async () => {
     try {
-      // Check if token exists in localStorage first
       const token = localStorage.getItem(ETokenName.ACCESS_TOKEN);
-      if (!token) {
-        setIsAuth(false);
+      if (token) {
+        setIsAuth(true);
+        const response = await accountMe();
+        if (!response) {
+          localStorage.removeItem(ETokenName.ACCESS_TOKEN);
+          setIsAuth(false);
+        }
         return;
       }
-
       const response = await accountMe();
       if (!response) {
-        // Token exists but invalid, remove it
-        localStorage.removeItem(ETokenName.ACCESS_TOKEN);
         setIsAuth(false);
         return;
       }
@@ -28,8 +35,7 @@ function useAuth() {
       setRoles(response.roles);
       setAccount(response);
       setIsAuth(true);
-    } catch (error) {
-      // Token exists but request failed, remove it
+    } catch {
       localStorage.removeItem(ETokenName.ACCESS_TOKEN);
       setIsAuth(false);
     }
@@ -39,8 +45,9 @@ function useAuth() {
     checkAuth();
   }, [checkAuth]);
 
-  const logout = useCallback(async () => {
+  const handleLogout = useCallback(async () => {
     localStorage.removeItem(ETokenName.ACCESS_TOKEN);
+    await logout();
     window.location.reload();
   }, []);
 
@@ -57,13 +64,13 @@ function useAuth() {
   );
 
   return {
-    logout,
+    handleLogout,
     login,
     roles,
     checkAuth,
     auth,
     account,
-    isLoading: auth === null, // Add loading state
+    isLoading: auth === null,
   };
 }
 

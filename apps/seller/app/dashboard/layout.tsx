@@ -25,9 +25,8 @@ import {
   Store,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import type React from 'react';
-import { useEffect } from 'react';
 
 const menuItems = [
   {
@@ -88,41 +87,6 @@ const menuItems = [
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { auth, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    // Only redirect if we're not loading and user is not authenticated
-    if (!isLoading && auth === false) {
-      router.push('/login');
-    }
-  }, [auth, isLoading, router]);
-
-  // Show loading spinner while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang xác thực...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show loading spinner while redirecting to login
-  if (auth === false) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang chuyển hướng...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Only render dashboard if authenticated
   return (
     <SidebarProvider>
       <DashboardContent>{children}</DashboardContent>
@@ -133,7 +97,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
-  const { logout } = useAuth();
+  const { handleLogout } = useAuth();
 
   return (
     <div className="flex min-h-screen w-full">
@@ -157,7 +121,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                     ))}
                     <SidebarMenuItem>
                       <SidebarMenuButton
-                        onClick={logout}
+                        onClick={handleLogout}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <LogOut className="h-4 w-4" />
