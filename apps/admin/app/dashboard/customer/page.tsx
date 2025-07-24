@@ -127,7 +127,6 @@ const CustomerDetailModal = ({
 }) => {
   if (!customer) return null;
 
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">

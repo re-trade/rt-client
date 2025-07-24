@@ -40,14 +40,18 @@ const getReports = async (
   }
 };
 
-  const acceptReport = async (id: string): Promise<IResponseObject<null>> => {
-    const response = await authApi.default.patch<IResponseObject<null>>(`/report-seller/accept/${id}`);
-    return response.data;
-  };
+const acceptReport = async (id: string): Promise<IResponseObject<null>> => {
+  const response = await authApi.default.patch<IResponseObject<null>>(
+    `/report-seller/accept/${id}`,
+  );
+  return response.data;
+};
 
- const rejectReport = async (id: string): Promise<IResponseObject<null>> => {
-    const response = await authApi.default.patch<IResponseObject<null>>(`/report-seller/reject/${id}`);
-    return response.data;
-  };
+const rejectReport = async (id: string): Promise<IResponseObject<null>> => {
+  const response = await authApi.default.patch<IResponseObject<null>>(
+    `/report-seller/reject/${id}`,
+  );
+  return response.data;
+};
 
 export { acceptReport, getReports, rejectReport };

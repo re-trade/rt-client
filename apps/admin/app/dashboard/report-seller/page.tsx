@@ -312,12 +312,12 @@ export default function ReportManagementPage() {
     setSelectedReport(report);
     setIsDetailModalOpen(true);
   };
-const filteredReports = reports.filter((report) => {
-  const matchesCategory =
-    selectedCategory === 'all' ||
-    report.resolutionStatus.toLowerCase().includes(selectedCategory.toLowerCase());
-  return matchesCategory;
-});
+  const filteredReports = reports.filter((report) => {
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      report.resolutionStatus.toLowerCase().includes(selectedCategory.toLowerCase());
+    return matchesCategory;
+  });
 
   return (
     <div className="space-y-6">
@@ -415,7 +415,6 @@ const filteredReports = reports.filter((report) => {
               </TableHeader>
               <TableBody>
                 {filteredReports.map((report) => (
-                  
                   <TableRow key={report.reportSellerId}>
                     <TableCell className="font-medium">{report.reportSellerId}</TableCell>
                     <TableCell className="font-medium">{report.customerId}</TableCell>

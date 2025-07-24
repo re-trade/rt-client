@@ -1,6 +1,11 @@
 'use client';
 
-import { TReportSellerProfile, getReports, acceptReport, rejectReport } from '@/services/report.seller.api';
+import {
+  TReportSellerProfile,
+  acceptReport,
+  getReports,
+  rejectReport,
+} from '@/services/report.seller.api';
 import { useCallback, useEffect, useState } from 'react';
 
 const useReportSeller = () => {
