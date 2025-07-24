@@ -1,6 +1,7 @@
 'use client';
 
-import type { Message } from '@/types/chat/chat';
+import type { Message } from '@retrade/util';
+import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { TypingIndicator } from './TypingIndicator';
 
@@ -35,25 +36,25 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
   }, []);
 
   const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end',
-        inline: 'nearest',
-      });
-    }
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+    });
   };
 
   const handleScroll = () => {
     if (!messagesContainerRef.current) return;
 
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-    const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100;
+    const isAtBottom = scrollHeight - scrollTop <= clientHeight + 50; // Reduced threshold for better detection
 
     setShouldAutoScroll(isAtBottom);
     setIsUserScrolling(true);
-    setTimeout(() => setIsUserScrolling(false), 1000);
+
+    // Clear previous timeout and set new one
+    setTimeout(() => setIsUserScrolling(false), 1500);
   };
+
   return (
     <div className="h-full relative">
       <div
@@ -67,11 +68,11 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
           .map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.sender?.senderRole === 'customer' ? 'justify-end' : 'justify-start'} group`}
+              className={`flex ${message.sender?.senderRole === 'seller' ? 'justify-end' : 'justify-start'} group`}
             >
               <div
                 className={`max-w-md lg:max-w-xl xl:max-w-2xl px-4 py-3 rounded-2xl shadow-sm transition-all duration-200 group-hover:shadow-md ${
-                  message.sender?.senderRole === 'customer'
+                  message.sender?.senderRole === 'seller'
                     ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-br-md'
                     : 'bg-white text-gray-900 border border-gray-200 hover:border-gray-300 rounded-bl-md'
                 }`}
@@ -79,7 +80,7 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
                 <p className="text-base leading-relaxed">{message.content}</p>
                 <p
                   className={`text-xs mt-2 ${
-                    message.sender?.senderRole === 'customer' ? 'text-orange-100' : 'text-gray-500'
+                    message.sender?.senderRole === 'seller' ? 'text-orange-100' : 'text-gray-500'
                   }`}
                 >
                   {new Date(message.createdAt).toLocaleTimeString('vi-VN', {
@@ -97,11 +98,11 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
         <div ref={messagesEndRef} />
 
         {messages.length === 0 && (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center max-w-sm mx-auto p-8">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
-                  className="w-8 h-8 text-orange-500"
+                  className="w-8 h-8 text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -114,9 +115,9 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Chưa có tin nhắn</h3>
-              <p className="text-gray-500">
-                Hãy bắt đầu cuộc trò chuyện bằng cách gửi tin nhắn đầu tiên
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Bắt đầu cuộc trò chuyện</h3>
+              <p className="text-gray-600 text-sm">
+                Gửi tin nhắn đầu tiên để bắt đầu trò chuyện với khách hàng
               </p>
             </div>
           </div>
@@ -126,17 +127,10 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
       {!shouldAutoScroll && (
         <button
           onClick={scrollToBottom}
-          className="absolute bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-10"
+          className="absolute bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
           title="Cuộn xuống cuối"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
+          <ChevronDown size={20} />
         </button>
       )}
     </div>
