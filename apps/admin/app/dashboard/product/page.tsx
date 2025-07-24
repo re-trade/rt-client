@@ -34,7 +34,6 @@ import {
   Calendar,
   CheckCircle,
   Download,
-  Edit,
   Eye,
   Filter,
   Package,
@@ -42,7 +41,6 @@ import {
   Search,
   Store,
   Tag,
-  Trash2,
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
