@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -18,45 +19,8 @@ import { useCategoryManager } from '@/hooks/use-category-manager';
 import type { Category } from '@/services/category.api';
 import { unAuthApi } from '@retrade/util/src/api/instance';
 import { ChevronRight } from 'lucide-react';
-import { Camera, DeviceMobile, House, Laptop, SpeakerHigh, Tag, TShirt } from 'phosphor-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-
-const getIconForCategory = (name: string): { Icon: React.ElementType; color: string } => {
-  const lowerCaseName = name.toLowerCase();
-  if (
-    lowerCaseName.includes('electronic') ||
-    lowerCaseName.includes('computer') ||
-    lowerCaseName.includes('laptop') ||
-    lowerCaseName.includes('computing')
-  ) {
-    return { Icon: Laptop, color: '#3b82f6' };
-  }
-  if (lowerCaseName.includes('phone') || lowerCaseName.includes('mobile')) {
-    return { Icon: DeviceMobile, color: '#06b6d4' };
-  }
-  if (
-    lowerCaseName.includes('fashion') ||
-    lowerCaseName.includes('apparel') ||
-    lowerCaseName.includes('clothing')
-  ) {
-    return { Icon: TShirt, color: '#f472b6' };
-  }
-  if (lowerCaseName.includes('home') || lowerCaseName.includes('appliances')) {
-    return { Icon: House, color: '#f59e42' };
-  }
-  if (lowerCaseName.includes('camera') || lowerCaseName.includes('photography')) {
-    return { Icon: Camera, color: '#a78bfa' };
-  }
-  if (
-    lowerCaseName.includes('audio') ||
-    lowerCaseName.includes('music') ||
-    lowerCaseName.includes('speaker')
-  ) {
-    return { Icon: SpeakerHigh, color: '#facc15' };
-  }
-  return { Icon: Tag, color: '#64748b' };
-};
 
 const normalizeCategory = (cat: any): Category => ({
   ...cat,
@@ -184,12 +148,11 @@ export default function CategoryPage() {
   }) {
     const [expanded, setExpanded] = useState(false);
     const hasChildren = Array.isArray(category.children) && category.children.length > 0;
-    const { Icon, color } = getIconForCategory(category.name);
     if (!parentExpanded) return null;
     return (
       <>
         <TableRow
-          className={`transition-colors hover:bg-gray-50 group ${level > 0 ? 'border-l-4 border-blue-100 bg-blue-50/30' : ''}`}
+          className={`transition-colors group ${level > 0 ? 'border-l-4 border-blue-100 bg-blue-50/30' : ''} hover:bg-blue-50`}
         >
           <TableCell style={{ paddingLeft: `${level * 32 + 16}px` }}>
             <div className="flex items-center gap-2">
@@ -215,14 +178,8 @@ export default function CategoryPage() {
                   )}
                 </span>
               </Button>
-              <Icon
-                size={20}
-                weight="duotone"
-                color={color}
-                className="transition-colors group-hover:scale-110"
-              />
               <span
-                className={`font-medium group-hover:text-blue-600 transition-colors ${level > 0 ? 'text-sm text-blue-700' : 'text-base'}`}
+                className={`group-hover:text-blue-600 transition-colors ${level === 0 ? 'font-bold text-base' : 'text-sm text-blue-700 font-medium'}`}
               >
                 {category.name}
               </span>
@@ -242,7 +199,7 @@ export default function CategoryPage() {
             <Button
               size="sm"
               variant="outline"
-              className="mr-2"
+              className="mr-2 hover:border-blue-400 hover:text-blue-700"
               onClick={() => openEditDialog(category)}
             >
               Sửa
@@ -250,11 +207,17 @@ export default function CategoryPage() {
             <Button
               size="sm"
               variant={category.visible ? 'destructive' : 'secondary'}
+              className="hover:border-blue-400 hover:text-blue-700"
               onClick={() => handleToggleVisible(normalizeCategory(category))}
             >
               {category.visible ? 'Ẩn' : 'Hiện'}
             </Button>
-            <Button size="sm" variant="secondary" onClick={() => openCreateDialog(category.id)}>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="hover:border-blue-400 hover:text-blue-700"
+              onClick={() => openCreateDialog(category.id)}
+            >
               Thêm con
             </Button>
           </TableCell>
@@ -281,7 +244,38 @@ export default function CategoryPage() {
       <Button type="button" variant="secondary" className="mb-4" onClick={() => openCreateDialog()}>
         Thêm mới
       </Button>
-      {loading && <div>Đang tải...</div>}
+      {loading && (
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-2/5">Tên danh mục</TableHead>
+                <TableHead>Mô tả</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead>Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(6)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-24" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
       {error && <div className="text-red-500">{error}</div>}
       {!loading && !error && (
         <Card>

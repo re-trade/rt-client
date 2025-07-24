@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -672,10 +673,62 @@ export default function ProductManagementPage() {
       <Card className="p-6">
         <div className="mt-6">
           {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <RefreshCw className="h-6 w-6 animate-spin mr-2" />
-              <span>Đang tải sản phẩm...</span>
-            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[180px] max-w-[220px] truncate">Sản phẩm</TableHead>
+                  <TableHead className="min-w-[120px] max-w-[140px] text-right">Giá</TableHead>
+                  <TableHead className="min-w-[80px] max-w-[100px] text-center">Tồn kho</TableHead>
+                  <TableHead className="min-w-[120px] max-w-[160px]">Người bán</TableHead>
+                  <TableHead className="min-w-[120px] max-w-[160px]">Danh mục</TableHead>
+                  <TableHead className="min-w-[100px] max-w-[120px] text-center">
+                    Trạng thái
+                  </TableHead>
+                  <TableHead className="min-w-[120px] max-w-[140px] text-center">
+                    Ngày tạo
+                  </TableHead>
+                  <TableHead className="text-center min-w-[120px]">Thao tác</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...Array(6)].map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="min-w-[180px] max-w-[220px] truncate">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="w-10 h-10 rounded" />
+                        <div>
+                          <Skeleton className="h-4 w-32 mb-1" />
+                          <Skeleton className="h-3 w-24 mb-1" />
+                          <Skeleton className="h-3 w-20" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="min-w-[120px] max-w-[140px] text-right">
+                      <Skeleton className="h-4 w-20 mb-1" />
+                      <Skeleton className="h-3 w-16" />
+                    </TableCell>
+                    <TableCell className="min-w-[80px] max-w-[100px] text-center">
+                      <Skeleton className="h-4 w-10 mx-auto" />
+                    </TableCell>
+                    <TableCell className="min-w-[120px] max-w-[160px]">
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell className="min-w-[120px] max-w-[160px]">
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell className="min-w-[100px] max-w-[120px] text-center">
+                      <Skeleton className="h-4 w-16 mx-auto" />
+                    </TableCell>
+                    <TableCell className="min-w-[120px] max-w-[140px] text-center">
+                      <Skeleton className="h-4 w-20 mx-auto" />
+                    </TableCell>
+                    <TableCell className="text-center min-w-[120px]">
+                      <Skeleton className="h-8 w-24 mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : products.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
               <Package className="h-12 w-12 mb-4" />
