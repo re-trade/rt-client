@@ -43,24 +43,24 @@ export default function Footer() {
             <h3 className="font-bold text-gray-800 text-lg mb-6">Dịch vụ khách hàng</h3>
             <div className="space-y-3">
               {[
-                'Trung tâm hỗ trợ',
-                'Hướng dẫn mua hàng',
-                'Hướng dẫn bán hàng',
-                'Chính sách đổi trả',
-                'Chính sách bảo hành',
-                'Phương thức thanh toán',
-                'Chính sách vận chuyển',
+                { name: 'Trung tâm hỗ trợ', href: '#' },
+                { name: 'Hướng dẫn mua hàng', href: '#' },
+                { name: 'Hướng dẫn bán hàng', href: '#' },
+                { name: 'Chính sách đổi trả', href: '/policy' },
+                { name: 'Chính sách bảo hành', href: '/policy' },
+                { name: 'Phương thức thanh toán', href: '/policy' },
+                { name: 'Chính sách vận chuyển', href: '/policy' },
               ].map((item) => (
                 <Link
-                  key={item}
-                  href="#"
+                  key={item.name}
+                  href={item.href}
                   className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors duration-200 text-sm group"
                 >
                   <IconChevronRight
                     size={14}
                     className="text-orange-400 group-hover:translate-x-1 transition-transform duration-200"
                   />
-                  {item}
+                  {item.name}
                 </Link>
               ))}
             </div>
@@ -71,24 +71,24 @@ export default function Footer() {
             <h3 className="font-bold text-gray-800 text-lg mb-6">Về ReTrade</h3>
             <div className="space-y-3">
               {[
-                'Giới thiệu về chúng tôi',
-                'Tuyển dụng',
-                'Chính sách bảo mật',
-                'Điều khoản dịch vụ',
-                'Chính sách cookie',
-                'Liên hệ truyền thông',
-                'Bán hàng cùng ReTrade',
+                { name: 'Giới thiệu về chúng tôi', href: '#' },
+                { name: 'Tuyển dụng', href: '#' },
+                { name: 'Chính sách bảo mật', href: '/policy' },
+                { name: 'Điều khoản dịch vụ', href: '/policy' },
+                { name: 'Chính sách cookie', href: '/policy' },
+                { name: 'Liên hệ truyền thông', href: '#' },
+                { name: 'Bán hàng cùng ReTrade', href: '#' },
               ].map((item) => (
                 <Link
-                  key={item}
-                  href="#"
+                  key={item.name}
+                  href={item.href}
                   className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors duration-200 text-sm group"
                 >
                   <IconChevronRight
                     size={14}
                     className="text-orange-400 group-hover:translate-x-1 transition-transform duration-200"
                   />
-                  {item}
+                  {item.name}
                 </Link>
               ))}
             </div>
@@ -128,18 +128,18 @@ export default function Footer() {
             </div>
             <div className="flex flex-wrap justify-center lg:justify-end gap-6 text-sm">
               {[
-                'Chính sách bảo mật',
-                'Điều khoản sử dụng',
-                'Chính sách đổi trả',
-                'Pháp lý',
-                'Sơ đồ trang web',
+                { name: 'Chính sách bảo mật', href: '/policy' },
+                { name: 'Điều khoản sử dụng', href: '/policy' },
+                { name: 'Chính sách đổi trả', href: '/policy' },
+                { name: 'Pháp lý', href: '/policy' },
+                { name: 'Sơ đồ trang web', href: '#' },
               ].map((item) => (
                 <Link
-                  key={item}
-                  href="#"
+                  key={item.name}
+                  href={item.href}
                   className="text-gray-600 hover:text-orange-600 transition-colors duration-200 whitespace-nowrap"
                 >
-                  {item}
+                  {item.name}
                 </Link>
               ))}
             </div>

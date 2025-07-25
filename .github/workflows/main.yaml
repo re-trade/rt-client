@@ -13,6 +13,7 @@ jobs:
       REGISTRY: ghcr.io/${{ github.repository }}
       TAG: nightly
       API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      SOCKET_URL: ${{ secrets.SOCKET_URL }}
     continue-on-error: true
     permissions:
       contents: read
@@ -42,6 +43,7 @@ jobs:
       REGISTRY: ghcr.io/${{ github.repository }}
       TAG: prod
       API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      SOCKET_URL: ${{ secrets.SOCKET_URL }}
     permissions:
       contents: read
       packages: write

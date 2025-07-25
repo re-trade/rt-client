@@ -1,10 +1,10 @@
 'use client';
 
+import { CallInterface } from '@/components/chat/CallInterface';
+import { ChatHeader } from '@/components/chat/ChatHeader';
+import { MessageInput } from '@/components/chat/MessageInput';
+import { MessagesList } from '@/components/chat/MessagesList';
 import { useMessengerContext } from '@/context/MessengerContext';
-import { CallInterface } from '@components/chat/CallInterface';
-import { ChatHeader } from '@components/chat/ChatHeader';
-import { MessageInput } from '@components/chat/MessageInput';
-import { MessagesList } from '@components/chat/MessagesList';
 import { useParams, usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
@@ -50,33 +50,21 @@ export default function MessageDetailPage() {
     }
   }, [chatId, setSelectedChatId]);
 
-  const handleMessageChange = (value: string) => {
-    setNewMessage(value);
+  const handleMessageChange = (message: string) => {
+    setNewMessage(message);
+
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current);
+    }
+
     handleTyping(true);
 
-    if (typingTimeout.current) clearTimeout(typingTimeout.current);
     typingTimeout.current = setTimeout(() => {
       handleTyping(false);
     }, 2000);
   };
 
-  if (chatId && !selectedContact) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-gray-500">Loading chat...</div>
-      </div>
-    );
-  }
-
-  if (!chatId) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-gray-500">Chat not found</div>
-      </div>
-    );
-  }
-
-  if (isVideoCall || isAudioCall) {
+  if (isCalling && (isVideoCall || isAudioCall)) {
     return (
       <CallInterface
         contact={selectedContact}
@@ -99,7 +87,8 @@ export default function MessageDetailPage() {
     );
   }
 
-  const isOnSpecificChatPage = pathname.startsWith('/chat/') && pathname !== '/chat';
+  const isOnSpecificChatPage =
+    pathname.startsWith('/dashboard/chat/') && pathname !== '/dashboard/chat';
 
   return (
     <div

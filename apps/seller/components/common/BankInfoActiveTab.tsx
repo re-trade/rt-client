@@ -13,13 +13,17 @@ import {
 } from '@/service/wallet.api';
 import { Building2, CheckCircle, CreditCard, Edit, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+interface BankInfoActiveTabProps {
+  isAddingBank: boolean;
+  setIsAddingBank: (value: boolean) => void;
+}
 
-export function BankInfoActiveTab() {
+export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoActiveTabProps) {
   const [listBanks, setListBanks] = useState<BankResponse[]>([]);
   const [wallet, setWallet] = useState<WalletResponse>();
 
   const [bankAccounts, setBankAccounts] = useState<BankInfor[]>([]);
-  const [isAddingBank, setIsAddingBank] = useState(false);
+  // const [isAddingBank, setIsAddingBank] = useState(false);
   const [editingBank, setEditingBank] = useState<BankInfor | null>(null);
   const [newBankInfo, setNewBankInfo] = useState<CreateBankInfor>({
     bankName: '',
@@ -143,9 +147,12 @@ export function BankInfoActiveTab() {
 
   const handleDeleteBank = async (bankId: string) => {
     try {
-      // Call API to delete bank
-      // await walletApi.deleteBankInfo(bankId);
-
+      const response = await walletApi.deleteBankInfor(bankId);
+      if (!response) {
+        console.error('Failed to delete bank information');
+        return;
+      }
+      console.log('Bank deleted successfully:', response);
       setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankId));
     } catch (error) {
       console.error('Error deleting bank:', error);
@@ -192,6 +199,10 @@ export function BankInfoActiveTab() {
       }));
     }
   };
+  const getBankIconUrl = (bankName: string) => {
+    const bank = listBanks.find((b) => b.name === bankName);
+    return bank ? bank.url : '';
+  };
 
   const getStatusDisplayName = (status: string) => {
     switch (status) {
@@ -206,12 +217,11 @@ export function BankInfoActiveTab() {
     }
   };
 
-  // Bank icon component with proper error handling for URL
   const BankIcon = ({ bankUrl, bankName }: { bankUrl?: string; bankName: string }) => {
     const [imageError, setImageError] = useState(false);
 
     return (
-      <div className="flex-shrink-0 w-8 h-8 rounded overflow-hidden bg-gray-100 flex items-center justify-center">
+      <div className="w-full h-full rounded overflow-hidden bg-gray-100 flex items-center justify-center">
         {!imageError && bankUrl ? (
           <img
             src={bankUrl}
@@ -221,7 +231,7 @@ export function BankInfoActiveTab() {
             onLoad={() => setImageError(false)}
           />
         ) : (
-          <Building2 className="w-5 h-5 text-gray-500" />
+          <Building2 className="w-8 h-8 text-gray-400" />
         )}
       </div>
     );
@@ -310,8 +320,11 @@ export function BankInfoActiveTab() {
                 <div className="flex justify-between items-start">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <Building2 className="h-6 w-6 text-white" />
+                      <div className="w-[140px] h-[84px]">
+                        <BankIcon
+                          bankUrl={getBankIconUrl(bank.bankName)}
+                          bankName={bank.bankName}
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -363,7 +376,7 @@ export function BankInfoActiveTab() {
         {bankAccounts.length === 0 && !isAddingBank && (
           <Card className="border-dashed border-2 border-gray-300">
             <CardContent className="p-12 text-center">
-              <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <Building2 className="h-35 w-21 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 Chưa có tài khoản ngân hàng
               </h3>
