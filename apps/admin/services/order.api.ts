@@ -1,5 +1,5 @@
 import { IPaginationResponse, IResponseObject } from '@retrade/util';
-import { authApi, unAuthApi } from '@retrade/util/src/api/instance';
+import { unAuthApi } from '@retrade/util/src/api/instance';
 
 export type Order = {
   orderId: string;
@@ -88,12 +88,12 @@ export const orderApi = {
   },
 
   async cancelOrder(orderId: string): Promise<Order> {
-    const response = await unAuthApi.default.get<IResponseObject<Order>>(`/orders/cancel/${orderId}`);
+    const response = await unAuthApi.default.get<IResponseObject<Order>>(
+      `/orders/cancel/${orderId}`,
+    );
     if (response.data.success) {
       return response.data.content;
     }
     throw new Error('Order not found');
   },
-
-  
 };

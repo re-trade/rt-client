@@ -16,9 +16,8 @@ export type WithdrawalRequest = {
 
 export type CreateWithdrawalRequest = {
   amount: number;
-  bankBin: string;
-  accountNumber: string;
-  accountName: string;
+  bankProfileId: string;
+  content: string;
 };
 
 export const getWalletBalance = async (): Promise<WalletBalance | undefined> => {
@@ -66,7 +65,7 @@ export const createWithdrawal = async (
 ): Promise<IResponseObject<WithdrawalRequest> | undefined> => {
   try {
     const response = await authApi.default.post<IResponseObject<WithdrawalRequest>>(
-      '/wallets/me/withdrawals',
+      '/wallets/withdraw',
       withdrawalData,
     );
     return response.data;
