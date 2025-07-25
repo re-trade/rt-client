@@ -14,12 +14,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Wallet, CreditCard, Smartphone, ArrowRight, CheckCircle, Car } from 'lucide-react';
+import { walletApi, WithdrawCreate } from '@/service/wallet.api';
+import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Smartphone, Wallet } from 'lucide-react';
 import { useState } from 'react';
-import { BankInfor, walletApi, WithdrawCreate } from '@/service/wallet.api';
 import { SelectBankInfo } from './SelectBankInfo';
-
 
 interface WithdrawDialogProps {
   open: boolean;
@@ -36,7 +34,6 @@ export function WithdrawDialog({
   onWithdraw,
   onOpenAddBankForm,
 }: WithdrawDialogProps) {
-
   const [withdrawMethod, setWithdrawMethod] = useState('');
 
   const [bankInfo, setBankInfo] = useState('');
@@ -51,14 +48,17 @@ export function WithdrawDialog({
   const MAX_WITHDRAW = availableBalance;
   const TRANSACTION_FEE = 5000; // Phí giao dịch cố định
 
-
   // Tính toán số tiền thực nhận
   const actualAmount = Math.max(0, Number(withdrawData.amount) - TRANSACTION_FEE);
 
   // Kiểm tra tính hợp lệ của form
-  const isValidAmount = Number(withdrawData.amount) >= MIN_WITHDRAW && Number(withdrawData.amount) <= MAX_WITHDRAW;
+  const isValidAmount =
+    Number(withdrawData.amount) >= MIN_WITHDRAW && Number(withdrawData.amount) <= MAX_WITHDRAW;
 
-  const isFormValid = withdrawData.amount && withdrawMethod && isValidAmount &&
+  const isFormValid =
+    withdrawData.amount &&
+    withdrawMethod &&
+    isValidAmount &&
     (withdrawMethod !== 'bank' || selectedBank);
 
   // Định dạng số tiền
@@ -69,16 +69,15 @@ export function WithdrawDialog({
   // Xử lý nhập số tiền với định dạng
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d]/g, '');
-    setWithdrawData(prev => ({
+    setWithdrawData((prev) => ({
       ...prev,
       amount: Number(value),
     }));
   };
 
-
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^a-zA-Z0-9À-ỹà-ỹ\s]/g, '');
-    setWithdrawData(prev => ({
+    setWithdrawData((prev) => ({
       ...prev,
       content: value.slice(0, 140),
     }));
@@ -89,7 +88,7 @@ export function WithdrawDialog({
 
   const handleQuickAmount = (amount: number) => {
     if (amount <= MAX_WITHDRAW) {
-      setWithdrawData(prev => ({
+      setWithdrawData((prev) => ({
         ...prev,
         amount: amount,
       }));
@@ -164,7 +163,9 @@ export function WithdrawDialog({
               <Input
                 id="amount"
                 placeholder="0"
-                value={withdrawData.amount ? Number(withdrawData.amount).toLocaleString('vi-VN') : ''}
+                value={
+                  withdrawData.amount ? Number(withdrawData.amount).toLocaleString('vi-VN') : ''
+                }
                 onChange={handleAmountChange}
                 className="text-xl font-bold text-right pr-12 h-14"
               />
@@ -198,16 +199,16 @@ export function WithdrawDialog({
               <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-amber-700">
                 <p className="font-medium">Giới hạn rút tiền:</p>
-                <p>Tối thiểu: {formatCurrency(MIN_WITHDRAW)} | Tối đa: {formatCurrency(MAX_WITHDRAW)}</p>
+                <p>
+                  Tối thiểu: {formatCurrency(MIN_WITHDRAW)} | Tối đa: {formatCurrency(MAX_WITHDRAW)}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Phương thức rút tiền */}
           <div className="space-y-4">
-            <Label className="text-base font-semibold text-gray-900">
-              Phương thức rút tiền
-            </Label>
+            <Label className="text-base font-semibold text-gray-900">Phương thức rút tiền</Label>
 
             <Select value={withdrawMethod} onValueChange={setWithdrawMethod}>
               <SelectTrigger className="h-14">
@@ -259,9 +260,7 @@ export function WithdrawDialog({
             </div>
           )}
 
-          <Label className="text-base font-semibold text-gray-900">
-            Nội dung giao dịch
-          </Label>
+          <Label className="text-base font-semibold text-gray-900">Nội dung giao dịch</Label>
           <Input
             placeholder="Nhập nội dung giao dịch"
             value={withdrawData.content}
@@ -282,12 +281,16 @@ export function WithdrawDialog({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Số tiền rút:</span>
-                    <span className="font-medium">{formatCurrency(Number(withdrawData.amount))}</span>
+                    <span className="font-medium">
+                      {formatCurrency(Number(withdrawData.amount))}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-gray-600">Nội dung:</span>
-                    <span className="font-medium truncate overflow-hidden whitespace-nowrap">{withdrawData.content}</span>
+                    <span className="font-medium truncate overflow-hidden whitespace-nowrap">
+                      {withdrawData.content}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
@@ -302,9 +305,13 @@ export function WithdrawDialog({
                     <div className="flex items-center gap-2">
                       {getMethodIcon(withdrawMethod)}
                       <span className="font-medium capitalize">
-                        {withdrawMethod === 'bank' ? 'Ngân hàng' :
-                          withdrawMethod === 'momo' ? 'MoMo' :
-                            withdrawMethod === 'zalopay' ? 'ZaloPay' : withdrawMethod}
+                        {withdrawMethod === 'bank'
+                          ? 'Ngân hàng'
+                          : withdrawMethod === 'momo'
+                            ? 'MoMo'
+                            : withdrawMethod === 'zalopay'
+                              ? 'ZaloPay'
+                              : withdrawMethod}
                       </span>
                     </div>
                   </div>
@@ -314,7 +321,9 @@ export function WithdrawDialog({
                   <div className="flex justify-between items-center pt-2">
                     <span className="font-semibold text-gray-900">Số tiền thực nhận:</span>
                     <span className="text-xl font-bold text-green-600">
-                      {formatCurrency(withdrawMethod === 'bank' ? Number(withdrawData.amount) : actualAmount)}
+                      {formatCurrency(
+                        withdrawMethod === 'bank' ? Number(withdrawData.amount) : actualAmount,
+                      )}
                     </span>
                   </div>
                 </div>
@@ -324,11 +333,7 @@ export function WithdrawDialog({
 
           {/* Nút hành động */}
           <div className="flex gap-3 pt-4">
-            <Button
-              variant="outline"
-              className="flex-1 h-12"
-              onClick={() => onOpenChange(false)}
-            >
+            <Button variant="outline" className="flex-1 h-12" onClick={() => onOpenChange(false)}>
               Hủy bỏ
             </Button>
             <Button

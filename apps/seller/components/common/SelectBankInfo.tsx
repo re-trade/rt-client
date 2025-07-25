@@ -1,9 +1,9 @@
 'use client';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { BankInfor, BankResponse, walletApi } from '@/service/wallet.api';
-import { Building2, CreditCard, Plus, Check, Star } from 'lucide-react';
+import { Building2, Check, CreditCard, Plus, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface SelectBankInfoProps {
@@ -12,10 +12,10 @@ interface SelectBankInfoProps {
   onSelectBank?: (bank: BankInfor) => void;
 }
 
-export function SelectBankInfo({ 
-  onCloseWithdrawDialog, 
+export function SelectBankInfo({
+  onCloseWithdrawDialog,
   onOpenAddBankForm,
-  onSelectBank 
+  onSelectBank,
 }: SelectBankInfoProps) {
   const [bankAccounts, setBankAccounts] = useState<BankInfor[]>([]);
   const [listBanks, setListBanks] = useState<BankResponse[]>([]);
@@ -31,7 +31,7 @@ export function SelectBankInfo({
         ]);
         setBankAccounts(bankInfo);
         setListBanks(banks);
-        
+
         // Tự động chọn tài khoản đầu tiên nếu có
         // if (bankInfo.length > 0) {
         //   setSelectedBankId(bankInfo[0].id);
@@ -95,11 +95,11 @@ export function SelectBankInfo({
       {bankAccounts.length > 0 && (
         <div className="space-y-3">
           {bankAccounts.map((bank, index) => (
-            <Card 
-              key={bank.id} 
+            <Card
+              key={bank.id}
               className={`border-2 transition-all duration-200 cursor-pointer hover:shadow-md ${
-                selectedBankId === bank.id 
-                  ? 'border-green-500 bg-green-50 shadow-sm' 
+                selectedBankId === bank.id
+                  ? 'border-green-500 bg-green-50 shadow-sm'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
               onClick={() => handleSelectBank(bank)}
@@ -109,18 +109,16 @@ export function SelectBankInfo({
                   <div className="flex items-center gap-4 flex-1">
                     <div className="flex-shrink-0">
                       <div className="w-16 h-10">
-                        <BankIcon 
-                          bankUrl={getBankIconUrl(bank.bankName)} 
-                          bankName={bank.bankName} 
+                        <BankIcon
+                          bankUrl={getBankIconUrl(bank.bankName)}
+                          bankName={bank.bankName}
                         />
                       </div>
                     </div>
-                    
+
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-900 text-base">
-                          {bank.bankName}
-                        </h4>
+                        <h4 className="font-semibold text-gray-900 text-base">{bank.bankName}</h4>
                         {index === 0 && (
                           <Badge variant="secondary" className="text-xs px-2 py-0.5">
                             <Star className="w-3 h-3 mr-1" />
@@ -128,7 +126,7 @@ export function SelectBankInfo({
                           </Badge>
                         )}
                       </div>
-                      
+
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <CreditCard className="h-3.5 w-3.5" />
@@ -136,22 +134,20 @@ export function SelectBankInfo({
                             {maskAccountNumber(bank.accountNumber)}
                           </span>
                         </div>
-                        <div className="font-medium text-gray-900 text-sm">
-                          {bank.userBankName}
-                        </div>
+                        <div className="font-medium text-gray-900 text-sm">{bank.userBankName}</div>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Checkbox tùy chỉnh */}
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                    selectedBankId === bank.id 
-                      ? 'border-green-500 bg-green-500' 
-                      : 'border-gray-300'
-                  }`}>
-                    {selectedBankId === bank.id && (
-                      <Check className="w-4 h-4 text-white" />
-                    )}
+                  <div
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                      selectedBankId === bank.id
+                        ? 'border-green-500 bg-green-500'
+                        : 'border-gray-300'
+                    }`}
+                  >
+                    {selectedBankId === bank.id && <Check className="w-4 h-4 text-white" />}
                   </div>
                 </div>
               </CardContent>
@@ -167,22 +163,21 @@ export function SelectBankInfo({
             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
               <Plus className="h-6 w-6 text-gray-400" />
             </div>
-            
+
             <div className="space-y-2">
               <h3 className="font-medium text-gray-900">
                 {bankAccounts.length === 0 ? 'Chưa có tài khoản ngân hàng' : 'Thêm tài khoản khác'}
               </h3>
               <p className="text-sm text-gray-500">
-                {bankAccounts.length === 0 
+                {bankAccounts.length === 0
                   ? 'Thêm tài khoản ngân hàng để có thể rút tiền dễ dàng hơn'
-                  : 'Liên kết thêm tài khoản ngân hàng để có nhiều lựa chọn hơn'
-                }
+                  : 'Liên kết thêm tài khoản ngân hàng để có nhiều lựa chọn hơn'}
               </p>
             </div>
-            
-            <Button 
-              variant="outline" 
-              className="w-full border-dashed hover:bg-gray-50" 
+
+            <Button
+              variant="outline"
+              className="w-full border-dashed hover:bg-gray-50"
               onClick={handleAddBankClick}
             >
               <Plus className="mr-2 h-4 w-4" />
