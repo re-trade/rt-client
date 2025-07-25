@@ -1,7 +1,7 @@
 import { authApi, IResponseObject } from '@retrade/util';
 
 export type TReportSellerProfile = {
-  reportSellerId: string;
+  id: string;
   customerId: string;
   productId: string;
   orderId: string;
@@ -15,6 +15,29 @@ export type TReportSellerProfile = {
   resolutionDate: string;
   adminId: string;
 };
+
+export type TEvidence = {
+  id: string;
+  senderRole: string;
+  senderId: string;
+  senderName: string;
+  senderAvatarUrl: string;
+  notes: string;
+  evidenceUrls: string[];
+};
+
+interface IResponseObject<T> {
+  code: string;
+  success: boolean;
+  messages: string[];
+  content: T;
+  pagination?: {
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+  };
+}
 
 const getReports = async (
   page: number = 0,
@@ -42,16 +65,32 @@ const getReports = async (
 
 const acceptReport = async (id: string): Promise<IResponseObject<null>> => {
   const response = await authApi.default.patch<IResponseObject<null>>(
-    `/report-seller/accept/${id}`,
+    `/report-seller/${id}/accept`,
   );
   return response.data;
 };
 
 const rejectReport = async (id: string): Promise<IResponseObject<null>> => {
   const response = await authApi.default.patch<IResponseObject<null>>(
-    `/report-seller/reject/${id}`,
+    `/report-seller/${id}/reject`,
   );
   return response.data;
 };
 
-export { acceptReport, getReports, rejectReport };
+ 
+
+const getEvidence = async (id: string): Promise<TEvidence[]> => {
+  try {
+    const response = await authApi.default.get<IResponseObject<TEvidence[]>>(
+      `/report-seller/${id}/evidences/SYSTEM`,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data.content || []; 
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { acceptReport, getReports, rejectReport, getEvidence };

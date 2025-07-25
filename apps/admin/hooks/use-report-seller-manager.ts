@@ -2,9 +2,11 @@
 
 import {
   TReportSellerProfile,
+  TEvidence,
   acceptReport,
   getReports,
   rejectReport,
+  getEvidence,
 } from '@/services/report.seller.api';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -15,15 +17,18 @@ const useReportSeller = () => {
   const [totalReports, setTotalReports] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [evidence, setEvidence] = useState<TEvidence[] | null>(null);
+  const [evidenceLoading, setEvidenceLoading] = useState<boolean>(false);
+  const [evidenceError, setEvidenceError] = useState<string | null>(null);
+
   const pageSize = 10;
 
-  const fethReports = useCallback(
+  const fetchReports = useCallback(
     async (searchQuery?: string, customPage?: number) => {
       setLoading(true);
       setError(null);
       try {
         const response = await getReports((customPage ?? page) - 1, pageSize, searchQuery);
-
         if (response && response.success) {
           setReports(response.content || []);
           setMaxPage(response.pagination?.totalPages ?? 1);
@@ -46,18 +51,36 @@ const useReportSeller = () => {
     [page],
   );
 
-  useEffect(() => {
-    fethReports();
-  }, [fethReports]);
+const fetchEvidence = useCallback(async (id: string) => {
+  setEvidenceLoading(true);
+  setEvidenceError(null);
+  try {
+    const response = await getEvidence(id); // response is TEvidence[]
+    setEvidence(response); // Set the array of evidence
+    return response;
+  } catch (err) {
+    setEvidence([]); // Set empty array on error
+    setEvidenceError(err instanceof Error ? err.message : 'Failed to fetch evidence');
+    return [];
+  } finally {
+    setEvidenceLoading(false);
+  }
+}, []);
 
-  const refetch = () => fethReports();
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
+
+  const refetch = () => fetchReports();
+
   const goToPage = (newPage: number, searchQuery?: string) => {
     setPage(newPage);
-    fethReports(searchQuery, newPage);
+    fetchReports(searchQuery, newPage);
   };
+
   const searchReports = (searchQuery: string) => {
     setPage(1);
-    fethReports(searchQuery, 1);
+    fetchReports(searchQuery, 1);
   };
 
   const handleAccept = useCallback(
@@ -65,7 +88,7 @@ const useReportSeller = () => {
       try {
         const result = await acceptReport(id);
         if (result?.success) {
-          await fethReports();
+          await fetchReports();
           return true;
         }
         setError('Failed to accept report');
@@ -75,7 +98,7 @@ const useReportSeller = () => {
         return false;
       }
     },
-    [fethReports],
+    [fetchReports],
   );
 
   const handleReject = useCallback(
@@ -83,7 +106,7 @@ const useReportSeller = () => {
       try {
         const result = await rejectReport(id);
         if (result?.success) {
-          await fethReports();
+          await fetchReports();
           return true;
         }
         setError('Failed to reject report');
@@ -93,7 +116,7 @@ const useReportSeller = () => {
         return false;
       }
     },
-    [fethReports],
+    [fetchReports],
   );
 
   return {
@@ -103,11 +126,15 @@ const useReportSeller = () => {
     totalReports,
     loading,
     error,
+    evidence,
+    evidenceLoading,
+    evidenceError,
     refetch,
     goToPage,
     searchReports,
-    acceptReport,
-    rejectReport,
+    acceptReport: handleAccept,
+    rejectReport: handleReject,
+    fetchEvidence,
   };
 };
 
