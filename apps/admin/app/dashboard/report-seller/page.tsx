@@ -26,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useReportSeller } from '@/hooks/use-report-seller-manager';
+import { TEvidence } from '@/services/report.seller.api';
 import {
   AlertCircle,
   CheckCircle,
@@ -49,7 +50,7 @@ const ReportStats = ({ reports }: { reports: any[] }) => {
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Tổng số khách hàng</p>
+            <p className="text-sm font-medium text-muted-foreground">Tổng số tố cáo</p>
             <p className="text-2xl font-bold">{totalReports}</p>
           </div>
           <Package className="h-8 w-8 text-blue-500" />
@@ -124,7 +125,7 @@ const AdvancedFilters = ({ searchQuery, onSearch, selectedCategory, setSelectedC
   );
 };
 
-const ReporttDetailModal = ({
+const ReportDetailModal = ({
   report,
   isOpen,
   onClose,
@@ -156,7 +157,7 @@ const ReporttDetailModal = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">ID</p>
-                <p>{report.reportSellerId}</p>
+                <p className="max-w-[150px] truncate overflow-hidden whitespace-nowrap">{report.id}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">ID khách hàng</p>
@@ -192,7 +193,7 @@ const ReporttDetailModal = ({
             <Button
               variant="outline"
               className="text-green-600 border-green-600"
-              onClick={() => onVerify && onVerify(report.reportSellerId)}
+              onClick={() => onVerify && onVerify(report.id)}
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Đồng ý tố cáo
@@ -200,7 +201,7 @@ const ReporttDetailModal = ({
             <Button
               variant="outline"
               className="text-red-600 border-red-600"
-              onClick={() => onReject && onReject(report.reportSellerId)}
+              onClick={() => onReject && onReject(report.id)}
             >
               <XCircle className="h-4 w-4 mr-2" />
               Từ chối tố cáo
@@ -254,6 +255,9 @@ export default function ReportManagementPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
+  const [selectedEvidence, setSelectedEvidence] = useState<TEvidence[] | null>(null);
+  const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
+
   const {
     reports = [],
     page,
@@ -266,7 +270,87 @@ export default function ReportManagementPage() {
     searchReports,
     acceptReport,
     rejectReport,
+    fetchEvidence,
   } = useReportSeller();
+
+const EvidenceDetailModal = ({
+  evidence,
+  isOpen,
+  onClose,
+}: {
+  evidence: TEvidence[] | null;
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  console.log('Evidence in modal:', evidence); // Add for debugging
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Chi tiết bằng chứng
+          </DialogTitle>
+          <DialogDescription>Thông tin chi tiết về bằng chứng</DialogDescription>
+        </DialogHeader>
+        {evidence && evidence.length > 0 ? (
+          <div className="grid gap-6">
+            {evidence.map((item, index) => (
+              <div key={item.id || index} className="grid gap-4 border-b pb-4">
+                {/* <h4 className="font-medium">Bằng chứng {index + 1}</h4> */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">ID</p>
+                    <p>{item.id || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Vai trò người gửi</p>
+                    <p>{item.senderRole || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Tên người gửi</p>
+                    <p>{item.senderName || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">ID người gửi</p>
+                    <p>{item.senderId || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Ghi chú</p>
+                    <p>{item.notes || 'N/A'}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm font-medium text-muted-foreground">Hình ảnh/Video</p>
+                    {Array.isArray(item.evidenceUrls) && item.evidenceUrls.length > 0 ? (
+                      <div className="flex flex-col gap-2 mt-2">
+                        {item.evidenceUrls.map((url, urlIndex) => (
+                          <a
+                            key={urlIndex}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline truncate"
+                          >
+                            {url}
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Không có bằng chứng</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-red-600 text-center">Không có dữ liệu bằng chứng</p>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -312,6 +396,18 @@ export default function ReportManagementPage() {
     setSelectedReport(report);
     setIsDetailModalOpen(true);
   };
+const handleViewEvidence = async (reportId: string) => {
+  try {
+    const evidenceArray = await fetchEvidence(reportId);
+    console.log('Fetched evidence:', evidenceArray);
+    setSelectedEvidence(evidenceArray); // Set the full array
+    setIsEvidenceModalOpen(true);
+  } catch (error) {
+    console.error('Error fetching evidence:', error);
+    setDeleteError('Lỗi khi tải bằng chứng');
+    setSelectedEvidence([]); // Set empty array on error
+  }
+};
   const filteredReports = reports.filter((report) => {
     const matchesCategory =
       selectedCategory === 'all' ||
@@ -400,30 +496,43 @@ export default function ReportManagementPage() {
             </div>
           ) : (
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>ID khách hàng</TableHead>
-                  <TableHead>ID sản phẩm</TableHead>
-                  <TableHead>ID đơn hàng</TableHead>
-                  <TableHead>ID người bán</TableHead>
-                  <TableHead>Loại tố cáo</TableHead>
-                  <TableHead>Nội dung</TableHead>
-                  <TableHead>Trạng thái</TableHead>
-                  <TableHead className="text-right">Thao tác</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredReports.map((report) => (
-                  <TableRow key={report.reportSellerId}>
-                    <TableCell className="font-medium">{report.reportSellerId}</TableCell>
-                    <TableCell className="font-medium">{report.customerId}</TableCell>
-                    <TableCell className="font-medium">{report.productId}</TableCell>
-                    <TableCell className="font-medium">{report.orderId}</TableCell>
-                    <TableCell className="font-medium">{report.sellerId}</TableCell>
-                    <TableCell className="font-medium">{report.typeReport}</TableCell>
-                    <TableCell className="font-medium">{report.content}</TableCell>
-                    <TableCell className="font-medium">{report.resolutionStatus}</TableCell>
+  <TableHeader>
+    <TableRow>
+      <TableHead>ID</TableHead>
+      <TableHead>ID khách hàng</TableHead>
+      <TableHead>ID sản phẩm</TableHead>
+      <TableHead>ID đơn hàng</TableHead>
+      <TableHead>ID người bán</TableHead>
+      <TableHead>Loại tố cáo</TableHead>
+      <TableHead>Nội dung</TableHead>
+      <TableHead>Trạng thái</TableHead>
+      <TableHead>Bằng chứng</TableHead>
+
+      <TableHead className="text-right">Thao tác</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {filteredReports.map((report) => (
+      <TableRow key={report.id}>
+        <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
+          {report.id}
+        </TableCell>
+        <TableCell className="font-medium">{report.customerId}</TableCell>
+        <TableCell className="font-medium">{report.productId}</TableCell>
+        <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
+          {report.orderId}
+        </TableCell>
+        <TableCell className="font-medium">{report.sellerId}</TableCell>
+        <TableCell className="font-medium">{report.typeReport}</TableCell>
+        <TableCell className="font-medium">{report.content}</TableCell>
+        <TableCell className="font-medium">{report.resolutionStatus}</TableCell>
+<TableCell className="text-right">
+                      <Button variant="outline" size="sm" onClick={() => handleViewEvidence(report.id)}>
+                        Bằng chứng
+                      </Button>
+                    </TableCell>
+        
+
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => handleView(report)}>
                         Chi tiết
@@ -467,7 +576,7 @@ export default function ReportManagementPage() {
         )}
       </Card>
 
-      <ReporttDetailModal
+      <ReportDetailModal
         report={selectedReport}
         isOpen={isDetailModalOpen}
         onClose={() => {
@@ -490,6 +599,12 @@ export default function ReportManagementPage() {
           setSelectedReport(null);
           refetch();
         }}
+      />
+
+      <EvidenceDetailModal
+        evidence={selectedEvidence}
+        isOpen={isEvidenceModalOpen}
+        onClose={() => setIsEvidenceModalOpen(false)}
       />
     </div>
   );
