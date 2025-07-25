@@ -314,7 +314,7 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
               className={`border transition-all hover:shadow-md ${
                 // bank.isDefault ? 'border-blue-500 bg-blue-50/30' : ''
                 ''
-                }`}
+              }`}
             >
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">

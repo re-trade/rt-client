@@ -40,7 +40,7 @@ export type WithdrawCreate = {
   amount: number;
   bankProfileId: string;
   content: string;
-}
+};
 export const walletApi = {
   async getWalletBySeller(): Promise<WalletResponse> {
     const response =
