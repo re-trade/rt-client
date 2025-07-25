@@ -147,9 +147,12 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
 
   const handleDeleteBank = async (bankId: string) => {
     try {
-      // Call API to delete bank
-      // await walletApi.deleteBankInfo(bankId);
-
+      const response = await walletApi.deleteBankInfor(bankId);
+      if (!response) {
+        console.error('Failed to delete bank information');
+        return;
+      }
+      console.log('Bank deleted successfully:', response);
       setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankId));
     } catch (error) {
       console.error('Error deleting bank:', error);
@@ -311,7 +314,7 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
               className={`border transition-all hover:shadow-md ${
                 // bank.isDefault ? 'border-blue-500 bg-blue-50/30' : ''
                 ''
-              }`}
+                }`}
             >
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
