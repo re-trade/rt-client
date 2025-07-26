@@ -265,7 +265,7 @@ export default function Home() {
           showLoading={true}
         />
         <ProductSection
-          title="Mới Đăng Gần Đây"
+          title="Mới đăng gần đây"
           subtitle="Cập nhật liên tục từ cộng đồng"
           icon={<Clock className="w-6 h-6" />}
         />

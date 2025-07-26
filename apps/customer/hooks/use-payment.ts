@@ -1,6 +1,6 @@
 'use client';
 
-import { PaymentInitRequest, paymentApi } from '@/services/payment.api';
+import { PaymentInitRequest, PaymentStatusResponse, paymentApi } from '@/services/payment.api';
 import { useCallback, useState } from 'react';
 
 export interface PaymentMethod {
@@ -17,6 +17,7 @@ export interface PaymentState {
   selectedPaymentMethodId: string | null;
   isLoadingMethods: boolean;
   isInitializingPayment: boolean;
+  isLoadingStatus: boolean;
   error: string | null;
 }
 
@@ -26,6 +27,7 @@ export function usePayment() {
     selectedPaymentMethodId: null,
     isLoadingMethods: false,
     isInitializingPayment: false,
+    isLoadingStatus: false,
     error: null,
   });
 
@@ -100,12 +102,44 @@ export function usePayment() {
     }
   }, []);
 
+  const getPaymentStatus = useCallback(async (orderId: string): Promise<PaymentStatusResponse> => {
+    setPaymentState((prev) => ({
+      ...prev,
+      isLoadingStatus: true,
+      error: null,
+    }));
+
+    try {
+      const response = await paymentApi.getPaymentStatus(orderId);
+
+      setPaymentState((prev) => ({
+        ...prev,
+        isLoadingStatus: false,
+        error: null,
+      }));
+
+      return response;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Không thể tải trạng thái thanh toán';
+
+      setPaymentState((prev) => ({
+        ...prev,
+        isLoadingStatus: false,
+        error: errorMessage,
+      }));
+
+      throw error;
+    }
+  }, []);
+
   const resetPaymentState = useCallback(() => {
     setPaymentState({
       paymentMethods: [],
       selectedPaymentMethodId: null,
       isLoadingMethods: false,
       isInitializingPayment: false,
+      isLoadingStatus: false,
       error: null,
     });
   }, []);
@@ -122,6 +156,7 @@ export function usePayment() {
     getPaymentMethods,
     selectPaymentMethod,
     initPayment,
+    getPaymentStatus,
     resetPaymentState,
     clearError,
   };

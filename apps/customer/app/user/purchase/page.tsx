@@ -2,26 +2,22 @@
 
 import { useOrder } from '@/hooks/use-order';
 import { OrderCombo } from '@/services/order.api';
+import PurchaseOrderEmpty from '@components/purchase/PurchaseOrderEmpty';
+import PurchaseOrderItem from '@components/purchase/PurchaseOrderItem';
+import PurchaseSkeleton from '@components/purchase/PurchaseSkeleton';
 import {
   ArrowRight,
   CheckCircle,
   Clock,
   DollarSign,
-  Eye,
   Filter,
-  Heart,
-  MessageCircle,
   Package,
   RefreshCw,
   Search,
   ShoppingBag,
-  Star,
   Truck,
-  User,
   XCircle,
 } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const statusConfig = {
@@ -136,37 +132,12 @@ export default function PurchasePage() {
     }
   };
 
-  // Calculate stats
   const totalOrders = pagination?.totalElements || 0;
   const deliveredCount = orders.filter((o) => o.orderStatus === 'Delivered').length;
   const totalSpent = orders.reduce((sum, order) => sum + order.grandPrice, 0);
 
   if (isInitialLoading) {
-    return (
-      <div className="min-h-screen bg-[#FDFEF9] p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-[#525252]/20">
-            <div className="animate-pulse space-y-6">
-              <div className="flex justify-between items-center">
-                <div className="space-y-3">
-                  <div className="h-8 bg-gray-200 rounded w-64"></div>
-                  <div className="h-4 bg-gray-200 rounded w-96"></div>
-                </div>
-              </div>
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-gray-100 rounded-xl p-6 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div className="h-6 bg-gray-200 rounded w-32"></div>
-                    <div className="h-6 bg-gray-200 rounded w-24"></div>
-                  </div>
-                  <div className="h-20 bg-gray-200 rounded"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <PurchaseSkeleton />;
   }
 
   return (
@@ -276,153 +247,18 @@ export default function PurchasePage() {
           </div>
         )}
 
-        {/* Orders List */}
         <div className="space-y-6">
           {filteredOrders.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-md p-12 border border-[#525252]/20 text-center">
-              <div className="mx-auto w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6">
-                <ShoppingBag className="w-12 h-12 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                {searchTerm || statusFilter !== 'all'
-                  ? 'Không tìm thấy đơn hàng'
-                  : 'Chưa có đơn hàng nào'}
-              </h3>
-              <p className="text-gray-600">
-                {searchTerm || statusFilter !== 'all'
-                  ? 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm'
-                  : 'Hãy bắt đầu mua sắm để tạo đơn hàng đầu tiên'}
-              </p>
-            </div>
+            <PurchaseOrderEmpty statusFilter={statusFilter} searchTerm={searchTerm} />
           ) : (
             filteredOrders.map((order) => {
               const statusDisplay = getStatusDisplay(order.orderStatus);
-
               return (
-                <div
+                <PurchaseOrderItem
                   key={order.comboId}
-                  className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden hover:shadow-lg transition-all duration-300"
-                >
-                  {/* Order Header */}
-                  <div className="p-6 border-b border-gray-100">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex flex-col">
-                          <h3 className="text-lg font-bold text-gray-800">
-                            #{order.comboId.slice(0, 8)}...
-                          </h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
-                            <div className="flex items-center space-x-1">
-                              <User className="w-4 h-4" />
-                              <span>Bán bởi: {order.sellerName}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium border ${statusDisplay.color}`}
-                        >
-                          {statusDisplay.icon}
-                          <span>{statusDisplay.label}</span>
-                        </div>
-                      </div>
-
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-800">
-                          {formatPrice(order.grandPrice)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Order Items */}
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      {order.items.map((item) => (
-                        <div
-                          key={item.itemId}
-                          className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl"
-                        >
-                          <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                            {item.itemThumbnail ? (
-                              <Image
-                                src={item.itemThumbnail}
-                                alt={item.itemName}
-                                width={64}
-                                height={64}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  target.nextElementSibling?.classList.remove('hidden');
-                                }}
-                              />
-                            ) : null}
-                            <div
-                              className={`w-full h-full flex items-center justify-center ${item.itemThumbnail ? 'hidden' : ''}`}
-                            >
-                              <Package className="w-8 h-8 text-gray-400" />
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-800">{item.itemName}</h4>
-                            <p className="text-sm text-gray-600">
-                              Mã sản phẩm: {item.productId.slice(0, 8)}...
-                            </p>
-                            {item.discount > 0 && (
-                              <p className="text-sm text-green-600">
-                                Giảm giá: {formatPrice(item.discount)}
-                              </p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-gray-800">{formatPrice(item.basePrice)}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Shipping Address */}
-                    <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                      <h5 className="font-semibold text-blue-800 mb-2">Địa chỉ giao hàng</h5>
-                      <div className="text-sm text-blue-700">
-                        <p className="font-medium">{order.destination.customerName}</p>
-                        <p>{order.destination.phone}</p>
-                        <p>
-                          {order.destination.addressLine}, {order.destination.ward},{' '}
-                          {order.destination.district}, {order.destination.state}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Order Actions */}
-                    <div className="mt-6 flex flex-wrap gap-3">
-                      <Link href={`/user/purchase/${order.comboId}`}>
-                        <button className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
-                          <Eye className="w-4 h-4" />
-                          <span>Xem chi tiết</span>
-                        </button>
-                      </Link>
-
-                      {order.orderStatus === 'Delivered' && (
-                        <>
-                          <button className="flex items-center space-x-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors">
-                            <Star className="w-4 h-4" />
-                            <span>Đánh giá</span>
-                          </button>
-                          <button className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                            <Heart className="w-4 h-4" />
-                            <span>Mua lại</span>
-                          </button>
-                        </>
-                      )}
-
-                      <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                        <MessageCircle className="w-4 h-4" />
-                        <span>Liên hệ người bán</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  order={order}
+                  statusDisplay={statusDisplay}
+                />
               );
             })
           )}

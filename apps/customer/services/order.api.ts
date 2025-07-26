@@ -39,8 +39,8 @@ export interface OrderCombo {
   grandPrice: number;
   items: OrderItem[];
   destination: OrderDestination;
-  createdAt?: string;
-  updatedAt?: string;
+  createDate?: string;
+  updateDate?: string;
 }
 
 // Response for order detail endpoint

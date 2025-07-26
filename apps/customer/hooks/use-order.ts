@@ -11,7 +11,7 @@ import {
 import { useCallback, useState } from 'react';
 
 export interface OrderState {
-  currentOrder: OrderCombo | null; // Changed from OrderResponse to OrderCombo
+  currentOrder: OrderCombo | null;
   orders: OrderCombo[];
   pagination: {
     page: number;
@@ -35,6 +35,8 @@ export function useOrder() {
     error: null,
     success: false,
   });
+
+  const [orderStatuses, setOrderStatuses] = useState<string[]>([]);
 
   const createOrder = useCallback(
     async (payload: CreateOrderRequest): Promise<OrderResponse | null> => {
