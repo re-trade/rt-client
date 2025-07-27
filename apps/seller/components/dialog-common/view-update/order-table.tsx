@@ -43,8 +43,9 @@ import {
   Truck,
   XCircle,
 } from 'lucide-react';
-import { useState } from 'react';
-
+import { JSX, useState } from 'react';
+type PaymentStatus = 'PENDING' | 'PAYMENT_CONFIRMATION' | 'PAYMENT_FAILED' | 'PAYMENT_CANCELLED';
+type OrderStatus = 'PENDING' | 'PREPARING' | 'DELIVERING' | 'DELIVERED' | 'CANCELLED' | 'RETURNING' | 'REFUNDED' | 'RETURN_REJECTED' | 'RETURN_REQUESTED' | 'COMPLETED' | 'RETURNED' | 'RETURN_APPROVED' | 'PAYMENT_CONFIRMATION' | 'PAYMENT_FAILED' | 'PAYMENT_CANCELLED';
 interface OrderTableProps {
   orders: OrderResponse[];
   onViewDetail: (order: OrderResponse) => void;
@@ -158,7 +159,12 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
   };
 
   const getPaymentStatusConfig = (status: OrderResponse['paymentStatus']) => {
-    const configs = {
+    const configs: Record<PaymentStatus, {
+      color: string;
+      icon: JSX.Element;
+      text: string;
+      pulse: boolean;
+    }> = {
       PENDING: {
         color: 'bg-amber-50 text-amber-700 border-amber-200 shadow-amber-100',
         icon: <Clock className="h-3.5 w-3.5" />,
@@ -185,14 +191,16 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
       },
     };
 
-    return (
-      configs[status] || {
-        color: 'bg-gray-50 text-gray-700 border-gray-200 shadow-gray-100',
-        icon: <AlertCircle className="h-3.5 w-3.5" />,
-        text: 'Không xác định',
-        pulse: false,
-      }
-    );
+    if (status in configs) {
+      return configs[status as PaymentStatus];
+    }
+
+    return {
+      color: 'bg-gray-50 text-gray-700 border-gray-200 shadow-gray-100',
+      icon: <AlertCircle className="h-3.5 w-3.5" />,
+      text: 'Không xác định',
+      pulse: false,
+    };
   };
 
   const canUpdateStatus = (status: OrderResponse['orderStatus']) => {

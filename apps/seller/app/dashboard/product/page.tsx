@@ -213,10 +213,10 @@ export default function ProductManagement() {
     const updatedProducts = productList.map((product) =>
       product.id === selectedProduct.id
         ? {
-            ...product,
-            ...updatedData,
-            updatedAt: new Date().toISOString(),
-          }
+          ...product,
+          ...updatedData,
+          updatedAt: new Date().toISOString(),
+        }
         : product,
     );
     setProductList(updatedProducts);
@@ -315,7 +315,7 @@ export default function ProductManagement() {
               Quản lý tất cả sản phẩm của bạn ({filteredProducts.length}/{productList.length})
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <Button
               variant="outline"
               onClick={handleRefresh}
@@ -415,7 +415,7 @@ export default function ProductManagement() {
         {/* Search and Filters */}
         <Card className="border-0 shadow-lg shadow-slate-200/50 bg-white/80 backdrop-blur-sm">
           <CardHeader className="pb-4">
-            <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex flex-col lg:flex-row">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <Input
