@@ -2,6 +2,7 @@ import { OrderCombo } from '@services/order.api';
 import { Eye, Heart, MessageCircle, Package, Star, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { memo } from 'react';
 
 interface Props {
   order: OrderCombo;
@@ -31,7 +32,7 @@ const formatDate = (dateString?: string) => {
   return `${timePart} ${datePart}`;
 };
 
-const PurchaseOrderItem = ({ order, statusDisplay }: Props) => {
+const PurchaseOrderItem = memo(({ order, statusDisplay }: Props) => {
   return (
     <div className="bg-white rounded-xl border border-orange-200 overflow-hidden hover:shadow-lg transition-all duration-200">
       <div className="p-6 border-b border-orange-200">
@@ -149,6 +150,8 @@ const PurchaseOrderItem = ({ order, statusDisplay }: Props) => {
       </div>
     </div>
   );
-};
+});
+
+PurchaseOrderItem.displayName = 'PurchaseOrderItem';
 
 export default PurchaseOrderItem;
