@@ -1,7 +1,7 @@
 'use client';
 
 import { orderStatusApi, OrderStatusResponse } from '@/services/order-status.api';
-import { orderApi, OrderCombo, OrdersResponse } from '@/services/order.api';
+import { orderApi, OrderCombo } from '@/services/order.api';
 import {
   ArrowLeftRight,
   ArrowRightLeft,
@@ -22,101 +22,97 @@ import { useCallback, useEffect, useState } from 'react';
 export const statusConfig = {
   PENDING: {
     label: 'Chưa thanh toán',
+    description: 'Đơn hàng chưa được thanh toán',
     color: 'bg-gray-100 text-gray-800 border-gray-200',
     icon: CreditCard,
   },
   PAYMENT_CONFIRMATION: {
     label: 'Đã thanh toán',
+    description: 'Thanh toán đã được thực hiện, chờ xác nhận',
     color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     icon: BadgeCheck,
   },
   PREPARING: {
     label: 'Đang chuẩn bị',
+    description: 'Đơn hàng đang được chuẩn bị để giao',
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     icon: Package,
   },
   DELIVERING: {
     label: 'Đang giao',
+    description: 'Đơn hàng đang trong quá trình vận chuyển',
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     icon: Truck,
   },
   DELIVERED: {
     label: 'Đã giao',
+    description: 'Đơn hàng đã được giao thành công',
     color: 'bg-amber-100 text-amber-800 border-amber-200',
     icon: CheckCircle,
   },
   CANCELLED: {
     label: 'Đã hủy',
+    description: 'Đơn hàng đã bị hủy',
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: XCircle,
   },
   PAYMENT_CANCELLED: {
     label: 'Hủy thanh toán',
+    description: 'Thanh toán đã bị hủy',
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: Ban,
   },
   PAYMENT_FAILED: {
     label: 'Thanh toán thất bại',
+    description: 'Thanh toán không thành công',
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: XCircle,
   },
   RETURNING: {
     label: 'Đang trả hàng',
+    description: 'Đơn hàng đang trong quá trình trả lại',
     color: 'bg-orange-100 text-orange-800 border-orange-200',
     icon: RotateCcw,
   },
   RETURN_REQUESTED: {
     label: 'Yêu cầu trả hàng',
+    description: 'Khách hàng đã gửi yêu cầu trả hàng',
     color: 'bg-orange-100 text-orange-800 border-orange-200',
     icon: ArrowLeftRight,
   },
   RETURN_APPROVED: {
     label: 'Đồng ý trả hàng',
+    description: 'Yêu cầu trả hàng đã được chấp thuận',
     color: 'bg-green-100 text-green-800 border-green-200',
     icon: ThumbsUp,
   },
   RETURN_REJECTED: {
     label: 'Từ chối trả hàng',
+    description: 'Yêu cầu trả hàng đã bị từ chối',
     color: 'bg-red-100 text-red-800 border-red-200',
     icon: ThumbsDown,
   },
   RETURNED: {
     label: 'Đã trả hàng',
+    description: 'Hàng đã được trả lại thành công',
     color: 'bg-green-100 text-green-800 border-green-200',
     icon: ArrowRightLeft,
   },
   REFUNDED: {
     label: 'Đã hoàn tiền',
+    description: 'Khách hàng đã được hoàn tiền',
     color: 'bg-green-100 text-green-800 border-green-200',
     icon: ShieldCheck,
   },
   COMPLETED: {
     label: 'Hoàn thành',
+    description: 'Đơn hàng đã hoàn tất toàn bộ quy trình',
     color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
     icon: CheckCircle,
   },
 } as const;
 
 export type OrderStatusCode = keyof typeof statusConfig;
-
-export interface OrderState {
-  currentOrder: OrderCombo | null;
-  orders: OrderCombo[];
-  orderStatuses: OrderStatusResponse[];
-  orderStatusRecord: Record<string, OrderStatusModel>;
-  selectedOrderStatuses: string | null;
-  pagination: {
-    page: number;
-    size: number;
-    totalPages: number;
-    totalElements: number;
-  } | null;
-  isLoading: boolean;
-  isCreating: boolean;
-  search?: string;
-  error: string | null;
-  success: boolean;
-}
 
 type OrderStatusModel = {
   id: string;
@@ -128,21 +124,26 @@ type OrderStatusModel = {
 type OrderStatusConfig = {
   code: string;
   label: string;
+  description: string;
   color: string;
   icon: React.ElementType;
 };
 
-export function useOrder() {
+export interface OrderState {
+  currentOrder: OrderCombo | null;
+  orderStatuses: OrderStatusResponse[];
+  orderStatusRecord: Record<string, OrderStatusModel>;
+  isLoading: boolean;
+  error: string | null;
+  success: boolean;
+}
+
+export function useOrderDetail(orderId: string) {
   const [orderState, setOrderState] = useState<OrderState>({
     currentOrder: null,
-    orders: [],
     orderStatuses: [],
     orderStatusRecord: {},
-    selectedOrderStatuses: null,
-    pagination: null,
     isLoading: false,
-    isCreating: false,
-    search: '',
     error: null,
     success: false,
   });
@@ -163,7 +164,8 @@ export function useOrder() {
           code: item.code,
           label: config?.label ?? item.name,
           color: config?.color ?? '',
-          icon: config?.icon ?? null,
+          description: config?.description ?? '',
+          icon: config?.icon ?? Package,
         },
       };
     });
@@ -175,7 +177,7 @@ export function useOrder() {
     }));
   }, []);
 
-  const getMyOrders = useCallback(async (): Promise<OrdersResponse | null> => {
+  const getOrderById = useCallback(async () => {
     setOrderState((prev) => ({
       ...prev,
       isLoading: true,
@@ -183,23 +185,11 @@ export function useOrder() {
     }));
 
     try {
-      const query = new URLSearchParams();
-      if (orderState.search) {
-        query.append('keyword', orderState.search);
-      }
-      if (orderState.selectedOrderStatuses && orderState.selectedOrderStatuses !== 'all') {
-        query.append('orderStatusId', orderState.selectedOrderStatuses);
-      }
-      const response = await orderApi.getMyOrders(
-        orderState.pagination?.page || 0,
-        6,
-        query.toString(),
-      );
+      const response = await orderApi.getOrderById(orderId);
 
       setOrderState((prev) => ({
         ...prev,
-        orders: response.content,
-        pagination: response.pagination,
+        currentOrder: response,
         isLoading: false,
         error: null,
       }));
@@ -207,7 +197,7 @@ export function useOrder() {
       return response;
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || error.message || 'Không thể tải danh sách đơn hàng';
+        error.response?.data?.message || error.message || 'Không thể tải đơn hàng';
 
       setOrderState((prev) => ({
         ...prev,
@@ -217,53 +207,12 @@ export function useOrder() {
 
       throw error;
     }
-  }, [orderState.pagination?.page, orderState.search, orderState.selectedOrderStatuses]);
+  }, [orderId]);
 
   useEffect(() => {
-    getMyOrders();
-  }, [getMyOrders]);
-
-  useEffect(() => {
+    getOrderById();
     getAllOrderStatus();
-  }, [getAllOrderStatus]);
-
-  const resetOrderState = useCallback(() => {
-    setOrderState({
-      currentOrder: null,
-      orders: [],
-      pagination: null,
-      orderStatuses: [],
-      orderStatusRecord: {},
-      selectedOrderStatuses: null,
-      isLoading: false,
-      isCreating: false,
-      error: null,
-      success: false,
-    });
-  }, []);
-
-  const clearError = useCallback(() => {
-    setOrderState((prev) => ({
-      ...prev,
-      error: null,
-    }));
-  }, []);
-
-  const clearCurrentOrder = useCallback(() => {
-    setOrderState((prev) => ({
-      ...prev,
-      currentOrder: null,
-      error: null,
-    }));
-  }, []);
-
-  const updateSearchFilter = (search: string) => {
-    setOrderState((prev) => ({
-      ...prev,
-      search,
-      pagination: prev.pagination ? { ...prev.pagination, page: 0 } : null, // Reset to first page when search changes
-    }));
-  };
+  }, [getAllOrderStatus, getOrderById]);
 
   const getStatusDisplay = (id: string) => {
     return (
@@ -271,56 +220,16 @@ export function useOrder() {
         label: 'Không xác định',
         color: 'bg-gray-100 text-gray-800 border-gray-200',
         icon: Package,
+        description: 'Không xác định',
       }
     );
   };
 
-  const updateOrderStatusFilter = (orderStatusId: string | null) => {
-    setOrderState((prev) => ({
-      ...prev,
-      selectedOrderStatuses: orderStatusId,
-      pagination: prev.pagination ? { ...prev.pagination, page: 0 } : null, // Reset to first page when filter changes
-    }));
-  };
-
-  const goToPage = useCallback((page: number) => {
-    setOrderState((prev) => ({
-      ...prev,
-      pagination: prev.pagination ? { ...prev.pagination, page: page - 1 } : null, // Convert to 0-based index
-    }));
-  }, []);
-
-  const nextPage = useCallback(() => {
-    setOrderState((prev) => ({
-      ...prev,
-      pagination:
-        prev.pagination && prev.pagination.page < prev.pagination.totalPages - 1
-          ? { ...prev.pagination, page: prev.pagination.page + 1 }
-          : prev.pagination,
-    }));
-  }, []);
-
-  const previousPage = useCallback(() => {
-    setOrderState((prev) => ({
-      ...prev,
-      pagination:
-        prev.pagination && prev.pagination.page > 0
-          ? { ...prev.pagination, page: prev.pagination.page - 1 }
-          : prev.pagination,
-    }));
-  }, []);
-
   return {
     ...orderState,
-    getMyOrders,
-    resetOrderState,
-    clearError,
-    clearCurrentOrder,
-    updateSearchFilter,
-    updateOrderStatusFilter,
+    getOrderById,
     getStatusDisplay,
-    goToPage,
-    nextPage,
-    previousPage,
   };
 }
+
+export default useOrderDetail;
