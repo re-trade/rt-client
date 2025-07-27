@@ -1,7 +1,7 @@
 'use client';
 
 import PaymentStatus from '@/components/payment/PaymentStatus';
-import { useOrder } from '@/hooks/use-order';
+import { useOrderDetail } from '@/hooks/use-order-detail';
 import {
   ArrowLeft,
   Calendar,
@@ -22,7 +22,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const statusConfig = {
   'Payment Confirmation': {
@@ -66,18 +66,8 @@ const statusConfig = {
 export default function OrderDetailPage() {
   const params = useParams();
   const orderId = params.id as string;
-  const { currentOrder, isLoading, error, getOrderById, clearCurrentOrder } = useOrder();
+  const { currentOrder, orderStatuses, isLoading, error } = useOrderDetail(orderId);
   const [copiedOrderId, setCopiedOrderId] = useState(false);
-
-  useEffect(() => {
-    if (orderId) {
-      getOrderById(orderId);
-    }
-
-    return () => {
-      clearCurrentOrder();
-    };
-  }, [orderId, getOrderById, clearCurrentOrder]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -349,17 +339,12 @@ export default function OrderDetailPage() {
                   <p className="text-sm text-gray-600">
                     Mã sản phẩm: {item.productId.slice(0, 8)}...
                   </p>
-                  {item.discount > 0 && (
-                    <p className="text-sm text-orange-600">
-                      Giảm giá: {formatPrice(item.discount)}
-                    </p>
+                  {item.quantity > 0 && (
+                    <p className="text-sm text-orange-600">Số lượng: {item.quantity} món</p>
                   )}
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-gray-800">{formatPrice(item.basePrice)}</p>
-                  {item.discount > 0 && (
-                    <p className="text-sm text-orange-600">Đã giảm {formatPrice(item.discount)}</p>
-                  )}
                 </div>
               </div>
             ))}

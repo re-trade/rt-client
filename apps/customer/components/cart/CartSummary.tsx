@@ -1,7 +1,6 @@
 'use client';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/hooks/use-cart';
-import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
 import { CreateOrderRequest } from '@services/order.api';
 import Image from 'next/image';
@@ -14,9 +13,10 @@ export default function CartSummary({
   selectedAddressId,
   selectAddress,
   selectedItems,
+  createOrder,
+  isCreateOrder,
 }: ReturnType<typeof useCart>) {
   const router = useRouter();
-  const { createOrder, isCreating, error: orderError, clearError } = useOrder();
   const {
     paymentMethods,
     selectedPaymentMethodId,
@@ -55,7 +55,6 @@ export default function CartSummary({
   };
 
   const handleCheckout = async () => {
-    clearError();
     clearPaymentError();
 
     const validationError = validateOrder();
@@ -106,7 +105,7 @@ export default function CartSummary({
     }
   };
 
-  const isProcessing = isCreating || isInitializingPayment;
+  const isProcessing = isCreateOrder || isInitializingPayment;
   const canCheckout =
     selectedItems &&
     selectedItems.length > 0 &&
@@ -354,7 +353,7 @@ export default function CartSummary({
               <>
                 <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 <span className="text-sm md:text-base">
-                  {isCreating ? 'Đang tạo đơn hàng...' : 'Đang khởi tạo thanh toán...'}
+                  {isCreateOrder ? 'Đang tạo đơn hàng...' : 'Đang khởi tạo thanh toán...'}
                 </span>
               </>
             ) : (
@@ -466,7 +465,7 @@ export default function CartSummary({
             <div>
               <h3 className="mb-2 text-xl font-bold text-gray-900">Không thể tạo đơn hàng</h3>
               <p className="mb-6 text-gray-600">
-                {orderError || paymentError || 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại.'}
+                {paymentError || 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại.'}
               </p>
             </div>
           )}

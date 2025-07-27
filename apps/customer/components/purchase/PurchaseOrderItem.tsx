@@ -2,11 +2,10 @@ import { OrderCombo } from '@services/order.api';
 import { Eye, Heart, MessageCircle, Package, Star, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { JSX } from 'react';
 
 interface Props {
   order: OrderCombo;
-  statusDisplay: { label: string; color: string; icon: JSX.Element };
+  statusDisplay: { label: string; color: string; icon: React.ElementType };
 }
 
 const formatPrice = (price: number) => {
@@ -42,7 +41,7 @@ const PurchaseOrderItem = ({ order, statusDisplay }: Props) => {
             <div
               className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${statusDisplay.color} self-start`}
             >
-              {statusDisplay.icon}
+              {statusDisplay.icon && <statusDisplay.icon className="w-4 h-4" />}
               <span>{statusDisplay.label}</span>
             </div>
           </div>
@@ -98,8 +97,8 @@ const PurchaseOrderItem = ({ order, statusDisplay }: Props) => {
                 <p className="text-sm text-gray-600">
                   Mã sản phẩm: {item.productId.slice(0, 8)}...
                 </p>
-                {item.discount > 0 && (
-                  <p className="text-sm text-orange-600">Giảm giá: {formatPrice(item.discount)}</p>
+                {item.quantity > 0 && (
+                  <p className="text-sm text-orange-600">Số lượng: {item.quantity}</p>
                 )}
               </div>
               <div className="text-right">

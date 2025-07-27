@@ -26,7 +26,7 @@ export interface OrderItem {
   itemThumbnail: string;
   productId: string;
   basePrice: number;
-  discount: number;
+  quantity: number;
 }
 
 export interface OrderCombo {
@@ -67,12 +67,6 @@ export interface OrdersResponse {
   pagination: PaginationInfo;
 }
 
-export interface GetOrdersParams {
-  page?: number;
-  size?: number;
-  status?: string;
-}
-
 export const orderApi = {
   async createOrder(payload: CreateOrderRequest): Promise<OrderResponse> {
     try {
@@ -103,16 +97,15 @@ export const orderApi = {
     }
   },
 
-  async getMyOrders(params: GetOrdersParams = {}): Promise<OrdersResponse> {
+  async getMyOrders(page: number = 0, size: number = 10, query?: string): Promise<OrdersResponse> {
     try {
-      const { page = 0, size = 10, status } = params;
-      let url = `/orders/customer/combo?page=${page}&size=${size}`;
-
-      if (status) {
-        url += `&status=${status}`;
-      }
-
-      const response = await authApi.default.get<OrdersResponse>(url);
+      const response = await authApi.default.get<OrdersResponse>('/orders/customer/combo', {
+        params: {
+          page,
+          size,
+          ...(query ? { q: query } : {}),
+        },
+      });
       if (response.data.success) {
         return response.data;
       }
@@ -122,17 +115,6 @@ export const orderApi = {
     }
   },
 };
-
-// Legacy interface for backward compatibility
-export interface VoucherApplication {
-  voucherId: string;
-  voucherCode: string;
-  voucherType: string;
-  discountAmount: number;
-  discountType: string;
-  applied: boolean;
-  message: string;
-}
 
 export interface PaymentMethod {
   id: string;
@@ -155,7 +137,6 @@ export interface OrderResponse {
   discountTotal: number;
   shippingCost: number;
   grandTotal: number;
-  voucherApplication: VoucherApplication;
   paymentMethod: PaymentMethod;
   status: string;
   notes: string;
