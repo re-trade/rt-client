@@ -1,5 +1,16 @@
+import { Card, CardContent } from '@/components/ui/card';
 import { WithdrawHistoryResponse } from '@/service/wallet.api';
-import { AlertCircle, Building2, Calendar, CheckCircle, Clock, Hash, XCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  Building2,
+  Calendar,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  Hash,
+  XCircle,
+} from 'lucide-react';
+import { useState } from 'react';
 interface WithdrawDetailDialogProps {
   withdraw: WithdrawHistoryResponse;
   onClose: () => void;
@@ -45,7 +56,27 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
       minute: '2-digit',
     });
   };
+
   const statusConfig = getStatusConfig(withdraw.status);
+  const BankIcon = ({ bankUrl, bankName }: { bankUrl?: string; bankName: string }) => {
+    const [imageError, setImageError] = useState(false);
+
+    return (
+      <div className="w-full h-full rounded overflow-hidden bg-gray-100 flex items-center justify-center">
+        {!imageError && bankUrl ? (
+          <img
+            src={bankUrl}
+            alt={bankName}
+            className="w-full h-full object-contain"
+            onError={() => setImageError(true)}
+            onLoad={() => setImageError(false)}
+          />
+        ) : (
+          <Building2 className="w-8 h-8 text-gray-400" />
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -94,31 +125,39 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
             </div>
 
             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <Building2 className="h-5 w-5 text-gray-400 mt-0.5" />
-              <div className="flex-1">
-                <div className="text-sm font-medium text-gray-700 mb-1">Thông tin ngân hàng</div>
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-900">
-                    <span className="font-medium">Mã BIN:</span> {withdraw.bankBin || 'N/A'}
-                  </div>
-                  <div className="text-sm text-gray-900">
-                    <span className="font-medium">Tên ngân hàng:</span>{' '}
-                    {withdraw.bankName || 'Không xác định'}
-                  </div>
-                  {withdraw.bankUrl && (
-                    <div className="text-sm">
-                      <a
-                        href={withdraw.bankUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700 underline"
-                      >
-                        Xem thông tin ngân hàng
-                      </a>
+              <Card
+                key={withdraw.id}
+                className={`border transition-all hover:shadow-md ${
+                  // bank.isDefault ? 'border-blue-500 bg-blue-50/30' : ''
+                  ''
+                }`}
+              >
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-[140px] h-[84px]">
+                          <BankIcon bankUrl={withdraw.bankUrl} bankName={withdraw.bankName || ''} />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-lg font-semibold text-gray-900">
+                            {withdraw.bankName}
+                          </h4>
+                        </div>
+                        <div className="space-y-1 text-sm text-gray-600">
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="h-4 w-4" />
+                            <span className="font-mono">{withdraw.bankBin}</span>
+                          </div>
+                          <div className="font-medium text-gray-900">{withdraw.bankName}</div>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
