@@ -5,7 +5,6 @@ import { useOrderDetail } from '@/hooks/use-order-detail';
 import {
   ArrowLeft,
   Calendar,
-  CheckCircle,
   Clock,
   Copy,
   Heart,
@@ -15,7 +14,6 @@ import {
   Phone,
   Receipt,
   Star,
-  Truck,
   User,
   XCircle,
 } from 'lucide-react';
@@ -24,49 +22,10 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
-const statusConfig = {
-  'Payment Confirmation': {
-    label: 'Chờ thanh toán',
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    icon: <Clock className="w-5 h-5" />,
-    description: 'Đơn hàng đang chờ xác nhận thanh toán',
-  },
-  'Order Confirmed': {
-    label: 'Đã xác nhận',
-    color: 'bg-blue-100 text-blue-800 border-blue-200',
-    icon: <CheckCircle className="w-5 h-5" />,
-    description: 'Đơn hàng đã được xác nhận và đang được xử lý',
-  },
-  Preparing: {
-    label: 'Đang chuẩn bị',
-    color: 'bg-purple-100 text-purple-800 border-purple-200',
-    icon: <Package className="w-5 h-5" />,
-    description: 'Người bán đang chuẩn bị hàng hóa',
-  },
-  Shipping: {
-    label: 'Đang giao',
-    color: 'bg-purple-100 text-purple-800 border-purple-200',
-    icon: <Truck className="w-5 h-5" />,
-    description: 'Đơn hàng đang được vận chuyển',
-  },
-  Delivered: {
-    label: 'Đã giao',
-    color: 'bg-amber-100 text-amber-800 border-amber-200',
-    icon: <CheckCircle className="w-5 h-5" />,
-    description: 'Đơn hàng đã được giao thành công',
-  },
-  Cancelled: {
-    label: 'Đã hủy',
-    color: 'bg-red-100 text-red-800 border-red-200',
-    icon: <XCircle className="w-5 h-5" />,
-    description: 'Đơn hàng đã được hủy',
-  },
-};
-
 export default function OrderDetailPage() {
   const params = useParams();
   const orderId = params.id as string;
-  const { currentOrder, orderStatuses, isLoading, error } = useOrderDetail(orderId);
+  const { currentOrder, isLoading, error, getStatusDisplay } = useOrderDetail(orderId);
   const [copiedOrderId, setCopiedOrderId] = useState(false);
 
   const formatPrice = (price: number) => {
@@ -93,15 +52,11 @@ export default function OrderDetailPage() {
     setTimeout(() => setCopiedOrderId(false), 2000);
   };
 
-  const getStatusDisplay = (status: string) => {
-    return (
-      statusConfig[status as keyof typeof statusConfig] || {
-        label: status,
-        color: 'bg-gray-100 text-gray-800 border-gray-200',
-        icon: <Package className="w-5 h-5" />,
-        description: 'Trạng thái không xác định',
-      }
-    );
+  const getStatusDisplayWithDescription = (statusId: string) => {
+    const baseStatus = getStatusDisplay(statusId);
+    return {
+      ...baseStatus,
+    };
   };
 
   if (isLoading) {
@@ -147,7 +102,7 @@ export default function OrderDetailPage() {
     );
   }
 
-  const statusDisplay = getStatusDisplay(currentOrder.orderStatus);
+  const statusDisplay = getStatusDisplayWithDescription(currentOrder.orderStatusId);
   const totalItems = currentOrder.items.length;
   const totalValue = currentOrder.grandPrice;
 
@@ -183,8 +138,8 @@ export default function OrderDetailPage() {
                     <div
                       className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border bg-white/20 text-white border-white/30`}
                     >
-                      {statusDisplay.icon}
-                      <span>{statusDisplay.label}</span>
+                      <statusDisplay.icon className="w-4 h-4" />
+                      <span>{statusDisplay.description}</span>
                     </div>
                   </div>
                   {currentOrder.createDate && (
@@ -209,7 +164,7 @@ export default function OrderDetailPage() {
             <div
               className={`p-3 rounded-full ${statusDisplay.color.replace('border-', 'bg-').replace('text-', 'text-white ').split(' ')[0]} text-white`}
             >
-              {statusDisplay.icon}
+              <statusDisplay.icon className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-semibold text-gray-800">{statusDisplay.label}</h3>
@@ -397,7 +352,7 @@ export default function OrderDetailPage() {
 
         <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
           <div className="flex flex-wrap gap-3">
-            {currentOrder.orderStatus === 'Delivered' && (
+            {currentOrder.orderStatus === 'DELIVERED' && (
               <>
                 <button className="flex items-center gap-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors duration-200">
                   <Star className="w-4 h-4" />
