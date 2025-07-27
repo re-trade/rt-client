@@ -213,10 +213,10 @@ export default function ProductManagement() {
     const updatedProducts = productList.map((product) =>
       product.id === selectedProduct.id
         ? {
-          ...product,
-          ...updatedData,
-          updatedAt: new Date().toISOString(),
-        }
+            ...product,
+            ...updatedData,
+            updatedAt: new Date().toISOString(),
+          }
         : product,
     );
     setProductList(updatedProducts);
