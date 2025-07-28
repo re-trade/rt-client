@@ -32,29 +32,29 @@ const UserDashboard = () => {
       label: 'Sản phẩm đã mua',
       value: '24',
       icon: <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />,
-      color: 'text-[#121212]',
-      bgColor: 'bg-[#FDFEF9]',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
     },
     {
       label: 'Sản phẩm yêu thích',
       value: '12',
       icon: <Heart className="w-5 h-5 sm:w-6 sm:h-6" />,
-      color: 'text-[#121212]',
-      bgColor: 'bg-[#FDFEF9]',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
     },
     {
       label: 'Đơn hàng đã đặt',
       value: '5',
       icon: <Package className="w-5 h-5 sm:w-6 sm:h-6" />,
-      color: 'text-[#121212]',
-      bgColor: 'bg-[#FDFEF9]',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
     },
     {
       label: 'Sản phẩm đã trao đổi',
       value: '8',
       icon: <Gift className="w-5 h-5 sm:w-6 sm:h-6" />,
-      color: 'text-[#121212]',
-      bgColor: 'bg-[#FDFEF9]',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
       subtitle: 'món đồ',
     },
   ];
@@ -108,15 +108,15 @@ const UserDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-3 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-3 sm:p-4 lg:p-6">
       <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
-        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-8 border border-[#525252]/20">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-8 border border-orange-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#121212] leading-tight">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 leading-tight">
                 {greeting}, {profile?.firstName + ' ' + profile?.lastName} 👋
               </h1>
-              <p className="text-[#525252] mt-1 sm:mt-2 text-sm sm:text-base lg:text-lg">
+              <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base lg:text-lg">
                 Chào mừng bạn quay trở lại với nền tảng buôn bán đồ cũ
               </p>
             </div>
@@ -132,7 +132,7 @@ const UserDashboard = () => {
                       className="w-full h-full object-cover rounded-xl"
                     />
                   ) : (
-                    <div className="w-full h-full bg-[#FFD2B2] flex items-center justify-center text-[#121212] text-lg sm:text-xl font-bold rounded-xl">
+                    <div className="w-full h-full bg-orange-500 flex items-center justify-center text-white text-lg sm:text-xl font-bold rounded-xl">
                       {profile?.firstName?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                   )}
@@ -145,32 +145,32 @@ const UserDashboard = () => {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-md p-3 sm:p-4 lg:p-6 border border-[#525252]/20 hover:shadow-lg transition-all duration-300 group"
+              className="bg-white rounded-xl shadow-md p-3 sm:p-4 lg:p-6 border border-orange-200 hover:shadow-lg hover:border-orange-300 transition-all duration-300 group"
             >
               <div className="flex items-center justify-between mb-2 sm:mb-3 lg:mb-4">
                 <div
-                  className={`p-2 sm:p-2.5 lg:p-3 rounded-lg ${stat.bgColor} border border-[#525252]/20`}
+                  className={`p-2 sm:p-2.5 lg:p-3 rounded-lg ${stat.bgColor} border border-orange-200`}
                 >
                   <div className={stat.color}>{stat.icon}</div>
                 </div>
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#121212] opacity-60" />
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 opacity-60" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#121212] mb-1">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-1">
                 {stat.value}
               </h3>
-              <p className="text-[#525252] text-xs sm:text-sm font-medium leading-tight">
+              <p className="text-gray-600 text-xs sm:text-sm font-medium leading-tight">
                 {stat.label}
               </p>
-              {stat.subtitle && <p className="text-xs text-[#121212] mt-1">{stat.subtitle}</p>}
+              {stat.subtitle && <p className="text-xs text-gray-800 mt-1">{stat.subtitle}</p>}
             </div>
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 lg:p-6 border border-[#525252]/20">
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 lg:p-6 border border-orange-200">
               <div className="flex items-center justify-between mb-4 sm:mb-5 lg:mb-6">
-                <h2 className="text-lg sm:text-xl font-bold text-[#121212] flex items-center">
-                  <Activity className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-[#121212]" />
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 flex items-center">
+                  <Activity className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-orange-500" />
                   Thao tác nhanh
                 </h2>
               </div>
@@ -178,20 +178,20 @@ const UserDashboard = () => {
                 {quickActions.map((action, index) => (
                   <div
                     key={index}
-                    className="group cursor-pointer p-3 sm:p-4 rounded-lg border border-[#525252]/20 hover:border-[#FFD2B2] hover:shadow-md transition-all duration-300 bg-white"
+                    className="group cursor-pointer p-3 sm:p-4 rounded-lg border border-orange-200 hover:border-orange-400 hover:shadow-md transition-all duration-300 bg-white"
                   >
                     <div className="flex items-start space-x-3 sm:space-x-4">
-                      <div className="p-2 sm:p-2.5 lg:p-3 rounded-lg bg-[#FFD2B2] text-[#121212] shadow-md flex-shrink-0">
+                      <div className="p-2 sm:p-2.5 lg:p-3 rounded-lg bg-orange-100 text-orange-600 shadow-md flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors">
                         {action.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-[#121212] group-hover:text-[#121212] transition-colors text-sm sm:text-base">
+                        <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors text-sm sm:text-base">
                           {action.title}
                         </h3>
-                        <p className="text-xs sm:text-sm text-[#525252] mt-1 leading-tight">
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-tight">
                           {action.description}
                         </p>
-                        <div className="flex items-center mt-2 text-[#121212] opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center mt-2 text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">
                           <span className="text-xs sm:text-sm font-medium">Xem chi tiết</span>
                           <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
@@ -203,47 +203,50 @@ const UserDashboard = () => {
             </div>
           </div>
           <div className="space-y-4 sm:space-y-6">
-            <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 lg:p-6 border border-[#525252]/20">
-              <h2 className="text-lg sm:text-xl font-bold text-[#121212] mb-3 sm:mb-4 flex items-center">
-                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-[#121212]" />
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-5 lg:p-6 border border-orange-200">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-orange-500" />
                 Hoạt động gần đây
               </h2>
               <div className="space-y-3 sm:space-y-4">
                 {recentActivities.map((activity, index) => (
                   <div
                     key={index}
-                    className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-[#FDFEF9] transition-colors"
+                    className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-orange-50 transition-colors"
                   >
                     <div className="mt-0.5 sm:mt-1 flex-shrink-0">{activity.icon}</div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm font-medium text-[#121212] leading-tight">
+                      <p className="text-xs sm:text-sm font-medium text-gray-800 leading-tight">
                         {activity.title}
                       </p>
-                      <p className="text-xs text-[#525252] mt-1">{activity.time}</p>
+                      <p className="text-xs text-gray-600 mt-1">{activity.time}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-[#FFD2B2] rounded-xl shadow-md p-4 sm:p-5 lg:p-6 border border-[#525252]/20">
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl shadow-md p-4 sm:p-5 lg:p-6 border border-orange-200">
               <div className="flex items-center mb-3 sm:mb-4">
-                <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-[#121212] mr-2" />
-                <h2 className="text-base sm:text-lg font-bold text-[#121212]">Thông báo gần đây</h2>
+                <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 mr-2" />
+                <h2 className="text-base sm:text-lg font-bold text-gray-800">Thông báo gần đây</h2>
               </div>
               <div className="space-y-2 sm:space-y-3">
-                <div className="p-2 sm:p-3 bg-white rounded-lg">
-                  <p className="text-xs sm:text-sm text-[#121212] font-medium">
+                <div className="p-2 sm:p-3 bg-white rounded-lg border border-orange-100">
+                  <p className="text-xs sm:text-sm text-gray-800 font-medium">
                     Cập nhật đơn hàng #RT20240415
                   </p>
-                  <p className="text-xs text-[#525252] mt-1">Đơn hàng đã được xác nhận</p>
+                  <p className="text-xs text-gray-600 mt-1">Đơn hàng đã được xác nhận</p>
                 </div>
-                <div className="p-2 sm:p-3 bg-white rounded-lg">
-                  <p className="text-xs sm:text-sm text-[#121212] font-medium">Khuyến mãi mới</p>
-                  <p className="text-xs text-[#525252] mt-1">Giảm 15% cho đơn hàng trên 500k</p>
+                <div className="p-2 sm:p-3 bg-white rounded-lg border border-orange-100">
+                  <p className="text-xs sm:text-sm text-gray-800 font-medium">Khuyến mãi mới</p>
+                  <p className="text-xs text-gray-600 mt-1">Giảm 15% cho đơn hàng trên 500k</p>
                 </div>
               </div>
               <div className="mt-3 sm:mt-4 text-center">
-                <a href="#" className="text-xs text-[#121212] font-medium hover:underline">
+                <a
+                  href="#"
+                  className="text-xs text-orange-600 font-medium hover:text-orange-700 hover:underline transition-colors"
+                >
                   Xem tất cả thông báo
                 </a>
               </div>

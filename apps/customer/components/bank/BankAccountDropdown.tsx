@@ -32,7 +32,7 @@ const BankIcon = ({ account }: { account: BankAccountResponse }) => {
   }, [account.bankBin]);
 
   return (
-    <div className="w-10 h-10 rounded-lg overflow-hidden bg-white border border-[#525252]/20 flex items-center justify-center">
+    <div className="w-10 h-10 rounded-lg overflow-hidden bg-white border border-orange-200 flex items-center justify-center">
       {!imageError && bankInfo?.url ? (
         <img
           src={bankInfo.url}
@@ -41,8 +41,8 @@ const BankIcon = ({ account }: { account: BankAccountResponse }) => {
           onError={() => setImageError(true)}
         />
       ) : (
-        <div className="w-8 h-8 bg-[#FFD2B2] rounded flex items-center justify-center">
-          <span className="text-sm font-bold text-[#121212]">{account.bankName.charAt(0)}</span>
+        <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
+          <span className="text-sm font-bold text-orange-600">{account.bankName.charAt(0)}</span>
         </div>
       )}
     </div>
@@ -69,19 +69,19 @@ const BankAccountDropdown = ({
         onClick={() => setIsOpen(!isOpen)}
         className={`block w-full rounded-lg border ${
           selectedAccount
-            ? 'border-[#525252]/20 bg-white'
-            : 'border-dashed border-[#525252]/40 bg-[#FFD2B2]/10'
-        } py-3 px-4 text-left hover:border-[#FFD2B2] focus:border-[#FFD2B2] focus:ring-2 focus:ring-[#FFD2B2]/20 transition-all duration-200`}
+            ? 'border-orange-200 bg-white'
+            : 'border-dashed border-orange-300 bg-orange-50'
+        } py-3 px-4 text-left hover:border-orange-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all duration-200`}
       >
         {selectedAccount ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <BankIcon account={selectedAccount} />
               <div className="ml-3 flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#121212] truncate">
+                <p className="text-sm font-semibold text-gray-800 truncate">
                   {selectedAccount.bankName}
                 </p>
-                <p className="text-sm text-[#525252] truncate">
+                <p className="text-sm text-gray-600 truncate">
                   {selectedAccount.accountNumber} • {selectedAccount.userBankName}
                 </p>
               </div>

@@ -13,15 +13,15 @@ export const paginationThemes = {
     loadingSpinner: 'border-blue-500',
   },
   purchase: {
-    container: 'bg-white rounded-xl shadow-md border border-[#525252]/20 p-6',
+    container: 'bg-white rounded-xl shadow-md border border-orange-200 p-6',
     button:
-      'px-3 py-2 rounded-lg border border-[#525252]/20 bg-white hover:bg-[#FFD2B2] hover:border-[#FFD2B2] text-[#121212] transition-all duration-200',
-    activeButton: 'bg-[#FFD2B2] border-[#FFD2B2] text-[#121212] shadow-md',
+      'px-3 py-2 rounded-lg border border-orange-200 bg-white hover:bg-orange-100 hover:border-orange-300 text-gray-800 transition-all duration-200',
+    activeButton: 'bg-orange-500 border-orange-500 text-white shadow-md',
     disabledButton:
-      'opacity-50 cursor-not-allowed disabled:hover:bg-white disabled:hover:border-[#525252]/20',
+      'opacity-50 cursor-not-allowed disabled:hover:bg-white disabled:hover:border-orange-200',
     dotButton: 'border-transparent text-gray-400 cursor-default',
     infoText: 'text-sm text-gray-600',
-    loadingSpinner: 'border-[#FFD2B2]',
+    loadingSpinner: 'border-orange-500',
   },
   minimal: {
     container: 'p-4',

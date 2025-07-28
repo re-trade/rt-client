@@ -100,24 +100,24 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   const SidebarContent = () => (
     <>
-      <div className="p-4 sm:p-6 bg-[#FFD2B2] text-[#121212]">
+      <div className="p-4 sm:p-6 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
         <div className="flex items-center space-x-3 sm:space-x-4">
           <div className="relative">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-xl flex items-center justify-center text-[#121212] text-lg sm:text-xl font-bold shadow-md">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-500 rounded-xl flex items-center justify-center text-white text-lg sm:text-xl font-bold shadow-md">
               {profile?.email?.charAt(0)?.toUpperCase() || 'U'}
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold truncate">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 truncate">
               {profile?.username ?? 'N/A'}
             </h2>
             <button
               onClick={() => router.push('/user/profile')}
-              className="flex items-center text-[#121212] hover:underline transition-colors text-xs sm:text-sm mt-1 group"
+              className="flex items-center text-gray-600 hover:text-orange-600 transition-colors text-xs sm:text-sm mt-1 group"
             >
-              <Edit3 className="w-3 h-3 mr-1 flex-shrink-0" />
+              <Edit3 className="w-3 h-3 mr-1 flex-shrink-0 text-orange-500" />
               <span className="truncate">Sửa Hồ Sơ</span>
-              <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0 text-orange-400" />
             </button>
           </div>
         </div>
@@ -133,14 +133,14 @@ export default function UserLayout({ children }: UserLayoutProps) {
                 onClick={() => (item.subMenu ? toggleMenu(item.path) : handleNavigation(item.path))}
                 className={`group flex items-center justify-between p-2 sm:p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                   isItemActive
-                    ? 'bg-[#FFD2B2] text-[#121212] shadow-sm border border-[#525252]/20'
-                    : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
+                    ? 'bg-gradient-to-r from-orange-50 to-orange-100 text-gray-800 shadow-sm border border-orange-200'
+                    : 'hover:bg-orange-50 text-gray-600 hover:text-gray-800'
                 }`}
               >
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                   <div
                     className={`transition-colors flex-shrink-0 ${
-                      isItemActive ? 'text-[#121212]' : 'text-[#525252] group-hover:text-[#121212]'
+                      isItemActive ? 'text-orange-500' : 'text-gray-500 group-hover:text-orange-500'
                     }`}
                   >
                     {item.icon}
@@ -151,7 +151,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
                   <ChevronRight
                     className={`w-4 h-4 transition-transform duration-200 flex-shrink-0 ${
                       isExpanded ? 'rotate-90' : ''
-                    } ${isItemActive ? 'text-[#121212]' : 'text-[#525252]'}`}
+                    } ${isItemActive ? 'text-orange-500' : 'text-gray-500 group-hover:text-orange-400'}`}
                   />
                 )}
               </div>
@@ -161,18 +161,24 @@ export default function UserLayout({ children }: UserLayoutProps) {
                     isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}
                 >
-                  <div className="ml-4 sm:ml-6 space-y-1 border-l-2 border-[#525252]/20 pl-3 sm:pl-4">
+                  <div className="ml-4 sm:ml-6 space-y-1 border-l-2 border-orange-200 pl-3 sm:pl-4">
                     {item.subMenu.map((subItem) => (
                       <div
                         key={subItem.path}
                         onClick={() => handleNavigation(subItem.path)}
                         className={`flex items-center space-x-2 sm:space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200 ${
                           activeTab === subItem.path
-                            ? 'bg-[#FFD2B2]/30 text-[#121212] border-l-2 border-[#FFD2B2]'
-                            : 'hover:bg-[#FDFEF9] text-[#525252] hover:text-[#121212]'
+                            ? 'bg-orange-100 text-gray-800 border-l-2 border-orange-500'
+                            : 'hover:bg-orange-50 text-gray-600 hover:text-gray-800'
                         }`}
                       >
-                        <div className="flex-shrink-0">{subItem.icon}</div>
+                        <div
+                          className={`flex-shrink-0 ${
+                            activeTab === subItem.path ? 'text-orange-500' : 'text-gray-500'
+                          }`}
+                        >
+                          {subItem.icon}
+                        </div>
                         <span className="text-xs sm:text-sm font-medium truncate">
                           {subItem.name}
                         </span>
@@ -189,35 +195,35 @@ export default function UserLayout({ children }: UserLayoutProps) {
   );
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9]">
-      <div className="lg:hidden bg-white shadow-md border-b border-[#525252]/20 p-4">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50">
+      <div className="lg:hidden bg-white shadow-md border-b border-orange-200 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-[#FFD2B2] rounded-lg flex items-center justify-center text-[#121212] text-sm font-bold">
+            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white text-sm font-bold">
               {profile?.email?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-[#121212] truncate">
+              <h2 className="text-sm font-semibold text-gray-800 truncate">
                 {profile?.username ?? 'N/A'}
               </h2>
             </div>
           </div>
           <button
             onClick={toggleMobileMenu}
-            className="p-2 rounded-lg hover:bg-[#FDFEF9] transition-colors"
+            className="p-2 rounded-lg hover:bg-orange-50 transition-colors"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
-              <X className="w-6 h-6 text-[#121212]" />
+              <X className="w-6 h-6 text-gray-600" />
             ) : (
-              <Menu className="w-6 h-6 text-[#121212]" />
+              <Menu className="w-6 h-6 text-gray-600" />
             )}
           </button>
         </div>
       </div>
 
       <div className="flex max-w-7xl mx-auto">
-        <aside className="hidden lg:block w-80 bg-white shadow-md border-r border-[#525252]/20">
+        <aside className="hidden lg:block w-80 bg-white shadow-md border-r border-orange-200">
           <SidebarContent />
         </aside>
 

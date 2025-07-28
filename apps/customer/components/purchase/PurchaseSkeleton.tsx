@@ -1,8 +1,8 @@
 const PurchaseSkeleton = () => {
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-[#525252]/20">
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-orange-200">
           <div className="animate-pulse space-y-6">
             <div className="flex justify-between items-center">
               <div className="space-y-3">
