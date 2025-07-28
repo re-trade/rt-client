@@ -27,6 +27,19 @@ const UserDashboard = () => {
     else setGreeting('Chào buổi tối');
   }, []);
 
+  const getInitials = () => {
+    if (profile?.firstName && profile?.lastName) {
+      return `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase();
+    }
+    if (profile?.username) {
+      return profile.username.charAt(0).toUpperCase();
+    }
+    if (profile?.email) {
+      return profile.email.charAt(0).toUpperCase();
+    }
+    return 'U';
+  };
+
   const stats = [
     {
       label: 'Sản phẩm đã mua',
@@ -133,7 +146,7 @@ const UserDashboard = () => {
                     />
                   ) : (
                     <div className="w-full h-full bg-orange-500 flex items-center justify-center text-white text-lg sm:text-xl font-bold rounded-xl">
-                      {profile?.firstName?.charAt(0)?.toUpperCase() || 'U'}
+                      {getInitials()}
                     </div>
                   )}
                 </div>
