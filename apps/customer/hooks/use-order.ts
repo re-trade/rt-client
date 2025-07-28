@@ -17,7 +17,7 @@ import {
   Truck,
   XCircle,
 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const statusConfig = {
   PENDING: {
@@ -113,7 +113,6 @@ export interface OrderState {
   } | null;
   isLoading: boolean;
   isCreating: boolean;
-  search?: string;
   error: string | null;
   success: boolean;
 }
@@ -142,10 +141,14 @@ export function useOrder() {
     pagination: null,
     isLoading: false,
     isCreating: false,
-    search: '',
     error: null,
     success: false,
   });
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialMount = useRef(true);
 
   const getAllOrderStatus = useCallback(async () => {
     const result = await orderStatusApi.getOrderStatuses();
@@ -175,59 +178,97 @@ export function useOrder() {
     }));
   }, []);
 
-  const getMyOrders = useCallback(async (): Promise<OrdersResponse | null> => {
-    setOrderState((prev) => ({
-      ...prev,
-      isLoading: true,
-      error: null,
-    }));
-
-    try {
-      const query = new URLSearchParams();
-      if (orderState.search) {
-        query.append('keyword', orderState.search);
-      }
-      if (orderState.selectedOrderStatuses && orderState.selectedOrderStatuses !== 'all') {
-        query.append('orderStatusId', orderState.selectedOrderStatuses);
-      }
-      const response = await orderApi.getMyOrders(
-        orderState.pagination?.page || 0,
-        6,
-        query.toString(),
-      );
-
+  const getMyOrders = useCallback(
+    async (
+      page?: number,
+      search?: string,
+      statusFilter?: string | null,
+    ): Promise<OrdersResponse | null> => {
       setOrderState((prev) => ({
         ...prev,
-        orders: response.content,
-        pagination: response.pagination,
-        isLoading: false,
+        isLoading: true,
         error: null,
       }));
 
-      return response;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || error.message || 'Không thể tải danh sách đơn hàng';
+      try {
+        const query = new URLSearchParams();
+        const searchValue = search !== undefined ? search : debouncedSearchTerm;
+        const statusFilterValue =
+          statusFilter !== undefined ? statusFilter : orderState.selectedOrderStatuses;
+        const currentPage = page !== undefined ? page : orderState.pagination?.page || 0;
 
-      setOrderState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage,
-      }));
+        if (searchValue) {
+          query.append('keyword', searchValue);
+        }
+        if (statusFilterValue && statusFilterValue !== 'all') {
+          query.append('orderStatusId', statusFilterValue);
+        }
 
-      throw error;
+        const response = await orderApi.getMyOrders(currentPage, 6, query.toString());
+
+        setOrderState((prev) => ({
+          ...prev,
+          orders: response.content,
+          pagination: response.pagination,
+          isLoading: false,
+          error: null,
+        }));
+
+        return response;
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || 'Không thể tải danh sách đ�n hàng';
+
+        setOrderState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+
+        throw error;
+      }
+    },
+    [orderState.pagination?.page, debouncedSearchTerm, orderState.selectedOrderStatuses],
+  );
+
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
-  }, [orderState.pagination?.page, orderState.search, orderState.selectedOrderStatuses]);
+
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      getMyOrders();
+      getAllOrderStatus();
+      return;
+    }
+
+    getMyOrders();
+  }, [debouncedSearchTerm, getAllOrderStatus, getMyOrders, orderState.selectedOrderStatuses]);
 
   useEffect(() => {
     getMyOrders();
-  }, [getMyOrders]);
+  }, [getMyOrders, orderState.pagination?.page]);
 
   useEffect(() => {
     getAllOrderStatus();
   }, [getAllOrderStatus]);
 
   const resetOrderState = useCallback(() => {
+    setSearchTerm('');
+    setDebouncedSearchTerm('');
     setOrderState({
       currentOrder: null,
       orders: [],
@@ -257,13 +298,13 @@ export function useOrder() {
     }));
   }, []);
 
-  const updateSearchFilter = (search: string) => {
+  const updateSearchFilter = useCallback((search: string) => {
+    setSearchTerm(search);
     setOrderState((prev) => ({
       ...prev,
-      search,
-      pagination: prev.pagination ? { ...prev.pagination, page: 0 } : null, // Reset to first page when search changes
+      pagination: prev.pagination ? { ...prev.pagination, page: 0 } : null,
     }));
-  };
+  }, []);
 
   const getStatusDisplay = (id: string) => {
     return (
@@ -275,13 +316,13 @@ export function useOrder() {
     );
   };
 
-  const updateOrderStatusFilter = (orderStatusId: string | null) => {
+  const updateOrderStatusFilter = useCallback((orderStatusId: string | null) => {
     setOrderState((prev) => ({
       ...prev,
       selectedOrderStatuses: orderStatusId,
-      pagination: prev.pagination ? { ...prev.pagination, page: 0 } : null, // Reset to first page when filter changes
+      pagination: prev.pagination ? { ...prev.pagination, page: 0 } : null,
     }));
-  };
+  }, []);
 
   const goToPage = useCallback((page: number) => {
     setOrderState((prev) => ({
@@ -312,6 +353,7 @@ export function useOrder() {
 
   return {
     ...orderState,
+    search: searchTerm,
     getMyOrders,
     resetOrderState,
     clearError,

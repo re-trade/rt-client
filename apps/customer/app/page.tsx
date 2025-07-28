@@ -40,12 +40,12 @@ export default function Home() {
     icon: React.ReactNode;
     subtitle?: string;
   }) => (
-    <section className="bg-white p-6 sm:p-8 rounded-xl border border-[#525252]/20 shadow-md hover:shadow-lg transition-shadow duration-300">
+    <section className="bg-white p-6 sm:p-8 rounded-xl border border-orange-200 shadow-md hover:shadow-lg transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-[#FFD2B2] rounded-lg text-[#121212]">{icon}</div>
+          <div className="p-2 bg-orange-100 rounded-lg text-orange-600">{icon}</div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#121212] flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
               {title}
               {title === 'Được quan tâm' && (
                 <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium animate-pulse">
@@ -53,12 +53,12 @@ export default function Home() {
                 </span>
               )}
               {selectedCategoryId && (
-                <span className="bg-[#FFD2B2] text-[#121212] px-3 py-1 rounded-full text-xs font-medium border border-[#525252]/20">
+                <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-medium border border-orange-200">
                   {categories.find((cat) => cat.id === selectedCategoryId)?.name || 'Đã lọc'}
                 </span>
               )}
             </h2>
-            {subtitle && <p className="text-sm text-[#525252] mt-1">{subtitle}</p>}
+            {subtitle && <p className="text-sm text-gray-600 mt-1">{subtitle}</p>}
           </div>
         </div>
 
@@ -66,7 +66,7 @@ export default function Home() {
           {selectedCategoryId && (
             <button
               onClick={() => selectCategory(null)}
-              className="text-[#525252] hover:text-[#121212] text-sm font-medium flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#FDFEF9] transition-all duration-200"
+              className="text-gray-600 hover:text-gray-800 text-sm font-medium flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-orange-50 transition-all duration-200"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -185,13 +185,13 @@ export default function Home() {
             ].map((stat, index) => (
               <div
                 key={index}
-                className="bg-white p-4 rounded-xl border border-[#525252]/20 text-center hover:shadow-md transition-shadow duration-300"
+                className="bg-white p-4 rounded-xl border border-orange-200 text-center hover:shadow-md transition-shadow duration-300"
               >
                 <div className="flex justify-center mb-2">
-                  <div className="p-2 bg-[#FFD2B2] rounded-lg text-[#121212]">{stat.icon}</div>
+                  <div className="p-2 bg-orange-100 rounded-lg text-orange-600">{stat.icon}</div>
                 </div>
-                <div className="text-2xl font-bold text-[#121212] mb-1">{stat.count}</div>
-                <div className="text-sm text-[#525252]">{stat.label}</div>
+                <div className="text-2xl font-bold text-gray-800 mb-1">{stat.count}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -271,16 +271,16 @@ export default function Home() {
         />
       </div>
 
-      <section className="bg-white py-16 sm:py-20 px-4 sm:px-6 mt-16 border-t border-[#525252]/20">
+      <section className="bg-white py-16 sm:py-20 px-4 sm:px-6 mt-16 border-t border-orange-200">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <div className="flex justify-center mb-6">
-              <div className="p-3 bg-[#FFD2B2] rounded-xl">
-                <Sparkles className="w-8 h-8 text-[#121212]" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Sparkles className="w-8 h-8 text-orange-600" />
               </div>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#121212] mb-4">Cách hoạt động</h2>
-            <p className="text-[#525252] text-lg max-w-2xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">Cách hoạt động</h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
               Mua bán đồ cũ đơn giản, an toàn và hiệu quả chỉ với 3 bước
             </p>
           </div>
@@ -308,13 +308,13 @@ export default function Home() {
                 title: 'Liên hệ & giao dịch',
                 description: 'Chat trực tiếp với người bán để thỏa thuận giá cả và giao nhận.',
                 icon: <MessageCircle className="w-8 h-8" />,
-                color: 'bg-[#FFD2B2] text-[#121212]',
-                bgColor: 'bg-[#FDFEF9]',
+                color: 'bg-orange-100 text-orange-600',
+                bgColor: 'bg-orange-50',
               },
             ].map((item, idx) => (
               <div
                 key={idx}
-                className={`${item.bgColor} border border-[#525252]/20 rounded-2xl p-8 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-2 group`}
+                className={`${item.bgColor} border border-orange-200 rounded-2xl p-8 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-2 group`}
               >
                 <div className="flex justify-center mb-6">
                   <div
@@ -328,14 +328,14 @@ export default function Home() {
                 >
                   {item.step}
                 </div>
-                <h3 className="font-bold text-xl text-[#121212] mb-4">{item.title}</h3>
-                <p className="text-[#525252] leading-relaxed">{item.description}</p>
+                <h3 className="font-bold text-xl text-gray-800 mb-4">{item.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
 
           <div className="text-center mt-16">
-            <button className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-8 py-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-1 flex items-center gap-3 mx-auto text-lg">
+            <button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-1 flex items-center gap-3 mx-auto text-lg">
               Bắt đầu ngay
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
@@ -343,22 +343,22 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-[#FFD2B2] to-[#FFBB99] py-16 px-4 sm:px-6">
+      <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="flex justify-center mb-6">
             <div className="p-3 bg-white/20 rounded-xl">
-              <Star className="w-8 h-8 text-[#121212]" />
+              <Star className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#121212] mb-4">Đừng bỏ lỡ cơ hội</h2>
-          <p className="text-[#121212]/80 text-lg mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Đừng bỏ lỡ cơ hội</h2>
+          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
             Đăng ký nhận thông báo về những món đồ cũ độc đáo và ưu đãi đặc biệt
           </p>
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <input
               type="email"
               placeholder="Nhập email của bạn"
-              className="flex-1 px-4 py-3 rounded-lg border border-[#525252]/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="flex-1 px-4 py-3 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 text-gray-800"
             />
             <button className="bg-[#121212] hover:bg-[#525252] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
               Đăng ký

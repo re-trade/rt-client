@@ -1,8 +1,8 @@
 'use client';
 
-import type { Message } from '@/types/chat/chat';
+import { TypingIndicator } from '@/components/chat/TypingIndicator';
+import type { Message } from '@retrade/util';
 import { useEffect, useRef, useState } from 'react';
-import { TypingIndicator } from './TypingIndicator';
 
 interface MessagesListProps {
   messages: Message[];
@@ -18,21 +18,19 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
 
   useEffect(() => {
     if (shouldAutoScroll && !isUserScrolling) {
-      // Use a small delay to ensure DOM has updated
       setTimeout(() => {
         scrollToBottom();
       }, 100);
     }
   }, [messages, shouldAutoScroll, isUserScrolling, isSomeoneTyping]);
 
-  // Auto-scroll to bottom when component first mounts with messages
   useEffect(() => {
     if (messages.length > 0) {
       setTimeout(() => {
         scrollToBottom();
       }, 100);
     }
-  }, []);
+  }, [messages.length]);
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -90,8 +88,6 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
               </div>
             </div>
           ))}
-
-        {/* Typing Indicator */}
         <TypingIndicator isTyping={isSomeoneTyping} typingUser={typingUser} className="mb-2" />
 
         <div ref={messagesEndRef} />

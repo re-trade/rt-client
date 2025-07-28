@@ -1,6 +1,7 @@
 'use client';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import { IconLogout, IconPackage, IconShoppingCart, IconUser } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
@@ -8,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 const UserHeaderDropdown = () => {
   const { logout, account } = useAuth();
   const { cartGroups } = useCart();
+  const { profile } = useCustomerProfile();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -15,6 +17,43 @@ const UserHeaderDropdown = () => {
     (total, shop) => total + (shop.items?.length || 0),
     0,
   );
+
+  const getInitials = () => {
+    if (profile?.firstName && profile?.lastName) {
+      return `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase();
+    }
+    if (profile?.username) {
+      return profile.username.charAt(0).toUpperCase();
+    }
+    if (profile?.email) {
+      return profile.email.charAt(0).toUpperCase();
+    }
+    if (account?.username) {
+      return account.username.charAt(0).toUpperCase();
+    }
+    return 'U';
+  };
+
+  const renderAvatar = () => {
+    if (
+      profile?.avatarUrl &&
+      typeof profile.avatarUrl === 'string' &&
+      (profile.avatarUrl.startsWith('http') || profile.avatarUrl.startsWith('/'))
+    ) {
+      return (
+        <img
+          src={profile.avatarUrl}
+          alt="User avatar"
+          className="w-10 h-10 object-cover rounded-full"
+        />
+      );
+    }
+    return (
+      <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+        {getInitials()}
+      </div>
+    );
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -40,12 +79,10 @@ const UserHeaderDropdown = () => {
         <div className="absolute right-0 mt-2 w-64 bg-white border border-orange-200 rounded-xl shadow-xl z-50 overflow-hidden">
           <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                <IconUser size={20} className="text-white" />
-              </div>
+              {renderAvatar()}
               <div>
                 <p className="font-semibold text-gray-800">Xin chào!</p>
-                <p className="text-sm text-gray-600">{account?.username}</p>
+                <p className="text-sm text-gray-600">{profile?.username || account?.username}</p>
               </div>
             </div>
           </div>
