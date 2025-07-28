@@ -1,6 +1,6 @@
 'use client';
 
-import type { Room } from '@/types/chat/chat';
+import type { Room } from '@retrade/util';
 import { IconArrowLeft, IconDots, IconPhone, IconVideo } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
@@ -21,7 +21,7 @@ export function ChatHeader({ contact, onAudioCall, onVideoCall }: ChatHeaderProp
     router.push('/chat');
   };
   const otherParticipant = contact?.participants
-    ?.filter((item: any) => item.senderRole === 'seller')
+    ?.filter((item) => item.senderRole === 'seller')
     ?.pop();
 
   return (
