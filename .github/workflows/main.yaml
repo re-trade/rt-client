@@ -19,6 +19,7 @@ jobs:
 
   deploy-client:
     name: Deploy Client
+    needs: build-images
     permissions:
       contents: read
       packages: write
