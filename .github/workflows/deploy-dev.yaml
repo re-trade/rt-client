@@ -44,7 +44,7 @@ jobs:
     runs-on: retrade-prod
     env:
       REGISTRY: ghcr.io/${{ inputs.repository }}
-      TAG: nightly
+      TAG: prod
       DOMAIN: ${{ secrets.HOST_DOMAIN }}
     steps:
       - name: Checkout code
