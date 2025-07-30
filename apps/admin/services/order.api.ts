@@ -1,7 +1,7 @@
 import { IPaginationResponse, IResponseObject } from '@retrade/util';
-import { unAuthApi } from '@retrade/util/src/api/instance';
+import { authApi } from '@retrade/util/src/api/instance';
 
-export type Order = {
+export type TOrder = {
   orderId: string;
   customerId: string;
   customerName: string;
@@ -53,13 +53,13 @@ export type Order = {
 };
 
 export const orderApi = {
-  async getAllOrderss(
+  async getAllOrders(
     page: number = 0,
     size: number = 10,
     query?: string,
-  ): Promise<IResponseObject<IPaginationResponse<Order>>> {
+  ): Promise<IResponseObject<IPaginationResponse<TOrder>>> {
     try {
-      const response = await unAuthApi.default.get<IResponseObject<IPaginationResponse<Order>>>(
+      const response = await authApi.default.get<IResponseObject<IPaginationResponse<TOrder>>>(
         '/orders',
         {
           params: {
@@ -87,8 +87,9 @@ export const orderApi = {
     }
   },
 
-  async cancelOrder(orderId: string): Promise<Order> {
-    const response = await unAuthApi.default.get<IResponseObject<Order>>(
+
+  async cancelOrder(orderId: string): Promise<TOrder> {
+    const response = await authApi.default.get<IResponseObject<TOrder>>(
       `/orders/cancel/${orderId}`,
     );
     if (response.data.success) {
