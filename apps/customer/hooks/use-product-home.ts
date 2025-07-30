@@ -3,6 +3,7 @@ import { Category, getCategoriesInternal } from '@/services/category.api';
 import { productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
 
+
 export function useProductHome() {
   const [products, setProducts] = useState<TProduct[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
