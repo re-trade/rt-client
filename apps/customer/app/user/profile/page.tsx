@@ -110,18 +110,18 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-4 sm:p-6">
       <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
-        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
-          <div className="bg-[#FFD2B2] p-4 sm:p-6 text-[#121212]">
+        <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 sm:p-6 border-b border-orange-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="p-2 sm:p-3 bg-white/20 rounded-lg">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6" />
+                <div className="p-2 sm:p-3 bg-orange-500 rounded-lg">
+                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold">Hồ Sơ Cá Nhân</h1>
-                  <p className="text-[#121212] mt-1 text-sm sm:text-base">
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Hồ Sơ Cá Nhân</h1>
+                  <p className="text-gray-600 mt-1 text-sm sm:text-base">
                     Quản lý thông tin và tùy chỉnh tài khoản của bạn
                   </p>
                 </div>
@@ -196,7 +196,7 @@ export default function ProfilePage() {
                   <button
                     onClick={triggerFileInput}
                     disabled={isUploadingAvatar}
-                    className="absolute bottom-0 right-0 bg-amber-500 hover:bg-amber-600 text-white p-1.5 sm:p-2 rounded-full shadow-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute bottom-0 right-0 bg-orange-500 hover:bg-orange-600 text-white p-1.5 sm:p-2 rounded-full shadow-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Thay đổi ảnh đại diện"
                   >
                     <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -213,16 +213,16 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
-              <h3 className="text-base sm:text-lg font-semibold text-[#121212] mb-4 flex items-center">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#121212]" />
+            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-orange-200">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-orange-500" />
                 Thông tin tài khoản
               </h3>
               <div className="space-y-3">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-1 sm:space-y-0">
                   <span className="text-sm text-gray-600">Ngày tham gia</span>
                   <span className="text-sm font-medium text-gray-800 flex items-center">
-                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-amber-600" />
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-orange-500" />
                     {account?.joinInDate
                       ? new Date(account?.joinInDate).toLocaleDateString('vi-VN')
                       : 'N/A'}

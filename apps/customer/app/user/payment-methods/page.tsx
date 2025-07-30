@@ -2,11 +2,12 @@
 
 import { useToast } from '@/context/ToastContext';
 import { usePaymentMethod } from '@/hooks/use-payment-method';
-import BankAccountCard from '@components/bank/BankAccountCard';
+import BankAccountDropdown from '@components/bank/BankAccountDropdown';
 import BankAccountModal from '@components/bank/BankAccountModal';
 import Toast from '@components/toast/Toast';
 import { BankAccountResponse } from '@services/payment-method.api';
-import { Building2, Lock, Plus, Shield, Wallet } from 'lucide-react';
+import { Building2, Lock, Shield, Wallet } from 'lucide-react';
+import { useState } from 'react';
 
 export default function BankAccountsPage() {
   const {
@@ -23,6 +24,9 @@ export default function BankAccountsPage() {
     updateUserBankAccount,
   } = usePaymentMethod();
   const { messages } = useToast();
+
+  // State for dropdown selection
+  const [selectedAccount, setSelectedAccount] = useState<BankAccountResponse | null>(null);
 
   const openAddModal = () => {
     setForm({ selectedBankBin: '', accountNumber: '', userBankName: '' });
@@ -47,7 +51,14 @@ export default function BankAccountsPage() {
     setEditingAccount(null);
   };
 
-  const handleDelete = async (id: string) => {};
+  const handleDelete = async (id: string) => {
+    // Clear selected account if it's the one being deleted
+    if (selectedAccount?.id === id) {
+      setSelectedAccount(null);
+    }
+    // Add actual delete logic here when the API is available
+    console.log('Delete account with id:', id);
+  };
 
   const handleSave = async () => {
     if (!form.id) {
@@ -71,34 +82,34 @@ export default function BankAccountsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
       <Toast messages={messages} />
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
-          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
+        <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 border-b border-orange-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-lg">
-                  <Building2 className="w-6 h-6" />
+                <div className="p-3 bg-orange-500 rounded-lg">
+                  <Building2 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Tài khoản ngân hàng</h1>
-                  <p className="text-[#121212] mt-1">Quản lý tài khoản ngân hàng cho thanh toán</p>
+                  <h1 className="text-2xl font-bold text-gray-800">Tài khoản ngân hàng</h1>
+                  <p className="text-gray-600 mt-1">Quản lý tài khoản ngân hàng cho thanh toán</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-[#121212]">Tổng số tài khoản</p>
-                <p className="text-2xl font-bold">{bankAccounts.length}</p>
+                <p className="text-sm text-gray-600">Tổng số tài khoản</p>
+                <p className="text-2xl font-bold text-gray-800">{bankAccounts.length}</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <Shield className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Shield className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Bảo mật</p>
@@ -107,10 +118,10 @@ export default function BankAccountsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Wallet className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Wallet className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Đã lưu</p>
@@ -120,48 +131,89 @@ export default function BankAccountsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-800">Danh sách tài khoản ngân hàng</h2>
-            <button
-              onClick={openAddModal}
-              className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-4 py-2 rounded-xl transition-all duration-200 flex items-center space-x-2 font-medium shadow-md hover:shadow-lg"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Thêm tài khoản mới</span>
-            </button>
+        <div className="bg-white rounded-xl shadow-md p-8 border border-orange-200">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Quản lý tài khoản ngân hàng</h2>
+            <p className="text-gray-600 text-sm">
+              Chọn tài khoản ngân hàng để quản lý hoặc thêm tài khoản mới
+            </p>
           </div>
 
-          {bankAccounts.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="mx-auto w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6">
-                <Building2 className="w-12 h-12 text-gray-400" />
+          {/* Bank Account Dropdown */}
+          <div className="mb-6">
+            <BankAccountDropdown
+              bankAccounts={bankAccounts}
+              banks={banks}
+              selectedAccount={selectedAccount}
+              onSelectAccount={setSelectedAccount}
+              onAddNew={openAddModal}
+              loading={isBankAccountLoading}
+            />
+          </div>
+
+          {/* Selected Account Details */}
+          {selectedAccount && (
+            <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">Chi tiết tài khoản</h3>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => openEditModal(selectedAccount)}
+                    className="flex items-center justify-center bg-orange-100 text-orange-700 hover:bg-orange-200 p-2.5 rounded-lg transition-all duration-200 border border-orange-200"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(selectedAccount.id)}
+                    className="flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-100 p-2.5 rounded-lg transition-all duration-200 border border-red-200"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Chưa có tài khoản ngân hàng</h3>
-              <p className="text-gray-600 mb-6">
-                Thêm tài khoản ngân hàng để nhận thanh toán dễ dàng và nhanh chóng
-              </p>
-              <button
-                onClick={openAddModal}
-                className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-6 py-3 rounded-xl transition-all duration-200 flex items-center space-x-2 mx-auto font-medium shadow-md hover:shadow-lg"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Thêm tài khoản đầu tiên</span>
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {bankAccounts.map((account) => {
-                return (
-                  <BankAccountCard
-                    key={account.id}
-                    account={account}
-                    banks={banks}
-                    openEditModal={openEditModal}
-                    handleDelete={handleDelete}
-                  />
-                );
-              })}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Ngân hàng</label>
+                  <p className="text-gray-800 font-semibold">{selectedAccount.bankName}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Số tài khoản
+                  </label>
+                  <p className="text-gray-800 font-semibold font-mono">
+                    {selectedAccount.accountNumber}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Tên chủ tài khoản
+                  </label>
+                  <p className="text-gray-800 font-semibold">{selectedAccount.userBankName}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Ngày thêm</label>
+                  <p className="text-gray-800 font-semibold">
+                    {selectedAccount.addedDate
+                      ? new Date(selectedAccount.addedDate).toLocaleDateString('vi-VN')
+                      : 'N/A'}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>

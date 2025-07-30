@@ -13,7 +13,17 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { DollarSign, LayoutDashboard, Package, ShoppingCart, Star, Store } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import {
+  DollarSign,
+  LayoutDashboard,
+  LogOut,
+  MessageCircle,
+  Package,
+  ShoppingCart,
+  Star,
+  Store,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
@@ -49,6 +59,11 @@ const menuItems = [
     icon: ShoppingCart,
     href: '/dashboard/orders',
   },
+  {
+    title: 'Chat với khách hàng',
+    icon: MessageCircle,
+    href: '/dashboard/chat',
+  },
   // {
   //   title: 'Quản lý voucher',
   //   icon: Ticket,
@@ -82,6 +97,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const { handleLogout } = useAuth();
 
   return (
     <div className="flex min-h-screen w-full">
@@ -103,6 +119,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={handleLogout}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Đăng xuất</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>

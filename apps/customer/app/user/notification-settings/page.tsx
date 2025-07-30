@@ -144,25 +144,23 @@ export default function NotificationSettingsPage() {
   const enabledCount = settings.filter((s) => s.enabled).length;
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
-          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
+        <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 border-b border-orange-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-lg">
-                  <Bell className="w-6 h-6" />
+                <div className="p-3 bg-orange-500 rounded-lg">
+                  <Bell className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Cài đặt thông báo</h1>
-                  <p className="text-[#121212] mt-1">
-                    Quản lý cách bạn nhận thông báo từ chúng tôi
-                  </p>
+                  <h1 className="text-2xl font-bold text-gray-800">Cài đặt thông báo</h1>
+                  <p className="text-gray-600 mt-1">Quản lý cách bạn nhận thông báo từ chúng tôi</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-[#121212]">Đã bật</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm text-gray-600">Đã bật</p>
+                <p className="text-2xl font-bold text-gray-800">
                   {enabledCount}/{settings.length}
                 </p>
               </div>
@@ -171,10 +169,10 @@ export default function NotificationSettingsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-amber-100 rounded-xl">
-                <Mail className="w-6 h-6 text-amber-600" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Mail className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Email</p>
@@ -185,10 +183,10 @@ export default function NotificationSettingsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Smartphone className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Smartphone className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Push</p>
@@ -199,10 +197,10 @@ export default function NotificationSettingsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <MessageCircle className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <MessageCircle className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">SMS</p>
@@ -221,7 +219,7 @@ export default function NotificationSettingsPage() {
             return (
               <div
                 key={categoryKey}
-                className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden"
+                className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden"
               >
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center space-x-3">
@@ -242,12 +240,12 @@ export default function NotificationSettingsPage() {
                   {categorySettings.map((setting) => (
                     <div
                       key={setting.id}
-                      className="border border-gray-200 rounded-xl p-4 hover:border-[#FFD2B2] transition-all duration-200"
+                      className="border border-gray-200 rounded-xl p-4 hover:border-orange-300 transition-all duration-200"
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
                           <div
-                            className={`p-2 rounded-lg ${setting.enabled ? 'bg-[#FFD2B2] text-[#121212]' : 'bg-gray-100 text-gray-400'}`}
+                            className={`p-2 rounded-lg ${setting.enabled ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-400'}`}
                           >
                             {setting.icon}
                           </div>
@@ -258,8 +256,8 @@ export default function NotificationSettingsPage() {
                         </div>
                         <button
                           onClick={() => toggleSetting(setting.id)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:ring-offset-2 ${
-                            setting.enabled ? 'bg-[#FFD2B2]' : 'bg-gray-200'
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 ${
+                            setting.enabled ? 'bg-orange-500' : 'bg-gray-200'
                           }`}
                         >
                           <span
@@ -352,11 +350,11 @@ export default function NotificationSettingsPage() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-8 py-3 rounded-xl transition-all duration-200 font-medium shadow-md hover:shadow-lg disabled:opacity-50 flex items-center space-x-2"
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-xl transition-all duration-200 font-medium shadow-md hover:shadow-lg disabled:opacity-50 flex items-center space-x-2"
           >
             {isSaving ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#121212] border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                 <span>Đang lưu...</span>
               </>
             ) : (

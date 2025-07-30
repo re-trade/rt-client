@@ -7,6 +7,7 @@ services:
       dockerfile: apps/customer/Dockerfile
       args:
         - API_BASE_URL=${API_BASE_URL}
+        - SOCKET_URL=${SOCKET_URL}
         - NODE_ENV=production
     profiles:
       - customer
@@ -31,6 +32,7 @@ services:
       dockerfile: apps/seller/Dockerfile
       args:
         - API_BASE_URL=${API_BASE_URL}
+        - SOCKET_URL=${SOCKET_URL}
         - NODE_ENV=production
     profiles:
       - seller

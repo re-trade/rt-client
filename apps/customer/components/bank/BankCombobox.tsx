@@ -35,23 +35,48 @@ export default function BankCombobox({
   }, [query]);
 
   return (
-    <div className="form-control w-full relative">
-      <label className="label">
-        <span className="label-text">Ngân hàng</span>
-      </label>
-      <input
-        className="input input-bordered w-full text-gray-700"
-        value={query || (selected ? `${selected.code} – ${selected.name}` : '')}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        placeholder="Chọn ngân hàng..."
-      />
+    <div className="w-full relative">
+      <label className="block text-sm font-semibold text-[#121212] mb-1">Ngân hàng</label>
+      <div className="relative">
+        <input
+          className="input w-full px-4 py-2.5 border border-[#525252]/20 text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all pr-10"
+          value={query || (selected ? `${selected.code} – ${selected.name}` : '')}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 200)}
+          placeholder="Tìm kiếm và chọn ngân hàng..."
+        />
+        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+          <svg
+            className="h-5 w-5 text-[#525252]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
       {open && (
-        <ul className="absolute z-10 mt-1 w-full bg-base-100 border border-gray-200 rounded-box shadow-md max-h-60 overflow-auto text-gray-700">
-          {bankList.length === 0 && <li className="px-4 py-2 text-gray-500">Không tìm thấy</li>}
+        <ul className="absolute z-20 mt-1 w-full bg-white border border-[#525252]/20 rounded-lg shadow-lg max-h-60 overflow-auto">
+          {bankList.length === 0 && (
+            <li className="px-4 py-3 text-[#525252] text-center">
+              <div className="flex items-center justify-center">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 20a7.962 7.962 0 01-5.657-2.343m0-11.314A7.962 7.962 0 0112 4a7.962 7.962 0 015.657 2.343M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Không tìm thấy ngân hàng
+              </div>
+            </li>
+          )}
           {bankList.map((bank) => (
             <li
               key={bank.id}
@@ -60,13 +85,22 @@ export default function BankCombobox({
                 setQuery('');
                 setOpen(false);
               }}
-              className="px-4 py-2 hover:bg-base-200 cursor-pointer"
+              className="px-4 py-3 hover:bg-[#FFD2B2]/10 cursor-pointer transition-colors border-b border-[#525252]/10 last:border-b-0"
             >
-              {bank.bin} – {bank.name}
+              <div className="flex items-center">
+                <div className="w-8 h-8 mr-3 bg-[#FFD2B2] rounded flex items-center justify-center">
+                  <span className="text-xs font-bold text-[#121212]">{bank.code}</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-[#121212]">{bank.name}</span>
+                  <p className="text-sm text-[#525252]">{bank.code}</p>
+                </div>
+              </div>
             </li>
           ))}
         </ul>
       )}
+      <p className="text-xs text-[#525252] mt-1">Chọn ngân hàng mà bạn muốn thêm tài khoản</p>
     </div>
   );
 }

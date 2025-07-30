@@ -103,10 +103,16 @@ export function useMessenger() {
     });
     socket.on('message', (msg) => setMessages((prev) => [...prev, msg]));
     socket.on('signal', (data) => handleSignalRef.current(data));
-    socket.on('typing', (data) => {
+    const handleTypingEvent = (data: {
+      isTyping: boolean;
+      username?: string;
+      senderId?: string;
+    }) => {
       setIsSomeoneTyping(data.isTyping);
-      setTypingUser(data.isTyping ? data.username : null);
-    });
+      setTypingUser(data.isTyping ? data.username || 'Người bán' : null);
+    };
+
+    socket.on('typing', handleTypingEvent);
     return () => {
       socket.disconnect();
       socket.off('authSuccess', handleAuthSuccess);
@@ -114,7 +120,7 @@ export function useMessenger() {
       socket.off('roomJoined');
       socket.off('message');
       socket.off('signal');
-      socket.off('typing');
+      socket.off('typing', handleTypingEvent);
     };
   }, [router]);
 
@@ -157,10 +163,14 @@ export function useMessenger() {
 
   const handleTyping = useCallback(
     (isTyping: boolean) => {
-      if (!socketRef.current || !selectedContact) return;
+      if (!socketRef.current || !selectedContact) {
+        return;
+      }
 
       const seller = selectedContact.participants.find((p) => p.senderRole === 'seller');
-      if (!seller) return;
+      if (!seller) {
+        return;
+      }
 
       socketRef.current.emit('typing', {
         receiverId: seller.id,

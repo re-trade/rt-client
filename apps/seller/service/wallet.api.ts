@@ -36,6 +36,11 @@ export type BankInfor = {
   // isDefault: boolean;
   addedDate: string;
 };
+export type WithdrawCreate = {
+  amount: number;
+  bankProfileId: string;
+  content: string;
+};
 export const walletApi = {
   async getWalletBySeller(): Promise<WalletResponse> {
     const response =
@@ -68,6 +73,20 @@ export const walletApi = {
       },
     );
     return response.data.success ? response.data.content : [];
+  },
+  async createWithdraw(withdraw: WithdrawCreate): Promise<WithdrawHistoryResponse> {
+    const response = await authApi.default.post<IResponseObject<WithdrawHistoryResponse>>(
+      `wallets/withdraw`,
+      withdraw,
+    );
+    try {
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Withdraw not created');
+    } catch (error) {
+      throw error;
+    }
   },
   async createBankInfor(bankInfor: CreateBankInfor): Promise<BankInfor> {
     const response = await authApi.default.post<IResponseObject<BankInfor>>(

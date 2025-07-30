@@ -24,7 +24,7 @@ const BankAccountCard = ({ account, banks, openEditModal, handleDelete }: ModalP
   return (
     <div
       key={account.id}
-      className="relative group border border-gray-200 rounded-2xl p-6 hover:border-[#FFD2B2] hover:shadow-lg transition-all duration-300"
+      className="relative group border border-orange-200 rounded-2xl p-6 hover:border-orange-400 hover:shadow-lg transition-all duration-300 bg-white"
     >
       <div
         style={{ background: gradient ?? undefined }}
@@ -57,23 +57,23 @@ const BankAccountCard = ({ account, banks, openEditModal, handleDelete }: ModalP
       </div>
 
       <div className="space-y-2 mb-4">
-        <div className="flex items-center text-sm text-gray-600">
-          <Calendar className="w-4 h-4 mr-2" />
+        <div className="flex items-center text-sm text-[#525252]">
+          <Calendar className="w-4 h-4 mr-2 text-[#FFD2B2]" />
           <span>Thêm ngày: {formatTimestamp(account.addedDate)}</span>
         </div>
       </div>
 
-      <div className="flex space-x-2">
+      <div className="flex space-x-3">
         <button
           onClick={() => openEditModal(account)}
-          className="flex items-center justify-center bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg transition-colors"
+          className="flex items-center justify-center bg-[#FFD2B2]/20 text-[#121212] hover:bg-[#FFD2B2]/40 p-2.5 rounded-lg transition-all duration-200 border border-[#FFD2B2]/30"
           aria-label={`Sửa tài khoản ${account.bankName}`}
         >
           <Edit3 className="w-4 h-4" />
         </button>
         <button
           onClick={() => handleDelete(account.id)}
-          className="flex items-center justify-center bg-red-100 text-red-700 hover:bg-red-200 p-2 rounded-lg transition-colors disabled:opacity-50"
+          className="flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-100 p-2.5 rounded-lg transition-all duration-200 border border-red-200 disabled:opacity-50"
           aria-label={`Xóa tài khoản ${account.bankName}`}
         >
           <Trash2 className="w-4 h-4" />

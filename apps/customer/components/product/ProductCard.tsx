@@ -25,8 +25,8 @@ const ProductCard = ({
 }: ProductCardProps) => {
   return (
     <Link href={`/product/${id}`}>
-      <div className="bg-white rounded-xl border border-[#525252]/20 overflow-hidden transition-all duration-300 hover:border-[#FFD2B2] hover:shadow-lg hover:-translate-y-2 group">
-        <div className="relative h-48 overflow-hidden bg-[#FDFEF9]">
+      <div className="bg-white rounded-xl border border-orange-200 overflow-hidden transition-all duration-300 hover:border-orange-400 hover:shadow-lg hover:-translate-y-2 group">
+        <div className="relative h-48 overflow-hidden bg-orange-50">
           {image && image.length > 0 ? (
             <Image
               src={image}
@@ -36,14 +36,13 @@ const ProductCard = ({
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#FFD2B2] to-[#FFBB99] flex items-center justify-center">
-              <div className="text-4xl text-[#121212]">📦</div>
+            <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+              <div className="text-4xl text-white">📦</div>
             </div>
           )}
 
-          {/* Price Badge */}
           <div className="absolute top-3 right-3 z-10">
-            <div className="bg-[#FFD2B2] text-[#121212] px-3 py-1 rounded-full text-sm font-bold shadow-md border border-[#525252]/20">
+            <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-md">
               {price.toLocaleString()}đ
             </div>
           </div>
@@ -62,10 +61,10 @@ const ProductCard = ({
           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <div className="flex gap-2">
               <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors">
-                <Heart className="w-4 h-4 text-[#121212]" />
+                <Heart className="w-4 h-4 text-gray-800" />
               </button>
-              <button className="p-2 bg-[#FFD2B2] rounded-full hover:bg-[#FFBB99] transition-colors">
-                <ShoppingBag className="w-4 h-4 text-[#121212]" />
+              <button className="p-2 bg-orange-500 rounded-full hover:bg-orange-600 transition-colors">
+                <ShoppingBag className="w-4 h-4 text-white" />
               </button>
             </div>
           </div>
@@ -73,28 +72,28 @@ const ProductCard = ({
 
         <div className="p-4 space-y-3">
           <div className="flex items-start justify-between">
-            <h3 className="font-semibold text-[#121212] line-clamp-2 flex-1 group-hover:text-[#525252] transition-colors text-sm leading-tight">
+            <h3 className="font-semibold text-gray-800 line-clamp-2 flex-1 group-hover:text-gray-600 transition-colors text-sm leading-tight">
               {name}
             </h3>
           </div>
 
           {brand && (
-            <div className="inline-block bg-[#FFD2B2] text-[#121212] px-2 py-1 rounded-md text-xs font-medium border border-[#525252]/20">
+            <div className="inline-block bg-orange-100 text-orange-700 px-2 py-1 rounded-md text-xs font-medium border border-orange-200">
               {brand}
             </div>
           )}
 
           {shortDescription && (
             <div className="h-10 overflow-hidden">
-              <p className="text-xs text-[#525252] leading-5 line-clamp-2">{shortDescription}</p>
+              <p className="text-xs text-gray-600 leading-5 line-clamp-2">{shortDescription}</p>
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-2 border-t border-[#525252]/10">
+          <div className="flex items-center justify-between pt-2 border-t border-orange-100">
             {sellerShopName && (
-              <div className="text-xs text-[#525252] flex items-center gap-1">
-                <div className="w-4 h-4 bg-[#FFD2B2] rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-[#121212] rounded-full"></div>
+              <div className="text-xs text-gray-600 flex items-center gap-1">
+                <div className="w-4 h-4 bg-orange-100 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
                 </div>
                 <span className="truncate max-w-20">{sellerShopName}</span>
               </div>

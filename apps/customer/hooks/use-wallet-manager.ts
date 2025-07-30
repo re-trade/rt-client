@@ -1,7 +1,7 @@
 'use client';
 
 import { useWallet } from '@/hooks/use-wallet';
-import { BankResponse, getBanks } from '@/services/payment-method.api';
+import { BankAccountResponse, getUserBankAccounts } from '@/services/payment-method.api';
 import { CreateWithdrawalRequest } from '@/services/wallet.api';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -22,14 +22,13 @@ export const useWalletManager = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [accountName, setAccountName] = useState('');
-  const [selectedBank, setSelectedBank] = useState<BankResponse | null>(null);
+  const [withdrawContent, setWithdrawContent] = useState('');
+  const [selectedBankAccount, setSelectedBankAccount] = useState<BankAccountResponse | null>(null);
   const [processingWithdrawal, setProcessingWithdrawal] = useState(false);
 
-  const [banks, setBanks] = useState<BankResponse[]>([]);
-  const [bankSearch, setBankSearch] = useState('');
-  const [bankModalOpen, setBankModalOpen] = useState(false);
+  const [bankAccountModalOpen, setBankAccountModalOpen] = useState(false);
+  const [userBankAccounts, setUserBankAccounts] = useState<BankAccountResponse[]>([]);
+  const [loadingBankAccounts, setLoadingBankAccounts] = useState(false);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -46,38 +45,47 @@ export const useWalletManager = () => {
     });
   };
 
-  const fetchBanks = useCallback(async () => {
+  const fetchUserBankAccounts = useCallback(async () => {
+    setLoadingBankAccounts(true);
     try {
-      const response = await getBanks(0, 100, bankSearch);
+      const response = await getUserBankAccounts(0, 100);
       if (response?.success) {
-        setBanks(
-          response.content.map((bank) => ({
-            ...bank,
-            logo: bank.url,
-          })) || [],
-        );
+        setUserBankAccounts(response.content || []);
       }
     } catch (error) {
-      console.error('Failed to fetch banks:', error);
+      console.error('Error fetching user bank accounts:', error);
+    } finally {
+      setLoadingBankAccounts(false);
     }
-  }, [bankSearch]);
+  }, []);
 
   useEffect(() => {
-    fetchBanks();
-  }, [fetchBanks]);
+    if (bankAccountModalOpen) {
+      fetchUserBankAccounts();
+    }
+  }, [bankAccountModalOpen, fetchUserBankAccounts]);
 
-  const handleWithdrawalSubmit = useCallback(
-    async (data: CreateWithdrawalRequest) => {
-      setProcessingWithdrawal(true);
-      try {
-        const success = await requestWithdrawal(data);
-        return success;
-      } finally {
-        setProcessingWithdrawal(false);
+  const handleWithdrawalSubmit = useCallback(async () => {
+    if (!selectedBankAccount || !withdrawAmount || !withdrawContent) {
+      return false;
+    }
+
+    setProcessingWithdrawal(true);
+    try {
+      const data: CreateWithdrawalRequest = {
+        amount: parseFloat(withdrawAmount),
+        bankProfileId: selectedBankAccount.id,
+        content: withdrawContent,
+      };
+      const success = await requestWithdrawal(data);
+      if (success) {
+        resetForm();
       }
-    },
-    [requestWithdrawal],
-  );
+      return success;
+    } finally {
+      setProcessingWithdrawal(false);
+    }
+  }, [selectedBankAccount, withdrawAmount, withdrawContent, requestWithdrawal]);
 
   const openWithdrawalModal = useCallback(() => {
     setIsModalOpen(true);
@@ -85,12 +93,12 @@ export const useWalletManager = () => {
 
   const resetForm = useCallback(() => {
     setWithdrawAmount('');
-    setAccountNumber('');
-    setAccountName('');
-    setSelectedBank(null);
+    setWithdrawContent('');
+    setSelectedBankAccount(null);
   }, []);
 
   return {
+    // Data
     balance,
     withdrawals,
     loading,
@@ -98,28 +106,28 @@ export const useWalletManager = () => {
     page,
     totalItems,
     size,
-    banks,
 
+    // Withdrawal modal state
     isModalOpen,
     setIsModalOpen,
     withdrawAmount,
     setWithdrawAmount,
-    accountNumber,
-    setAccountNumber,
-    accountName,
-    setAccountName,
-    selectedBank,
-    setSelectedBank,
+    withdrawContent,
+    setWithdrawContent,
+    selectedBankAccount,
+    setSelectedBankAccount,
     processingWithdrawal,
 
-    bankModalOpen,
-    setBankModalOpen,
-    bankSearch,
-    setBankSearch,
+    // Bank account modal state
+    bankAccountModalOpen,
+    setBankAccountModalOpen,
+    userBankAccounts,
+    loadingBankAccounts,
+    fetchUserBankAccounts,
 
+    // Actions
     setPage,
     refresh,
-    fetchBanks,
     handleWithdrawalSubmit,
     cancelWithdrawal,
     openWithdrawalModal,
