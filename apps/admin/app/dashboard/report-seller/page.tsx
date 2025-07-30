@@ -157,7 +157,9 @@ const ReportDetailModal = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">ID</p>
-                <p className="max-w-[150px] truncate overflow-hidden whitespace-nowrap">{report.id}</p>
+                <p className="max-w-[150px] truncate overflow-hidden whitespace-nowrap">
+                  {report.id}
+                </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">ID khách hàng</p>
@@ -273,84 +275,84 @@ export default function ReportManagementPage() {
     fetchEvidence,
   } = useReportSeller();
 
-const EvidenceDetailModal = ({
-  evidence,
-  isOpen,
-  onClose,
-}: {
-  evidence: TEvidence[] | null;
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
-  console.log('Evidence in modal:', evidence); // Add for debugging
+  const EvidenceDetailModal = ({
+    evidence,
+    isOpen,
+    onClose,
+  }: {
+    evidence: TEvidence[] | null;
+    isOpen: boolean;
+    onClose: () => void;
+  }) => {
+    console.log('Evidence in modal:', evidence); // Add for debugging
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Chi tiết bằng chứng
-          </DialogTitle>
-          <DialogDescription>Thông tin chi tiết về bằng chứng</DialogDescription>
-        </DialogHeader>
-        {evidence && evidence.length > 0 ? (
-          <div className="grid gap-6">
-            {evidence.map((item, index) => (
-              <div key={item.id || index} className="grid gap-4 border-b pb-4">
-                {/* <h4 className="font-medium">Bằng chứng {index + 1}</h4> */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">ID</p>
-                    <p>{item.id || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Vai trò người gửi</p>
-                    <p>{item.senderRole || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Tên người gửi</p>
-                    <p>{item.senderName || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">ID người gửi</p>
-                    <p>{item.senderId || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Ghi chú</p>
-                    <p>{item.notes || 'N/A'}</p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-sm font-medium text-muted-foreground">Hình ảnh/Video</p>
-                    {Array.isArray(item.evidenceUrls) && item.evidenceUrls.length > 0 ? (
-                      <div className="flex flex-col gap-2 mt-2">
-                        {item.evidenceUrls.map((url, urlIndex) => (
-                          <a
-                            key={urlIndex}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline truncate"
-                          >
-                            {url}
-                          </a>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-muted-foreground">Không có bằng chứng</p>
-                    )}
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              Chi tiết bằng chứng
+            </DialogTitle>
+            <DialogDescription>Thông tin chi tiết về bằng chứng</DialogDescription>
+          </DialogHeader>
+          {evidence && evidence.length > 0 ? (
+            <div className="grid gap-6">
+              {evidence.map((item, index) => (
+                <div key={item.id || index} className="grid gap-4 border-b pb-4">
+                  {/* <h4 className="font-medium">Bằng chứng {index + 1}</h4> */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">ID</p>
+                      <p>{item.id || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Vai trò người gửi</p>
+                      <p>{item.senderRole || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Tên người gửi</p>
+                      <p>{item.senderName || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">ID người gửi</p>
+                      <p>{item.senderId || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Ghi chú</p>
+                      <p>{item.notes || 'N/A'}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-sm font-medium text-muted-foreground">Hình ảnh/Video</p>
+                      {Array.isArray(item.evidenceUrls) && item.evidenceUrls.length > 0 ? (
+                        <div className="flex flex-col gap-2 mt-2">
+                          {item.evidenceUrls.map((url, urlIndex) => (
+                            <a
+                              key={urlIndex}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline truncate"
+                            >
+                              {url}
+                            </a>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground">Không có bằng chứng</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-red-600 text-center">Không có dữ liệu bằng chứng</p>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-};
+              ))}
+            </div>
+          ) : (
+            <p className="text-red-600 text-center">Không có dữ liệu bằng chứng</p>
+          )}
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -396,18 +398,18 @@ const EvidenceDetailModal = ({
     setSelectedReport(report);
     setIsDetailModalOpen(true);
   };
-const handleViewEvidence = async (reportId: string) => {
-  try {
-    const evidenceArray = await fetchEvidence(reportId);
-    console.log('Fetched evidence:', evidenceArray);
-    setSelectedEvidence(evidenceArray); // Set the full array
-    setIsEvidenceModalOpen(true);
-  } catch (error) {
-    console.error('Error fetching evidence:', error);
-    setDeleteError('Lỗi khi tải bằng chứng');
-    setSelectedEvidence([]); // Set empty array on error
-  }
-};
+  const handleViewEvidence = async (reportId: string) => {
+    try {
+      const evidenceArray = await fetchEvidence(reportId);
+      console.log('Fetched evidence:', evidenceArray);
+      setSelectedEvidence(evidenceArray); // Set the full array
+      setIsEvidenceModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching evidence:', error);
+      setDeleteError('Lỗi khi tải bằng chứng');
+      setSelectedEvidence([]); // Set empty array on error
+    }
+  };
   const filteredReports = reports.filter((report) => {
     const matchesCategory =
       selectedCategory === 'all' ||
@@ -496,42 +498,45 @@ const handleViewEvidence = async (reportId: string) => {
             </div>
           ) : (
             <Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead>ID</TableHead>
-      <TableHead>ID khách hàng</TableHead>
-      <TableHead>ID sản phẩm</TableHead>
-      <TableHead>ID đơn hàng</TableHead>
-      <TableHead>ID người bán</TableHead>
-      <TableHead>Loại tố cáo</TableHead>
-      <TableHead>Nội dung</TableHead>
-      <TableHead>Trạng thái</TableHead>
-      <TableHead>Bằng chứng</TableHead>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>ID khách hàng</TableHead>
+                  <TableHead>ID sản phẩm</TableHead>
+                  <TableHead>ID đơn hàng</TableHead>
+                  <TableHead>ID người bán</TableHead>
+                  <TableHead>Loại tố cáo</TableHead>
+                  <TableHead>Nội dung</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Bằng chứng</TableHead>
 
-      <TableHead className="text-right">Thao tác</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {filteredReports.map((report) => (
-      <TableRow key={report.id}>
-        <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
-          {report.id}
-        </TableCell>
-        <TableCell className="font-medium">{report.customerId}</TableCell>
-        <TableCell className="font-medium">{report.productId}</TableCell>
-        <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
-          {report.orderId}
-        </TableCell>
-        <TableCell className="font-medium">{report.sellerId}</TableCell>
-        <TableCell className="font-medium">{report.typeReport}</TableCell>
-        <TableCell className="font-medium">{report.content}</TableCell>
-        <TableCell className="font-medium">{report.resolutionStatus}</TableCell>
-<TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => handleViewEvidence(report.id)}>
+                  <TableHead className="text-right">Thao tác</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredReports.map((report) => (
+                  <TableRow key={report.id}>
+                    <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
+                      {report.id}
+                    </TableCell>
+                    <TableCell className="font-medium">{report.customerId}</TableCell>
+                    <TableCell className="font-medium">{report.productId}</TableCell>
+                    <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
+                      {report.orderId}
+                    </TableCell>
+                    <TableCell className="font-medium">{report.sellerId}</TableCell>
+                    <TableCell className="font-medium">{report.typeReport}</TableCell>
+                    <TableCell className="font-medium">{report.content}</TableCell>
+                    <TableCell className="font-medium">{report.resolutionStatus}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewEvidence(report.id)}
+                      >
                         Bằng chứng
                       </Button>
                     </TableCell>
-        
 
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => handleView(report)}>

@@ -77,20 +77,18 @@ const rejectReport = async (id: string): Promise<IResponseObject<null>> => {
   return response.data;
 };
 
- 
-
 const getEvidence = async (id: string): Promise<TEvidence[]> => {
   try {
     const response = await authApi.default.get<IResponseObject<TEvidence[]>>(
       `/report-seller/${id}/evidences/SYSTEM`,
       {
         withCredentials: true,
-      }
+      },
     );
-    return response.data.content || []; 
+    return response.data.content || [];
   } catch (error) {
     throw error;
   }
 };
 
-export { acceptReport, getReports, rejectReport, getEvidence };
+export { acceptReport, getEvidence, getReports, rejectReport };

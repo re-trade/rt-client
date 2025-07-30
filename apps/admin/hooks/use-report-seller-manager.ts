@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  TReportSellerProfile,
   TEvidence,
+  TReportSellerProfile,
   acceptReport,
+  getEvidence,
   getReports,
   rejectReport,
-  getEvidence,
 } from '@/services/report.seller.api';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -51,21 +51,21 @@ const useReportSeller = () => {
     [page],
   );
 
-const fetchEvidence = useCallback(async (id: string) => {
-  setEvidenceLoading(true);
-  setEvidenceError(null);
-  try {
-    const response = await getEvidence(id); // response is TEvidence[]
-    setEvidence(response); // Set the array of evidence
-    return response;
-  } catch (err) {
-    setEvidence([]); // Set empty array on error
-    setEvidenceError(err instanceof Error ? err.message : 'Failed to fetch evidence');
-    return [];
-  } finally {
-    setEvidenceLoading(false);
-  }
-}, []);
+  const fetchEvidence = useCallback(async (id: string) => {
+    setEvidenceLoading(true);
+    setEvidenceError(null);
+    try {
+      const response = await getEvidence(id); // response is TEvidence[]
+      setEvidence(response); // Set the array of evidence
+      return response;
+    } catch (err) {
+      setEvidence([]); // Set empty array on error
+      setEvidenceError(err instanceof Error ? err.message : 'Failed to fetch evidence');
+      return [];
+    } finally {
+      setEvidenceLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchReports();
