@@ -33,7 +33,12 @@ export type TProductHistory = {
   ownerName: string;
   ownerAvatarUrl: string;
 };
-
+export type HomeStats ={
+  totalProducts: number;
+  totalSoldProducts: number;
+  totaOrders: number;
+  totalUsers: number;
+}
 export type TProductFilter = {
   categoriesAdvanceSearch: {
     id: string;
@@ -118,6 +123,18 @@ export const productApi = {
     });
     return response.data.content;
   },
+  async getproductBestSellers(
+    page: number = 0,
+    size: number = 8,
+  ): Promise<TProduct[]> {
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products/best-selling', {
+      params: {
+        page,
+        size,
+      },
+    });
+    return response.data.content;
+  },
   async getProductHistory(
     productId: string,
     page: number = 0,
@@ -132,6 +149,13 @@ export const productApi = {
         },
       },
     );
+    return response.data.content;
+  },
+  async getHomeStats(): Promise<HomeStats> {
+    const response = await unAuthApi.default.get<IResponseObject<HomeStats>>('/products/home-stats');
+    if (!response.data.success) {
+      throw new Error('Failed to fetch home stats');
+    }
     return response.data.content;
   },
 };

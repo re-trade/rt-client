@@ -2,8 +2,6 @@
 
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useProductHome } from '@/hooks/use-product-home';
 import {
   ChevronRight,
@@ -19,6 +17,9 @@ import {
   TrendingUp,
   Upload,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { productApi, TProduct,HomeStats } from '@/services/product.api';
 
 export default function Home() {
   const {
@@ -31,7 +32,24 @@ export default function Home() {
     error,
   } = useProductHome();
   const router = useRouter();
-  
+
+  const [productsBestSellers, setProducts] = useState<TProduct[]>([]);
+  const [homeStats, setHomeStats] = useState<HomeStats | null>(null);
+  useEffect(() => {
+    const fetching = async () => {
+      const homeStatsResponse = await productApi.getHomeStats();
+      console.log(homeStatsResponse);
+      if (homeStatsResponse) {
+        setHomeStats(homeStatsResponse);
+      }
+      const response = await productApi.getproductBestSellers();
+      if (response) {
+        setProducts(response);
+      }
+    };
+    fetching();
+  }, []); 
+
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
       router.push(`/category/${categoryId}`);
@@ -40,7 +58,6 @@ export default function Home() {
     }
   };
 
-  
   const ProductSection = ({
     title,
     showLoading = false,
@@ -138,7 +155,7 @@ export default function Home() {
         </div>
       ) : products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {productsBestSellers.map((product) => (
             <ProductCard
               key={product.id}
               id={product.id}
@@ -253,7 +270,7 @@ export default function Home() {
                 {categories.map((category) => (
                   <button
                     key={category.id}
-                    onClick={() =>handleSelectCategory(category.id)}
+                    onClick={() => handleSelectCategory(category.id)}
                     className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                       selectedCategoryId === category.id
                         ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
