@@ -2,6 +2,8 @@
 
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useProductHome } from '@/hooks/use-product-home';
 import {
   ChevronRight,
@@ -28,7 +30,17 @@ export default function Home() {
     categoriesLoading,
     error,
   } = useProductHome();
+  const router = useRouter();
+  
+  const handleSelectCategory = (categoryId: string | null) => {
+    if (categoryId) {
+      router.push(`/category/${categoryId}`);
+    } else {
+      router.push('/products');
+    }
+  };
 
+  
   const ProductSection = ({
     title,
     showLoading = false,
@@ -47,7 +59,7 @@ export default function Home() {
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-[#121212] flex items-center gap-2">
               {title}
-              {title === 'Được quan tâm' && (
+              {title === 'Được mua nhiều' && (
                 <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium animate-pulse">
                   HOT
                 </span>
@@ -228,7 +240,7 @@ export default function Home() {
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[#FFD2B2] scrollbar-track-[#FDFEF9]">
                 <button
-                  onClick={() => selectCategory(null)}
+                  onClick={() => handleSelectCategory}
                   className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                     selectedCategoryId === null
                       ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
@@ -241,7 +253,7 @@ export default function Home() {
                 {categories.map((category) => (
                   <button
                     key={category.id}
-                    onClick={() => selectCategory(category.id)}
+                    onClick={() =>handleSelectCategory(category.id)}
                     className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                       selectedCategoryId === category.id
                         ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
@@ -259,13 +271,13 @@ export default function Home() {
 
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         <ProductSection
-          title="Được quan tâm"
+          title="Được mua nhiều"
           subtitle="Những sản phẩm hot nhất hiện tại"
           icon={<TrendingUp className="w-6 h-6" />}
           showLoading={true}
         />
         <ProductSection
-          title="Mới Đăng Gần Đây"
+          title="Mới đăng gần đây"
           subtitle="Cập nhật liên tục từ cộng đồng"
           icon={<Clock className="w-6 h-6" />}
         />
