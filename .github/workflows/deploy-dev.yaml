@@ -29,10 +29,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull nightly images
-        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod pull
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile stag pull
 
       - name: Clean Container, Image And Prepare For Deploy
-        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod up -d
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile stag up -d
         continue-on-error: true
 
       - name: Clean Old Images
