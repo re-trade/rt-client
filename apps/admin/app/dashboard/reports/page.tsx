@@ -126,7 +126,7 @@ function ReportDetailModal({
                   alt="Bằng chứng báo cáo"
                   className="max-w-full h-auto rounded-md"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none'; 
+                    e.currentTarget.style.display = 'none';
                     console.error('Error loading image:', report.imageUrl);
                   }}
                 />

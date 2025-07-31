@@ -1,4 +1,4 @@
-import {authApi } from '@retrade/util';
+import { authApi } from '@retrade/util';
 
 export type TReportSellerProfile = {
   id: string;
@@ -81,7 +81,7 @@ const getEvidence = async (id: string): Promise<TEvidence[]> => {
   try {
     const response = await authApi.default.get<IResponseObject<TEvidence[]>>(
       `/report-seller/${id}/evidences/SYSTEM`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
     return response.data.content || [];
   } catch (error: any) {
@@ -90,48 +90,46 @@ const getEvidence = async (id: string): Promise<TEvidence[]> => {
   }
 };
 
-
 const postEvidence = async (
   id: string,
   data: { evidenceUrls: string[]; note: string },
 ): Promise<IResponseObject<TEvidence>> => {
   try {
-    if (!id || id.trim() === "") {
-      throw new Error("Report ID is required")
+    if (!id || id.trim() === '') {
+      throw new Error('Report ID is required');
     }
 
     if (!data.evidenceUrls?.length && !data.note?.trim()) {
-      throw new Error("Either evidence URLs or note is required")
+      throw new Error('Either evidence URLs or note is required');
     }
 
-    
     const cleanData = {
-      evidenceUrls: data.evidenceUrls.filter((url) => url && url.trim() !== ""),
-      note: data.note?.trim() || "",
-    }
+      evidenceUrls: data.evidenceUrls.filter((url) => url && url.trim() !== ''),
+      note: data.note?.trim() || '',
+    };
 
-    console.log("Posting evidence with:", { id: id, data: cleanData })
+    console.log('Posting evidence with:', { id: id, data: cleanData });
 
     const response = await authApi.default.post<IResponseObject<TEvidence>>(
       `/report-seller/${id}/evidences/system`,
       cleanData,
       {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         withCredentials: true,
       },
-    )
+    );
 
     if (!response?.data) {
-      throw new Error("No data returned from postEvidence")
+      throw new Error('No data returned from postEvidence');
     }
 
-    return response.data
+    return response.data;
   } catch (error: any) {
-    console.error("Error posting evidence:", error)
-    throw new Error(error.message || "Failed to post evidence")
+    console.error('Error posting evidence:', error);
+    throw new Error(error.message || 'Failed to post evidence');
   }
-}
+};
 
-export { acceptReport, getEvidence, getReports, rejectReport, postEvidence };
+export { acceptReport, getEvidence, getReports, postEvidence, rejectReport };
