@@ -29,6 +29,7 @@ import {
 } from 'react-icons/md';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import BuyNowDialog from '@components/common/BuyNowDialog';
 
 function ProductDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -38,6 +39,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [stockWarning, setStockWarning] = useState(false);
+  const [showBuyNow, setShowBuyNow] = useState(false);
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description',
   );
@@ -343,11 +345,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     Tình trạng:
                   </span>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      productDetail.quantity > 0
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${productDetail.quantity > 0
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
-                    }`}
+                      }`}
                     style={{
                       color: productDetail.quantity > 0 ? '#166534' : '#991b1b',
                       backgroundColor: productDetail.quantity > 0 ? '#dcfce7' : '#fee2e2',
@@ -419,7 +420,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     </button>
                     <button
                       className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors"
-                      onClick={buyNow}
+                      onClick={() => setShowBuyNow(true)}
                       disabled={productDetail.quantity === 0}
                       style={{ color: '#ffffff' }}
                     >
@@ -429,7 +430,12 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 </div>
               </div>
             </div>
-
+            <BuyNowDialog
+              isOpen={showBuyNow}
+              onClose={() => setShowBuyNow(false)}
+              product={productDetail}
+              initialQuantity={2}
+            />
             {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
@@ -482,11 +488,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   onClick={() =>
                     setActiveTab(tab.key as 'description' | 'specifications' | 'reviews')
                   }
-                  className={`px-6 py-4 font-semibold transition-colors relative ${
-                    activeTab === tab.key
+                  className={`px-6 py-4 font-semibold transition-colors relative ${activeTab === tab.key
                       ? 'text-orange-600 border-b-2 border-orange-600'
                       : 'text-gray-600 hover:text-orange-600'
-                  }`}
+                    }`}
                   style={{
                     color: activeTab === tab.key ? '#ea580c' : '#6b7280',
                   }}
