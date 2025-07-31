@@ -18,8 +18,12 @@ export function useProductDetail(id: string) {
         ...(product.productImages || []),
       ]);
 
-      const related = await productApi.getProductSimilar(id, 0, 4);
-      setRelatedProducts(related);
+      try {
+        const related = await productApi.getProductSimilar(id, 0, 4);
+        setRelatedProducts(related);
+      } catch {
+        setRelatedProducts([]);
+      }
 
       const productHistories = await productApi.getProductHistory(id);
       setProductHistories(productHistories);
