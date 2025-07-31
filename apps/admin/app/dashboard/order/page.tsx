@@ -26,6 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useOrderManager } from '@/hooks/use-order-manager';
+import { TOrder } from '@/services/order.api';
 import {
   AlertCircle,
   Ban,
@@ -46,7 +47,6 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
-import { TOrder } from '@/services/order.api';
 
 const OrderStats = ({ orders }: { orders: TOrder[] }) => {
   const completedOrders = orders.filter((o) =>

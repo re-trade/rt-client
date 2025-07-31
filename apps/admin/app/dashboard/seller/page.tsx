@@ -28,6 +28,7 @@ import {
 import { useSellerManager } from '@/hooks/use-seller-manager';
 import {
   AlertCircle,
+  Calendar,
   CheckCircle,
   Eye,
   Filter,
@@ -35,10 +36,8 @@ import {
   RefreshCw,
   Search,
   XCircle,
-  Calendar,
 } from 'lucide-react';
 import { useState } from 'react';
-import { format } from 'date-fns';
 
 // Define the TSellerProfile interface
 interface TSellerProfile {
