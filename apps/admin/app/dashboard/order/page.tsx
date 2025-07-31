@@ -26,12 +26,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useOrderManager } from '@/hooks/use-order-manager';
-import { number } from 'joi';
 
 import {
   AlertCircle,
   Ban,
   CheckCircle,
+  ChevronDown,
+  ChevronRight,
   Clock,
   CreditCard,
   DollarSign,
@@ -45,30 +46,39 @@ import {
   Undo2,
   XCircle,
 } from 'lucide-react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const OrderStats = ({ orders }: { orders: any[] }) => {
   const totalOrders = orders.length;
 
-const completedOrder = orders.filter((o) =>
-  o.orderCombos?.some((combo: any) => combo.status === 'Completed')
-).length;
+  const completedOrder = orders.filter((o) =>
+    o.orderCombos?.some((combo: any) => combo.status === 'Completed'),
+  ).length;
   const pendingOrders = orders.filter((o) => o.status === 'Peding').length;
   const paymentConfirmationOrders = orders.filter(
     (o) => o.status === 'PAYMENT_CONFIRMATION',
   ).length;
-  const paymentFailedOrders = orders.filter((o) => o.orderCombos.status === 'PAYMENT_FAILED').length;
-  const paymentCancelledOrders = orders.filter((o) => o.orderCombos.status === 'PAYMENT_CANCELLED').length;
+  const paymentFailedOrders = orders.filter(
+    (o) => o.orderCombos.status === 'PAYMENT_FAILED',
+  ).length;
+  const paymentCancelledOrders = orders.filter(
+    (o) => o.orderCombos.status === 'PAYMENT_CANCELLED',
+  ).length;
   const unpaidOrders = orders.filter((o) => o.orderCombos.status === 'UNPAID').length;
   const preparingOrders = orders.filter((o) => o.orderCombos.status === 'PREPARING').length;
   const deliveringOrders = orders.filter((o) => o.orderCombos.status === 'DELIVERING').length;
   const deliveredOrders = orders.filter((o) => o.orderCombos.status === 'DELIVERED').length;
   const completedOrders = orders.filter((o) => o.orderCombos.status === 'COMPLETED').length;
   const cancelledOrders = orders.filter((o) => o.orderCombos.status === 'CANCELLED').length;
-  const returnRequestedOrders = orders.filter((o) => o.orderCombos.status === 'RETURN_REQUESTED').length;
-  const returnApprovedOrders = orders.filter((o) => o.orderCombos.status === 'RETURN_APPROVED').length;
-  const returnRejectedOrders = orders.filter((o) => o.orderCombos.status === 'RETURN_REJECTED').length;
+  const returnRequestedOrders = orders.filter(
+    (o) => o.orderCombos.status === 'RETURN_REQUESTED',
+  ).length;
+  const returnApprovedOrders = orders.filter(
+    (o) => o.orderCombos.status === 'RETURN_APPROVED',
+  ).length;
+  const returnRejectedOrders = orders.filter(
+    (o) => o.orderCombos.status === 'RETURN_REJECTED',
+  ).length;
   const returningOrders = orders.filter((o) => o.orderCombos.status === 'RETURNING').length;
   const returnedOrders = orders.filter((o) => o.orderCombos.status === 'RETURNED').length;
   const refundedOrders = orders.filter((o) => o.orderCombos.status === 'REFUNDED').length;
@@ -377,7 +387,7 @@ export default function OrderManagementPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
- const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set()); // Track expanded orders
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set()); // Track expanded orders
   const {
     orders = [],
     page,
@@ -413,7 +423,6 @@ export default function OrderManagementPage() {
     goToPage(newPage, searchQuery);
   };
 
-  
   const handleCancel = async (reportId: string) => {
     const result = await cancelOrder(reportId);
     if (result.success) {
@@ -443,35 +452,34 @@ export default function OrderManagementPage() {
   const filteredOrders = orders.filter((order) => {
     const matchesCategory =
       selectedCategory === 'all' ||
-order.orderCombos.some((combo) =>
-  combo.status.toLowerCase().includes(selectedCategory.toLowerCase())
-)
+      order.orderCombos.some((combo) =>
+        combo.status.toLowerCase().includes(selectedCategory.toLowerCase()),
+      );
     return matchesCategory;
   });
 
   const getStatusColor = (status?: string): string => {
-  switch (status) {
-    case "PENDING":
-      return "bg-gray-100 text-gray-800";
-    case "PAYMENT_CONFIRMATION":
-    case "PREPARING":
-    case "DELIVERING":
-      return "bg-blue-100 text-blue-800";
-    case "COMPLETED":
-    case "RETURNED":
-    case "REFUNDED":
-      return "bg-green-100 text-green-800";
-    case "PAYMENT_FAILED":
-    case "CANCELLED":
-    case "RETURN_REJECTED":
-      return "bg-red-100 text-red-800";
-    case "DELIVERED":
-      return "bg-purple-100 text-purple-800";
-    default:
-      return "bg-muted text-muted-foreground";
-  }
-};
-
+    switch (status) {
+      case 'PENDING':
+        return 'bg-gray-100 text-gray-800';
+      case 'PAYMENT_CONFIRMATION':
+      case 'PREPARING':
+      case 'DELIVERING':
+        return 'bg-blue-100 text-blue-800';
+      case 'COMPLETED':
+      case 'RETURNED':
+      case 'REFUNDED':
+        return 'bg-green-100 text-green-800';
+      case 'PAYMENT_FAILED':
+      case 'CANCELLED':
+      case 'RETURN_REJECTED':
+        return 'bg-red-100 text-red-800';
+      case 'DELIVERED':
+        return 'bg-purple-100 text-purple-800';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -555,110 +563,110 @@ order.orderCombos.some((combo) =>
           ) : (
             <Table>
               <TableHeader>
-  <TableRow>
-    <TableHead></TableHead> {/* Empty header for expand icon */}
-    <TableHead>ID</TableHead>
-    <TableHead>ID khách hàng</TableHead>
-    <TableHead>Tên khách hàng</TableHead>
-    <TableHead>Số điện thoại</TableHead>
-    <TableHead>Tổng số tiền</TableHead>
-    <TableHead>Tình trạng</TableHead>
-    <TableHead>Ngày tạo</TableHead>
-    <TableHead>Ngày cập nhật cuối</TableHead>
-    <TableHead className="text-right">Thao tác</TableHead>
-  </TableRow>
-</TableHeader>
+                <TableRow>
+                  <TableHead></TableHead> {/* Empty header for expand icon */}
+                  <TableHead>ID</TableHead>
+                  <TableHead>ID khách hàng</TableHead>
+                  <TableHead>Tên khách hàng</TableHead>
+                  <TableHead>Số điện thoại</TableHead>
+                  <TableHead>Tổng số tiền</TableHead>
+                  <TableHead>Tình trạng</TableHead>
+                  <TableHead>Ngày tạo</TableHead>
+                  <TableHead>Ngày cập nhật cuối</TableHead>
+                  <TableHead className="text-right">Thao tác</TableHead>
+                </TableRow>
+              </TableHeader>
               <TableBody>
-  {filteredOrders.map((order) => (
-    <>
-      <TableRow key={order.orderId}>
-        <TableCell>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => toggleExpandOrder(order.orderId)}
-          >
-            {expandedOrders.has(order.orderId) ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-        </TableCell>
-        <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
-          {order.orderId}
-        </TableCell>
-        <TableCell className="font-medium">{order.customerId}</TableCell>
-        <TableCell className="font-medium">{order.customerName}</TableCell>
-        <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
-          {order.destination.phone}
-        </TableCell>
-        <TableCell className="font-medium">{order.grandTotal}</TableCell>
-        <TableCell className="font-medium">
-          <span
-            className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
-              order.orderCombos[0]?.status
-            )}`}
-          >
-            {order.orderCombos[0]?.status ?? '-'}
-          </span>
-        </TableCell>
-        <TableCell className="font-medium">
-          {new Date(order.createdAt).toLocaleDateString('vi-VN')}
-        </TableCell>
-        <TableCell className="font-medium">
-          {new Date(order.updatedAt).toLocaleDateString('vi-VN')}
-        </TableCell>
-        <TableCell className="text-right">
-          <Button variant="outline" size="sm" onClick={() => handleView(order)}>
-            Chi tiết
-          </Button>
-        </TableCell>
-      </TableRow>
-      {expandedOrders.has(order.orderId) && (
-        <TableRow>
-          <TableCell colSpan={10}>
-            <div className="pl-8">
-              <h4 className="font-medium mb-2">Danh sách Order Combos</h4>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Combo ID</TableHead>
-                    <TableHead>Seller ID</TableHead>
-                    <TableHead>Tên Seller</TableHead>
-                    <TableHead>Giá</TableHead>
-                    <TableHead>Tình trạng</TableHead>
-                    <TableHead>Item IDs</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {order.orderCombos.map((combo: any) => (
-                    <TableRow key={combo.comboId}>
-                      <TableCell>{combo.comboId}</TableCell>
-                      <TableCell>{combo.sellerId}</TableCell>
-                      <TableCell>{combo.sellerName}</TableCell>
-                      <TableCell>{combo.grandPrice}</TableCell>
+                {filteredOrders.map((order) => (
+                  <>
+                    <TableRow key={order.orderId}>
                       <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleExpandOrder(order.orderId)}
+                        >
+                          {expandedOrders.has(order.orderId) ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </TableCell>
+                      <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
+                        {order.orderId}
+                      </TableCell>
+                      <TableCell className="font-medium">{order.customerId}</TableCell>
+                      <TableCell className="font-medium">{order.customerName}</TableCell>
+                      <TableCell className="font-medium max-w-[150px] truncate overflow-hidden whitespace-nowrap">
+                        {order.destination.phone}
+                      </TableCell>
+                      <TableCell className="font-medium">{order.grandTotal}</TableCell>
+                      <TableCell className="font-medium">
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
-                            combo.status
+                            order.orderCombos[0]?.status,
                           )}`}
                         >
-                          {combo.status}
+                          {order.orderCombos[0]?.status ?? '-'}
                         </span>
                       </TableCell>
-                      <TableCell>{combo.itemIds.join(', ')}</TableCell>
+                      <TableCell className="font-medium">
+                        {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {new Date(order.updatedAt).toLocaleDateString('vi-VN')}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" size="sm" onClick={() => handleView(order)}>
+                          Chi tiết
+                        </Button>
+                      </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </TableCell>
-        </TableRow>
-      )}
-    </>
-  ))}
-</TableBody>
+                    {expandedOrders.has(order.orderId) && (
+                      <TableRow>
+                        <TableCell colSpan={10}>
+                          <div className="pl-8">
+                            <h4 className="font-medium mb-2">Danh sách Order Combos</h4>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Combo ID</TableHead>
+                                  <TableHead>Seller ID</TableHead>
+                                  <TableHead>Tên Seller</TableHead>
+                                  <TableHead>Giá</TableHead>
+                                  <TableHead>Tình trạng</TableHead>
+                                  <TableHead>Item IDs</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {order.orderCombos.map((combo: any) => (
+                                  <TableRow key={combo.comboId}>
+                                    <TableCell>{combo.comboId}</TableCell>
+                                    <TableCell>{combo.sellerId}</TableCell>
+                                    <TableCell>{combo.sellerName}</TableCell>
+                                    <TableCell>{combo.grandPrice}</TableCell>
+                                    <TableCell>
+                                      <span
+                                        className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
+                                          combo.status,
+                                        )}`}
+                                      >
+                                        {combo.status}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell>{combo.itemIds.join(', ')}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
+                ))}
+              </TableBody>
             </Table>
           )}
         </div>

@@ -2,8 +2,6 @@
 
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useProductHome } from '@/hooks/use-product-home';
 import {
   ChevronRight,
@@ -19,6 +17,7 @@ import {
   TrendingUp,
   Upload,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const {
@@ -31,7 +30,7 @@ export default function Home() {
     error,
   } = useProductHome();
   const router = useRouter();
-  
+
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
       router.push(`/category/${categoryId}`);
@@ -40,7 +39,6 @@ export default function Home() {
     }
   };
 
-  
   const ProductSection = ({
     title,
     showLoading = false,
@@ -253,7 +251,7 @@ export default function Home() {
                 {categories.map((category) => (
                   <button
                     key={category.id}
-                    onClick={() =>handleSelectCategory(category.id)}
+                    onClick={() => handleSelectCategory(category.id)}
                     className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                       selectedCategoryId === category.id
                         ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'

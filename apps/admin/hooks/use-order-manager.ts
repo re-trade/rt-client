@@ -1,6 +1,6 @@
 'use client';
 
-import { orderApi, TOrder} from '@/services/order.api';
+import { orderApi, TOrder } from '@/services/order.api';
 import { useCallback, useEffect, useState } from 'react';
 
 const useOrderManager = () => {
@@ -12,37 +12,37 @@ const useOrderManager = () => {
   const [error, setError] = useState<string | null>(null);
   const pageSize = 10;
 
-    const fetchOrders = useCallback(
-      async (searchQuery?: string, customPage?: number) => {
-        setLoading(true);
-        setError(null);
-        try {
-          const response = await orderApi.getAllOrders(
-            (customPage ?? page) - 1,
-            pageSize,
-            searchQuery,
-          );
-          if (response.success) {
-            setOrders(response.content as any);
-            setMaxPage(response.pagination?.totalPages ?? 1);
-            setTotalOrders(response.pagination?.totalElements ?? 0);
-          } else {
-            setOrders([]);
-            setMaxPage(1);
-            setTotalOrders(0);
-            setError(response.message || 'Lỗi khi tải đơn hàng');
-          }
-        } catch (err) {
+  const fetchOrders = useCallback(
+    async (searchQuery?: string, customPage?: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await orderApi.getAllOrders(
+          (customPage ?? page) - 1,
+          pageSize,
+          searchQuery,
+        );
+        if (response.success) {
+          setOrders(response.content as any);
+          setMaxPage(response.pagination?.totalPages ?? 1);
+          setTotalOrders(response.pagination?.totalElements ?? 0);
+        } else {
           setOrders([]);
           setMaxPage(1);
           setTotalOrders(0);
-          setError(err instanceof Error ? err.message : 'Lỗi khi tải đơn hàng');
-        } finally {
-          setLoading(false);
+          setError(response.message || 'Lỗi khi tải đơn hàng');
         }
-      },
-      [page],
-    );
+      } catch (err) {
+        setOrders([]);
+        setMaxPage(1);
+        setTotalOrders(0);
+        setError(err instanceof Error ? err.message : 'Lỗi khi tải đơn hàng');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page],
+  );
 
   useEffect(() => {
     fetchOrders();
@@ -59,21 +59,19 @@ const useOrderManager = () => {
   };
 
   const cancelOrder = async (id: string) => {
-      try {
-        const result = await orderApi.cancelOrder(id);
-        if (result) {
-          await refetch();
-        }
-        return result;
-      } catch (err) {
-        return {
-          success: false,
-          message: err instanceof Error ? err.message : 'Lỗi hoãn đơn hàng',
-        };
+    try {
+      const result = await orderApi.cancelOrder(id);
+      if (result) {
+        await refetch();
       }
-    };
-
-
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : 'Lỗi hoãn đơn hàng',
+      };
+    }
+  };
 
   return {
     orders,
@@ -86,7 +84,6 @@ const useOrderManager = () => {
     goToPage,
     searchOrders,
     cancelOrder,
-
   };
 };
 

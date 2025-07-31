@@ -8,8 +8,12 @@ import {
   Package,
   Store,
   Users,
+  ShoppingCart,
+  AlertTriangle,
+  Tag,
 } from 'lucide-react';
 import React from 'react';
+import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 
 const StatCard = ({
   title,
@@ -95,6 +99,55 @@ const ActivityCard = ({
 );
 
 export default function AdminPage() {
+  const { stats, loading, error } = useDashboardStats();
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold">Tổng quan hệ thống</h2>
+          <p className="text-muted-foreground">Đang tải dữ liệu...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(5)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-2" />
+                <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold">Tổng quan hệ thống</h2>
+          <p className="text-red-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold">Tổng quan hệ thống</h2>
+          <p className="text-muted-foreground">Không có dữ liệu</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -102,33 +155,40 @@ export default function AdminPage() {
         <p className="text-muted-foreground">Xem tổng quan về hoạt động của hệ thống admin</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Tổng số shop"
-          value="150"
-          change="+5% so với tháng trước"
-          icon={Store}
-          trend="up"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
           title="Tổng số người dùng"
-          value="12,500"
-          change="+8% so với tháng trước"
+          value={stats.totalCustomers.toLocaleString()}
+          change="+5% so với tháng trước"
           icon={Users}
           trend="up"
         />
         <StatCard
-          title="Tổng số sản phẩm"
-          value="45,231"
+          title="Shop đang hoạt động"
+          value={stats.totalSellers.toLocaleString()}
+          change="+8% so với tháng trước"
+          icon={Store}
+          trend="up"
+        />
+        <StatCard
+          title="Sản phẩm đang bán"
+          value={stats.totalProducts.toLocaleString()}
           change="+12% so với tháng trước"
           icon={Package}
           trend="up"
         />
         <StatCard
-          title="Doanh thu hệ thống"
-          value="1.2 tỷ"
+          title="Tổng đơn hàng"
+          value={stats.totalOrders.toLocaleString()}
           change="+15% so với tháng trước"
-          icon={DollarSign}
+          icon={ShoppingCart}
+          trend="up"
+        />
+        <StatCard
+          title="Danh mục sản phẩm"
+          value={stats.totalCategories.toLocaleString()}
+          change="+3% so với tháng trước"
+          icon={Tag}
           trend="up"
         />
       </div>
@@ -138,46 +198,46 @@ export default function AdminPage() {
           title="Hoạt động gần đây"
           items={[
             {
-              title: 'Shop mới đăng ký',
-              description: 'Shop Thời Trang ABC đã đăng ký thành công',
+              title: 'Hệ thống hoạt động bình thường',
+              description: 'Tất cả các dịch vụ đang hoạt động ổn định',
               time: '2 phút trước',
               status: 'success',
             },
             {
-              title: 'Cảnh báo hệ thống',
-              description: 'Phát hiện hoạt động bất thường từ IP 192.168.1.1',
-              time: '15 phút trước',
-              status: 'warning',
+              title: 'Cập nhật dữ liệu thành công',
+              description: 'Đã cập nhật thống kê dashboard từ API',
+              time: '5 phút trước',
+              status: 'success',
             },
             {
-              title: 'Lỗi thanh toán',
-              description: 'Giao dịch #12345 thất bại do lỗi kết nối',
-              time: '1 giờ trước',
-              status: 'error',
+              title: 'Hệ thống admin online',
+              description: 'Admin dashboard đang hoạt động bình thường',
+              time: '10 phút trước',
+              status: 'success',
             },
           ]}
         />
 
         <ActivityCard
-          title="Đơn hàng cần xử lý"
+          title="Thống kê hệ thống"
           items={[
             {
-              title: 'Đơn hàng #ORD1001',
-              description: 'Shop Thời Trang ABC - 2,990,000đ',
-              time: 'Cần xác nhận',
-              status: 'warning',
+              title: `Tổng ${stats.totalCustomers.toLocaleString()} người dùng`,
+              description: 'Khách hàng đã đăng ký trên hệ thống',
+              time: 'Cập nhật mới nhất',
+              status: 'success',
             },
             {
-              title: 'Đơn hàng #ORD1002',
-              description: 'Shop Mỹ Phẩm XYZ - 5,990,000đ',
-              time: 'Cần xử lý khiếu nại',
-              status: 'error',
+              title: `${stats.totalSellers.toLocaleString()} shop đang hoạt động`,
+              description: 'Các shop đang kinh doanh trên nền tảng',
+              time: 'Cập nhật mới nhất',
+              status: 'success',
             },
             {
-              title: 'Đơn hàng #ORD1003',
-              description: 'Shop Điện Tử 123 - 1,990,000đ',
-              time: 'Cần xác nhận',
-              status: 'warning',
+              title: `${stats.totalProducts.toLocaleString()} sản phẩm đang bán`,
+              description: 'Sản phẩm đang được đăng bán trên hệ thống',
+              time: 'Cập nhật mới nhất',
+              status: 'success',
             },
           ]}
         />
