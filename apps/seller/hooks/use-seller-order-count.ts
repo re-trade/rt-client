@@ -9,7 +9,6 @@ interface UseSellerOrderCountsState {
   error: string | null;
 }
 
-// Status code configuration for UI presentation - consolidated for better readability
 export const orderStatusConfig = {
   PENDING: {
     label: 'Chờ thanh toán',
@@ -56,7 +55,6 @@ export const orderStatusConfig = {
     color: '#6366f1',
     group: 'problem',
   },
-  // Default fallback for any unknown status
   DEFAULT: {
     label: 'Không xác định',
     color: '#6b7280',
