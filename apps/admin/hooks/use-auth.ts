@@ -3,7 +3,7 @@
 import { accountMe, TAccountMeResponse } from '@/services/auth.api';
 import { useCallback, useEffect, useState } from 'react';
 
-function useAuth() {
+function useAuth(skipAutoCheck = false) {
   const [auth, setIsAuth] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
   const [account, setAccount] = useState<TAccountMeResponse>();
@@ -29,8 +29,10 @@ function useAuth() {
   }, []);
 
   useEffect(() => {
-    isAuth();
-  }, [isAuth]);
+    if (!skipAutoCheck) {
+      isAuth();
+    }
+  }, [isAuth, skipAutoCheck]);
 
   const logout = useCallback(async () => {
     // Remove from localStorage

@@ -15,7 +15,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { loginInternal } from '@/services/auth.api';
 import Joi from 'joi';
 import { EyeIcon, EyeOffIcon, KeyIcon, LoaderIcon, UserIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 
 interface LoginForm {
@@ -37,7 +37,9 @@ const loginSchema = Joi.object({
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuth } = useAuth();
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get('error');
+  const { isAuth } = useAuth(true); // Không tự động check auth
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +109,11 @@ export default function LoginPage() {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {errorParam === 'unauthorized' && (
+                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-500 text-center">
+                  Bạn không có quyền truy cập. Vui lòng đăng nhập với tài khoản admin.
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="username">Tên đăng nhập</Label>
                 <div className="relative">
