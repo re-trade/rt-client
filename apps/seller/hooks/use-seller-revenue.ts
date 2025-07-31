@@ -112,7 +112,7 @@ export function useSellerRevenue(initialYear: number = new Date().getFullYear())
     let highestMonth = state.revenueData[0];
 
     for (const month of state.revenueData) {
-      if (month.total > highestMonth.total) {
+      if (highestMonth && month.total > highestMonth.total) {
         highestMonth = month;
       }
     }
