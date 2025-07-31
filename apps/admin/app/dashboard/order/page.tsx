@@ -46,7 +46,7 @@ import {
   Undo2,
   XCircle,
 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const OrderStats = ({ orders }: { orders: TOrder[] }) => {
   const completedOrders = orders.filter((o) =>
@@ -502,11 +502,11 @@ export default function OrderManagementPage() {
   };
 
   const handleCancel = async (orderId: string) => {
-    const result = await cancelOrder(orderId);
-    if (result.success) {
+    try {
+      await cancelOrder(orderId);
       setDeleteSuccess('Hủy đơn hàng thành công!');
-    } else {
-      setDeleteError(result.message || 'Lỗi hủy đơn hàng');
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : 'Lỗi hủy đơn hàng');
     }
   };
 
@@ -540,8 +540,9 @@ export default function OrderManagementPage() {
     setExpandedSections((prev) => ({
       ...prev,
       [orderId]: {
-        ...prev[orderId],
-        [section]: !prev[orderId]?.[section],
+        combos: prev[orderId]?.combos ?? false,
+        items: prev[orderId]?.items ?? false,
+        [section]: !(prev[orderId]?.[section] ?? false),
       },
     }));
   };
@@ -672,8 +673,8 @@ export default function OrderManagementPage() {
               </TableHeader>
               <TableBody>
                 {filteredOrders.map((order: TOrder) => (
-                  <>
-                    <TableRow key={order.orderId}>
+                  <React.Fragment key={order.orderId}>
+                    <TableRow>
                       <TableCell>
                         <Button
                           variant="ghost"
@@ -821,7 +822,7 @@ export default function OrderManagementPage() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </TableBody>
             </Table>
@@ -865,12 +866,15 @@ export default function OrderManagementPage() {
           setSelectedOrder(null);
         }}
         onVerify={async (id: string) => {
-          const result = await cancelOrder(id);
-          if (result.success) setDeleteSuccess('Hủy đơn hàng thành công!');
-          else setDeleteError(result.message || 'Lỗi hủy đơn hàng');
-          setIsDetailModalOpen(false);
-          setSelectedOrder(null);
-          refetch();
+          try {
+            await cancelOrder(id);
+            setDeleteSuccess('Hủy đơn hàng thành công!');
+            setIsDetailModalOpen(false);
+            setSelectedOrder(null);
+            refetch();
+          } catch (error) {
+            setDeleteError(error instanceof Error ? error.message : 'Lỗi hủy đơn hàng');
+          }
         }}
       />
     </div>
