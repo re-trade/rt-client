@@ -1,3 +1,5 @@
+import type { Config } from 'tailwindcss';
+
 const config: any = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -17,28 +19,30 @@ const config: any = {
     themes: [
       {
         light: {
-          ...require('daisyui/src/theming/themes')['light'],
-          primary: '#3b82f6',
-          secondary: '#64748b',
-          accent: '#f59e0b',
-          neutral: '#374151',
+          primary: '#6366f1', // Indigo
+          secondary: '#8b5cf6', // Violet
+          accent: '#06b6d4', // Cyan
+          neutral: '#64748b', // Slate
           'base-100': '#ffffff',
-          info: '#0ea5e9',
-          success: '#10b981',
-          warning: '#f59e0b',
-          error: '#ef4444',
+          'base-200': '#f8fafc',
+          'base-300': '#f1f5f9',
+          info: '#0ea5e9', // Sky
+          success: '#10b981', // Emerald
+          warning: '#f59e0b', // Amber
+          error: '#ef4444', // Red
         },
         dark: {
-          ...require('daisyui/src/theming/themes')['dark'],
-          primary: '#3b82f6',
-          secondary: '#64748b',
-          accent: '#f59e0b',
-          neutral: '#374151',
-          'base-100': '#1f2937',
-          info: '#0ea5e9',
-          success: '#10b981',
-          warning: '#f59e0b',
-          error: '#ef4444',
+          primary: '#818cf8', // Indigo light
+          secondary: '#a78bfa', // Violet light
+          accent: '#22d3ee', // Cyan light
+          neutral: '#94a3b8', // Slate light
+          'base-100': '#0f172a', // Slate 900
+          'base-200': '#1e293b', // Slate 800
+          'base-300': '#334155', // Slate 700
+          info: '#38bdf8', // Sky light
+          success: '#34d399', // Emerald light
+          warning: '#fbbf24', // Amber light
+          error: '#f87171', // Red light
         },
       },
     ],

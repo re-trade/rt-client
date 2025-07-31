@@ -1,7 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -18,14 +16,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useProductManager } from '@/hooks/use-product-manager';
 import {
   AlertCircle,
@@ -40,9 +30,9 @@ import {
   Search,
   Store,
   Tag,
-  XCircle,
-  TrendingUp,
   TrendingDown,
+  TrendingUp,
+  XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -103,9 +93,7 @@ const ProductStats = ({ products }: { products: any[] }) => {
           </div>
         </div>
         <div className="stat-title text-base-content/70">Tổng giá trị</div>
-        <div className="stat-value text-secondary">
-          {totalValue.toLocaleString('vi-VN')} ₫
-        </div>
+        <div className="stat-value text-secondary">{totalValue.toLocaleString('vi-VN')} ₫</div>
         <div className="stat-desc flex items-center gap-1">
           <TrendingUp className="h-4 w-4 text-success" />
           <span className="text-success">+15% so với tháng trước</span>
@@ -262,7 +250,10 @@ const ProductDetailModal = ({
             {product.productImages && product.productImages.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {product.productImages.slice(0, 4).map((image: string, index: number) => (
-                  <div key={index} className="aspect-square overflow-hidden rounded border border-base-300">
+                  <div
+                    key={index}
+                    className="aspect-square overflow-hidden rounded border border-base-300"
+                  >
                     <img
                       src={image}
                       alt={`${product.name} ${index + 1}`}
@@ -292,10 +283,15 @@ const ProductDetailModal = ({
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 text-secondary" />
                 <span className="font-medium">Số lượng:</span>
-                <div className={`badge ${
-                  product.quantity > 10 ? 'badge-success' : 
-                  product.quantity > 0 ? 'badge-warning' : 'badge-error'
-                }`}>
+                <div
+                  className={`badge ${
+                    product.quantity > 10
+                      ? 'badge-success'
+                      : product.quantity > 0
+                        ? 'badge-warning'
+                        : 'badge-error'
+                  }`}
+                >
                   {product.quantity}
                 </div>
               </div>
@@ -350,7 +346,9 @@ const ProductDetailModal = ({
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-info" />
                 <span className="font-medium">Ngày tạo:</span>
-                <span className="text-base-content/80">{new Date(product.createdAt).toLocaleDateString('vi-VN')}</span>
+                <span className="text-base-content/80">
+                  {new Date(product.createdAt).toLocaleDateString('vi-VN')}
+                </span>
               </div>
             </div>
 
@@ -563,10 +561,7 @@ export default function ProductManagementPage() {
             <h3 className="font-bold">Thành công!</h3>
             <div className="text-xs">{deleteSuccess}</div>
           </div>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => setDeleteSuccess(null)}
-          >
+          <button className="btn btn-ghost btn-sm" onClick={() => setDeleteSuccess(null)}>
             <XCircle className="h-4 w-4" />
           </button>
         </div>
@@ -586,16 +581,12 @@ export default function ProductManagementPage() {
                   tác này.
                 </p>
                 <p className="mt-1 text-xs">
-                  <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3
-                  giây.
+                  <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3 giây.
                 </p>
               </div>
             )}
           </div>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => setDeleteError(null)}
-          >
+          <button className="btn btn-ghost btn-sm" onClick={() => setDeleteError(null)}>
             <XCircle className="h-4 w-4" />
           </button>
         </div>
@@ -731,10 +722,15 @@ export default function ProductManagementPage() {
                         )}
                       </td>
                       <td className="min-w-[80px] max-w-[100px] text-center">
-                        <div className={`badge ${
-                          product.quantity > 10 ? 'badge-success' : 
-                          product.quantity > 0 ? 'badge-warning' : 'badge-error'
-                        }`}>
+                        <div
+                          className={`badge ${
+                            product.quantity > 10
+                              ? 'badge-success'
+                              : product.quantity > 0
+                                ? 'badge-warning'
+                                : 'badge-error'
+                          }`}
+                        >
                           {product.quantity}
                         </div>
                       </td>
@@ -758,7 +754,9 @@ export default function ProductManagementPage() {
                         </div>
                       </td>
                       <td className="min-w-[100px] max-w-[120px] text-center">
-                        <div className={`badge ${product.verified ? 'badge-success' : 'badge-warning'}`}>
+                        <div
+                          className={`badge ${product.verified ? 'badge-success' : 'badge-warning'}`}
+                        >
                           {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
                         </div>
                       </td>

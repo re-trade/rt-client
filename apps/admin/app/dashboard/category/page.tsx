@@ -1,14 +1,23 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TableCell, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useCategoryManager } from '@/hooks/use-category-manager';
 import type { Category } from '@/services/category.api';
 import { unAuthApi } from '@retrade/util/src/api/instance';
-import { ChevronRight, Edit, Eye, EyeOff, Plus } from 'lucide-react';
+import { ChevronRight, Plus, Edit, Eye, EyeOff, Tag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -152,15 +161,15 @@ export default function CategoryPage() {
     return (
       <>
         <TableRow
-          className={`transition-all duration-300 hover:bg-base-200 ${
-            level > 0 ? 'border-l-4 border-primary/20 bg-primary/5' : ''
+          className={`transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 ${
+            level > 0 ? 'border-l-4 border-indigo-200 bg-gradient-to-r from-indigo-50/30 to-purple-50/30' : ''
           }`}
         >
           <TableCell style={{ paddingLeft: `${level * 32 + 16}px` }}>
             <div className="flex items-center gap-3">
               <button
                 className={`btn btn-ghost btn-sm btn-circle ${
-                  hasChildren ? 'hover:bg-primary/10' : 'opacity-50 cursor-default'
+                  hasChildren ? 'hover:bg-indigo-100 text-indigo-600' : 'opacity-50 cursor-default'
                 }`}
                 onClick={hasChildren ? () => setExpanded((e) => !e) : undefined}
                 disabled={!hasChildren}
@@ -168,14 +177,14 @@ export default function CategoryPage() {
                 <ChevronRight
                   className={`h-4 w-4 transition-transform duration-200 ${
                     expanded ? 'rotate-90' : ''
-                  } ${hasChildren ? 'text-primary' : 'text-base-content/30'}`}
+                  } ${hasChildren ? 'text-indigo-600' : 'text-gray-400'}`}
                 />
               </button>
               <span
                 className={`font-medium transition-colors ${
                   level === 0
-                    ? 'text-lg text-base-content font-bold'
-                    : 'text-sm text-primary font-semibold'
+                    ? 'text-lg text-gray-800 font-bold'
+                    : 'text-sm text-indigo-700 font-semibold'
                 }`}
               >
                 {category.name}
@@ -183,20 +192,20 @@ export default function CategoryPage() {
             </div>
           </TableCell>
           <TableCell>
-            <div className="text-sm text-base-content/70">
+            <div className="text-sm text-gray-600">
               {category.description || (
-                <span className="text-base-content/40 italic">(Không có mô tả)</span>
+                <span className="text-gray-400 italic">(Không có mô tả)</span>
               )}
             </div>
           </TableCell>
           <TableCell>
             {category.visible ? (
-              <div className="badge badge-success badge-sm gap-1">
+              <div className="badge badge-success badge-sm gap-1 bg-emerald-100 text-emerald-700 border-emerald-200">
                 <Eye className="h-3 w-3" />
                 Hiện
               </div>
             ) : (
-              <div className="badge badge-neutral badge-sm gap-1">
+              <div className="badge badge-neutral badge-sm gap-1 bg-gray-100 text-gray-600 border-gray-200">
                 <EyeOff className="h-3 w-3" />
                 Ẩn
               </div>
@@ -205,7 +214,7 @@ export default function CategoryPage() {
           <TableCell>
             <div className="flex gap-2">
               <button
-                className="btn btn-primary btn-sm btn-outline"
+                className="btn btn-primary btn-sm btn-outline border-indigo-500 text-indigo-600 hover:bg-indigo-500 hover:text-white"
                 onClick={() => openEditDialog(category)}
               >
                 <Edit className="h-4 w-4" />
@@ -213,7 +222,9 @@ export default function CategoryPage() {
               </button>
               <button
                 className={`btn btn-sm ${
-                  category.visible ? 'btn-error btn-outline' : 'btn-success btn-outline'
+                  category.visible 
+                    ? 'btn-error btn-outline border-red-500 text-red-600 hover:bg-red-500 hover:text-white' 
+                    : 'btn-success btn-outline border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white'
                 }`}
                 onClick={() => handleToggleVisible(normalizeCategory(category))}
               >
@@ -230,7 +241,7 @@ export default function CategoryPage() {
                 )}
               </button>
               <button
-                className="btn btn-accent btn-sm btn-outline"
+                className="btn btn-accent btn-sm btn-outline border-cyan-500 text-cyan-600 hover:bg-cyan-500 hover:text-white"
                 onClick={() => openCreateDialog(category.id)}
               >
                 <Plus className="h-4 w-4" />
@@ -255,26 +266,32 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="hero bg-gradient-to-r from-primary to-secondary text-primary-content rounded-lg p-6">
+      <div className="hero bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white rounded-3xl p-12">
         <div className="hero-content text-center">
-          <div className="max-w-md">
-            <h1 className="text-3xl font-bold">Quản lý Danh mục</h1>
-            <p className="py-4">Quản lý các danh mục sản phẩm trong hệ thống</p>
+          <div className="max-w-2xl">
+            <h1 className="text-5xl font-bold mb-6">Quản lý Danh mục</h1>
+            <p className="text-xl opacity-90">Quản lý các danh mục sản phẩm trong hệ thống</p>
           </div>
         </div>
       </div>
 
       {/* Action Button */}
       <div className="flex justify-between items-center">
-        <div className="stats shadow">
+        <div className="stats shadow-lg bg-white rounded-2xl border-0">
           <div className="stat">
-            <div className="stat-title">Tổng danh mục</div>
-            <div className="stat-value text-primary">{categories.length}</div>
+            <div className="stat-figure text-indigo-600">
+              <Tag className="h-8 w-8" />
+            </div>
+            <div className="stat-title text-gray-600">Tổng danh mục</div>
+            <div className="stat-value text-indigo-600">{categories.length}</div>
           </div>
         </div>
-        <button className="btn btn-primary btn-lg" onClick={() => openCreateDialog()}>
+        <button
+          className="btn btn-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0 hover:scale-105 transition-all duration-300 shadow-lg"
+          onClick={() => openCreateDialog()}
+        >
           <Plus className="h-5 w-5" />
           Thêm danh mục mới
         </button>
@@ -282,7 +299,7 @@ export default function CategoryPage() {
 
       {/* Loading State */}
       {loading && (
-        <div className="card bg-base-100 shadow-lg border border-base-300">
+        <div className="card bg-white shadow-xl border-0 rounded-2xl">
           <div className="card-body">
             <div className="overflow-x-auto">
               <table className="table table-zebra w-full">
@@ -320,19 +337,9 @@ export default function CategoryPage() {
 
       {/* Error State */}
       {error && (
-        <div className="alert alert-error shadow-lg">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+        <div className="alert alert-error shadow-lg rounded-2xl">
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
             <h3 className="font-bold">Lỗi!</h3>
@@ -343,16 +350,16 @@ export default function CategoryPage() {
 
       {/* Categories Table */}
       {!loading && !error && (
-        <div className="card bg-base-100 shadow-lg border border-base-300">
+        <div className="card bg-white shadow-xl border-0 rounded-2xl">
           <div className="card-body">
             <div className="overflow-x-auto">
               <table className="table table-zebra w-full">
                 <thead>
-                  <tr>
-                    <th className="w-2/5">Tên danh mục</th>
-                    <th>Mô tả</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
+                  <tr className="bg-gradient-to-r from-indigo-50 to-purple-50">
+                    <th className="w-2/5 text-gray-700 font-semibold">Tên danh mục</th>
+                    <th className="text-gray-700 font-semibold">Mô tả</th>
+                    <th className="text-gray-700 font-semibold">Trạng thái</th>
+                    <th className="text-gray-700 font-semibold">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -370,59 +377,63 @@ export default function CategoryPage() {
 
       {/* Dialog Thêm/Sửa */}
       <Dialog open={!!openDialog} onOpenChange={closeDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogTitle className="text-xl font-bold">
+        <DialogContent className="sm:max-w-md bg-white rounded-2xl border-0 shadow-2xl">
+          <DialogTitle className="text-2xl font-bold text-gray-800">
             {openDialog === 'create' ? 'Thêm danh mục mới' : 'Sửa danh mục'}
           </DialogTitle>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
               <Label className="label">
-                <span className="label-text">Tên danh mục</span>
+                <span className="label-text text-gray-700 font-semibold">Tên danh mục</span>
               </Label>
               <Input
                 name="name"
                 value={form.name || ''}
                 onChange={handleFormChange}
-                className="input input-bordered"
+                className="input input-bordered border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </div>
             <div className="form-control">
               <Label className="label">
-                <span className="label-text">Mô tả</span>
+                <span className="label-text text-gray-700 font-semibold">Mô tả</span>
               </Label>
               <Input
                 name="description"
                 value={form.description || ''}
                 onChange={handleFormChange}
-                className="input input-bordered"
+                className="input input-bordered border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
                 placeholder="Mô tả danh mục (tùy chọn)"
               />
             </div>
             <div className="form-control">
               <Label className="label">
-                <span className="label-text">Trạng thái</span>
+                <span className="label-text text-gray-700 font-semibold">Trạng thái</span>
               </Label>
               <select
                 name="visible"
                 value={form.visible ? 'true' : 'false'}
                 onChange={handleFormChange}
-                className="select select-bordered w-full"
+                className="select select-bordered border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 w-full"
               >
                 <option value="true">Hiện</option>
                 <option value="false">Ẩn</option>
               </select>
             </div>
-            <div className="flex gap-2 justify-end mt-6">
+            <div className="flex gap-3 justify-end mt-8">
               <button
                 type="button"
-                className="btn btn-ghost"
+                className="btn btn-ghost text-gray-600 hover:bg-gray-100"
                 onClick={closeDialog}
                 disabled={isSubmitting}
               >
                 Hủy
               </button>
-              <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+              <button
+                type="submit"
+                className="btn bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0 hover:scale-105 transition-all duration-300"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
