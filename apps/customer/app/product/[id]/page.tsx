@@ -241,9 +241,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   key={index}
                   onClick={() => setSelectedImage(index)}
                   className={`relative min-w-[100px] h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 hover:shadow-md
-                    ${selectedImage === index
-                      ? 'border-orange-500 ring-2 ring-orange-200 shadow-md'
-                      : 'border-orange-200 hover:border-orange-300'
+                    ${
+                      selectedImage === index
+                        ? 'border-orange-500 ring-2 ring-orange-200 shadow-md'
+                        : 'border-orange-200 hover:border-orange-300'
                     }`}
                 >
                   <Image src={img} alt={`Ảnh ${index + 1}`} fill className="object-cover" />
@@ -651,23 +652,23 @@ function ProductDetail({ params }: { params: { id: string } }) {
                       <span className="text-gray-800">
                         {productDetail.categories?.length > 0
                           ? productDetail.categories.map((cat, index) => {
-                            const colorClasses = [
-                              'text-orange-500 border-orange-500',
-                              'text-blue-500 border-blue-500',
-                              'text-yellow-500 border-yellow-500',
-                              'text-teal-500 border-teal-500',
-                              'text-red-500 border-red-500',
-                            ];
-                            const colorClass = colorClasses[index % colorClasses.length];
-                            return (
-                              <span
-                                key={cat.name}
-                                className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
-                              >
-                                {cat.name}
-                              </span>
-                            );
-                          })
+                              const colorClasses = [
+                                'text-orange-500 border-orange-500',
+                                'text-blue-500 border-blue-500',
+                                'text-yellow-500 border-yellow-500',
+                                'text-teal-500 border-teal-500',
+                                'text-red-500 border-red-500',
+                              ];
+                              const colorClass = colorClasses[index % colorClasses.length];
+                              return (
+                                <span
+                                  key={cat.name}
+                                  className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
+                                >
+                                  {cat.name}
+                                </span>
+                              );
+                            })
                           : 'Không có'}
                       </span>
                     </div>
@@ -678,23 +679,23 @@ function ProductDetail({ params }: { params: { id: string } }) {
                       <span className="text-gray-800">
                         {productDetail.tags?.length > 0
                           ? productDetail.tags.map((tag, index) => {
-                            const colorClasses = [
-                              'text-orange-500 border-orange-500',
-                              'text-blue-500 border-blue-500',
-                              'text-yellow-500 border-yellow-500',
-                              'text-teal-500 border-teal-500',
-                              'text-red-500 border-red-500',
-                            ];
-                            const colorClass = colorClasses[index % colorClasses.length];
-                            return (
-                              <span
-                                key={tag}
-                                className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
-                              >
-                                {tag}
-                              </span>
-                            );
-                          })
+                              const colorClasses = [
+                                'text-orange-500 border-orange-500',
+                                'text-blue-500 border-blue-500',
+                                'text-yellow-500 border-yellow-500',
+                                'text-teal-500 border-teal-500',
+                                'text-red-500 border-red-500',
+                              ];
+                              const colorClass = colorClasses[index % colorClasses.length];
+                              return (
+                                <span
+                                  key={tag}
+                                  className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
+                                >
+                                  {tag}
+                                </span>
+                              );
+                            })
                           : 'Không có'}
                       </span>
                     </div>

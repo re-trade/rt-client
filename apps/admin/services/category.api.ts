@@ -61,7 +61,7 @@ const getCategoryByIdInternal = async (id: string): Promise<Category> => {
 const createCategory = async (data: {
   name: string;
   description?: string;
-  parentId?: string | null;
+  categoryParentId?: string | null;
   visible: boolean;
 }): Promise<Category> => {
   try {
@@ -74,14 +74,17 @@ const createCategory = async (data: {
 
 const updateCategory = async (
   id: string,
-  data: { name: string; description?: string; parentId?: string | null; visible: boolean },
+  data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean },
 ): Promise<Category> => {
   try {
+    console.log('Updating category with data:', { id, data });
     const response = await unAuthApi.default.put(`/categories/${id}`, data, {
       withCredentials: true,
     });
+    console.log('Update response:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Update category error:', error);
     throw error;
   }
 };

@@ -133,12 +133,27 @@ const CustomerDetailModal = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Thông tin người bán
+            Thông tin khách hàng
           </DialogTitle>
-          <DialogDescription>Thông tin chi tiết về người bán</DialogDescription>
+          <DialogDescription>Thông tin chi tiết về khách hàng</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6">
+          {/* Add Avatar Image */}
+          <div className="flex justify-center">
+            {customer.avatarUrl ? (
+              <img
+                src={customer.avatarUrl}
+                alt={`${customer.firstName} ${customer.lastName}'s avatar`}
+                className="h-24 w-24 rounded-full object-cover border-2 border-gray-200"
+              />
+            ) : (
+              <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">No Avatar</span>
+              </div>
+            )}
+          </div>
+
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -147,48 +162,48 @@ const CustomerDetailModal = ({
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Tên người bán</p>
-                <p>{customer.shopName}</p>
+                <p>{customer.shopName || `${customer.firstName} ${customer.lastName}`}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Mô tả</p>
-                <p>{customer.description}</p>
+                <p>{customer.description || 'Không có mô tả'}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Địa chỉ</p>
-                <p>{customer.addressLine}</p>
+                <p>{customer.addressLine || customer.address}</p>
                 <p className="text-sm text-muted-foreground">
                   {customer.ward}, {customer.district}, {customer.state}
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Số điện thoại</p>
-                <p>{customer.phoneNumber}</p>
+                <p>{customer.phoneNumber || customer.phone}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Email</p>
                 <p>{customer.email}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Ngày tạo</p>
-                <p>{new Date(customer.createdAt).toLocaleDateString('vi-VN')}</p>
+                <p className="text-sm font-medium text-muted-foreground">Giới tính</p>
+                <p>{customer.gender === '0' ? 'Nam' : 'Nữ'}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                <p>{new Date(customer.updatedAt).toLocaleDateString('vi-VN')}</p>
+                <p>{new Date(customer.lastUpdate).toLocaleDateString('vi-VN')}</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="flex justify-end gap-2 mt-4">
-          {customer.verified ? (
+          {customer.enabled ? (
             <Button
               variant="outline"
               className="text-red-600 border-red-600"
               onClick={() => onReject && onReject(customer.id)}
             >
               <XCircle className="h-4 w-4 mr-2" />
-              Vô hiệu hóa người bán{' '}
+              Vô hiệu hóa người bán
             </Button>
           ) : (
             <Button
@@ -457,7 +472,7 @@ export default function CustomerManagementPage() {
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
               Hiển thị {customers.length} người bán trên trang {page} / {maxPage} (Tổng cộng{' '}
-              {totalCustomers} người bán)
+              {totalCustomers} khách hàng)
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -493,16 +508,16 @@ export default function CustomerManagementPage() {
         }}
         onVerify={async (id: string) => {
           const result = await handleUnbanCustomer(id);
-          if (result) setDeleteSuccess('Xác minh người bán thành công!');
-          else setDeleteError(result || 'Lỗi xác minh người bán');
+          if (result) setDeleteSuccess('Xác minh khách hàng thành công!');
+          else setDeleteError(result || 'Lỗi xác minh khách hàng');
           setIsDetailModalOpen(false);
           setSelectedCustomer(null);
           refetch();
         }}
         onReject={async (id: string) => {
           const result = await handleBanCustomer(id);
-          if (result) setDeleteSuccess('Hủy xác minh người bán thành công!');
-          else setDeleteError(result || 'Lỗi hủy xác minh người bán');
+          if (result) setDeleteSuccess('Hủy xác minh khách hàng thành công!');
+          else setDeleteError(result || 'Lỗi hủy xác minh khách hàng');
           setIsDetailModalOpen(false);
           setSelectedCustomer(null);
           refetch();

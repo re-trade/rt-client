@@ -1,11 +1,12 @@
 'use client';
 
 import {
-  TEvidence,
-  TReportSellerProfile,
+  type TEvidence,
+  type TReportSellerProfile,
   acceptReport,
   getEvidence,
   getReports,
+  postEvidence,
   rejectReport,
 } from '@/services/report.seller.api';
 import { useCallback, useEffect, useState } from 'react';
@@ -37,13 +38,13 @@ const useReportSeller = () => {
           setReports([]);
           setMaxPage(1);
           setTotalReports(0);
-          setError(response?.message || 'Fail to get reports');
+          setError(response?.messages?.[0] || 'Failed to get reports');
         }
       } catch (err) {
         setReports([]);
         setMaxPage(1);
         setTotalReports(0);
-        setError(err instanceof Error ? err.message : 'Fail to get reports');
+        setError(err instanceof Error ? err.message : 'Failed to get reports');
       } finally {
         setLoading(false);
       }
@@ -52,20 +53,55 @@ const useReportSeller = () => {
   );
 
   const fetchEvidence = useCallback(async (id: string) => {
+    if (!id || id.trim() === '') {
+      console.error('Invalid report ID provided to fetchEvidence');
+      setEvidence([]);
+      setEvidenceError('Invalid report ID');
+      return [];
+    }
+
     setEvidenceLoading(true);
     setEvidenceError(null);
     try {
-      const response = await getEvidence(id); // response is TEvidence[]
-      setEvidence(response); // Set the array of evidence
+      const response = await getEvidence(id);
+      setEvidence(response);
       return response;
-    } catch (err) {
-      setEvidence([]); // Set empty array on error
-      setEvidenceError(err instanceof Error ? err.message : 'Failed to fetch evidence');
+    } catch (err: any) {
+      const errorMessage = 'Không thể tải bằng chứng: ' + (err.message || 'Lỗi không xác định');
+      setEvidence([]);
+      setEvidenceError(errorMessage);
       return [];
     } finally {
       setEvidenceLoading(false);
     }
   }, []);
+
+  const postEvidenceAction = useCallback(
+    async (id: string, evidenceData: { evidenceUrls: string[]; note: string }) => {
+      if (!id || id.trim() === '') {
+        return { success: false, message: 'Invalid report ID' };
+      }
+
+      setEvidenceLoading(true);
+      setEvidenceError(null);
+      try {
+        const response = await postEvidence(id, evidenceData);
+        if (response.success) {
+          await fetchEvidence(id);
+          return { success: true, message: 'Evidence posted successfully' };
+        }
+        setEvidenceError(response.messages?.[0] || 'Failed to post evidence');
+        return { success: false, message: response.messages?.[0] || 'Failed to post evidence' };
+      } catch (err: any) {
+        const errorMessage = err.message || 'Failed to post evidence';
+        setEvidenceError(errorMessage);
+        return { success: false, message: errorMessage };
+      } finally {
+        setEvidenceLoading(false);
+      }
+    },
+    [fetchEvidence],
+  );
 
   useEffect(() => {
     fetchReports();
@@ -135,6 +171,7 @@ const useReportSeller = () => {
     acceptReport: handleAccept,
     rejectReport: handleReject,
     fetchEvidence,
+    postEvidence: postEvidenceAction,
   };
 };
 

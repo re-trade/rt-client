@@ -1,8 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -18,15 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useProductManager } from '@/hooks/use-product-manager';
 import {
   AlertCircle,
@@ -34,7 +22,6 @@ import {
   Calendar,
   CheckCircle,
   Download,
-  Edit,
   Eye,
   Filter,
   Package,
@@ -42,7 +29,8 @@ import {
   Search,
   Store,
   Tag,
-  Trash2,
+  TrendingDown,
+  TrendingUp,
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -54,48 +42,72 @@ const ProductStats = ({ products }: { products: any[] }) => {
   const totalValue = products.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Tổng sản phẩm</p>
-            <p className="text-2xl font-bold">{totalProducts}</p>
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Package className="h-6 w-6 text-blue-600" />
           </div>
-          <Package className="h-8 w-8 text-blue-500" />
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingUp className="h-4 w-4 text-green-500" />
+            <span className="text-green-600">+12% so với tháng trước</span>
+          </div>
         </div>
-      </Card>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">{totalProducts}</div>
+          <div className="text-sm text-gray-600">Tổng sản phẩm</div>
+        </div>
+      </div>
 
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Đã xác minh</p>
-            <p className="text-2xl font-bold text-green-600">{verifiedProducts}</p>
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <CheckCircle className="h-6 w-6 text-green-600" />
           </div>
-          <CheckCircle className="h-8 w-8 text-green-500" />
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingUp className="h-4 w-4 text-green-500" />
+            <span className="text-green-600">+8% so với tháng trước</span>
+          </div>
         </div>
-      </Card>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">{verifiedProducts}</div>
+          <div className="text-sm text-gray-600">Đã xác minh</div>
+        </div>
+      </div>
 
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Chờ duyệt</p>
-            <p className="text-2xl font-bold text-orange-600">{pendingProducts}</p>
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <AlertCircle className="h-6 w-6 text-orange-600" />
           </div>
-          <AlertCircle className="h-8 w-8 text-orange-500" />
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingDown className="h-4 w-4 text-red-500" />
+            <span className="text-red-600">-5% so với tháng trước</span>
+          </div>
         </div>
-      </Card>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">{pendingProducts}</div>
+          <div className="text-sm text-gray-600">Chờ duyệt</div>
+        </div>
+      </div>
 
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Tổng giá trị</p>
-            <p className="text-2xl font-bold text-purple-600">
-              {totalValue.toLocaleString('vi-VN')} ₫
-            </p>
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <BarChart3 className="h-6 w-6 text-purple-600" />
           </div>
-          <BarChart3 className="h-8 w-8 text-purple-500" />
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingUp className="h-4 w-4 text-green-500" />
+            <span className="text-green-600">+15% so với tháng trước</span>
+          </div>
         </div>
-      </Card>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">
+            {totalValue.toLocaleString('vi-VN')} ₫
+          </div>
+          <div className="text-sm text-gray-600">Tổng giá trị</div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -111,62 +123,70 @@ const AdvancedFilters = ({
   setPriceRange,
 }: any) => {
   return (
-    <Card className="p-4">
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-4 w-4" />
-        <h3 className="font-medium">Bộ lọc nâng cao</h3>
+        <Filter className="h-4 w-4 text-blue-600" />
+        <h3 className="font-medium text-lg text-gray-800">Bộ lọc nâng cao</h3>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Tìm kiếm sản phẩm..."
-            value={searchQuery}
-            onChange={(e) => onSearch(e.target.value)}
-            className="pl-8"
-          />
+        <div>
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Tìm kiếm sản phẩm..."
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
+              className="pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
         </div>
 
-        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-          <SelectTrigger>
-            <SelectValue placeholder="Trạng thái" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="verified">Đã xác minh</SelectItem>
-            <SelectItem value="pending">Chờ duyệt</SelectItem>
-            <SelectItem value="rejected">Từ chối</SelectItem>
-          </SelectContent>
-        </Select>
+        <div>
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <SelectValue placeholder="Trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="verified">Đã xác minh</SelectItem>
+              <SelectItem value="pending">Chờ duyệt</SelectItem>
+              <SelectItem value="rejected">Từ chối</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger>
-            <SelectValue placeholder="Danh mục" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả danh mục</SelectItem>
-            <SelectItem value="electronics">Điện tử</SelectItem>
-            <SelectItem value="clothing">Thời trang</SelectItem>
-            <SelectItem value="books">Sách</SelectItem>
-            <SelectItem value="home">Nhà cửa</SelectItem>
-          </SelectContent>
-        </Select>
+        <div>
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <SelectValue placeholder="Danh mục" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả danh mục</SelectItem>
+              <SelectItem value="electronics">Điện tử</SelectItem>
+              <SelectItem value="clothing">Thời trang</SelectItem>
+              <SelectItem value="books">Sách</SelectItem>
+              <SelectItem value="home">Nhà cửa</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select value={priceRange} onValueChange={setPriceRange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Khoảng giá" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả giá</SelectItem>
-            <SelectItem value="0-100000">Dưới 100.000 ₫</SelectItem>
-            <SelectItem value="100000-500000">100.000 ₫ - 500.000 ₫</SelectItem>
-            <SelectItem value="500000-1000000">500.000 ₫ - 1.000.000 ₫</SelectItem>
-            <SelectItem value="1000000+">Trên 1.000.000 ₫</SelectItem>
-          </SelectContent>
-        </Select>
+        <div>
+          <Select value={priceRange} onValueChange={setPriceRange}>
+            <SelectTrigger className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <SelectValue placeholder="Khoảng giá" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả giá</SelectItem>
+              <SelectItem value="0-100000">Dưới 100.000 ₫</SelectItem>
+              <SelectItem value="100000-500000">100.000 ₫ - 500.000 ₫</SelectItem>
+              <SelectItem value="500000-1000000">500.000 ₫ - 1.000.000 ₫</SelectItem>
+              <SelectItem value="1000000+">Trên 1.000.000 ₫</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-    </Card>
+    </div>
   );
 };
 
@@ -215,19 +235,21 @@ const ProductDetailModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-lg border border-gray-200">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-800">
+            <Package className="h-5 w-5 text-blue-600" />
             Chi tiết sản phẩm
           </DialogTitle>
-          <DialogDescription>Thông tin chi tiết về sản phẩm {product.name}</DialogDescription>
+          <DialogDescription className="text-gray-600">
+            Thông tin chi tiết về sản phẩm {product.name}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Hình ảnh sản phẩm */}
           <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-lg border">
+            <div className="aspect-square overflow-hidden rounded-lg border border-gray-200">
               <img
                 src={product.thumbnail}
                 alt={product.name}
@@ -237,7 +259,10 @@ const ProductDetailModal = ({
             {product.productImages && product.productImages.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
                 {product.productImages.slice(0, 4).map((image: string, index: number) => (
-                  <div key={index} className="aspect-square overflow-hidden rounded border">
+                  <div
+                    key={index}
+                    className="aspect-square overflow-hidden rounded border border-gray-200"
+                  >
                     <img
                       src={image}
                       alt={`${product.name} ${index + 1}`}
@@ -251,80 +276,81 @@ const ProductDetailModal = ({
 
           <div className="space-y-4">
             <div>
-              <h3 className="text-xl font-bold">{product.name}</h3>
-              <p className="text-muted-foreground">{product.shortDescription}</p>
+              <h3 className="text-xl font-bold text-gray-800">{product.name}</h3>
+              <p className="text-gray-600">{product.shortDescription}</p>
             </div>
 
             <div className="grid gap-3">
               <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Giá:</span>
+                <Tag className="h-4 w-4 text-blue-600" />
+                <span className="font-medium text-gray-700">Giá:</span>
                 <span className="text-lg font-bold text-green-600">
                   {product.currentPrice.toLocaleString('vi-VN')} ₫
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Số lượng:</span>
-                <Badge
-                  variant={
+                <Package className="h-4 w-4 text-purple-600" />
+                <span className="font-medium text-gray-700">Số lượng:</span>
+                <div
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
                     product.quantity > 10
-                      ? 'default'
+                      ? 'bg-green-100 text-green-700'
                       : product.quantity > 0
-                        ? 'secondary'
-                        : 'destructive'
-                  }
+                        ? 'bg-orange-100 text-orange-700'
+                        : 'bg-red-100 text-red-700'
+                  }`}
                 >
                   {product.quantity}
-                </Badge>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <Store className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Người bán:</span>
-                <span>{product.sellerShopName}</span>
+                <Store className="h-4 w-4 text-orange-600" />
+                <span className="font-medium text-gray-700">Người bán:</span>
+                <span className="text-gray-600">{product.sellerShopName}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Thương hiệu:</span>
-                <Badge variant="outline">{product.brand}</Badge>
+                <span className="font-medium text-gray-700">Thương hiệu:</span>
+                <div className="px-2 py-1 border border-gray-300 rounded text-xs">
+                  ${product.brand}
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Model:</span>
-                <span>{product.model}</span>
+                <span className="font-medium text-gray-700">Model:</span>
+                <span className="text-gray-600">{product.model}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Tình trạng:</span>
-                <Badge variant="outline">{getConditionText(product.condition)}</Badge>
+                <span className="font-medium text-gray-700">Tình trạng:</span>
+                <div className="px-2 py-1 border border-gray-300 rounded text-xs">
+                  {getConditionText(product.condition)}
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Trạng thái:</span>
-                <Badge variant="outline">{getStatusText(product.status)}</Badge>
+                <span className="font-medium text-gray-700">Trạng thái:</span>
+                <div className="px-2 py-1 border border-gray-300 rounded text-xs">
+                  {getStatusText(product.status)}
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Xác minh:</span>
-                <Badge
-                  variant={product.verified ? 'default' : 'secondary'}
-                  className={
-                    product.verified
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-orange-100 text-orange-800'
-                  }
+                <span className="font-medium text-gray-700">Xác minh:</span>
+                <div
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${product.verified ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}
                 >
                   {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
-                </Badge>
+                </div>
               </div>
 
               {product.warrantyExpiryDate && (
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Bảo hành đến:</span>
-                  <span>
+                  <Calendar className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-gray-700">Bảo hành đến:</span>
+                  <span className="text-gray-600">
                     {new Date(
                       product.warrantyExpiryDate[0],
                       product.warrantyExpiryDate[1] - 1,
@@ -335,20 +361,22 @@ const ProductDetailModal = ({
               )}
 
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Ngày tạo:</span>
-                <span>{new Date(product.createdAt).toLocaleDateString('vi-VN')}</span>
+                <Calendar className="h-4 w-4 text-blue-600" />
+                <span className="font-medium text-gray-700">Ngày tạo:</span>
+                <span className="text-gray-600">
+                  {new Date(product.createdAt).toLocaleDateString('vi-VN')}
+                </span>
               </div>
             </div>
 
             {/* Danh mục */}
             <div>
-              <h4 className="font-medium mb-2">Danh mục:</h4>
+              <h4 className="font-medium mb-2 text-gray-700">Danh mục:</h4>
               <div className="flex flex-wrap gap-1">
                 {product.categories.map((cat: any) => (
-                  <Badge key={cat.id} variant="outline" className="text-xs">
+                  <div key={cat.id} className="px-2 py-1 border border-gray-300 rounded text-xs">
                     {cat.name}
-                  </Badge>
+                  </div>
                 ))}
               </div>
             </div>
@@ -356,12 +384,15 @@ const ProductDetailModal = ({
             {/* Tags */}
             {product.tags && product.tags.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Tags:</h4>
+                <h4 className="font-medium mb-2 text-gray-700">Tags:</h4>
                 <div className="flex flex-wrap gap-1">
                   {product.tags.map((tag: string, index: number) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
+                    <div
+                      key={index}
+                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                    >
                       {tag}
-                    </Badge>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -370,30 +401,28 @@ const ProductDetailModal = ({
         </div>
 
         {/* Mô tả chi tiết */}
-        <div className="border-t pt-4">
-          <h4 className="font-medium mb-2">Mô tả chi tiết:</h4>
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{product.description}</p>
+        <div className="border-t border-gray-200 pt-4">
+          <h4 className="font-medium mb-2 text-gray-700">Mô tả chi tiết:</h4>
+          <p className="text-sm text-gray-600 whitespace-pre-wrap">{product.description}</p>
         </div>
 
         {/* Nút duyệt/không duyệt */}
         {!product.verified && (
           <div className="flex justify-end gap-2 mt-4">
-            <Button
-              variant="outline"
-              className="text-green-600 border-green-600"
+            <button
+              className="px-4 py-2 border border-green-500 text-green-600 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
               onClick={() => onVerify && onVerify(product.id)}
             >
-              <CheckCircle className="h-4 w-4 mr-2" />
+              <CheckCircle className="h-4 w-4 inline mr-2" />
               Duyệt
-            </Button>
-            <Button
-              variant="outline"
-              className="text-red-600 border-red-600"
+            </button>
+            <button
+              className="px-4 py-2 border border-red-500 text-red-600 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
               onClick={() => onReject && onReject(product.id)}
             >
-              <XCircle className="h-4 w-4 mr-2" />
+              <XCircle className="h-4 w-4 inline mr-2" />
               Không duyệt
-            </Button>
+            </button>
           </div>
         )}
       </DialogContent>
@@ -401,41 +430,16 @@ const ProductDetailModal = ({
   );
 };
 
-const ProductActions = ({ product, onVerify, onReject, onView, onEdit, onDelete }: any) => {
+const ProductActions = ({ product, onView }: any) => {
   return (
-    <div className="flex items-center space-x-2">
-      <Button variant="ghost" size="icon" onClick={() => onView(product)}>
-        <Eye className="h-4 w-4" />
-      </Button>
-
-      {!product.verified && (
-        <>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onVerify(product.id)}
-            className="text-green-600 hover:text-green-700"
-          >
-            <CheckCircle className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onReject(product.id)}
-            className="text-red-600 hover:text-red-700"
-          >
-            <XCircle className="h-4 w-4" />
-          </Button>
-        </>
-      )}
-
-      <Button variant="ghost" size="icon" onClick={() => onEdit(product)}>
-        <Edit className="h-4 w-4" />
-      </Button>
-
-      <Button variant="ghost" size="icon" onClick={() => onDelete(product.id)}>
-        <Trash2 className="h-4 w-4" />
-      </Button>
+    <div className="flex items-center gap-2">
+      <button
+        className="px-3 py-1 text-sm border border-blue-500 text-blue-600 rounded hover:bg-blue-500 hover:text-white transition-colors"
+        onClick={() => onView(product)}
+      >
+        <Eye className="h-4 w-4 inline mr-1" />
+        Xem
+      </button>
     </div>
   );
 };
@@ -464,7 +468,6 @@ export default function ProductManagementPage() {
     searchProducts,
     verifyProduct,
     unverifyProduct,
-    // deleteProduct,
   } = useProductManager();
 
   const handleSort = (field: string) => {
@@ -512,35 +515,6 @@ export default function ProductManagementPage() {
     setIsDetailModalOpen(true);
   };
 
-  const handleEdit = (product: any) => {
-    // TODO: Open edit product modal
-    console.log('Edit product:', product);
-  };
-
-  const handleDelete = async (productId: string) => {
-    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      try {
-        setDeleteError(null); // Clear previous errors
-        setDeleteSuccess(null); // Clear previous success
-        // const result = await deleteProduct(productId);
-        // if (result.success) {
-        //   // Show success message
-        //   setDeleteSuccess(result.message);
-        //   // Auto hide success message after 3 seconds
-        //   setTimeout(() => {
-        //     setDeleteSuccess(null);
-        //   }, 3000);
-        // } else {
-        //   // Show error message in UI
-        //   setDeleteError(result.message);
-        // }
-      } catch (error) {
-        console.error('Error deleting product:', error);
-        setDeleteError('Có lỗi xảy ra khi xóa sản phẩm');
-      }
-    }
-  };
-
   const handleExport = () => {
     console.log('Export products');
   };
@@ -579,79 +553,84 @@ export default function ProductManagementPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Quản lý sản phẩm</h1>
-          <p className="text-muted-foreground">Quản lý và duyệt sản phẩm từ người bán</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button onClick={handleExport} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Xuất dữ liệu
-          </Button>
-          <Button onClick={handleRefresh} disabled={loading} variant="outline">
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Làm mới
-          </Button>
-        </div>
+      <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
+        <h1 className="text-3xl font-bold mb-2">Quản lý sản phẩm</h1>
+        <p className="text-lg opacity-90">Quản lý và duyệt sản phẩm từ người bán</p>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-4">
+        <button
+          className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+          onClick={handleExport}
+        >
+          <Download className="h-4 w-4" />
+          Xuất dữ liệu
+        </button>
+        <button
+          className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition-colors flex items-center gap-2"
+          onClick={handleRefresh}
+          disabled={loading}
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Làm mới
+        </button>
       </div>
 
       {/* Success Display */}
       {deleteSuccess && (
-        <Card className="p-4 border-green-200 bg-green-50">
-          <div className="flex items-center gap-2 text-green-700">
-            <CheckCircle className="h-4 w-4" />
-            <div className="flex-1">
-              <span className="font-medium">Thành công:</span> {deleteSuccess}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <CheckCircle className="h-4 w-4 text-white" />
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setDeleteSuccess(null);
-              }}
-              className="text-green-600 hover:text-green-700"
+            <div>
+              <h3 className="font-semibold text-green-800">Thành công!</h3>
+              <p className="text-sm text-green-600">{deleteSuccess}</p>
+            </div>
+            <button
+              className="ml-auto p-1 hover:bg-green-100 rounded transition-colors"
+              onClick={() => setDeleteSuccess(null)}
             >
-              <XCircle className="h-4 w-4" />
-            </Button>
+              <XCircle className="h-4 w-4 text-green-600" />
+            </button>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Error Display */}
       {(error || deleteError) && (
-        <Card className="p-4 border-red-200 bg-red-50">
-          <div className="flex items-center gap-2 text-red-700">
-            <AlertCircle className="h-4 w-4" />
-            <div className="flex-1">
-              <span className="font-medium">Lỗi:</span> {error || deleteError}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+              <AlertCircle className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-red-800">Lỗi!</h3>
+              <p className="text-sm text-red-600">{error || deleteError}</p>
               {(error || deleteError)?.includes('đăng nhập') && (
                 <div className="mt-2 text-sm">
-                  <p>
+                  <p className="text-red-600">
                     Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao
                     tác này.
                   </p>
-                  <p className="mt-1 text-xs text-red-600">
+                  <p className="mt-1 text-xs text-red-500">
                     <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3
                     giây.
                   </p>
                 </div>
               )}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setDeleteError(null);
-              }}
-              className="text-red-600 hover:text-red-700"
+            <button
+              className="ml-auto p-1 hover:bg-red-100 rounded transition-colors"
+              onClick={() => setDeleteError(null)}
             >
-              <XCircle className="h-4 w-4" />
-            </Button>
+              <XCircle className="h-4 w-4 text-red-600" />
+            </button>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Statistics */}
@@ -670,216 +649,242 @@ export default function ProductManagementPage() {
       />
 
       {/* Products Table */}
-      <Card className="p-6">
-        <div className="mt-6">
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-6">
           {loading ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[180px] max-w-[220px] truncate">Sản phẩm</TableHead>
-                  <TableHead className="min-w-[120px] max-w-[140px] text-right">Giá</TableHead>
-                  <TableHead className="min-w-[80px] max-w-[100px] text-center">Tồn kho</TableHead>
-                  <TableHead className="min-w-[120px] max-w-[160px]">Người bán</TableHead>
-                  <TableHead className="min-w-[120px] max-w-[160px]">Danh mục</TableHead>
-                  <TableHead className="min-w-[100px] max-w-[120px] text-center">
-                    Trạng thái
-                  </TableHead>
-                  <TableHead className="min-w-[120px] max-w-[140px] text-center">
-                    Ngày tạo
-                  </TableHead>
-                  <TableHead className="text-center min-w-[120px]">Thao tác</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[...Array(6)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="min-w-[180px] max-w-[220px] truncate">
-                      <div className="flex items-center gap-2">
-                        <Skeleton className="w-10 h-10 rounded" />
-                        <div>
-                          <Skeleton className="h-4 w-32 mb-1" />
-                          <Skeleton className="h-3 w-24 mb-1" />
-                          <Skeleton className="h-3 w-20" />
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[180px] max-w-[220px]">
+                      Sản phẩm
+                    </th>
+                    <th className="text-right px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Giá
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[80px] max-w-[100px]">
+                      Tồn kho
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Người bán
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Danh mục
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[100px] max-w-[120px]">
+                      Trạng thái
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Ngày tạo
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px]">
+                      Thao tác
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...Array(6)].map((_, i) => (
+                    <tr key={i} className="border-b border-gray-100">
+                      <td className="px-6 py-4 min-w-[180px] max-w-[220px]">
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-10 bg-gray-200 rounded animate-pulse"></div>
+                          <div>
+                            <div className="h-4 bg-gray-200 rounded w-32 mb-1 animate-pulse"></div>
+                            <div className="h-3 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div>
+                            <div className="h-3 bg-gray-200 rounded w-20 animate-pulse"></div>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[140px] text-right">
-                      <Skeleton className="h-4 w-20 mb-1" />
-                      <Skeleton className="h-3 w-16" />
-                    </TableCell>
-                    <TableCell className="min-w-[80px] max-w-[100px] text-center">
-                      <Skeleton className="h-4 w-10 mx-auto" />
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[160px]">
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[160px]">
-                      <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell className="min-w-[100px] max-w-[120px] text-center">
-                      <Skeleton className="h-4 w-16 mx-auto" />
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[140px] text-center">
-                      <Skeleton className="h-4 w-20 mx-auto" />
-                    </TableCell>
-                    <TableCell className="text-center min-w-[120px]">
-                      <Skeleton className="h-8 w-24 mx-auto" />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      </td>
+                      <td className="px-6 py-4 text-right min-w-[120px] max-w-[140px]">
+                        <div className="h-4 bg-gray-200 rounded w-20 mb-1 animate-pulse"></div>
+                        <div className="h-3 bg-gray-200 rounded w-16 animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[80px] max-w-[100px]">
+                        <div className="h-4 bg-gray-200 rounded w-10 mx-auto animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
+                        <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
+                        <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[100px] max-w-[120px]">
+                        <div className="h-4 bg-gray-200 rounded w-16 mx-auto animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[120px] max-w-[140px]">
+                        <div className="h-4 bg-gray-200 rounded w-20 mx-auto animate-pulse"></div>
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[120px]">
+                        <div className="h-8 bg-gray-200 rounded w-24 mx-auto animate-pulse"></div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Package className="h-12 w-12 mb-4" />
-              <p>Không tìm thấy sản phẩm</p>
+            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+              <Package className="h-16 w-16 mb-4" />
+              <p className="text-lg font-medium">Không tìm thấy sản phẩm</p>
               <p className="text-sm">Thử điều chỉnh bộ lọc hoặc tìm kiếm</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[180px] max-w-[220px] truncate">Sản phẩm</TableHead>
-                  <TableHead className="min-w-[120px] max-w-[140px] text-right">Giá</TableHead>
-                  <TableHead className="min-w-[80px] max-w-[100px] text-center">Tồn kho</TableHead>
-                  <TableHead className="min-w-[120px] max-w-[160px]">Người bán</TableHead>
-                  <TableHead className="min-w-[120px] max-w-[160px]">Danh mục</TableHead>
-                  <TableHead className="min-w-[100px] max-w-[120px] text-center">
-                    Trạng thái
-                  </TableHead>
-                  <TableHead className="min-w-[120px] max-w-[140px] text-center">
-                    Ngày tạo
-                  </TableHead>
-                  <TableHead className="text-center min-w-[120px]">Thao tác</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProducts.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="min-w-[180px] max-w-[220px] truncate">
-                      <div className="flex items-center gap-2">
-                        {product.thumbnail && (
-                          <img
-                            src={product.thumbnail}
-                            alt={product.name}
-                            className="w-10 h-10 rounded object-cover"
-                          />
-                        )}
-                        <div>
-                          <div className="font-medium truncate max-w-[140px]">{product.name}</div>
-                          <div className="text-sm text-muted-foreground truncate max-w-[140px]">
-                            {product.shortDescription}
-                          </div>
-                          <div className="text-xs text-muted-foreground truncate max-w-[140px]">
-                            {product.brand} • {product.model}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[180px] max-w-[220px]">
+                      Sản phẩm
+                    </th>
+                    <th className="text-right px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Giá
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[80px] max-w-[100px]">
+                      Tồn kho
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Người bán
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Danh mục
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[100px] max-w-[120px]">
+                      Trạng thái
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Ngày tạo
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px]">
+                      Thao tác
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr
+                      key={product.id}
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 min-w-[180px] max-w-[220px]">
+                        <div className="flex items-center gap-3">
+                          {product.thumbnail && (
+                            <img
+                              src={product.thumbnail}
+                              alt={product.name}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                          )}
+                          <div>
+                            <div className="font-medium truncate max-w-[140px] text-gray-800">
+                              {product.name}
+                            </div>
+                            <div className="text-sm text-gray-600 truncate max-w-[140px]">
+                              {product.shortDescription}
+                            </div>
+                            <div className="text-xs text-gray-500 truncate max-w-[140px]">
+                              {product.brand} • {product.model}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[140px] text-right">
-                      <div className="font-medium">
-                        {product.currentPrice.toLocaleString('vi-VN')} ₫
-                      </div>
-                      {product.quantity > 0 ? (
-                        <div className="text-sm text-green-600">Còn hàng</div>
-                      ) : (
-                        <div className="text-sm text-red-600">Hết hàng</div>
-                      )}
-                    </TableCell>
-                    <TableCell className="min-w-[80px] max-w-[100px] text-center">
-                      <Badge
-                        variant={
-                          product.quantity > 10
-                            ? 'default'
-                            : product.quantity > 0
-                              ? 'secondary'
-                              : 'destructive'
-                        }
-                      >
-                        {product.quantity}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[160px]">
-                      <div className="text-sm font-medium truncate max-w-[120px]">
-                        {product.sellerShopName}
-                      </div>
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[160px]">
-                      <div className="flex flex-wrap gap-1">
-                        {product.categories.slice(0, 2).map((cat: any) => (
-                          <Badge key={cat.id} variant="outline" className="text-xs">
-                            {cat.name}
-                          </Badge>
-                        ))}
-                        {product.categories.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{product.categories.length - 2}
-                          </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-right min-w-[120px] max-w-[140px]">
+                        <div className="font-medium text-gray-800">
+                          {product.currentPrice.toLocaleString('vi-VN')} ₫
+                        </div>
+                        {product.quantity > 0 ? (
+                          <div className="text-sm text-green-600">Còn hàng</div>
+                        ) : (
+                          <div className="text-sm text-red-600">Hết hàng</div>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="min-w-[100px] max-w-[120px] text-center">
-                      <Badge
-                        variant={product.verified ? 'default' : 'secondary'}
-                        className={
-                          product.verified
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-orange-100 text-orange-800'
-                        }
-                      >
-                        {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="min-w-[120px] max-w-[140px] text-center">
-                      {new Date(product.createdAt).toLocaleDateString('vi-VN')}
-                    </TableCell>
-                    <TableCell className="text-center min-w-[120px]">
-                      <ProductActions
-                        product={product}
-                        onVerify={handleVerify}
-                        onReject={handleReject}
-                        onView={handleView}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[80px] max-w-[100px]">
+                        <div
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            product.quantity > 10
+                              ? 'bg-green-100 text-green-700'
+                              : product.quantity > 0
+                                ? 'bg-orange-100 text-orange-700'
+                                : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {product.quantity}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
+                        <div className="text-sm font-medium truncate max-w-[120px] text-gray-600">
+                          {product.sellerShopName}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
+                        <div className="flex flex-wrap gap-1">
+                          {product.categories.slice(0, 2).map((cat: any) => (
+                            <div
+                              key={cat.id}
+                              className="px-2 py-1 border border-gray-300 rounded text-xs"
+                            >
+                              {cat.name}
+                            </div>
+                          ))}
+                          {product.categories.length > 2 && (
+                            <div className="px-2 py-1 border border-gray-300 rounded text-xs">
+                              +{product.categories.length - 2}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[100px] max-w-[120px]">
+                        <div
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            product.verified
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-orange-100 text-orange-700'
+                          }`}
+                        >
+                          {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[120px] max-w-[140px] text-sm text-gray-600">
+                        {new Date(product.createdAt).toLocaleDateString('vi-VN')}
+                      </td>
+                      <td className="px-6 py-4 text-center min-w-[120px]">
+                        <ProductActions product={product} onView={handleView} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {!loading && products.length > 0 && (
+            <div className="flex items-center justify-between mt-6">
+              <div className="text-sm text-gray-600">
+                Hiển thị {products.length} sản phẩm trên trang {page} / {maxPage} (Tổng cộng{' '}
+                {totalProducts} sản phẩm)
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
+                >
+                  Trước
+                </button>
+                <span className="text-sm text-gray-600">
+                  Trang {page} / {maxPage}
+                </span>
+                <button
+                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                  onClick={() => handlePageChange(page + 1)}
+                  disabled={page === maxPage}
+                >
+                  Sau
+                </button>
+              </div>
+            </div>
           )}
         </div>
-
-        {!loading && products.length > 0 && (
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Hiển thị {products.length} sản phẩm trên trang {page} / {maxPage} (Tổng cộng{' '}
-              {totalProducts} sản phẩm)
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page === 1}
-              >
-                Trước
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                Trang {page} / {maxPage}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(page + 1)}
-                disabled={page === maxPage}
-              >
-                Sau
-              </Button>
-            </div>
-          </div>
-        )}
-      </Card>
+      </div>
 
       <ProductDetailModal
         product={selectedProduct}

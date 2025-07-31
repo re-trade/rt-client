@@ -15,14 +15,10 @@ export interface PaymentMethod {
   imgUrl: string;
 }
 
-export interface PaymentMethodsResponse {
-  content: PaymentMethod[];
-  pagination: {
-    page: number;
-    size: number;
-    totalPages: number;
-    totalElements: number;
-  };
+export interface PaymentStatusResponse {
+  paid: boolean;
+  relatedComboIds: string[];
+  orderId: string;
 }
 
 export const paymentApi = {
@@ -50,6 +46,20 @@ export const paymentApi = {
         return response.data.content;
       }
       throw new Error('Failed to fetch payment methods');
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getPaymentStatus(orderId: string): Promise<PaymentStatusResponse> {
+    try {
+      const response = await authApi.default.get<IResponseObject<PaymentStatusResponse>>(
+        `/payments/order/${orderId}`,
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to fetch payment status');
     } catch (error) {
       throw error;
     }

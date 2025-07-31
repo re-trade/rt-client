@@ -1,7 +1,7 @@
 'use client';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductList } from '@/hooks/use-product-list';
-import PaginationBar from '@components/common/PaginationBar';
+import Pagination from '@components/common/Pagination';
 import ProductFilter from '@components/product/FillterProduct';
 import ProductCardSkeleton from '@components/product/ProductCardSkeleton';
 import { IconFilter, IconGridDots, IconList } from '@tabler/icons-react';
@@ -164,7 +164,7 @@ export default function ProductListPage() {
                   ))}
                 </div>
 
-                <PaginationBar
+                <Pagination
                   currentPage={page}
                   totalPages={maxPage}
                   onPageChange={handlePageChange}

@@ -82,34 +82,34 @@ export default function BankAccountsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
       <Toast messages={messages} />
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
-          <div className="bg-[#FFD2B2] p-6 text-[#121212]">
+        <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 border-b border-orange-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white/20 rounded-lg">
-                  <Building2 className="w-6 h-6" />
+                <div className="p-3 bg-orange-500 rounded-lg">
+                  <Building2 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Tài khoản ngân hàng</h1>
-                  <p className="text-[#121212] mt-1">Quản lý tài khoản ngân hàng cho thanh toán</p>
+                  <h1 className="text-2xl font-bold text-gray-800">Tài khoản ngân hàng</h1>
+                  <p className="text-gray-600 mt-1">Quản lý tài khoản ngân hàng cho thanh toán</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-[#121212]">Tổng số tài khoản</p>
-                <p className="text-2xl font-bold">{bankAccounts.length}</p>
+                <p className="text-sm text-gray-600">Tổng số tài khoản</p>
+                <p className="text-2xl font-bold text-gray-800">{bankAccounts.length}</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <Shield className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Shield className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Bảo mật</p>
@@ -118,10 +118,10 @@ export default function BankAccountsPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Wallet className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Wallet className="w-6 h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Đã lưu</p>
@@ -131,10 +131,10 @@ export default function BankAccountsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-8 border border-[#525252]/20">
+        <div className="bg-white rounded-xl shadow-md p-8 border border-orange-200">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-[#121212] mb-4">Quản lý tài khoản ngân hàng</h2>
-            <p className="text-[#525252] text-sm">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Quản lý tài khoản ngân hàng</h2>
+            <p className="text-gray-600 text-sm">
               Chọn tài khoản ngân hàng để quản lý hoặc thêm tài khoản mới
             </p>
           </div>
@@ -153,13 +153,13 @@ export default function BankAccountsPage() {
 
           {/* Selected Account Details */}
           {selectedAccount && (
-            <div className="bg-[#FFD2B2]/10 rounded-lg p-6 border border-[#FFD2B2]/30">
+            <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-[#121212]">Chi tiết tài khoản</h3>
+                <h3 className="text-lg font-semibold text-gray-800">Chi tiết tài khoản</h3>
                 <div className="flex space-x-3">
                   <button
                     onClick={() => openEditModal(selectedAccount)}
-                    className="flex items-center justify-center bg-[#FFD2B2]/20 text-[#121212] hover:bg-[#FFD2B2]/40 p-2.5 rounded-lg transition-all duration-200 border border-[#FFD2B2]/30"
+                    className="flex items-center justify-center bg-orange-100 text-orange-700 hover:bg-orange-200 p-2.5 rounded-lg transition-all duration-200 border border-orange-200"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -188,26 +188,26 @@ export default function BankAccountsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#525252] mb-1">Ngân hàng</label>
-                  <p className="text-[#121212] font-semibold">{selectedAccount.bankName}</p>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Ngân hàng</label>
+                  <p className="text-gray-800 font-semibold">{selectedAccount.bankName}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#525252] mb-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
                     Số tài khoản
                   </label>
-                  <p className="text-[#121212] font-semibold font-mono">
+                  <p className="text-gray-800 font-semibold font-mono">
                     {selectedAccount.accountNumber}
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#525252] mb-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
                     Tên chủ tài khoản
                   </label>
-                  <p className="text-[#121212] font-semibold">{selectedAccount.userBankName}</p>
+                  <p className="text-gray-800 font-semibold">{selectedAccount.userBankName}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#525252] mb-1">Ngày thêm</label>
-                  <p className="text-[#121212] font-semibold">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Ngày thêm</label>
+                  <p className="text-gray-800 font-semibold">
                     {selectedAccount.addedDate
                       ? new Date(selectedAccount.addedDate).toLocaleDateString('vi-VN')
                       : 'N/A'}

@@ -378,7 +378,7 @@ export default function SecurityPage() {
   const activeSecurityCount = securityActions.filter((action) => action.status === 'active').length;
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9] p-3 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-3 sm:p-6">
       <div className="max-w-6xl mx-auto space-y-4 sm:space-y-8">
         <SecurityModal
           isOpen={modalState.password}
@@ -461,23 +461,23 @@ export default function SecurityPage() {
           />
         </SecurityModal>
 
-        <div className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden">
-          <div className="bg-[#FFD2B2] p-4 sm:p-6 text-[#121212]">
+        <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 sm:p-6 border-b border-orange-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="p-2 sm:p-3 bg-white/20 rounded-lg shadow-sm">
-                  <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
+                <div className="p-2 sm:p-3 bg-orange-500 rounded-lg shadow-sm">
+                  <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold">Bảo mật tài khoản</h1>
-                  <p className="text-[#121212] mt-1 opacity-80 text-sm sm:text-base">
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Bảo mật tài khoản</h1>
+                  <p className="text-gray-600 mt-1 text-sm sm:text-base">
                     Quản lý bảo mật và quyền riêng tư của tài khoản
                   </p>
                 </div>
               </div>
-              <div className="text-center sm:text-right bg-white/20 px-3 py-2 sm:px-4 sm:py-3 rounded-lg shadow-sm">
-                <p className="text-xs sm:text-sm text-[#8B4513] font-medium">Bảo mật</p>
-                <p className="text-xl sm:text-2xl font-bold">
+              <div className="text-center sm:text-right bg-orange-100 px-3 py-2 sm:px-4 sm:py-3 rounded-lg shadow-sm">
+                <p className="text-xs sm:text-sm text-orange-700 font-medium">Bảo mật</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-800">
                   {activeSecurityCount}/{securityActions.length}
                 </p>
               </div>
@@ -486,10 +486,10 @@ export default function SecurityPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20 hover:border-[#FFD2B2] transition-all duration-300">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-orange-200 hover:border-orange-300 transition-all duration-300">
             <div className="flex items-center space-x-3">
-              <div className="p-2 sm:p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl shadow-sm">
-                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-orange-100 rounded-xl shadow-sm">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-xs sm:text-sm text-gray-600">Mức bảo mật</p>
@@ -498,10 +498,10 @@ export default function SecurityPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-2 sm:p-3 bg-amber-100 rounded-xl">
-                <Key className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+              <div className="p-2 sm:p-3 bg-orange-100 rounded-xl">
+                <Key className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-xs sm:text-sm text-gray-600">Đã kích hoạt</p>
@@ -512,10 +512,10 @@ export default function SecurityPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-2 sm:p-3 bg-blue-100 rounded-xl">
-                <Monitor className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-orange-100 rounded-xl">
+                <Monitor className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-xs sm:text-sm text-gray-600">Thiết bị</p>
@@ -524,10 +524,10 @@ export default function SecurityPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-[#525252]/20">
+          <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-orange-200">
             <div className="flex items-center space-x-3">
-              <div className="p-2 sm:p-3 bg-red-100 rounded-xl">
-                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+              <div className="p-2 sm:p-3 bg-orange-100 rounded-xl">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div>
                 <p className="text-xs sm:text-sm text-gray-600">Cảnh báo</p>
@@ -547,7 +547,7 @@ export default function SecurityPage() {
               return (
                 <div
                   key={categoryKey}
-                  className="bg-white rounded-xl shadow-md border border-[#525252]/20 overflow-hidden"
+                  className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden"
                 >
                   <div className="p-4 sm:p-6 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
@@ -570,15 +570,15 @@ export default function SecurityPage() {
                     {categoryActions.map((action) => (
                       <div
                         key={action.id}
-                        className="border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-[#FFD2B2] hover:shadow-md transition-all duration-200 bg-white"
+                        className="border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-orange-300 hover:shadow-md transition-all duration-200 bg-white"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                           <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
                             <div
                               className={`p-2 sm:p-3 rounded-xl shadow-sm ${
                                 action.status === 'active'
-                                  ? 'bg-gradient-to-br from-amber-100 to-amber-200 text-amber-600'
-                                  : 'bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400'
+                                  ? 'bg-orange-100 text-orange-600'
+                                  : 'bg-gray-100 text-gray-400'
                               }`}
                             >
                               {action.icon}

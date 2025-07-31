@@ -117,6 +117,22 @@ function ReportDetailModal({
           <div>
             <b>Trạng thái:</b> {report.status || '-'}
           </div>
+          {report.imageUrl && (
+            <div>
+              <b>Bằng chứng:</b>
+              <div className="mt-2">
+                <img
+                  src={report.imageUrl}
+                  alt="Bằng chứng báo cáo"
+                  className="max-w-full h-auto rounded-md"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    console.error('Error loading image:', report.imageUrl);
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
