@@ -1,15 +1,6 @@
 'use client';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
-import {
-  Activity,
-  Package,
-  ShoppingCart,
-  Store,
-  Tag,
-  Users,
-  TrendingUp,
-  TrendingDown,
-} from 'lucide-react';
+import { Package, ShoppingCart, Store, Tag, TrendingDown, TrendingUp, Users } from 'lucide-react';
 import React from 'react';
 
 const StatCard = ({
@@ -56,7 +47,7 @@ export default function AdminPage() {
           <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
           <p className="text-lg opacity-90">Đang tải dữ liệu...</p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">

@@ -1,23 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useCategoryManager } from '@/hooks/use-category-manager';
 import type { Category } from '@/services/category.api';
 import { unAuthApi } from '@retrade/util/src/api/instance';
-import { ChevronRight, Plus, Edit, Eye, EyeOff, Tag } from 'lucide-react';
+import { ChevronRight, Edit, Eye, EyeOff, Plus, Tag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -160,9 +149,11 @@ export default function CategoryPage() {
     if (!parentExpanded) return null;
     return (
       <>
-        <tr className={`hover:bg-gray-50 transition-colors ${
-          level > 0 ? 'border-l-4 border-blue-200 bg-blue-50/30' : ''
-        }`}>
+        <tr
+          className={`hover:bg-gray-50 transition-colors ${
+            level > 0 ? 'border-l-4 border-blue-200 bg-blue-50/30' : ''
+          }`}
+        >
           <td className="px-6 py-4" style={{ paddingLeft: `${level * 32 + 24}px` }}>
             <div className="flex items-center gap-3">
               <button
@@ -220,8 +211,8 @@ export default function CategoryPage() {
               </button>
               <button
                 className={`px-3 py-1 text-sm border rounded transition-colors ${
-                  category.visible 
-                    ? 'border-red-500 text-red-600 hover:bg-red-500 hover:text-white' 
+                  category.visible
+                    ? 'border-red-500 text-red-600 hover:bg-red-500 hover:text-white'
                     : 'border-green-500 text-green-600 hover:bg-green-500 hover:text-white'
                 }`}
                 onClick={() => handleToggleVisible(normalizeCategory(category))}
@@ -301,7 +292,9 @@ export default function CategoryPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left px-6 py-3 text-gray-700 font-semibold w-2/5">Tên danh mục</th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold w-2/5">
+                      Tên danh mục
+                    </th>
                     <th className="text-left px-6 py-3 text-gray-700 font-semibold">Mô tả</th>
                     <th className="text-left px-6 py-3 text-gray-700 font-semibold">Trạng thái</th>
                     <th className="text-left px-6 py-3 text-gray-700 font-semibold">Thao tác</th>
@@ -354,7 +347,9 @@ export default function CategoryPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="text-left px-6 py-3 text-gray-700 font-semibold w-2/5">Tên danh mục</th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold w-2/5">
+                      Tên danh mục
+                    </th>
                     <th className="text-left px-6 py-3 text-gray-700 font-semibold">Mô tả</th>
                     <th className="text-left px-6 py-3 text-gray-700 font-semibold">Trạng thái</th>
                     <th className="text-left px-6 py-3 text-gray-700 font-semibold">Thao tác</th>
@@ -381,9 +376,7 @@ export default function CategoryPage() {
           </DialogTitle>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-2">
-                Tên danh mục
-              </Label>
+              <Label className="block text-sm font-medium text-gray-700 mb-2">Tên danh mục</Label>
               <Input
                 name="name"
                 value={form.name || ''}
@@ -393,9 +386,7 @@ export default function CategoryPage() {
               />
             </div>
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-2">
-                Mô tả
-              </Label>
+              <Label className="block text-sm font-medium text-gray-700 mb-2">Mô tả</Label>
               <Input
                 name="description"
                 value={form.description || ''}
@@ -405,9 +396,7 @@ export default function CategoryPage() {
               />
             </div>
             <div>
-              <Label className="block text-sm font-medium text-gray-700 mb-2">
-                Trạng thái
-              </Label>
+              <Label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái</Label>
               <select
                 name="visible"
                 value={form.visible ? 'true' : 'false'}
