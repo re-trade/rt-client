@@ -26,7 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useOrderManager } from '@/hooks/use-order-manager';
-
+import { TOrder } from '@/services/order.api';
 import {
   AlertCircle,
   Ban,
@@ -48,40 +48,55 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const OrderStats = ({ orders }: { orders: any[] }) => {
-  const totalOrders = orders.length;
-
-  const completedOrder = orders.filter((o) =>
-    o.orderCombos?.some((combo: any) => combo.status === 'Completed'),
+const OrderStats = ({ orders }: { orders: TOrder[] }) => {
+  const completedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'COMPLETED'),
   ).length;
-  const pendingOrders = orders.filter((o) => o.status === 'Peding').length;
-  const paymentConfirmationOrders = orders.filter(
-    (o) => o.status === 'PAYMENT_CONFIRMATION',
+  const pendingOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'PENDING'),
   ).length;
-  const paymentFailedOrders = orders.filter(
-    (o) => o.orderCombos.status === 'PAYMENT_FAILED',
+  const paymentConfirmationOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'PAYMENT_CONFIRMATION'),
   ).length;
-  const paymentCancelledOrders = orders.filter(
-    (o) => o.orderCombos.status === 'PAYMENT_CANCELLED',
+  const paymentFailedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'PAYMENT_FAILED'),
   ).length;
-  const unpaidOrders = orders.filter((o) => o.orderCombos.status === 'UNPAID').length;
-  const preparingOrders = orders.filter((o) => o.orderCombos.status === 'PREPARING').length;
-  const deliveringOrders = orders.filter((o) => o.orderCombos.status === 'DELIVERING').length;
-  const deliveredOrders = orders.filter((o) => o.orderCombos.status === 'DELIVERED').length;
-  const completedOrders = orders.filter((o) => o.orderCombos.status === 'COMPLETED').length;
-  const cancelledOrders = orders.filter((o) => o.orderCombos.status === 'CANCELLED').length;
-  const returnRequestedOrders = orders.filter(
-    (o) => o.orderCombos.status === 'RETURN_REQUESTED',
+  const paymentCancelledOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'PAYMENT_CANCELLED'),
   ).length;
-  const returnApprovedOrders = orders.filter(
-    (o) => o.orderCombos.status === 'RETURN_APPROVED',
+  const unpaidOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'UNPAID'),
   ).length;
-  const returnRejectedOrders = orders.filter(
-    (o) => o.orderCombos.status === 'RETURN_REJECTED',
+  const preparingOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'PREPARING'),
   ).length;
-  const returningOrders = orders.filter((o) => o.orderCombos.status === 'RETURNING').length;
-  const returnedOrders = orders.filter((o) => o.orderCombos.status === 'RETURNED').length;
-  const refundedOrders = orders.filter((o) => o.orderCombos.status === 'REFUNDED').length;
+  const deliveringOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'DELIVERING'),
+  ).length;
+  const deliveredOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'DELIVERED'),
+  ).length;
+  const cancelledOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'CANCELLED'),
+  ).length;
+  const returnRequestedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETURN_REQUESTED'),
+  ).length;
+  const returnApprovedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETURN_APPROVED'),
+  ).length;
+  const returnRejectedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETURN_REJECTED'),
+  ).length;
+  const returningOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETURNING'),
+  ).length;
+  const returnedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETURNED'),
+  ).length;
+  const refundedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'REFUNDED'),
+  ).length;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -94,7 +109,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <Package className="h-8 w-8 text-blue-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -104,7 +118,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <Clock className="h-8 w-8 text-yellow-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -114,7 +127,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <CreditCard className="h-8 w-8 text-indigo-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -124,7 +136,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <XCircle className="h-8 w-8 text-red-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -134,17 +145,15 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <DollarSign className="h-8 w-8 text-orange-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Đang chuẩn bị</p>
-            <p className="text-2xl font-bold">{pendingOrders}</p>
+            <p className="text-2xl font-bold">{preparingOrders}</p>
           </div>
           <Loader className="h-8 w-8 text-cyan-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -154,7 +163,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <Truck className="h-8 w-8 text-amber-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -164,17 +172,15 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <CheckCircle className="h-8 w-8 text-lime-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">Hoàn tất</p>
-            <p className="text-2xl font-bold">{completedOrder}</p>
+            <p className="text-2xl font-bold">{completedOrders}</p>
           </div>
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -184,7 +190,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <Ban className="h-8 w-8 text-red-600" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -194,7 +199,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <Undo2 className="h-8 w-8 text-pink-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -204,7 +208,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <CheckCircle className="h-8 w-8 text-emerald-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -214,7 +217,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <XCircle className="h-8 w-8 text-rose-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -224,7 +226,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <RotateCcw className="h-8 w-8 text-sky-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -234,7 +235,6 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
           <RotateCcw className="h-8 w-8 text-violet-500" />
         </div>
       </Card>
-
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -248,14 +248,27 @@ const OrderStats = ({ orders }: { orders: any[] }) => {
   );
 };
 
-const AdvancedFilters = ({ searchQuery, onSearch, selectedCategory, setSelectedCategory }: any) => {
+const AdvancedFilters = ({
+  searchQuery,
+  onSearch,
+  selectedCategory,
+  setSelectedCategory,
+  sortOption,
+  setSortOption,
+}: {
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+  sortOption: string;
+  setSortOption: (option: string) => void;
+}) => {
   return (
     <Card className="p-4">
       <div className="flex items-center gap-2 mb-4">
         <Filter className="h-4 w-4" />
         <h3 className="font-medium">Bộ lọc nâng cao</h3>
       </div>
-
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -266,7 +279,6 @@ const AdvancedFilters = ({ searchQuery, onSearch, selectedCategory, setSelectedC
             className="pl-8"
           />
         </div>
-
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger>
             <SelectValue placeholder="Danh mục" />
@@ -280,7 +292,7 @@ const AdvancedFilters = ({ searchQuery, onSearch, selectedCategory, setSelectedC
             <SelectItem value="PREPARING">Đang chuẩn bị</SelectItem>
             <SelectItem value="DELIVERING">Đang giao hàng</SelectItem>
             <SelectItem value="DELIVERED">Đã giao hàng</SelectItem>
-            <SelectItem value="completed">Hoàn tất</SelectItem>
+            <SelectItem value="COMPLETED">Hoàn tất</SelectItem>
             <SelectItem value="CANCELLED">Đã huỷ</SelectItem>
             <SelectItem value="RETURN_REQUESTED">Yêu cầu hoàn trả</SelectItem>
             <SelectItem value="RETURN_APPROVED">Đã chấp nhận trả</SelectItem>
@@ -288,6 +300,29 @@ const AdvancedFilters = ({ searchQuery, onSearch, selectedCategory, setSelectedC
             <SelectItem value="RETURNING">Đang hoàn trả</SelectItem>
             <SelectItem value="RETURNED">Đã hoàn trả</SelectItem>
             <SelectItem value="REFUNDED">Đã hoàn tiền</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sortOption} onValueChange={setSortOption}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sắp xếp theo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="orderId-asc">ID (A-Z)</SelectItem>
+            <SelectItem value="orderId-desc">ID (Z-A)</SelectItem>
+            <SelectItem value="customerId-asc">ID Khách hàng (A-Z)</SelectItem>
+            <SelectItem value="customerId-desc">ID Khách hàng (Z-A)</SelectItem>
+            <SelectItem value="customerName-asc">Tên Khách hàng (A-Z)</SelectItem>
+            <SelectItem value="customerName-desc">Tên Khách hàng (Z-A)</SelectItem>
+            <SelectItem value="phone-asc">Số điện thoại (A-Z)</SelectItem>
+            <SelectItem value="phone-desc">Số điện thoại (Z-A)</SelectItem>
+            <SelectItem value="grandTotal-asc">Tổng số tiền (Thấp-Cao)</SelectItem>
+            <SelectItem value="grandTotal-desc">Tổng số tiền (Cao-Thấp)</SelectItem>
+            <SelectItem value="status-asc">Tình trạng (A-Z)</SelectItem>
+            <SelectItem value="status-desc">Tình trạng (Z-A)</SelectItem>
+            <SelectItem value="createdAt-asc">Ngày tạo (Cũ-Mới)</SelectItem>
+            <SelectItem value="createdAt-desc">Ngày tạo (Mới-Cũ)</SelectItem>
+            <SelectItem value="updatedAt-asc">Ngày cập nhật (Cũ-Mới)</SelectItem>
+            <SelectItem value="updatedAt-desc">Ngày cập nhật (Mới-Cũ)</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -300,14 +335,11 @@ const OrderDetailModal = ({
   isOpen,
   onClose,
   onVerify,
-  onReject,
 }: {
-  order: any;
+  order: TOrder | null;
   isOpen: boolean;
   onClose: () => void;
   onVerify?: (id: string) => void;
-  onReject?: (id: string) => void;
-  onPending?: (id: string) => void;
 }) => {
   if (!order) return null;
 
@@ -321,7 +353,6 @@ const OrderDetailModal = ({
           </DialogTitle>
           <DialogDescription>Thông tin chi tiết về đơn hàng</DialogDescription>
         </DialogHeader>
-
         <div className="grid gap-6">
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
@@ -339,7 +370,6 @@ const OrderDetailModal = ({
                 <p className="text-sm font-medium text-muted-foreground">Tên khách hàng</p>
                 <p>{order.customerName}</p>
               </div>
-
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Số điện thoại</p>
                 <p>{order.destination.phone}</p>
@@ -354,18 +384,17 @@ const OrderDetailModal = ({
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                <p>{new Date(order.resolutionDate).toLocaleDateString('vi-VN')}</p>
+                <p>{new Date(order.updatedAt).toLocaleDateString('vi-VN')}</p>
               </div>
             </div>
           </div>
         </div>
-
         {order.status === 'PENDING' && (
           <div className="flex justify-end gap-2 mt-4">
             <Button
               variant="outline"
               className="text-green-600 border-green-600"
-              onClick={() => onVerify && onVerify(order.id)}
+              onClick={() => onVerify && onVerify(order.orderId)}
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Hủy đơn hàng
@@ -381,13 +410,16 @@ export default function OrderManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<string>('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [sortOption, setSortOption] = useState<string>('orderId-asc'); // Default sort by orderId ascending
+  const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
-  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set()); // Track expanded orders
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<{
+    [orderId: string]: { combos: boolean; items: boolean };
+  }>({});
+
   const {
     orders = [],
     page,
@@ -401,14 +433,59 @@ export default function OrderManagementPage() {
     cancelOrder,
   } = useOrderManager();
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
+  const handleSort = (option: string) => {
+    setSortOption(option);
   };
+
+  const [sortField, sortOrder] = sortOption.split('-') as [string, 'asc' | 'desc'];
+
+  const sortedOrders = [...orders].sort((a: TOrder, b: TOrder) => {
+    let valueA: any;
+    let valueB: any;
+
+    switch (sortField) {
+      case 'orderId':
+        valueA = a.orderId.toLowerCase();
+        valueB = b.orderId.toLowerCase();
+        break;
+      case 'customerId':
+        valueA = a.customerId.toLowerCase();
+        valueB = b.customerId.toLowerCase();
+        break;
+      case 'customerName':
+        valueA = a.customerName.toLowerCase();
+        valueB = b.customerName.toLowerCase();
+        break;
+      case 'phone':
+        valueA = a.destination.phone.toLowerCase();
+        valueB = b.destination.phone.toLowerCase();
+        break;
+      case 'grandTotal':
+        valueA = a.grandTotal;
+        valueB = b.grandTotal;
+        break;
+      case 'status':
+        valueA = a.orderCombos[0]?.status?.toLowerCase() || '';
+        valueB = b.orderCombos[0]?.status?.toLowerCase() || '';
+        break;
+      case 'createdAt':
+        valueA = new Date(a.createdAt).getTime();
+        valueB = new Date(b.createdAt).getTime();
+        break;
+      case 'updatedAt':
+        valueA = new Date(a.updatedAt).getTime();
+        valueB = new Date(b.updatedAt).getTime();
+        break;
+      default:
+        return 0;
+    }
+
+    if (valueA === valueB) return 0;
+    if (!valueA) return 1;
+    if (!valueB) return -1;
+
+    return sortOrder === 'asc' ? (valueA < valueB ? -1 : 1) : valueA > valueB ? -1 : 1;
+  });
 
   const handleRefresh = () => {
     refetch();
@@ -420,11 +497,12 @@ export default function OrderManagementPage() {
   };
 
   const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
     goToPage(newPage, searchQuery);
   };
 
-  const handleCancel = async (reportId: string) => {
-    const result = await cancelOrder(reportId);
+  const handleCancel = async (orderId: string) => {
+    const result = await cancelOrder(orderId);
     if (result.success) {
       setDeleteSuccess('Hủy đơn hàng thành công!');
     } else {
@@ -432,7 +510,7 @@ export default function OrderManagementPage() {
     }
   };
 
-  const handleView = (order: any) => {
+  const handleView = (order: TOrder) => {
     setSelectedOrder(order);
     setIsDetailModalOpen(true);
   };
@@ -442,14 +520,33 @@ export default function OrderManagementPage() {
       const newSet = new Set(prev);
       if (newSet.has(orderId)) {
         newSet.delete(orderId);
+        setExpandedSections((prevSections) => {
+          const newSections = { ...prevSections };
+          delete newSections[orderId];
+          return newSections;
+        });
       } else {
         newSet.add(orderId);
+        setExpandedSections((prevSections) => ({
+          ...prevSections,
+          [orderId]: { combos: false, items: false },
+        }));
       }
       return newSet;
     });
   };
 
-  const filteredOrders = orders.filter((order) => {
+  const toggleSection = (orderId: string, section: 'combos' | 'items') => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [orderId]: {
+        ...prev[orderId],
+        [section]: !prev[orderId]?.[section],
+      },
+    }));
+  };
+
+  const filteredOrders = sortedOrders.filter((order: TOrder) => {
     const matchesCategory =
       selectedCategory === 'all' ||
       order.orderCombos.some((combo) =>
@@ -503,7 +600,6 @@ export default function OrderManagementPage() {
           </div>
         </Card>
       )}
-
       {(error || deleteError) && (
         <Card className="p-4 border-red-200 bg-red-50">
           <div className="flex items-center gap-2 text-red-700">
@@ -536,17 +632,15 @@ export default function OrderManagementPage() {
           </div>
         </Card>
       )}
-
       <OrderStats orders={orders} />
-
-      {/* Advanced Filters */}
       <AdvancedFilters
         searchQuery={searchQuery}
         onSearch={handleSearch}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        sortOption={sortOption}
+        setSortOption={handleSort}
       />
-
       <Card className="p-6">
         <div className="mt-6">
           {loading ? (
@@ -564,7 +658,7 @@ export default function OrderManagementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead></TableHead> {/* Empty header for expand icon */}
+                  <TableHead></TableHead>
                   <TableHead>ID</TableHead>
                   <TableHead>ID khách hàng</TableHead>
                   <TableHead>Tên khách hàng</TableHead>
@@ -577,7 +671,7 @@ export default function OrderManagementPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredOrders.map((order) => (
+                {filteredOrders.map((order: TOrder) => (
                   <>
                     <TableRow key={order.orderId}>
                       <TableCell>
@@ -626,40 +720,103 @@ export default function OrderManagementPage() {
                     {expandedOrders.has(order.orderId) && (
                       <TableRow>
                         <TableCell colSpan={10}>
-                          <div className="pl-8">
-                            <h4 className="font-medium mb-2">Danh sách Order Combos</h4>
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Combo ID</TableHead>
-                                  <TableHead>Seller ID</TableHead>
-                                  <TableHead>Tên Seller</TableHead>
-                                  <TableHead>Giá</TableHead>
-                                  <TableHead>Tình trạng</TableHead>
-                                  <TableHead>Item IDs</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {order.orderCombos.map((combo: any) => (
-                                  <TableRow key={combo.comboId}>
-                                    <TableCell>{combo.comboId}</TableCell>
-                                    <TableCell>{combo.sellerId}</TableCell>
-                                    <TableCell>{combo.sellerName}</TableCell>
-                                    <TableCell>{combo.grandPrice}</TableCell>
-                                    <TableCell>
-                                      <span
-                                        className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
-                                          combo.status,
-                                        )}`}
-                                      >
-                                        {combo.status}
-                                      </span>
-                                    </TableCell>
-                                    <TableCell>{combo.itemIds.join(', ')}</TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
+                          <div className="pl-8 space-y-6">
+                            <div>
+                              <div className="flex items-center mb-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleSection(order.orderId, 'combos')}
+                                  className="mr-2"
+                                >
+                                  {expandedSections[order.orderId]?.combos ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <h4 className="font-medium">Danh sách Order Combos</h4>
+                              </div>
+                              {expandedSections[order.orderId]?.combos && (
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead>Combo ID</TableHead>
+                                      <TableHead>Seller ID</TableHead>
+                                      <TableHead>Tên Seller</TableHead>
+                                      <TableHead>Giá</TableHead>
+                                      <TableHead>Tình trạng</TableHead>
+                                      <TableHead>Item IDs</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {order.orderCombos.map((combo) => (
+                                      <TableRow key={combo.comboId}>
+                                        <TableCell>{combo.comboId}</TableCell>
+                                        <TableCell>{combo.sellerId}</TableCell>
+                                        <TableCell>{combo.sellerName}</TableCell>
+                                        <TableCell>{combo.grandPrice}</TableCell>
+                                        <TableCell>
+                                          <span
+                                            className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
+                                              combo.status,
+                                            )}`}
+                                          >
+                                            {combo.status}
+                                          </span>
+                                        </TableCell>
+                                        <TableCell className="max-w-[150px]">
+                                          {combo.itemIds.join(', ')}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              )}
+                            </div>
+                            <div>
+                              <div className="flex items-center mb-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleSection(order.orderId, 'items')}
+                                  className="mr-2"
+                                >
+                                  {expandedSections[order.orderId]?.items ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <h4 className="font-medium">Danh sách Items</h4>
+                              </div>
+                              {expandedSections[order.orderId]?.items && (
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead>Product ID</TableHead>
+                                      <TableHead>Tên sản phẩm</TableHead>
+                                      <TableHead>Tên Seller</TableHead>
+                                      <TableHead>Số lượng</TableHead>
+                                      <TableHead>Đơn giá</TableHead>
+                                      <TableHead>Tổng giá</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {order.items.map((item) => (
+                                      <TableRow key={item.productId}>
+                                        <TableCell>{item.productId}</TableCell>
+                                        <TableCell>{item.productName}</TableCell>
+                                        <TableCell>{item.sellerName}</TableCell>
+                                        <TableCell>{item.quantity}</TableCell>
+                                        <TableCell>{item.unitPrice}</TableCell>
+                                        <TableCell>{item.totalPrice}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -670,12 +827,11 @@ export default function OrderManagementPage() {
             </Table>
           )}
         </div>
-
         {!loading && orders.length > 0 && (
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Hiển thị {orders.length} tố cáo trên trang {page} / {maxPage} (Tổng cộng {totalOrders}{' '}
-              tố cáo)
+              Hiển thị {filteredOrders.length} đơn hàng trên trang {page} / {maxPage} (Tổng cộng{' '}
+              {totalOrders} đơn hàng)
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -701,7 +857,6 @@ export default function OrderManagementPage() {
           </div>
         )}
       </Card>
-
       <OrderDetailModal
         order={selectedOrder}
         isOpen={isDetailModalOpen}
