@@ -35,10 +35,29 @@ import {
   RefreshCw,
   Search,
   XCircle,
+  Calendar,
 } from 'lucide-react';
 import { useState } from 'react';
+import { format } from 'date-fns';
 
-const SellerStats = ({ sellers }: { sellers: any[] }) => {
+// Define the TSellerProfile interface
+interface TSellerProfile {
+  id: string;
+  shopName: string;
+  description: string;
+  addressLine: string;
+  ward: string;
+  district: string;
+  state: string;
+  phoneNumber: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+  verified: boolean;
+}
+
+// SellerStats component (unchanged)
+const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   const totalSellers = sellers.length;
   const verifiedSellers = sellers.filter((p) => p.verified).length;
   const pendingSellers = sellers.filter((p) => !p.verified).length;
@@ -78,7 +97,44 @@ const SellerStats = ({ sellers }: { sellers: any[] }) => {
   );
 };
 
-const AdvancedFilters = ({ searchQuery, onSearch, selectedStatus, setSelectedStatus }: any) => {
+// AdvancedFilters component (updated to use TSellerProfile)
+const AdvancedFilters = ({
+  sellers,
+  searchQuery,
+  onSearch,
+  selectedStatus,
+  setSelectedStatus,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  selectedState,
+  setSelectedState,
+  sortField,
+  setSortField,
+  sortOrder,
+  setSortOrder,
+  onClearFilters,
+}: {
+  sellers: TSellerProfile[];
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (status: string) => void;
+  startDate: string;
+  setStartDate: (date: string) => void;
+  endDate: string;
+  setEndDate: (date: string) => void;
+  selectedState: string;
+  setSelectedState: (state: string) => void;
+  sortField: keyof TSellerProfile; // Use keyof TSellerProfile for type safety
+  setSortField: (field: keyof TSellerProfile) => void;
+  sortOrder: 'asc' | 'desc';
+  setSortOrder: (order: 'asc' | 'desc') => void;
+  onClearFilters: () => void;
+}) => {
+  const states = Array.from(new Set(sellers.map((seller) => seller.state))).sort();
+
   return (
     <Card className="p-4">
       <div className="flex items-center gap-2 mb-4">
@@ -90,7 +146,7 @@ const AdvancedFilters = ({ searchQuery, onSearch, selectedStatus, setSelectedSta
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Tìm kiếm người bán..."
+            placeholder="Tìm kiếm theo tên hoặc số điện thoại..."
             value={searchQuery}
             onChange={(e) => onSearch(e.target.value)}
             className="pl-8"
@@ -107,11 +163,73 @@ const AdvancedFilters = ({ searchQuery, onSearch, selectedStatus, setSelectedSta
             <SelectItem value="pending">Chờ duyệt</SelectItem>
           </SelectContent>
         </Select>
+
+        <div className="relative">
+          <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="date"
+            placeholder="Từ ngày"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+
+        <div className="relative">
+          <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="date"
+            placeholder="Đến ngày"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+
+        <Select value={selectedState} onValueChange={setSelectedState}>
+          <SelectTrigger>
+            <SelectValue placeholder="Tỉnh/Thành phố" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả tỉnh/thành</SelectItem>
+            {states.map((state) => (
+              <SelectItem key={state} value={state}>
+                {state}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* <Select value={sortField} onValueChange={setSortField}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sắp xếp theo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="shopName">Tên người bán</SelectItem>
+            <SelectItem value="createdAt">Ngày tạo</SelectItem>
+            <SelectItem value="verified">Trạng thái</SelectItem>
+          </SelectContent>
+        </Select> */}
+
+        <Select value={sortOrder} onValueChange={setSortOrder}>
+          <SelectTrigger>
+            <SelectValue placeholder="Thứ tự" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="asc">Tăng dần</SelectItem>
+            <SelectItem value="desc">Giảm dần</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Button variant="outline" onClick={onClearFilters}>
+          Xóa bộ lọc
+        </Button>
       </div>
     </Card>
   );
 };
 
+// SellerDetailModal (updated to use TSellerProfile)
 const SellerDetailModal = ({
   seller,
   isOpen,
@@ -119,7 +237,7 @@ const SellerDetailModal = ({
   onVerify,
   onReject,
 }: {
-  seller: any;
+  seller: TSellerProfile | null;
   isOpen: boolean;
   onClose: () => void;
   onVerify?: (id: string) => void;
@@ -127,15 +245,8 @@ const SellerDetailModal = ({
 }) => {
   if (!seller) return null;
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'true':
-        return 'Hoạt động';
-      case 'false':
-        return 'Không hoạt động';
-      default:
-        return status;
-    }
+  const getStatusText = (status: boolean) => {
+    return status ? 'Hoạt động' : 'Không hoạt động';
   };
 
   return (
@@ -199,7 +310,7 @@ const SellerDetailModal = ({
               onClick={() => onReject && onReject(seller.id)}
             >
               <XCircle className="h-4 w-4 mr-2" />
-              Vô hiệu hóa người bán{' '}
+              Vô hiệu hóa người bán
             </Button>
           ) : (
             <Button
@@ -217,7 +328,18 @@ const SellerDetailModal = ({
   );
 };
 
-const SellerActions = ({ seller, onVerify, onPending, onView }: any) => {
+// SellerActions (updated to use TSellerProfile)
+const SellerActions = ({
+  seller,
+  onVerify,
+  onPending,
+  onView,
+}: {
+  seller: TSellerProfile;
+  onVerify: (id: string) => void;
+  onPending: (id: string) => void;
+  onView: (seller: TSellerProfile) => void;
+}) => {
   return (
     <div className="flex items-center space-x-2">
       <Button variant="ghost" size="icon" onClick={() => onView(seller)}>
@@ -251,10 +373,13 @@ const SellerActions = ({ seller, onVerify, onPending, onView }: any) => {
 export default function SellerManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<string>('name');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [selectedState, setSelectedState] = useState<string>('all');
+  const [sortField, setSortField] = useState<keyof TSellerProfile>('shopName');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [selectedSeller, setSelectedSeller] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedSeller, setSelectedSeller] = useState<TSellerProfile | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
@@ -270,19 +395,18 @@ export default function SellerManagementPage() {
     searchSellers,
     handleBanSeller,
     handleUnbanSeller,
-  } = useSellerManager();
+  } = useSellerManager(); // Assume useSellerManager returns TSellerProfile[]
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-  };
-
-  const handleRefresh = () => {
-    refetch();
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedStatus('all');
+    setStartDate('');
+    setEndDate('');
+    setSelectedState('all');
+    setSortField('shopName');
+    setSortOrder('asc');
+    searchSellers('');
+    goToPage(1, '');
   };
 
   const handleSearch = (query: string) => {
@@ -299,6 +423,7 @@ export default function SellerManagementPage() {
     true: 'Đã xác minh',
     false: 'Chờ duyệt',
   };
+
   const handlePageChange = (newPage: number) => {
     goToPage(newPage, searchQuery);
   };
@@ -315,29 +440,59 @@ export default function SellerManagementPage() {
   const handleReject = async (sellerId: string) => {
     const result = await handleBanSeller(sellerId);
     if (result) {
-      setDeleteSuccess('hủy xác minh người bán thành công!');
+      setDeleteSuccess('Hủy xác minh người bán thành công!');
     } else {
       setDeleteError(result || 'Lỗi hủy xác minh người bán');
     }
   };
 
-  const handleView = (seller: any) => {
+  const handleView = (seller: TSellerProfile) => {
     setSelectedSeller(seller);
     setIsDetailModalOpen(true);
   };
 
-  const filteredSellers = sellers.filter((seller) => {
-    const matchesStatus =
-      selectedStatus === 'all' ||
-      (selectedStatus === 'verified' && seller.verified) ||
-      (selectedStatus === 'pending' && !seller.verified);
+  // Apply filters
+  const filteredSellers = sellers
+    .filter((seller) => {
+      const matchesStatus =
+        selectedStatus === 'all' ||
+        (selectedStatus === 'verified' && seller.verified) ||
+        (selectedStatus === 'pending' && !seller.verified);
 
-    return matchesStatus;
-  });
+      const matchesState = selectedState === 'all' || seller.state === selectedState;
+
+      const matchesDate =
+        (!startDate || new Date(seller.createdAt) >= new Date(startDate)) &&
+        (!endDate || new Date(seller.createdAt) <= new Date(endDate));
+
+      const matchesSearch =
+        !searchQuery ||
+        seller.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        seller.phoneNumber.includes(searchQuery);
+
+      return matchesStatus && matchesState && matchesDate && matchesSearch;
+    })
+    .sort((a, b) => {
+      const fieldA = a[sortField];
+      const fieldB = b[sortField];
+      if (sortField === 'createdAt') {
+        return sortOrder === 'asc'
+          ? new Date(fieldA).getTime() - new Date(fieldB).getTime()
+          : new Date(fieldB).getTime() - new Date(fieldA).getTime();
+      }
+      if (sortField === 'verified') {
+        return sortOrder === 'asc'
+          ? Number(fieldA) - Number(fieldB)
+          : Number(fieldB) - Number(fieldA);
+      }
+      return sortOrder === 'asc'
+        ? String(fieldA).localeCompare(String(fieldB))
+        : String(fieldB).localeCompare(String(fieldA));
+    });
 
   return (
     <div className="space-y-6">
-      {/* Success Display */}
+      {/* Success and Error Displays */}
       {deleteSuccess && (
         <Card className="p-4 border-green-200 bg-green-50">
           <div className="flex items-center gap-2 text-green-700">
@@ -348,9 +503,7 @@ export default function SellerManagementPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                setDeleteSuccess(null);
-              }}
+              onClick={() => setDeleteSuccess(null)}
               className="text-green-600 hover:text-green-700"
             >
               <XCircle className="h-4 w-4" />
@@ -381,9 +534,7 @@ export default function SellerManagementPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                setDeleteError(null);
-              }}
+              onClick={() => setDeleteError(null)}
               className="text-red-600 hover:text-red-700"
             >
               <XCircle className="h-4 w-4" />
@@ -395,10 +546,22 @@ export default function SellerManagementPage() {
       <SellerStats sellers={sellers} />
 
       <AdvancedFilters
+        sellers={sellers}
         searchQuery={searchQuery}
         onSearch={handleSearch}
         selectedStatus={selectedStatus}
         setSelectedStatus={setSelectedStatus}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        selectedState={selectedState}
+        setSelectedState={setSelectedState}
+        sortField={sortField}
+        setSortField={setSortField}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+        onClearFilters={handleClearFilters}
       />
 
       <Card className="p-6">
@@ -408,7 +571,7 @@ export default function SellerManagementPage() {
               <RefreshCw className="h-6 w-6 animate-spin mr-2" />
               <span>Đang tải ...</span>
             </div>
-          ) : sellers.length === 0 ? (
+          ) : filteredSellers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
               <Package className="h-12 w-12 mb-4" />
               <p>Không tìm thấy người bán</p>
@@ -471,10 +634,10 @@ export default function SellerManagementPage() {
           )}
         </div>
 
-        {!loading && sellers.length > 0 && (
+        {!loading && filteredSellers.length > 0 && (
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Hiển thị {sellers.length} người bán trên trang {page} / {maxPage} (Tổng cộng{' '}
+              Hiển thị {filteredSellers.length} người bán trên trang {page} / {maxPage} (Tổng cộng{' '}
               {totalSellers} người bán)
             </div>
             <div className="flex items-center space-x-2">

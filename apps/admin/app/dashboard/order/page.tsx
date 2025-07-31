@@ -46,7 +46,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
-import { TOrder } from './orderApi';
+import { TOrder } from '@/services/order.api';
 
 const OrderStats = ({ orders }: { orders: TOrder[] }) => {
   const completedOrders = orders.filter((o) =>
@@ -484,7 +484,7 @@ export default function OrderManagementPage() {
     if (!valueA) return 1;
     if (!valueB) return -1;
 
-    return sortOrder === 'asc' ? (valueA < valueB ? -1 : 1) : (valueA > valueB ? -1 : 1);
+    return sortOrder === 'asc' ? (valueA < valueB ? -1 : 1) : valueA > valueB ? -1 : 1;
   });
 
   const handleRefresh = () => {
@@ -830,8 +830,8 @@ export default function OrderManagementPage() {
         {!loading && orders.length > 0 && (
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Hiển thị {filteredOrders.length} đơn hàng trên trang {page} / {maxPage} (Tổng cộng {totalOrders}{' '}
-              đơn hàng)
+              Hiển thị {filteredOrders.length} đơn hàng trên trang {page} / {maxPage} (Tổng cộng{' '}
+              {totalOrders} đơn hàng)
             </div>
             <div className="flex items-center space-x-2">
               <Button
