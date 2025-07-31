@@ -128,6 +128,8 @@ export default function ShopManagementPage() {
                 <TableHead>Số tiền</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead>Thời gian tạo</TableHead>
+                <TableHead>Ngân hàng</TableHead>
+                <TableHead>Bin</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
@@ -142,7 +144,10 @@ export default function ShopManagementPage() {
                   </TableCell>
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
                   <TableCell>{withdraw.status}</TableCell>
-                  <TableCell>{withdraw.timestamp}</TableCell>
+                  <TableCell>{withdraw.processedDate}</TableCell>
+                  <TableCell>{withdraw.bankName}</TableCell>
+                  <TableCell>{withdraw.bankBin}</TableCell>
+
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => handleViewDetails(withdraw)}>
                       Chi tiết

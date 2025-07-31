@@ -12,7 +12,7 @@ export type TWithdrawProfile = {
   id: string;
   amount: number;
   status: string;
-  timestamp: string;
+  processedDate: string;
   bankBin: string;
   bankName: string;
   bankUrl: string;
