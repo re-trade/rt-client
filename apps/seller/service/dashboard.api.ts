@@ -58,11 +58,13 @@ const dashboardApi = () => {
     return [];
   };
 
-  const fetchSellerOrders = async (): Promise<DashboardOrderResponse[]> => {
-    const response =
-      await authApi.default.get<IResponseObject<DashboardOrderResponse[]>>(
-        '/dashboard/seller/order',
-      );
+  const fetchSellerOrders = async (limit: number = 5): Promise<DashboardOrderResponse[]> => {
+    const response = await authApi.default.get<IResponseObject<DashboardOrderResponse[]>>(
+      '/dashboard/seller/order',
+      {
+        params: { limit },
+      },
+    );
     if (response.data.success) {
       return response.data.content;
     }

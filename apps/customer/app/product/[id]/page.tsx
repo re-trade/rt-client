@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { useToast } from '@/context/ToastContext';
 import { useProductDetail } from '@/hooks/use-product-detail';
 import Chart from '@components/chart/chart';
+import BuyNowDialog from '@components/common/BuyNowDialog';
 import ContentSkeleton from '@components/product/ProductContentSkeleton';
 import { ProductHistoryList } from '@components/product/ProductHistoryList';
 import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
@@ -29,7 +30,6 @@ import {
 } from 'react-icons/md';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import BuyNowDialog from '@components/common/BuyNowDialog';
 
 function ProductDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -345,10 +345,11 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     Tình trạng:
                   </span>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${productDetail.quantity > 0
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      productDetail.quantity > 0
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
-                      }`}
+                    }`}
                     style={{
                       color: productDetail.quantity > 0 ? '#166534' : '#991b1b',
                       backgroundColor: productDetail.quantity > 0 ? '#dcfce7' : '#fee2e2',
@@ -488,10 +489,11 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   onClick={() =>
                     setActiveTab(tab.key as 'description' | 'specifications' | 'reviews')
                   }
-                  className={`px-6 py-4 font-semibold transition-colors relative ${activeTab === tab.key
+                  className={`px-6 py-4 font-semibold transition-colors relative ${
+                    activeTab === tab.key
                       ? 'text-orange-600 border-b-2 border-orange-600'
                       : 'text-gray-600 hover:text-orange-600'
-                    }`}
+                  }`}
                   style={{
                     color: activeTab === tab.key ? '#ea580c' : '#6b7280',
                   }}

@@ -3,27 +3,24 @@
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductHome } from '@/hooks/use-product-home';
-import { HomeStats, productApi, TProduct } from '@/services/product.api';
+import { TProduct } from '@/services/product.api';
 import {
   ChevronRight,
   Clock,
   Filter,
   Grid3X3,
-  Heart,
   MessageCircle,
   Package,
   Search,
+  ShoppingCart,
+  Smile,
   Sparkles,
   Star,
   TrendingUp,
   Upload,
   Users,
-  Smile,
-  ShoppingCart
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
-import { useEffect, useState } from 'react';
 
 export default function Home() {
   const {
@@ -33,27 +30,11 @@ export default function Home() {
     selectCategory,
     loading,
     categoriesLoading,
+    homeStats,
+    bestSellerProducts,
     error,
   } = useProductHome();
   const router = useRouter();
-
-
-  const [productsBestSellers, setProducts] = useState<TProduct[]>([]);
-  const [homeStats, setHomeStats] = useState<HomeStats | null>(null);
-  useEffect(() => {
-    const fetching = async () => {
-      const homeStatsResponse = await productApi.getHomeStats();
-      console.log(homeStatsResponse);
-      if (homeStatsResponse) {
-        setHomeStats(homeStatsResponse);
-      }
-      const response = await productApi.getproductBestSellers();
-      if (response) {
-        setProducts(response);
-      }
-    };
-    fetching();
-  }, []);
 
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
@@ -214,10 +195,26 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: <Package className="w-5 h-5" />, count: homeStats?.totalProducts, label: 'Sản phẩm' },
-              { icon: <Users className="w-5 h-5" />, count: homeStats?.totalUsers, label: 'Người dùng' },
-              { icon: <ShoppingCart className="w-5 h-5" />, count: homeStats?.totalSoldProducts, label: 'Sản phẩm đã bán' },
-              { icon: <Smile className="w-5 h-5" />, count: homeStats?.totaOrders, label: 'Đơn hàng' },
+              {
+                icon: <Package className="w-5 h-5" />,
+                count: homeStats?.totalProducts,
+                label: 'Sản phẩm',
+              },
+              {
+                icon: <Users className="w-5 h-5" />,
+                count: homeStats?.totalUsers,
+                label: 'Người dùng',
+              },
+              {
+                icon: <ShoppingCart className="w-5 h-5" />,
+                count: homeStats?.totalSoldProducts,
+                label: 'Sản phẩm đã bán',
+              },
+              {
+                icon: <Smile className="w-5 h-5" />,
+                count: homeStats?.totaOrders,
+                label: 'Đơn hàng',
+              },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -232,7 +229,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-
 
         {/* Categories Section */}
         <div className="container mx-auto px-4 sm:px-6">
@@ -266,10 +262,11 @@ export default function Home() {
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[#FFD2B2] scrollbar-track-[#FDFEF9]">
                 <button
                   onClick={() => handleSelectCategory}
-                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${selectedCategoryId === null
-                    ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
-                    : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                    }`}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
+                    selectedCategoryId === null
+                      ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
+                      : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
+                  }`}
                 >
                   Tất cả
                 </button>
@@ -278,11 +275,11 @@ export default function Home() {
                   <button
                     key={category.id}
                     onClick={() => handleSelectCategory(category.id)}
-
-                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${selectedCategoryId === category.id
-                      ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
-                      : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                      }`}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
+                      selectedCategoryId === category.id
+                        ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
+                        : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
+                    }`}
                   >
                     {category.name}
                   </button>
@@ -298,7 +295,7 @@ export default function Home() {
           title="Được mua nhiều"
           subtitle="Những sản phẩm hot nhất hiện tại"
           icon={<TrendingUp className="w-6 h-6" />}
-          items={productsBestSellers}
+          items={bestSellerProducts}
           showLoading={true}
         />
         <ProductSection

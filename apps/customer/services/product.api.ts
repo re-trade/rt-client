@@ -74,14 +74,23 @@ export const productApi = {
     page: number = 0,
     size: number = 10,
     query?: string,
+    sort: string[] = ['id,asc'],
   ): Promise<IResponseObject<TProduct[]>> {
-    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products/search', {
-      params: {
-        page,
-        size,
-        ...(query ? { q: query } : {}),
-      },
-    });
+    const params = new URLSearchParams();
+
+    params.set('page', page.toString());
+    params.set('size', size.toString());
+
+    if (query) {
+      params.set('q', query);
+    }
+
+    for (const s of sort) {
+      params.append('sort', s);
+    }
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>(
+      `/products/search?${params.toString()}`,
+    );
     return response.data;
   },
   async getProduct(id: string): Promise<TProduct> {

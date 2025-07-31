@@ -23,7 +23,6 @@ const LoadingIndicator = () => {
 export default function RecentOrdersWidget() {
   const { formattedOrders, isLoading } = useSellerOrders();
 
-  // Get only the 5 most recent orders
   const recentOrders = formattedOrders.slice(0, 5);
 
   // Format the date to show how long ago it was

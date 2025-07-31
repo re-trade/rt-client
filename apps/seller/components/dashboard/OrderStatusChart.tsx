@@ -1,11 +1,11 @@
 'use client';
+import CustomTooltip from '@/components/dashboard/CustomToolTip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSellerOrderCount } from '@/hooks/use-seller-order-count';
 import { Filter, PieChart } from 'lucide-react';
 import { useState } from 'react';
 import { Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from 'recharts';
-import CustomTooltip from './CustomToolTip';
 
 const LoadingIndicator = () => {
   return (
@@ -23,7 +23,7 @@ const LoadingIndicator = () => {
 };
 
 export default function OrderStatusChart() {
-  const { formattedOrderCounts, totalOrders, isLoading, orderStatusConfig } = useSellerOrderCount();
+  const { formattedOrderCounts, totalOrders, isLoading } = useSellerOrderCount();
   const [showDetails, setShowDetails] = useState(false);
 
   return (
@@ -106,7 +106,6 @@ export default function OrderStatusChart() {
                     </div>
                   </div>
 
-                  {/* Show detailed statuses when expanded */}
                   {showDetails && item.statuses && (
                     <div className="ml-6 mt-1 mb-2 space-y-1">
                       {item.statuses.map((status: any, statusIdx: number) => (
