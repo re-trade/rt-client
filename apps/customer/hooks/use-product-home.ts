@@ -39,7 +39,9 @@ export function useProductHome() {
 
       params.set('verified', 'true');
 
-      const response = await productApi.searchProducts(0, 8, params.toString());
+      const response = await productApi.searchProducts(0, 8, params.toString(), [
+        'createdDate,desc',
+      ]);
       const products = response.content || [];
       setProducts(products);
     } catch {
