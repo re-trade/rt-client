@@ -1,5 +1,7 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useDashboard } from '@/hooks/use-dashboard';
+import type { DashboardMetricCode } from '@/service/dashboard.api';
 import {
   Activity,
   ArrowDown,
@@ -16,7 +18,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -35,10 +37,10 @@ import {
 } from 'recharts';
 
 const Dashboard = () => {
-  const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // Sample data
+  const { dashboardMetric, timeRange, updateTimeRange, refreshDashboard, isLoading } =
+    useDashboard();
+  const selectedTimeRange = timeRange;
   const revenueData = [
     { month: 'T1', revenue: 25000000, orders: 180, customers: 150 },
     { month: 'T2', revenue: 28000000, orders: 210, customers: 180 },
@@ -81,12 +83,55 @@ const Dashboard = () => {
     { day: 'T7', visitors: 3600, pageviews: 9800 },
   ];
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1500);
+  const getMetricValue = (code: DashboardMetricCode) => {
+    const metric = dashboardMetric.find((m) => m.code === code);
+    return metric?.value || 0;
   };
 
-  const StatCard = ({ title, value, change, icon: Icon, color, trend }) => (
+  const getMetricChange = (code: DashboardMetricCode) => {
+    const metric = dashboardMetric.find((m) => m.code === code);
+    return metric?.change || 0;
+  };
+
+  const formatMetricChange = (code: DashboardMetricCode) => {
+    const change = getMetricChange(code);
+    return `${change >= 0 ? '+' : ''}${change.toFixed(2)}% so với tháng trước`;
+  };
+
+  const getMetricTrend = (code: DashboardMetricCode) => {
+    const change = getMetricChange(code);
+    if (change > 0) return 'up';
+    if (change < 0) return 'down';
+    return 'neutral';
+  };
+
+  const formatNumber = (value: number) => {
+    return new Intl.NumberFormat('vi-VN').format(value);
+  };
+
+  const handleRefresh = useCallback(async () => {
+    if (!isLoading) {
+      setIsRefreshing(true);
+      await refreshDashboard();
+      setTimeout(() => setIsRefreshing(false), 1500);
+    }
+  }, [isLoading, refreshDashboard]);
+
+  const StatCard = ({
+    title,
+    value,
+    change,
+    icon: Icon,
+    color,
+    trend,
+  }: {
+    title: string;
+    value: string | number;
+    change: string;
+    icon: React.ComponentType<{ className: string }>;
+    color: string;
+    trend: 'up' | 'down' | 'neutral';
+  }) => (
     <Card className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${color}`}></div>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -117,12 +162,20 @@ const Dashboard = () => {
     </Card>
   );
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: Array<any>;
+    label?: string;
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="text-sm font-medium text-gray-900">{label}</p>
-          {payload.map((entry, index) => (
+          {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {entry.value.toLocaleString()}
             </p>
@@ -136,7 +189,6 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -146,9 +198,14 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <select
-              value={selectedTimeRange}
-              onChange={(e) => setSelectedTimeRange(e.target.value)}
+              value={timeRange}
+              onChange={(e) => {
+                const newTimeRange = e.target.value as '7d' | '30d' | '90d' | '1y';
+                updateTimeRange(newTimeRange);
+                handleRefresh();
+              }}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isLoading}
             >
               <option value="7d">7 ngày qua</option>
               <option value="30d">30 ngày qua</option>
@@ -157,89 +214,104 @@ const Dashboard = () => {
             </select>
             <button
               onClick={handleRefresh}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              disabled={isLoading}
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Làm mới
+              <RefreshCw className={`h-4 w-4 ${isRefreshing || isLoading ? 'animate-spin' : ''}`} />
+              {isLoading ? 'Đang tải...' : 'Làm mới'}
             </button>
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Tổng sản phẩm"
-            value="150"
-            change="+12% so với tháng trước"
-            icon={Package}
-            color="from-blue-500 to-blue-600"
-            trend="up"
-          />
-          <StatCard
-            title="Doanh thu tháng"
-            value="45,231,000đ"
-            change="+20.1% so với tháng trước"
-            icon={DollarSign}
-            color="from-green-500 to-green-600"
-            trend="up"
-          />
-          <StatCard
-            title="Đơn hàng"
-            value="1,250"
-            change="+15% so với tháng trước"
-            icon={ShoppingCart}
-            color="from-purple-500 to-purple-600"
-            trend="up"
-          />
-          <StatCard
-            title="Tỷ lệ chuyển đổi"
-            value="3.2%"
-            change="+0.5% so với tháng trước"
-            icon={TrendingUp}
-            color="from-orange-500 to-orange-600"
-            trend="up"
-          />
+          {isLoading ? (
+            <div className="col-span-full flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3">Đang tải dữ liệu...</span>
+            </div>
+          ) : (
+            <>
+              <StatCard
+                title="Tổng sản phẩm"
+                value={formatNumber(getMetricValue('TOTAL_PRODUCTS'))}
+                change={formatMetricChange('TOTAL_PRODUCTS')}
+                icon={Package}
+                color="from-blue-500 to-blue-600"
+                trend={getMetricTrend('TOTAL_PRODUCTS')}
+              />
+              <StatCard
+                title="Doanh thu tháng"
+                value={`${formatNumber(getMetricValue('REVENUE'))}đ`}
+                change={formatMetricChange('REVENUE')}
+                icon={DollarSign}
+                color="from-green-500 to-green-600"
+                trend={getMetricTrend('REVENUE')}
+              />
+              <StatCard
+                title="Đơn hàng"
+                value={formatNumber(getMetricValue('TOTAL_ORDERS'))}
+                change={formatMetricChange('TOTAL_ORDERS')}
+                icon={ShoppingCart}
+                color="from-purple-500 to-purple-600"
+                trend={getMetricTrend('TOTAL_ORDERS')}
+              />
+              <StatCard
+                title="Tỷ lệ hoàn hàng"
+                value={`${getMetricValue('RETURN_RATE').toFixed(2)}%`}
+                change={formatMetricChange('RETURN_RATE')}
+                icon={TrendingUp}
+                color="from-orange-500 to-orange-600"
+                trend={getMetricTrend('RETURN_RATE')}
+              />
+            </>
+          )}
         </div>
 
-        {/* Secondary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatCard
-            title="Khách hàng mới"
-            value="+89"
-            change="+25% so với tuần trước"
-            icon={Users}
-            color="from-teal-500 to-teal-600"
-            trend="up"
-          />
-          <StatCard
-            title="Lượt xem shop"
-            value="12,543"
-            change="+18% so với tuần trước"
-            icon={Eye}
-            color="from-indigo-500 to-indigo-600"
-            trend="up"
-          />
-          <StatCard
-            title="Đánh giá trung bình"
-            value="4.8/5.0"
-            change="+0.2 so với tháng trước"
-            icon={Star}
-            color="from-yellow-500 to-yellow-600"
-            trend="up"
-          />
-          <StatCard
-            title="Tỷ lệ hoàn hàng"
-            value="2.1%"
-            change="-0.3% so với tháng trước"
-            icon={Activity}
-            color="from-red-500 to-red-600"
-            trend="down"
-          />
+          {isLoading ? (
+            <div className="col-span-full flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3">Đang tải dữ liệu...</span>
+            </div>
+          ) : (
+            <>
+              <StatCard
+                title="Sản phẩm đang bán"
+                value={formatNumber(getMetricValue('ACTIVE_PRODUCTS'))}
+                change={formatMetricChange('ACTIVE_PRODUCTS')}
+                icon={Users}
+                color="from-teal-500 to-teal-600"
+                trend={getMetricTrend('ACTIVE_PRODUCTS')}
+              />
+              <StatCard
+                title="Tỷ lệ bán hàng"
+                value={`${getMetricValue('SOLD_RATE').toFixed(2)}%`}
+                change={formatMetricChange('SOLD_RATE')}
+                icon={Eye}
+                color="from-indigo-500 to-indigo-600"
+                trend={getMetricTrend('SOLD_RATE')}
+              />
+              <StatCard
+                title="Đánh giá trung bình"
+                value={`${getMetricValue('AVERAGE_VOTE').toFixed(2)}/5.0`}
+                change={formatMetricChange('AVERAGE_VOTE')}
+                icon={Star}
+                color="from-yellow-500 to-yellow-600"
+                trend={getMetricTrend('AVERAGE_VOTE')}
+              />
+              <StatCard
+                title="Tỷ lệ xác minh"
+                value={`${getMetricValue('VERIFIED_RATE').toFixed(2)}%`}
+                change={formatMetricChange('VERIFIED_RATE')}
+                icon={Activity}
+                color="from-red-500 to-red-600"
+                trend={getMetricTrend('VERIFIED_RATE')}
+              />
+            </>
+          )}
         </div>
 
-        {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Revenue Chart */}
           <Card className="bg-white shadow-lg border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
               <CardTitle className="flex items-center gap-2">
@@ -262,7 +334,7 @@ const Dashboard = () => {
                     stroke="#6b7280"
                     tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
                   />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={CustomTooltip} />
                   <Area
                     type="monotone"
                     dataKey="revenue"
@@ -276,7 +348,6 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Order Status Chart */}
           <Card className="bg-white shadow-lg border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-green-500 to-teal-600 text-white">
               <CardTitle className="flex items-center gap-2">
@@ -302,7 +373,7 @@ const Dashboard = () => {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip content={CustomTooltip} />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                 </div>
@@ -328,9 +399,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Charts Row 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top Products Chart */}
           <Card className="bg-white shadow-lg border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
               <CardTitle>Top sản phẩm bán chạy</CardTitle>
@@ -347,14 +416,13 @@ const Dashboard = () => {
                     width={80}
                     tick={{ fontSize: 12 }}
                   />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={CustomTooltip} />
                   <Bar dataKey="sales" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
-          {/* Daily Traffic Chart */}
           <Card className="bg-white shadow-lg border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
               <CardTitle>Lưu lượng truy cập theo ngày</CardTitle>
@@ -365,7 +433,7 @@ const Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="day" stroke="#6b7280" />
                   <YAxis stroke="#6b7280" />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={CustomTooltip} />
                   <Line
                     type="monotone"
                     dataKey="visitors"
@@ -388,9 +456,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Best Selling Products */}
           <Card className="bg-white shadow-lg border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
               <CardTitle>Sản phẩm bán chạy nhất</CardTitle>
@@ -450,7 +516,6 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Orders */}
           <Card className="bg-white shadow-lg border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
               <CardTitle>Đơn hàng gần đây</CardTitle>

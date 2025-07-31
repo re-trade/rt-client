@@ -4,8 +4,8 @@ import CartProductRecommend from '@/components/cart/CartProductRecommend';
 import CartSection from '@/components/cart/CartSection';
 import CartSummary from '@/components/cart/CartSummary';
 import { useCart } from '@/context/CartContext';
-import { useRouter,useSearchParams} from 'next/navigation';
-import React, { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React from 'react';
 
 const ShoppingCart: React.FC = () => {
   const router = useRouter();

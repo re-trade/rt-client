@@ -87,7 +87,6 @@ export const orderApi = {
     }
   },
 
-
   async cancelOrder(orderId: string): Promise<TOrder> {
     const response = await authApi.default.get<IResponseObject<TOrder>>(
       `/orders/cancel/${orderId}`,
