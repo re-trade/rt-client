@@ -3,7 +3,7 @@
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductHome } from '@/hooks/use-product-home';
-import { HomeStats, productApi, TProduct } from '@/services/product.api';
+import { TProduct } from '@/services/product.api';
 import {
   ChevronRight,
   Clock,
@@ -22,8 +22,6 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-import { useEffect, useState } from 'react';
-
 export default function Home() {
   const {
     products,
@@ -32,26 +30,11 @@ export default function Home() {
     selectCategory,
     loading,
     categoriesLoading,
+    homeStats,
+    bestSellerProducts,
     error,
   } = useProductHome();
   const router = useRouter();
-
-  const [productsBestSellers, setProducts] = useState<TProduct[]>([]);
-  const [homeStats, setHomeStats] = useState<HomeStats | null>(null);
-  useEffect(() => {
-    const fetching = async () => {
-      const homeStatsResponse = await productApi.getHomeStats();
-      console.log(homeStatsResponse);
-      if (homeStatsResponse) {
-        setHomeStats(homeStatsResponse);
-      }
-      const response = await productApi.getproductBestSellers();
-      if (response) {
-        setProducts(response);
-      }
-    };
-    fetching();
-  }, []);
 
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
@@ -312,7 +295,7 @@ export default function Home() {
           title="Được mua nhiều"
           subtitle="Những sản phẩm hot nhất hiện tại"
           icon={<TrendingUp className="w-6 h-6" />}
-          items={productsBestSellers}
+          items={bestSellerProducts}
           showLoading={true}
         />
         <ProductSection

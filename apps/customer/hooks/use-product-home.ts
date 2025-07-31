@@ -1,10 +1,12 @@
 'use client';
 import { Category, getCategoriesInternal } from '@/services/category.api';
-import { productApi, TProduct } from '@/services/product.api';
+import { HomeStats, productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useProductHome() {
   const [products, setProducts] = useState<TProduct[]>([]);
+  const [bestSellerProducts, setBestSellerProducts] = useState<TProduct[]>([]);
+  const [homeStats, setHomeStats] = useState<HomeStats | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -47,6 +49,20 @@ export function useProductHome() {
     }
   }, []);
 
+  const fetchHomeStats = useCallback(async () => {
+    const homeStatsResponse = await productApi.getHomeStats();
+    if (homeStatsResponse) {
+      setHomeStats(homeStatsResponse);
+    }
+  }, []);
+
+  const fetchProductBestSeller = useCallback(async () => {
+    const response = await productApi.getproductBestSellers();
+    if (response) {
+      setBestSellerProducts(response);
+    }
+  }, []);
+
   const selectCategory = useCallback(
     (categoryId: string | null) => {
       setSelectedCategoryId(categoryId);
@@ -62,7 +78,9 @@ export function useProductHome() {
   useEffect(() => {
     fetchCategories();
     fetchProducts();
-  }, [fetchCategories, fetchProducts]);
+    fetchHomeStats();
+    fetchProductBestSeller();
+  }, [fetchCategories, fetchProducts, fetchHomeStats, fetchProductBestSeller]);
 
   return {
     loading,
@@ -72,6 +90,8 @@ export function useProductHome() {
     categories,
     selectedCategoryId,
     selectCategory,
+    bestSellerProducts,
     refetch,
+    homeStats,
   };
 }
