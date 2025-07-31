@@ -37,7 +37,7 @@ export function useCategoryManager() {
     async (data: {
       name: string;
       description?: string;
-      parentId?: string | null;
+      categoryParentId?: string | null;
       visible: boolean;
     }) => {
       setLoading(true);
@@ -63,7 +63,7 @@ export function useCategoryManager() {
       data: {
         name: string;
         description?: string;
-        parentId?: string | null;
+        categoryParentId?: string | null;
         visible: boolean;
       },
     ) => {
@@ -89,7 +89,7 @@ export function useCategoryManager() {
       return handleUpdate(cat.id, {
         name: cat.name,
         description: cat.description,
-        parentId: cat.parentId,
+        categoryParentId: (cat as any).parentId ?? null,
         visible: !cat.visible,
       });
     },

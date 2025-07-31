@@ -58,9 +58,9 @@ export default function CategoryPage() {
   const [form, setForm] = useState<{
     name: string;
     description?: string;
-    parentId?: string | null;
+    categoryParentId?: string | null;
     visible: boolean;
-  }>({ name: '', description: '', parentId: null, visible: true });
+  }>({ name: '', description: '', categoryParentId: null, visible: true });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load danh mục ban đầu
@@ -85,7 +85,7 @@ export default function CategoryPage() {
     setForm({
       name: '',
       description: '',
-      parentId: categoryParentId ?? null,
+      categoryParentId: categoryParentId ?? null,
       visible: true,
     });
     setEditingCategory(null);
@@ -97,7 +97,7 @@ export default function CategoryPage() {
     setForm({
       name: cat.name,
       description: cat.description ?? '',
-      parentId: cat.parentId ?? null,
+      categoryParentId: cat.parentId ?? null,
       visible: cat.visible,
     });
     setEditingCategory(cat);
@@ -108,7 +108,7 @@ export default function CategoryPage() {
   const closeDialog = () => {
     setOpenDialog(null);
     setEditingCategory(null);
-    setForm({ name: '', description: '', parentId: null, visible: true });
+    setForm({ name: '', description: '', categoryParentId: null, visible: true });
   };
 
   // Submit form thêm/sửa
@@ -118,7 +118,7 @@ export default function CategoryPage() {
     const payload = {
       name: form.name,
       description: form.description ?? undefined,
-      parentId: form.parentId ?? null,
+      categoryParentId: form.categoryParentId ?? null,
       visible: form.visible,
     };
     try {
@@ -129,8 +129,18 @@ export default function CategoryPage() {
         await handleUpdate(editingCategory.id, payload);
         toast.success('Cập nhật danh mục thành công!', { position: 'top-right' });
       }
-    } catch (err) {
-      toast.error('Có lỗi xảy ra!', { position: 'top-right' });
+    } catch (err: any) {
+      console.error('Form submit error:', err);
+      if (err?.response?.status === 401) {
+        // Redirect về login nếu token hết hạn
+        window.location.href = '/login?error=unauthorized';
+        return;
+      } else if (err?.response?.status === 500) {
+        // Lỗi server
+        toast.error('Lỗi server. Vui lòng thử lại sau!', { position: 'top-right' });
+      } else {
+        toast.error('Có lỗi xảy ra!', { position: 'top-right' });
+      }
     } finally {
       setIsSubmitting(false);
       closeDialog();
