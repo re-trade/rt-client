@@ -1,15 +1,14 @@
 'use client';
+import CustomTooltip from '@/components/dashboard/CustomToolTip';
+import MetricCard from '@/components/dashboard/MetricCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDashboard } from '@/hooks/use-dashboard';
 import type { DashboardMetricCode } from '@/service/dashboard.api';
 import {
   Activity,
-  ArrowDown,
-  ArrowUp,
   BarChart3,
   DollarSign,
   Eye,
-  Minus,
   Package,
   PieChart,
   RefreshCw,
@@ -22,12 +21,8 @@ import { useCallback, useState } from 'react';
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
   Cell,
-  Line,
-  LineChart,
   Pie,
   PieChart as RechartsPieChart,
   ResponsiveContainer,
@@ -40,7 +35,6 @@ const Dashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { dashboardMetric, timeRange, updateTimeRange, refreshDashboard, isLoading } =
     useDashboard();
-  const selectedTimeRange = timeRange;
   const revenueData = [
     { month: 'T1', revenue: 25000000, orders: 180, customers: 150 },
     { month: 'T2', revenue: 28000000, orders: 210, customers: 180 },
@@ -64,24 +58,24 @@ const Dashboard = () => {
     { name: 'Đã hủy', value: 25, color: '#6b7280' },
   ];
 
-  const topProductsData = [
-    { name: 'Áo thun nam', sales: 145, revenue: 43500000 },
-    { name: 'Quần jeans', sales: 132, revenue: 79200000 },
-    { name: 'Giày sneaker', sales: 98, revenue: 88200000 },
-    { name: 'Váy maxi', sales: 87, revenue: 39150000 },
-    { name: 'Áo khoác', sales: 76, revenue: 45600000 },
-    { name: 'Túi xách', sales: 65, revenue: 32500000 },
-  ];
-
-  const dailyTrafficData = [
-    { day: 'CN', visitors: 3200, pageviews: 8900 },
-    { day: 'T2', visitors: 4100, pageviews: 12400 },
-    { day: 'T3', visitors: 3800, pageviews: 11200 },
-    { day: 'T4', visitors: 4500, pageviews: 13800 },
-    { day: 'T5', visitors: 5200, pageviews: 15600 },
-    { day: 'T6', visitors: 4800, pageviews: 14200 },
-    { day: 'T7', visitors: 3600, pageviews: 9800 },
-  ];
+  // const topProductsData = [
+  //   { name: 'Áo thun nam', sales: 145, revenue: 43500000 },
+  //   { name: 'Quần jeans', sales: 132, revenue: 79200000 },
+  //   { name: 'Giày sneaker', sales: 98, revenue: 88200000 },
+  //   { name: 'Váy maxi', sales: 87, revenue: 39150000 },
+  //   { name: 'Áo khoác', sales: 76, revenue: 45600000 },
+  //   { name: 'Túi xách', sales: 65, revenue: 32500000 },
+  // ];
+  //
+  // const dailyTrafficData = [
+  //   { day: 'CN', visitors: 3200, pageviews: 8900 },
+  //   { day: 'T2', visitors: 4100, pageviews: 12400 },
+  //   { day: 'T3', visitors: 3800, pageviews: 11200 },
+  //   { day: 'T4', visitors: 4500, pageviews: 13800 },
+  //   { day: 'T5', visitors: 5200, pageviews: 15600 },
+  //   { day: 'T6', visitors: 4800, pageviews: 14200 },
+  //   { day: 'T7', visitors: 3600, pageviews: 9800 },
+  // ];
 
   const getMetricValue = (code: DashboardMetricCode) => {
     const metric = dashboardMetric.find((m) => m.code === code);
@@ -116,75 +110,6 @@ const Dashboard = () => {
       setTimeout(() => setIsRefreshing(false), 1500);
     }
   }, [isLoading, refreshDashboard]);
-
-  const StatCard = ({
-    title,
-    value,
-    change,
-    icon: Icon,
-    color,
-    trend,
-  }: {
-    title: string;
-    value: string | number;
-    change: string;
-    icon: React.ComponentType<{ className: string }>;
-    color: string;
-    trend: 'up' | 'down' | 'neutral';
-  }) => (
-    <Card className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
-      <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${color}`}></div>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
-        <div
-          className={`p-2 rounded-full bg-gradient-to-r ${color} opacity-20 group-hover:opacity-30 transition-opacity`}
-        >
-          <Icon className="h-4 w-4 text-gray-700" />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
-        <div className="flex items-center gap-1 text-xs">
-          {trend === 'up' ? (
-            <ArrowUp className="h-3 w-3 text-green-500" />
-          ) : trend === 'down' ? (
-            <ArrowDown className="h-3 w-3 text-red-500" />
-          ) : (
-            <Minus className="h-3 w-3 text-gray-400" />
-          )}
-          <span
-            className={`${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-500'}`}
-          >
-            {change}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const CustomTooltip = ({
-    active,
-    payload,
-    label,
-  }: {
-    active?: boolean;
-    payload?: Array<any>;
-    label?: string;
-  }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-gray-900">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value.toLocaleString()}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
@@ -231,7 +156,7 @@ const Dashboard = () => {
             </div>
           ) : (
             <>
-              <StatCard
+              <MetricCard
                 title="Tổng sản phẩm"
                 value={formatNumber(getMetricValue('TOTAL_PRODUCTS'))}
                 change={formatMetricChange('TOTAL_PRODUCTS')}
@@ -239,15 +164,15 @@ const Dashboard = () => {
                 color="from-blue-500 to-blue-600"
                 trend={getMetricTrend('TOTAL_PRODUCTS')}
               />
-              <StatCard
-                title="Doanh thu tháng"
+              <MetricCard
+                title="Doanh thu"
                 value={`${formatNumber(getMetricValue('REVENUE'))}đ`}
                 change={formatMetricChange('REVENUE')}
                 icon={DollarSign}
                 color="from-green-500 to-green-600"
                 trend={getMetricTrend('REVENUE')}
               />
-              <StatCard
+              <MetricCard
                 title="Đơn hàng"
                 value={formatNumber(getMetricValue('TOTAL_ORDERS'))}
                 change={formatMetricChange('TOTAL_ORDERS')}
@@ -255,7 +180,7 @@ const Dashboard = () => {
                 color="from-purple-500 to-purple-600"
                 trend={getMetricTrend('TOTAL_ORDERS')}
               />
-              <StatCard
+              <MetricCard
                 title="Tỷ lệ hoàn hàng"
                 value={`${getMetricValue('RETURN_RATE').toFixed(2)}%`}
                 change={formatMetricChange('RETURN_RATE')}
@@ -275,7 +200,7 @@ const Dashboard = () => {
             </div>
           ) : (
             <>
-              <StatCard
+              <MetricCard
                 title="Sản phẩm đang bán"
                 value={formatNumber(getMetricValue('ACTIVE_PRODUCTS'))}
                 change={formatMetricChange('ACTIVE_PRODUCTS')}
@@ -283,7 +208,7 @@ const Dashboard = () => {
                 color="from-teal-500 to-teal-600"
                 trend={getMetricTrend('ACTIVE_PRODUCTS')}
               />
-              <StatCard
+              <MetricCard
                 title="Tỷ lệ bán hàng"
                 value={`${getMetricValue('SOLD_RATE').toFixed(2)}%`}
                 change={formatMetricChange('SOLD_RATE')}
@@ -291,7 +216,7 @@ const Dashboard = () => {
                 color="from-indigo-500 to-indigo-600"
                 trend={getMetricTrend('SOLD_RATE')}
               />
-              <StatCard
+              <MetricCard
                 title="Đánh giá trung bình"
                 value={`${getMetricValue('AVERAGE_VOTE').toFixed(2)}/5.0`}
                 change={formatMetricChange('AVERAGE_VOTE')}
@@ -299,7 +224,7 @@ const Dashboard = () => {
                 color="from-yellow-500 to-yellow-600"
                 trend={getMetricTrend('AVERAGE_VOTE')}
               />
-              <StatCard
+              <MetricCard
                 title="Tỷ lệ xác minh"
                 value={`${getMetricValue('VERIFIED_RATE').toFixed(2)}%`}
                 change={formatMetricChange('VERIFIED_RATE')}
@@ -399,62 +324,62 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white shadow-lg border-0 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
-              <CardTitle>Top sản phẩm bán chạy</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topProductsData} layout="horizontal">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" stroke="#6b7280" />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    stroke="#6b7280"
-                    width={80}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip content={CustomTooltip} />
-                  <Bar dataKey="sales" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        {/*<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">*/}
+        {/*  <Card className="bg-white shadow-lg border-0 overflow-hidden">*/}
+        {/*    <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white">*/}
+        {/*      <CardTitle>Top sản phẩm bán chạy</CardTitle>*/}
+        {/*    </CardHeader>*/}
+        {/*    <CardContent className="p-6">*/}
+        {/*      <ResponsiveContainer width="100%" height={300}>*/}
+        {/*        <BarChart data={topProductsData} layout="horizontal">*/}
+        {/*          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />*/}
+        {/*          <XAxis type="number" stroke="#6b7280" />*/}
+        {/*          <YAxis*/}
+        {/*            type="category"*/}
+        {/*            dataKey="name"*/}
+        {/*            stroke="#6b7280"*/}
+        {/*            width={80}*/}
+        {/*            tick={{ fontSize: 12 }}*/}
+        {/*          />*/}
+        {/*          <Tooltip content={CustomTooltip} />*/}
+        {/*          <Bar dataKey="sales" fill="#8b5cf6" radius={[0, 4, 4, 0]} />*/}
+        {/*        </BarChart>*/}
+        {/*      </ResponsiveContainer>*/}
+        {/*    </CardContent>*/}
+        {/*  </Card>*/}
 
-          <Card className="bg-white shadow-lg border-0 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
-              <CardTitle>Lưu lượng truy cập theo ngày</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={dailyTrafficData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="day" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip content={CustomTooltip} />
-                  <Line
-                    type="monotone"
-                    dataKey="visitors"
-                    stroke="#f59e0b"
-                    strokeWidth={3}
-                    dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="pageviews"
-                    stroke="#ef4444"
-                    strokeWidth={3}
-                    dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+        {/*  <Card className="bg-white shadow-lg border-0 overflow-hidden">*/}
+        {/*    <CardHeader className="bg-gradient-to-r from-orange-500 to-red-600 text-white">*/}
+        {/*      <CardTitle>Lưu lượng truy cập theo ngày</CardTitle>*/}
+        {/*    </CardHeader>*/}
+        {/*    <CardContent className="p-6">*/}
+        {/*      <ResponsiveContainer width="100%" height={300}>*/}
+        {/*        <LineChart data={dailyTrafficData}>*/}
+        {/*          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />*/}
+        {/*          <XAxis dataKey="day" stroke="#6b7280" />*/}
+        {/*          <YAxis stroke="#6b7280" />*/}
+        {/*          <Tooltip content={CustomTooltip} />*/}
+        {/*          <Line*/}
+        {/*            type="monotone"*/}
+        {/*            dataKey="visitors"*/}
+        {/*            stroke="#f59e0b"*/}
+        {/*            strokeWidth={3}*/}
+        {/*            dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}*/}
+        {/*            activeDot={{ r: 6 }}*/}
+        {/*          />*/}
+        {/*          <Line*/}
+        {/*            type="monotone"*/}
+        {/*            dataKey="pageviews"*/}
+        {/*            stroke="#ef4444"*/}
+        {/*            strokeWidth={3}*/}
+        {/*            dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}*/}
+        {/*            activeDot={{ r: 6 }}*/}
+        {/*          />*/}
+        {/*        </LineChart>*/}
+        {/*      </ResponsiveContainer>*/}
+        {/*    </CardContent>*/}
+        {/*  </Card>*/}
+        {/*</div>*/}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="bg-white shadow-lg border-0 overflow-hidden">
