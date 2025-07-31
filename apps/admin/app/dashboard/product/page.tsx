@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useProductManager } from '@/hooks/use-product-manager';
 import {
   AlertCircle,
@@ -44,59 +43,69 @@ const ProductStats = ({ products }: { products: any[] }) => {
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <div className="stat bg-base-100 shadow-lg rounded-xl border border-base-300">
-        <div className="stat-figure text-primary">
-          <div className="avatar placeholder bg-primary bg-opacity-10 p-3 rounded-full">
-            <Package className="h-6 w-6 text-primary" />
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Package className="h-6 w-6 text-blue-600" />
+          </div>
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingUp className="h-4 w-4 text-green-500" />
+            <span className="text-green-600">+12% so với tháng trước</span>
           </div>
         </div>
-        <div className="stat-title text-base-content/70">Tổng sản phẩm</div>
-        <div className="stat-value text-primary">{totalProducts}</div>
-        <div className="stat-desc flex items-center gap-1">
-          <TrendingUp className="h-4 w-4 text-success" />
-          <span className="text-success">+12% so với tháng trước</span>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">{totalProducts}</div>
+          <div className="text-sm text-gray-600">Tổng sản phẩm</div>
         </div>
       </div>
 
-      <div className="stat bg-base-100 shadow-lg rounded-xl border border-base-300">
-        <div className="stat-figure text-success">
-          <div className="avatar placeholder bg-success bg-opacity-10 p-3 rounded-full">
-            <CheckCircle className="h-6 w-6 text-success" />
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <CheckCircle className="h-6 w-6 text-green-600" />
+          </div>
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingUp className="h-4 w-4 text-green-500" />
+            <span className="text-green-600">+8% so với tháng trước</span>
           </div>
         </div>
-        <div className="stat-title text-base-content/70">Đã xác minh</div>
-        <div className="stat-value text-success">{verifiedProducts}</div>
-        <div className="stat-desc flex items-center gap-1">
-          <TrendingUp className="h-4 w-4 text-success" />
-          <span className="text-success">+8% so với tháng trước</span>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">{verifiedProducts}</div>
+          <div className="text-sm text-gray-600">Đã xác minh</div>
         </div>
       </div>
 
-      <div className="stat bg-base-100 shadow-lg rounded-xl border border-base-300">
-        <div className="stat-figure text-warning">
-          <div className="avatar placeholder bg-warning bg-opacity-10 p-3 rounded-full">
-            <AlertCircle className="h-6 w-6 text-warning" />
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <AlertCircle className="h-6 w-6 text-orange-600" />
+          </div>
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingDown className="h-4 w-4 text-red-500" />
+            <span className="text-red-600">-5% so với tháng trước</span>
           </div>
         </div>
-        <div className="stat-title text-base-content/70">Chờ duyệt</div>
-        <div className="stat-value text-warning">{pendingProducts}</div>
-        <div className="stat-desc flex items-center gap-1">
-          <TrendingDown className="h-4 w-4 text-error" />
-          <span className="text-error">-5% so với tháng trước</span>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">{pendingProducts}</div>
+          <div className="text-sm text-gray-600">Chờ duyệt</div>
         </div>
       </div>
 
-      <div className="stat bg-base-100 shadow-lg rounded-xl border border-base-300">
-        <div className="stat-figure text-secondary">
-          <div className="avatar placeholder bg-secondary bg-opacity-10 p-3 rounded-full">
-            <BarChart3 className="h-6 w-6 text-secondary" />
+      <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <BarChart3 className="h-6 w-6 text-purple-600" />
+          </div>
+          <div className="flex items-center gap-1 text-sm">
+            <TrendingUp className="h-4 w-4 text-green-500" />
+            <span className="text-green-600">+15% so với tháng trước</span>
           </div>
         </div>
-        <div className="stat-title text-base-content/70">Tổng giá trị</div>
-        <div className="stat-value text-secondary">{totalValue.toLocaleString('vi-VN')} ₫</div>
-        <div className="stat-desc flex items-center gap-1">
-          <TrendingUp className="h-4 w-4 text-success" />
-          <span className="text-success">+15% so với tháng trước</span>
+        <div className="text-center">
+          <div className="text-3xl font-bold text-gray-800 mb-1">
+            {totalValue.toLocaleString('vi-VN')} ₫
+          </div>
+          <div className="text-sm text-gray-600">Tổng giá trị</div>
         </div>
       </div>
     </div>
@@ -114,69 +123,67 @@ const AdvancedFilters = ({
   setPriceRange,
 }: any) => {
   return (
-    <div className="card bg-base-100 shadow-lg border border-base-300">
-      <div className="card-body">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="h-4 w-4 text-primary" />
-          <h3 className="font-medium text-lg">Bộ lọc nâng cao</h3>
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Filter className="h-4 w-4 text-blue-600" />
+        <h3 className="font-medium text-lg text-gray-800">Bộ lọc nâng cao</h3>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Tìm kiếm sản phẩm..."
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
+              className="pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div className="form-control">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-base-content/50" />
-              <Input
-                placeholder="Tìm kiếm sản phẩm..."
-                value={searchQuery}
-                onChange={(e) => onSearch(e.target.value)}
-                className="input input-bordered pl-10"
-              />
-            </div>
-          </div>
+        <div>
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <SelectValue placeholder="Trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="verified">Đã xác minh</SelectItem>
+              <SelectItem value="pending">Chờ duyệt</SelectItem>
+              <SelectItem value="rejected">Từ chối</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="form-control">
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="select select-bordered">
-                <SelectValue placeholder="Trạng thái" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value="verified">Đã xác minh</SelectItem>
-                <SelectItem value="pending">Chờ duyệt</SelectItem>
-                <SelectItem value="rejected">Từ chối</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <SelectValue placeholder="Danh mục" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả danh mục</SelectItem>
+              <SelectItem value="electronics">Điện tử</SelectItem>
+              <SelectItem value="clothing">Thời trang</SelectItem>
+              <SelectItem value="books">Sách</SelectItem>
+              <SelectItem value="home">Nhà cửa</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="form-control">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="select select-bordered">
-                <SelectValue placeholder="Danh mục" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả danh mục</SelectItem>
-                <SelectItem value="electronics">Điện tử</SelectItem>
-                <SelectItem value="clothing">Thời trang</SelectItem>
-                <SelectItem value="books">Sách</SelectItem>
-                <SelectItem value="home">Nhà cửa</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="form-control">
-            <Select value={priceRange} onValueChange={setPriceRange}>
-              <SelectTrigger className="select select-bordered">
-                <SelectValue placeholder="Khoảng giá" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả giá</SelectItem>
-                <SelectItem value="0-100000">Dưới 100.000 ₫</SelectItem>
-                <SelectItem value="100000-500000">100.000 ₫ - 500.000 ₫</SelectItem>
-                <SelectItem value="500000-1000000">500.000 ₫ - 1.000.000 ₫</SelectItem>
-                <SelectItem value="1000000+">Trên 1.000.000 ₫</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div>
+          <Select value={priceRange} onValueChange={setPriceRange}>
+            <SelectTrigger className="border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <SelectValue placeholder="Khoảng giá" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả giá</SelectItem>
+              <SelectItem value="0-100000">Dưới 100.000 ₫</SelectItem>
+              <SelectItem value="100000-500000">100.000 ₫ - 500.000 ₫</SelectItem>
+              <SelectItem value="500000-1000000">500.000 ₫ - 1.000.000 ₫</SelectItem>
+              <SelectItem value="1000000+">Trên 1.000.000 ₫</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>
@@ -228,19 +235,21 @@ const ProductDetailModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-lg border border-gray-200">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-            <Package className="h-5 w-5 text-primary" />
+          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-800">
+            <Package className="h-5 w-5 text-blue-600" />
             Chi tiết sản phẩm
           </DialogTitle>
-          <DialogDescription>Thông tin chi tiết về sản phẩm {product.name}</DialogDescription>
+          <DialogDescription className="text-gray-600">
+            Thông tin chi tiết về sản phẩm {product.name}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* Hình ảnh sản phẩm */}
           <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-lg border border-base-300">
+            <div className="aspect-square overflow-hidden rounded-lg border border-gray-200">
               <img
                 src={product.thumbnail}
                 alt={product.name}
@@ -252,7 +261,7 @@ const ProductDetailModal = ({
                 {product.productImages.slice(0, 4).map((image: string, index: number) => (
                   <div
                     key={index}
-                    className="aspect-square overflow-hidden rounded border border-base-300"
+                    className="aspect-square overflow-hidden rounded border border-gray-200"
                   >
                     <img
                       src={image}
@@ -267,29 +276,29 @@ const ProductDetailModal = ({
 
           <div className="space-y-4">
             <div>
-              <h3 className="text-xl font-bold text-base-content">{product.name}</h3>
-              <p className="text-base-content/70">{product.shortDescription}</p>
+              <h3 className="text-xl font-bold text-gray-800">{product.name}</h3>
+              <p className="text-gray-600">{product.shortDescription}</p>
             </div>
 
             <div className="grid gap-3">
               <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-primary" />
-                <span className="font-medium">Giá:</span>
-                <span className="text-lg font-bold text-success">
+                <Tag className="h-4 w-4 text-blue-600" />
+                <span className="font-medium text-gray-700">Giá:</span>
+                <span className="text-lg font-bold text-green-600">
                   {product.currentPrice.toLocaleString('vi-VN')} ₫
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-secondary" />
-                <span className="font-medium">Số lượng:</span>
+                <Package className="h-4 w-4 text-purple-600" />
+                <span className="font-medium text-gray-700">Số lượng:</span>
                 <div
-                  className={`badge ${
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
                     product.quantity > 10
-                      ? 'badge-success'
+                      ? 'bg-green-100 text-green-700'
                       : product.quantity > 0
-                        ? 'badge-warning'
-                        : 'badge-error'
+                        ? 'bg-orange-100 text-orange-700'
+                        : 'bg-red-100 text-red-700'
                   }`}
                 >
                   {product.quantity}
@@ -297,43 +306,51 @@ const ProductDetailModal = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <Store className="h-4 w-4 text-accent" />
-                <span className="font-medium">Người bán:</span>
-                <span className="text-base-content/80">{product.sellerShopName}</span>
+                <Store className="h-4 w-4 text-orange-600" />
+                <span className="font-medium text-gray-700">Người bán:</span>
+                <span className="text-gray-600">{product.sellerShopName}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Thương hiệu:</span>
-                <div className="badge badge-outline">{product.brand}</div>
+                <span className="font-medium text-gray-700">Thương hiệu:</span>
+                <div className="px-2 py-1 border border-gray-300 rounded text-xs">
+                  ${product.brand}
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Model:</span>
-                <span className="text-base-content/80">{product.model}</span>
+                <span className="font-medium text-gray-700">Model:</span>
+                <span className="text-gray-600">{product.model}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Tình trạng:</span>
-                <div className="badge badge-outline">{getConditionText(product.condition)}</div>
+                <span className="font-medium text-gray-700">Tình trạng:</span>
+                <div className="px-2 py-1 border border-gray-300 rounded text-xs">
+                  {getConditionText(product.condition)}
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Trạng thái:</span>
-                <div className="badge badge-outline">{getStatusText(product.status)}</div>
+                <span className="font-medium text-gray-700">Trạng thái:</span>
+                <div className="px-2 py-1 border border-gray-300 rounded text-xs">
+                  {getStatusText(product.status)}
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">Xác minh:</span>
-                <div className={`badge ${product.verified ? 'badge-success' : 'badge-warning'}`}>
+                <span className="font-medium text-gray-700">Xác minh:</span>
+                <div
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${product.verified ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}
+                >
                   {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
                 </div>
               </div>
 
               {product.warrantyExpiryDate && (
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-info" />
-                  <span className="font-medium">Bảo hành đến:</span>
-                  <span className="text-base-content/80">
+                  <Calendar className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-gray-700">Bảo hành đến:</span>
+                  <span className="text-gray-600">
                     {new Date(
                       product.warrantyExpiryDate[0],
                       product.warrantyExpiryDate[1] - 1,
@@ -344,9 +361,9 @@ const ProductDetailModal = ({
               )}
 
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-info" />
-                <span className="font-medium">Ngày tạo:</span>
-                <span className="text-base-content/80">
+                <Calendar className="h-4 w-4 text-blue-600" />
+                <span className="font-medium text-gray-700">Ngày tạo:</span>
+                <span className="text-gray-600">
                   {new Date(product.createdAt).toLocaleDateString('vi-VN')}
                 </span>
               </div>
@@ -354,10 +371,10 @@ const ProductDetailModal = ({
 
             {/* Danh mục */}
             <div>
-              <h4 className="font-medium mb-2">Danh mục:</h4>
+              <h4 className="font-medium mb-2 text-gray-700">Danh mục:</h4>
               <div className="flex flex-wrap gap-1">
                 {product.categories.map((cat: any) => (
-                  <div key={cat.id} className="badge badge-outline badge-sm">
+                  <div key={cat.id} className="px-2 py-1 border border-gray-300 rounded text-xs">
                     {cat.name}
                   </div>
                 ))}
@@ -367,10 +384,13 @@ const ProductDetailModal = ({
             {/* Tags */}
             {product.tags && product.tags.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Tags:</h4>
+                <h4 className="font-medium mb-2 text-gray-700">Tags:</h4>
                 <div className="flex flex-wrap gap-1">
                   {product.tags.map((tag: string, index: number) => (
-                    <div key={index} className="badge badge-secondary badge-sm">
+                    <div
+                      key={index}
+                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
+                    >
                       {tag}
                     </div>
                   ))}
@@ -381,26 +401,26 @@ const ProductDetailModal = ({
         </div>
 
         {/* Mô tả chi tiết */}
-        <div className="border-t border-base-300 pt-4">
-          <h4 className="font-medium mb-2">Mô tả chi tiết:</h4>
-          <p className="text-sm text-base-content/70 whitespace-pre-wrap">{product.description}</p>
+        <div className="border-t border-gray-200 pt-4">
+          <h4 className="font-medium mb-2 text-gray-700">Mô tả chi tiết:</h4>
+          <p className="text-sm text-gray-600 whitespace-pre-wrap">{product.description}</p>
         </div>
 
         {/* Nút duyệt/không duyệt */}
         {!product.verified && (
           <div className="flex justify-end gap-2 mt-4">
             <button
-              className="btn btn-success btn-outline"
+              className="px-4 py-2 border border-green-500 text-green-600 rounded-lg hover:bg-green-500 hover:text-white transition-colors"
               onClick={() => onVerify && onVerify(product.id)}
             >
-              <CheckCircle className="h-4 w-4 mr-2" />
+              <CheckCircle className="h-4 w-4 inline mr-2" />
               Duyệt
             </button>
             <button
-              className="btn btn-error btn-outline"
+              className="px-4 py-2 border border-red-500 text-red-600 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
               onClick={() => onReject && onReject(product.id)}
             >
-              <XCircle className="h-4 w-4 mr-2" />
+              <XCircle className="h-4 w-4 inline mr-2" />
               Không duyệt
             </button>
           </div>
@@ -413,8 +433,11 @@ const ProductDetailModal = ({
 const ProductActions = ({ product, onView }: any) => {
   return (
     <div className="flex items-center gap-2">
-      <button className="btn btn-primary btn-sm btn-outline" onClick={() => onView(product)}>
-        <Eye className="h-4 w-4" />
+      <button
+        className="px-3 py-1 text-sm border border-blue-500 text-blue-600 rounded hover:bg-blue-500 hover:text-white transition-colors"
+        onClick={() => onView(product)}
+      >
+        <Eye className="h-4 w-4 inline mr-1" />
         Xem
       </button>
     </div>
@@ -530,65 +553,83 @@ export default function ProductManagementPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="hero bg-gradient-to-r from-primary to-secondary text-primary-content rounded-lg p-8">
-        <div className="hero-content text-center">
-          <div className="max-w-md">
-            <h1 className="text-4xl font-bold">Quản lý sản phẩm</h1>
-            <p className="py-6">Quản lý và duyệt sản phẩm từ người bán</p>
-          </div>
-        </div>
+      <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
+        <h1 className="text-3xl font-bold mb-2">Quản lý sản phẩm</h1>
+        <p className="text-lg opacity-90">Quản lý và duyệt sản phẩm từ người bán</p>
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4">
-        <button className="btn btn-outline btn-secondary" onClick={handleExport}>
-          <Download className="h-4 w-4 mr-2" />
+        <button
+          className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+          onClick={handleExport}
+        >
+          <Download className="h-4 w-4" />
           Xuất dữ liệu
         </button>
-        <button className="btn btn-outline btn-primary" onClick={handleRefresh} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+        <button
+          className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition-colors flex items-center gap-2"
+          onClick={handleRefresh}
+          disabled={loading}
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Làm mới
         </button>
       </div>
 
       {/* Success Display */}
       {deleteSuccess && (
-        <div className="alert alert-success shadow-lg">
-          <CheckCircle className="h-6 w-6" />
-          <div>
-            <h3 className="font-bold">Thành công!</h3>
-            <div className="text-xs">{deleteSuccess}</div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+              <CheckCircle className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-green-800">Thành công!</h3>
+              <p className="text-sm text-green-600">{deleteSuccess}</p>
+            </div>
+            <button
+              className="ml-auto p-1 hover:bg-green-100 rounded transition-colors"
+              onClick={() => setDeleteSuccess(null)}
+            >
+              <XCircle className="h-4 w-4 text-green-600" />
+            </button>
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={() => setDeleteSuccess(null)}>
-            <XCircle className="h-4 w-4" />
-          </button>
         </div>
       )}
 
       {/* Error Display */}
       {(error || deleteError) && (
-        <div className="alert alert-error shadow-lg">
-          <AlertCircle className="h-6 w-6" />
-          <div>
-            <h3 className="font-bold">Lỗi!</h3>
-            <div className="text-xs">{error || deleteError}</div>
-            {(error || deleteError)?.includes('đăng nhập') && (
-              <div className="mt-2 text-sm">
-                <p>
-                  Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao
-                  tác này.
-                </p>
-                <p className="mt-1 text-xs">
-                  <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3 giây.
-                </p>
-              </div>
-            )}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+              <AlertCircle className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-red-800">Lỗi!</h3>
+              <p className="text-sm text-red-600">{error || deleteError}</p>
+              {(error || deleteError)?.includes('đăng nhập') && (
+                <div className="mt-2 text-sm">
+                  <p className="text-red-600">
+                    Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao
+                    tác này.
+                  </p>
+                  <p className="mt-1 text-xs text-red-500">
+                    <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3
+                    giây.
+                  </p>
+                </div>
+              )}
+            </div>
+            <button
+              className="ml-auto p-1 hover:bg-red-100 rounded transition-colors"
+              onClick={() => setDeleteError(null)}
+            >
+              <XCircle className="h-4 w-4 text-red-600" />
+            </button>
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={() => setDeleteError(null)}>
-            <XCircle className="h-4 w-4" />
-          </button>
         </div>
       )}
 
@@ -608,57 +649,73 @@ export default function ProductManagementPage() {
       />
 
       {/* Products Table */}
-      <div className="card bg-base-100 shadow-lg border border-base-300">
-        <div className="card-body">
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-6">
           {loading ? (
             <div className="overflow-x-auto">
-              <table className="table table-zebra w-full">
+              <table className="w-full">
                 <thead>
-                  <tr>
-                    <th className="min-w-[180px] max-w-[220px] truncate">Sản phẩm</th>
-                    <th className="min-w-[120px] max-w-[140px] text-right">Giá</th>
-                    <th className="min-w-[80px] max-w-[100px] text-center">Tồn kho</th>
-                    <th className="min-w-[120px] max-w-[160px]">Người bán</th>
-                    <th className="min-w-[120px] max-w-[160px]">Danh mục</th>
-                    <th className="min-w-[100px] max-w-[120px] text-center">Trạng thái</th>
-                    <th className="min-w-[120px] max-w-[140px] text-center">Ngày tạo</th>
-                    <th className="text-center min-w-[120px]">Thao tác</th>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[180px] max-w-[220px]">
+                      Sản phẩm
+                    </th>
+                    <th className="text-right px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Giá
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[80px] max-w-[100px]">
+                      Tồn kho
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Người bán
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Danh mục
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[100px] max-w-[120px]">
+                      Trạng thái
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Ngày tạo
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px]">
+                      Thao tác
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...Array(6)].map((_, i) => (
-                    <tr key={i}>
-                      <td className="min-w-[180px] max-w-[220px] truncate">
+                    <tr key={i} className="border-b border-gray-100">
+                      <td className="px-6 py-4 min-w-[180px] max-w-[220px]">
                         <div className="flex items-center gap-2">
-                          <Skeleton className="w-10 h-10 rounded" />
+                          <div className="w-10 h-10 bg-gray-200 rounded animate-pulse"></div>
                           <div>
-                            <Skeleton className="h-4 w-32 mb-1" />
-                            <Skeleton className="h-3 w-24 mb-1" />
-                            <Skeleton className="h-3 w-20" />
+                            <div className="h-4 bg-gray-200 rounded w-32 mb-1 animate-pulse"></div>
+                            <div className="h-3 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div>
+                            <div className="h-3 bg-gray-200 rounded w-20 animate-pulse"></div>
                           </div>
                         </div>
                       </td>
-                      <td className="min-w-[120px] max-w-[140px] text-right">
-                        <Skeleton className="h-4 w-20 mb-1" />
-                        <Skeleton className="h-3 w-16" />
+                      <td className="px-6 py-4 text-right min-w-[120px] max-w-[140px]">
+                        <div className="h-4 bg-gray-200 rounded w-20 mb-1 animate-pulse"></div>
+                        <div className="h-3 bg-gray-200 rounded w-16 animate-pulse"></div>
                       </td>
-                      <td className="min-w-[80px] max-w-[100px] text-center">
-                        <Skeleton className="h-4 w-10 mx-auto" />
+                      <td className="px-6 py-4 text-center min-w-[80px] max-w-[100px]">
+                        <div className="h-4 bg-gray-200 rounded w-10 mx-auto animate-pulse"></div>
                       </td>
-                      <td className="min-w-[120px] max-w-[160px]">
-                        <Skeleton className="h-4 w-24" />
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
+                        <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
                       </td>
-                      <td className="min-w-[120px] max-w-[160px]">
-                        <Skeleton className="h-4 w-24" />
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
+                        <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
                       </td>
-                      <td className="min-w-[100px] max-w-[120px] text-center">
-                        <Skeleton className="h-4 w-16 mx-auto" />
+                      <td className="px-6 py-4 text-center min-w-[100px] max-w-[120px]">
+                        <div className="h-4 bg-gray-200 rounded w-16 mx-auto animate-pulse"></div>
                       </td>
-                      <td className="min-w-[120px] max-w-[140px] text-center">
-                        <Skeleton className="h-4 w-20 mx-auto" />
+                      <td className="px-6 py-4 text-center min-w-[120px] max-w-[140px]">
+                        <div className="h-4 bg-gray-200 rounded w-20 mx-auto animate-pulse"></div>
                       </td>
-                      <td className="text-center min-w-[120px]">
-                        <Skeleton className="h-8 w-24 mx-auto" />
+                      <td className="px-6 py-4 text-center min-w-[120px]">
+                        <div className="h-8 bg-gray-200 rounded w-24 mx-auto animate-pulse"></div>
                       </td>
                     </tr>
                   ))}
@@ -666,30 +723,49 @@ export default function ProductManagementPage() {
               </table>
             </div>
           ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-base-content/50">
+            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
               <Package className="h-16 w-16 mb-4" />
               <p className="text-lg font-medium">Không tìm thấy sản phẩm</p>
               <p className="text-sm">Thử điều chỉnh bộ lọc hoặc tìm kiếm</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="table table-zebra w-full">
+              <table className="w-full">
                 <thead>
-                  <tr>
-                    <th className="min-w-[180px] max-w-[220px] truncate">Sản phẩm</th>
-                    <th className="min-w-[120px] max-w-[140px] text-right">Giá</th>
-                    <th className="min-w-[80px] max-w-[100px] text-center">Tồn kho</th>
-                    <th className="min-w-[120px] max-w-[160px]">Người bán</th>
-                    <th className="min-w-[120px] max-w-[160px]">Danh mục</th>
-                    <th className="min-w-[100px] max-w-[120px] text-center">Trạng thái</th>
-                    <th className="min-w-[120px] max-w-[140px] text-center">Ngày tạo</th>
-                    <th className="text-center min-w-[120px]">Thao tác</th>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[180px] max-w-[220px]">
+                      Sản phẩm
+                    </th>
+                    <th className="text-right px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Giá
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[80px] max-w-[100px]">
+                      Tồn kho
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Người bán
+                    </th>
+                    <th className="text-left px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[160px]">
+                      Danh mục
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[100px] max-w-[120px]">
+                      Trạng thái
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px] max-w-[140px]">
+                      Ngày tạo
+                    </th>
+                    <th className="text-center px-6 py-3 text-gray-700 font-semibold min-w-[120px]">
+                      Thao tác
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-base-200 transition-colors">
-                      <td className="min-w-[180px] max-w-[220px] truncate">
+                    <tr
+                      key={product.id}
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4 min-w-[180px] max-w-[220px]">
                         <div className="flex items-center gap-3">
                           {product.thumbnail && (
                             <img
@@ -699,71 +775,78 @@ export default function ProductManagementPage() {
                             />
                           )}
                           <div>
-                            <div className="font-medium truncate max-w-[140px] text-base-content">
+                            <div className="font-medium truncate max-w-[140px] text-gray-800">
                               {product.name}
                             </div>
-                            <div className="text-sm text-base-content/70 truncate max-w-[140px]">
+                            <div className="text-sm text-gray-600 truncate max-w-[140px]">
                               {product.shortDescription}
                             </div>
-                            <div className="text-xs text-base-content/50 truncate max-w-[140px]">
+                            <div className="text-xs text-gray-500 truncate max-w-[140px]">
                               {product.brand} • {product.model}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="min-w-[120px] max-w-[140px] text-right">
-                        <div className="font-medium text-base-content">
+                      <td className="px-6 py-4 text-right min-w-[120px] max-w-[140px]">
+                        <div className="font-medium text-gray-800">
                           {product.currentPrice.toLocaleString('vi-VN')} ₫
                         </div>
                         {product.quantity > 0 ? (
-                          <div className="text-sm text-success">Còn hàng</div>
+                          <div className="text-sm text-green-600">Còn hàng</div>
                         ) : (
-                          <div className="text-sm text-error">Hết hàng</div>
+                          <div className="text-sm text-red-600">Hết hàng</div>
                         )}
                       </td>
-                      <td className="min-w-[80px] max-w-[100px] text-center">
+                      <td className="px-6 py-4 text-center min-w-[80px] max-w-[100px]">
                         <div
-                          className={`badge ${
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                             product.quantity > 10
-                              ? 'badge-success'
+                              ? 'bg-green-100 text-green-700'
                               : product.quantity > 0
-                                ? 'badge-warning'
-                                : 'badge-error'
+                                ? 'bg-orange-100 text-orange-700'
+                                : 'bg-red-100 text-red-700'
                           }`}
                         >
                           {product.quantity}
                         </div>
                       </td>
-                      <td className="min-w-[120px] max-w-[160px]">
-                        <div className="text-sm font-medium truncate max-w-[120px] text-base-content/80">
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
+                        <div className="text-sm font-medium truncate max-w-[120px] text-gray-600">
                           {product.sellerShopName}
                         </div>
                       </td>
-                      <td className="min-w-[120px] max-w-[160px]">
+                      <td className="px-6 py-4 min-w-[120px] max-w-[160px]">
                         <div className="flex flex-wrap gap-1">
                           {product.categories.slice(0, 2).map((cat: any) => (
-                            <div key={cat.id} className="badge badge-outline badge-xs">
+                            <div
+                              key={cat.id}
+                              className="px-2 py-1 border border-gray-300 rounded text-xs"
+                            >
                               {cat.name}
                             </div>
                           ))}
                           {product.categories.length > 2 && (
-                            <div className="badge badge-outline badge-xs">
+                            <div className="px-2 py-1 border border-gray-300 rounded text-xs">
                               +{product.categories.length - 2}
                             </div>
                           )}
                         </div>
                       </td>
-                      <td className="min-w-[100px] max-w-[120px] text-center">
+                      <td className="px-6 py-4 text-center min-w-[100px] max-w-[120px]">
                         <div
-                          className={`badge ${product.verified ? 'badge-success' : 'badge-warning'}`}
+                          className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            product.verified
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-orange-100 text-orange-700'
+                          }`}
                         >
                           {product.verified ? 'Đã xác minh' : 'Chờ duyệt'}
                         </div>
                       </td>
-                      <td className="min-w-[120px] max-w-[140px] text-center text-sm text-base-content/70">
+                      <td className="px-6 py-4 text-center min-w-[120px] max-w-[140px] text-sm text-gray-600">
                         {new Date(product.createdAt).toLocaleDateString('vi-VN')}
                       </td>
-                      <td className="text-center min-w-[120px]">
+                      <td className="px-6 py-4 text-center min-w-[120px]">
                         <ProductActions product={product} onView={handleView} />
                       </td>
                     </tr>
@@ -775,23 +858,23 @@ export default function ProductManagementPage() {
 
           {!loading && products.length > 0 && (
             <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-base-content/70">
+              <div className="text-sm text-gray-600">
                 Hiển thị {products.length} sản phẩm trên trang {page} / {maxPage} (Tổng cộng{' '}
                 {totalProducts} sản phẩm)
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  className="btn btn-outline btn-sm"
+                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                   onClick={() => handlePageChange(page - 1)}
                   disabled={page === 1}
                 >
                   Trước
                 </button>
-                <span className="text-sm text-base-content/70">
+                <span className="text-sm text-gray-600">
                   Trang {page} / {maxPage}
                 </span>
                 <button
-                  className="btn btn-outline btn-sm"
+                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                   onClick={() => handlePageChange(page + 1)}
                   disabled={page === maxPage}
                 >
