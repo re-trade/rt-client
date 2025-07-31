@@ -2,15 +2,13 @@
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import {
   Activity,
-  ArrowDownRight,
-  ArrowUpRight,
   Package,
   ShoppingCart,
   Store,
   Tag,
-  Users,
-  TrendingUp,
   TrendingDown,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 import React from 'react';
 
@@ -29,7 +27,9 @@ const StatCard = ({
   trend?: 'up' | 'down';
   color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error';
 }) => (
-  <div className={`stat bg-base-100 shadow-lg rounded-xl border border-base-300 hover:shadow-xl transition-all duration-300 hover:scale-105`}>
+  <div
+    className={`stat bg-base-100 shadow-lg rounded-xl border border-base-300 hover:shadow-xl transition-all duration-300 hover:scale-105`}
+  >
     <div className="stat-figure text-primary">
       <div className={`avatar placeholder bg-${color} bg-opacity-10 p-3 rounded-full`}>
         <Icon className="h-6 w-6 text-primary" />
@@ -65,7 +65,10 @@ const ActivityCard = ({
       <h2 className="card-title text-lg font-semibold">{title}</h2>
       <div className="space-y-4">
         {items.map((item, index) => (
-          <div key={index} className="flex items-start gap-4 p-3 rounded-lg hover:bg-base-200 transition-colors">
+          <div
+            key={index}
+            className="flex items-start gap-4 p-3 rounded-lg hover:bg-base-200 transition-colors"
+          >
             <div className={`avatar placeholder ${getStatusColor(item.status)}`}>
               <div className="bg-opacity-10 rounded-full w-10 h-10 flex items-center justify-center">
                 <Activity className={`h-5 w-5 ${getStatusTextColor(item.status)}`} />
@@ -85,21 +88,31 @@ const ActivityCard = ({
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'success': return 'bg-success';
-    case 'warning': return 'bg-warning';
-    case 'error': return 'bg-error';
-    case 'info': return 'bg-info';
-    default: return 'bg-primary';
+    case 'success':
+      return 'bg-success';
+    case 'warning':
+      return 'bg-warning';
+    case 'error':
+      return 'bg-error';
+    case 'info':
+      return 'bg-info';
+    default:
+      return 'bg-primary';
   }
 };
 
 const getStatusTextColor = (status: string) => {
   switch (status) {
-    case 'success': return 'text-success';
-    case 'warning': return 'text-warning';
-    case 'error': return 'text-error';
-    case 'info': return 'text-info';
-    default: return 'text-primary';
+    case 'success':
+      return 'text-success';
+    case 'warning':
+      return 'text-warning';
+    case 'error':
+      return 'text-error';
+    case 'info':
+      return 'text-info';
+    default:
+      return 'text-primary';
   }
 };
 
@@ -118,7 +131,7 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="stat bg-base-100 shadow-lg rounded-xl border border-base-300">
@@ -136,8 +149,18 @@ export default function AdminPage() {
     return (
       <div className="space-y-6">
         <div className="alert alert-error shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <div>
             <h3 className="font-bold">Lỗi!</h3>
