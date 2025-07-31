@@ -1,4 +1,3 @@
-// ProductManagement.tsx
 'use client';
 
 import { CreateProductDialog } from '@/components/dialog-common/add/create-product-dialog';
@@ -234,9 +233,6 @@ export default function ProductManagement() {
 
   const handleDeleteProduct = async (product: TProduct) => {
     try {
-      // Add your delete API call here
-      // await productApi.deleteProduct(product.id);
-
       const updatedProducts = productList.filter((p) => p.id !== product.id);
       setProductList(updatedProducts);
       toast.success('Đã xoá sản phẩm thành công');
@@ -739,7 +735,6 @@ export default function ProductManagement() {
           open={isCreateOpen}
           onOpenChange={setIsCreateOpen}
           onSuccess={() => {
-            // Refresh product list after creation
             const fetchProducts = async () => {
               try {
                 const productList = await productApi.getProducts();
