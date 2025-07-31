@@ -1,19 +1,17 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import {
   Activity,
   ArrowDownRight,
   ArrowUpRight,
-  DollarSign,
   Package,
-  Store,
-  Users,
   ShoppingCart,
-  AlertTriangle,
+  Store,
   Tag,
+  Users,
 } from 'lucide-react';
 import React from 'react';
-import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 
 const StatCard = ({
   title,

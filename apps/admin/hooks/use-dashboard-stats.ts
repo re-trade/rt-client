@@ -30,4 +30,4 @@ export function useDashboardStats() {
     error,
     refetch: fetchStats,
   };
-} 
+}

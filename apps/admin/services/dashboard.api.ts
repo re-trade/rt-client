@@ -87,13 +87,14 @@ const getSellersCount = async (): Promise<number> => {
 // Fetch all dashboard stats
 const getDashboardStats = async (): Promise<DashboardStats> => {
   try {
-    const [categoriesCount, customersCount, ordersCount, productsCount, sellersCount] = await Promise.all([
-      getCategoriesCount(),
-      getCustomersCount(),
-      getOrdersCount(),
-      getProductsCount(),
-      getSellersCount(),
-    ]);
+    const [categoriesCount, customersCount, ordersCount, productsCount, sellersCount] =
+      await Promise.all([
+        getCategoriesCount(),
+        getCustomersCount(),
+        getOrdersCount(),
+        getProductsCount(),
+        getSellersCount(),
+      ]);
 
     return {
       totalCategories: categoriesCount,
@@ -115,12 +116,12 @@ const getDashboardStats = async (): Promise<DashboardStats> => {
 };
 
 export {
-  getDashboardStats,
   getCategoriesCount,
   getCustomersCount,
+  getDashboardStats,
   getOrdersCount,
   getProductsCount,
   getSellersCount,
-  type DashboardStats,
   type ApiResponse,
-}; 
+  type DashboardStats,
+};
