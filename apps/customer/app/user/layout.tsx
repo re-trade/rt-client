@@ -98,26 +98,60 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   const activeTab = pathname.split('/user/')[1] || 'profile';
 
+  const getInitials = () => {
+    if (profile?.firstName && profile?.lastName) {
+      return `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase();
+    }
+    if (profile?.username) {
+      return profile.username.charAt(0).toUpperCase();
+    }
+    if (profile?.email) {
+      return profile.email.charAt(0).toUpperCase();
+    }
+    return 'U';
+  };
+
+  const renderAvatar = (size: string) => {
+    if (
+      profile?.avatarUrl &&
+      typeof profile.avatarUrl === 'string' &&
+      (profile.avatarUrl.startsWith('http') || profile.avatarUrl.startsWith('/'))
+    ) {
+      return (
+        <img
+          src={profile.avatarUrl}
+          alt="User avatar"
+          className={`${size} object-cover rounded-xl`}
+        />
+      );
+    }
+    return (
+      <div
+        className={`${size} bg-orange-500 rounded-xl flex items-center justify-center text-white font-bold shadow-md`}
+      >
+        {getInitials()}
+      </div>
+    );
+  };
+
   const SidebarContent = () => (
     <>
-      <div className="p-4 sm:p-6 bg-[#FFD2B2] text-[#121212]">
+      <div className="p-4 sm:p-6 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
         <div className="flex items-center space-x-3 sm:space-x-4">
           <div className="relative">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-xl flex items-center justify-center text-[#121212] text-lg sm:text-xl font-bold shadow-md">
-              {profile?.email?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
+            {renderAvatar('w-12 h-12 sm:w-16 sm:h-16 text-lg sm:text-xl')}
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold truncate">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 truncate">
               {profile?.username ?? 'N/A'}
             </h2>
             <button
               onClick={() => router.push('/user/profile')}
-              className="flex items-center text-[#121212] hover:underline transition-colors text-xs sm:text-sm mt-1 group"
+              className="flex items-center text-gray-600 hover:text-orange-600 transition-colors text-xs sm:text-sm mt-1 group"
             >
-              <Edit3 className="w-3 h-3 mr-1 flex-shrink-0" />
+              <Edit3 className="w-3 h-3 mr-1 flex-shrink-0 text-orange-500" />
               <span className="truncate">Sửa Hồ Sơ</span>
-              <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+              <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0 text-orange-400" />
             </button>
           </div>
         </div>
@@ -189,35 +223,33 @@ export default function UserLayout({ children }: UserLayoutProps) {
   );
 
   return (
-    <div className="min-h-screen bg-[#FDFEF9]">
-      <div className="lg:hidden bg-white shadow-md border-b border-[#525252]/20 p-4">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50">
+      <div className="lg:hidden bg-white shadow-md border-b border-orange-200 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-[#FFD2B2] rounded-lg flex items-center justify-center text-[#121212] text-sm font-bold">
-              {profile?.email?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
+            {renderAvatar('w-8 h-8 text-sm')}
             <div>
-              <h2 className="text-sm font-semibold text-[#121212] truncate">
+              <h2 className="text-sm font-semibold text-gray-800 truncate">
                 {profile?.username ?? 'N/A'}
               </h2>
             </div>
           </div>
           <button
             onClick={toggleMobileMenu}
-            className="p-2 rounded-lg hover:bg-[#FDFEF9] transition-colors"
+            className="p-2 rounded-lg hover:bg-orange-50 transition-colors"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
-              <X className="w-6 h-6 text-[#121212]" />
+              <X className="w-6 h-6 text-gray-600" />
             ) : (
-              <Menu className="w-6 h-6 text-[#121212]" />
+              <Menu className="w-6 h-6 text-gray-600" />
             )}
           </button>
         </div>
       </div>
 
       <div className="flex max-w-7xl mx-auto">
-        <aside className="hidden lg:block w-80 bg-white shadow-md border-r border-[#525252]/20">
+        <aside className="hidden lg:block w-80 bg-white shadow-md border-r border-orange-200">
           <SidebarContent />
         </aside>
 

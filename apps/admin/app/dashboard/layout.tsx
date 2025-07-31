@@ -24,6 +24,7 @@ import {
   Store,
   User,
   Users,
+  ShoppingCart
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -42,6 +43,8 @@ const menuItems = [
       { title: 'Quản lý khách hàng', icon: User, href: '/dashboard/customer' },
       { title: 'Quản lý người bán', icon: Store, href: '/dashboard/seller' },
       { title: 'Quản lý tố cáo', icon: Flag, href: '/dashboard/report-seller' },
+      { title: 'Quản lý đơn hàng', icon: ShoppingCart, href: '/dashboard/order' },
+
       { title: 'Quản lý Category', icon: FileText, href: '/dashboard/category' },
     ],
   },

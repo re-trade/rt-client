@@ -4,17 +4,30 @@ import CartProductRecommend from '@/components/cart/CartProductRecommend';
 import CartSection from '@/components/cart/CartSection';
 import CartSummary from '@/components/cart/CartSummary';
 import { useCart } from '@/context/CartContext';
-import { useRouter } from 'next/navigation';
-import React from 'react';
+import { useRouter,useSearchParams} from 'next/navigation';
+import React, { useEffect } from 'react';
 
 const ShoppingCart: React.FC = () => {
   const router = useRouter();
   const cartHook = useCart();
-
+  const searchParams = useSearchParams();
   const navigateHome = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push('/');
   };
+
+  // useEffect(() => {
+  //   const isBuyNow = searchParams.get('buyNow') === 'true';
+  //   if (isBuyNow) {
+  //     const productId = searchParams.get('productId');
+  //     if (productId) {
+  //       cartHook.addToCart(productId, 1);
+  //     }
+  //   }
+  // }, [cartHook, searchParams]);
+  // useEffect(() => {
+
+  // }, [cartHook]);
 
   const shouldShowCartSummary = () => {
     if (cartHook.loading || cartHook.error) {

@@ -49,16 +49,16 @@ export default function WalletPage() {
     .reduce((sum, w) => sum + w.amount, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50">
+      <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden mx-4 sm:mx-6 mt-6">
+        <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 border-b border-orange-200">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-orange-100 rounded-xl">
-              <Wallet className="w-8 h-8 text-orange-600" />
+            <div className="p-3 bg-orange-500 rounded-lg">
+              <Wallet className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Ví của tôi</h1>
-              <p className="text-gray-600 mt-1 text-lg">Quản lý số dư và yêu cầu rút tiền</p>
+              <h1 className="text-2xl font-bold text-gray-800">Ví của tôi</h1>
+              <p className="text-gray-600 mt-1">Quản lý số dư và yêu cầu rút tiền</p>
             </div>
           </div>
         </div>

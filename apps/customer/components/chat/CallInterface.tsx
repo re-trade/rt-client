@@ -1,6 +1,6 @@
 'use client';
 
-import type { Room } from '@/types/chat/chat';
+import type { Room } from '@retrade/util';
 import {
   IconMicrophone,
   IconMicrophoneOff,
