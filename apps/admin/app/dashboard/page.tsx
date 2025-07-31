@@ -2,18 +2,13 @@
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import {
   Activity,
-  ArrowDownRight,
-  ArrowUpRight,
   Package,
   ShoppingCart,
   Store,
   Tag,
-  Users,
-  TrendingUp,
   TrendingDown,
-  BarChart3,
-  DollarSign,
-  ShoppingBag,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 import React from 'react';
 
@@ -34,7 +29,9 @@ const StatCard = ({
   color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error';
   gradient?: string;
 }) => (
-  <div className={`stat bg-gradient-to-br ${gradient} text-white shadow-xl rounded-2xl border-0 hover:scale-105 transition-all duration-300`}>
+  <div
+    className={`stat bg-gradient-to-br ${gradient} text-white shadow-xl rounded-2xl border-0 hover:scale-105 transition-all duration-300`}
+  >
     <div className="stat-figure text-white">
       <div className="avatar placeholder bg-white bg-opacity-20 p-4 rounded-full">
         <Icon className="h-8 w-8 text-white" />
@@ -70,7 +67,10 @@ const ActivityCard = ({
       <h2 className="card-title text-xl font-bold text-gray-800">{title}</h2>
       <div className="space-y-4">
         {items.map((item, index) => (
-          <div key={index} className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+          <div
+            key={index}
+            className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors"
+          >
             <div className={`avatar placeholder ${getStatusColor(item.status)}`}>
               <div className="bg-opacity-10 rounded-full w-12 h-12 flex items-center justify-center">
                 <Activity className={`h-6 w-6 ${getStatusTextColor(item.status)}`} />
@@ -90,21 +90,31 @@ const ActivityCard = ({
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'success': return 'bg-emerald-500';
-    case 'warning': return 'bg-amber-500';
-    case 'error': return 'bg-red-500';
-    case 'info': return 'bg-blue-500';
-    default: return 'bg-indigo-500';
+    case 'success':
+      return 'bg-emerald-500';
+    case 'warning':
+      return 'bg-amber-500';
+    case 'error':
+      return 'bg-red-500';
+    case 'info':
+      return 'bg-blue-500';
+    default:
+      return 'bg-indigo-500';
   }
 };
 
 const getStatusTextColor = (status: string) => {
   switch (status) {
-    case 'success': return 'text-emerald-600';
-    case 'warning': return 'text-amber-600';
-    case 'error': return 'text-red-600';
-    case 'info': return 'text-blue-600';
-    default: return 'text-indigo-600';
+    case 'success':
+      return 'text-emerald-600';
+    case 'warning':
+      return 'text-amber-600';
+    case 'error':
+      return 'text-red-600';
+    case 'info':
+      return 'text-blue-600';
+    default:
+      return 'text-indigo-600';
   }
 };
 
@@ -123,7 +133,7 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="stat bg-white shadow-xl rounded-2xl border-0">
@@ -141,8 +151,18 @@ export default function AdminPage() {
     return (
       <div className="space-y-6">
         <div className="alert alert-error shadow-lg rounded-2xl">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <div>
             <h3 className="font-bold">Lỗi!</h3>

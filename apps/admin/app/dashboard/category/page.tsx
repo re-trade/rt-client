@@ -1,23 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { TableCell, TableRow } from '@/components/ui/table';
 import { useCategoryManager } from '@/hooks/use-category-manager';
 import type { Category } from '@/services/category.api';
 import { unAuthApi } from '@retrade/util/src/api/instance';
-import { ChevronRight, Plus, Edit, Eye, EyeOff, Tag } from 'lucide-react';
+import { ChevronRight, Edit, Eye, EyeOff, Plus, Tag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -162,7 +153,9 @@ export default function CategoryPage() {
       <>
         <TableRow
           className={`transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 ${
-            level > 0 ? 'border-l-4 border-indigo-200 bg-gradient-to-r from-indigo-50/30 to-purple-50/30' : ''
+            level > 0
+              ? 'border-l-4 border-indigo-200 bg-gradient-to-r from-indigo-50/30 to-purple-50/30'
+              : ''
           }`}
         >
           <TableCell style={{ paddingLeft: `${level * 32 + 16}px` }}>
@@ -222,8 +215,8 @@ export default function CategoryPage() {
               </button>
               <button
                 className={`btn btn-sm ${
-                  category.visible 
-                    ? 'btn-error btn-outline border-red-500 text-red-600 hover:bg-red-500 hover:text-white' 
+                  category.visible
+                    ? 'btn-error btn-outline border-red-500 text-red-600 hover:bg-red-500 hover:text-white'
                     : 'btn-success btn-outline border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white'
                 }`}
                 onClick={() => handleToggleVisible(normalizeCategory(category))}
@@ -338,8 +331,18 @@ export default function CategoryPage() {
       {/* Error State */}
       {error && (
         <div className="alert alert-error shadow-lg rounded-2xl">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <div>
             <h3 className="font-bold">Lỗi!</h3>
