@@ -64,6 +64,26 @@ const menuItems = [
     icon: MessageCircle,
     href: '/dashboard/chat',
   },
+  // {
+  //   title: 'Quản lý voucher',
+  //   icon: Ticket,
+  //   href: '/dashboard/voucher-management',
+  // },
+  // {
+  //   title: 'Phương thức vận chuyển',
+  //   icon: Truck,
+  //   href: '/dashboard/shipping-management',
+  // },
+  // {
+  //   title: 'Quản lý địa chỉ',
+  //   icon: MapPin,
+  //   href: '/dashboard/address-management',
+  // },
+  // {
+  //   title: 'Bảo mật',
+  //   icon: ShieldEllipsis,
+  //   href: '/dashboard/security',
+  // },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

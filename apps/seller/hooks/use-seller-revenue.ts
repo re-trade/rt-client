@@ -99,7 +99,7 @@ export function useSellerRevenue(initialYear: number = new Date().getFullYear())
       'Tháng 11',
       'Tháng 12',
     ];
-    return monthNames[monthIndex];
+    return monthNames[monthIndex] || '';
   };
 
   const getTotalAnnualRevenue = useCallback(() => {
