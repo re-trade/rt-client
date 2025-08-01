@@ -80,14 +80,13 @@ export const productApi = {
 
     params.set('page', page.toString());
     params.set('size', size.toString());
-
+    for (const s of sort) {
+      params.append('sort', s);
+    }
     if (query) {
       params.set('q', query);
     }
 
-    for (const s of sort) {
-      params.append('sort', s);
-    }
     const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>(
       `/products/search?${params.toString()}`,
     );
