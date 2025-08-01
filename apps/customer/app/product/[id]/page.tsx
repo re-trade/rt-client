@@ -259,7 +259,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 </div>
               )}
               <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                Nhấn để xem album
+                Nhấn để phóng to
               </div>
             </button>
 
