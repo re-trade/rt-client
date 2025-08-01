@@ -89,6 +89,7 @@ function useCart() {
       setProducts(data);
     } catch {
       setError('Không thể tải sản phẩm');
+      setProducts([]);
     }
   }, []);
 
