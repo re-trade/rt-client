@@ -1,7 +1,7 @@
 'use client';
 
 import Modal from '@/components/reusable/modal';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/hooks/use-cart';
 import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
 import { TProduct } from '@/services/product.api';
@@ -27,7 +27,8 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
   const router = useRouter();
   const { contacts, selectedAddressId, selectAddress } = useCart();
 
-  const { createOrder, isCreating, error: orderError, clearError } = useOrder();
+  const { isCreating, error: orderError, clearError } = useOrder();
+  const { createOrder } = useCart();
   const {
     paymentMethods,
     selectedPaymentMethodId,
@@ -122,7 +123,6 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
         if (paymentUrl) {
           setOrderSuccess(true);
           setCurrentStep('result');
-          // Redirect to payment after showing success message
           setTimeout(() => {
             window.location.href = paymentUrl;
           }, 2000);
