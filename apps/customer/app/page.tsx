@@ -93,7 +93,7 @@ export default function Home() {
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-              Bỏ lọc
+              Xoá bộ lọc
             </button>
           )}
           <button className="text-[#121212] hover:text-[#525252] text-sm font-medium flex items-center gap-2 px-4 py-2 bg-[#FFD2B2] hover:bg-[#FFBB99] rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
@@ -170,7 +170,7 @@ export default function Home() {
           <p className="text-[#525252] mb-6 max-w-md mx-auto">
             {selectedCategoryId
               ? 'Thử chọn danh mục khác hoặc quay lại sau để khám phá thêm sản phẩm!'
-              : 'Hãy quay lại sau để xem thêm những món đồ cũ thú vị!'}
+              : 'Quay lại sau để khám phá thêm nhiều món đồ cũ thú vị!'}
           </p>
           {selectedCategoryId && (
             <button
@@ -292,7 +292,7 @@ export default function Home() {
 
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         <ProductSection
-          title="Được mua nhiều"
+          title="Sản phẩm nổi bật"
           subtitle="Những sản phẩm hot nhất hiện tại"
           icon={<TrendingUp className="w-6 h-6" />}
           items={bestSellerProducts}
@@ -378,7 +378,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
+     {/*  <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="flex justify-center mb-6">
             <div className="p-3 bg-white/20 rounded-xl">
@@ -400,7 +400,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }
