@@ -15,7 +15,6 @@ import {
   ShoppingCart,
   Smile,
   Sparkles,
-  Star,
   TrendingUp,
   Upload,
   Users,
@@ -378,7 +377,7 @@ export default function Home() {
         </div>
       </section>
 
-     {/*  <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
+      {/*  <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="flex justify-center mb-6">
             <div className="p-3 bg-white/20 rounded-xl">
