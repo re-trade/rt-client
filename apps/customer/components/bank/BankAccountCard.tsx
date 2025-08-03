@@ -24,7 +24,7 @@ const BankAccountCard = ({ account, banks, openEditModal, handleDelete }: ModalP
   return (
     <div
       key={account.id}
-      className="relative group border border-[#525252]/20 rounded-2xl p-6 hover:border-[#FFD2B2] hover:shadow-lg transition-all duration-300 bg-white"
+      className="relative group border border-orange-200 rounded-2xl p-6 hover:border-orange-400 hover:shadow-lg transition-all duration-300 bg-white"
     >
       <div
         style={{ background: gradient ?? undefined }}

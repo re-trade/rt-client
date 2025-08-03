@@ -66,7 +66,7 @@ export function useProductList() {
         params.append('currentPrice', `0..${selectedFilter.maxPrice}`);
       }
       params.append('verified', String(true));
-      const response = await productApi.searchProducts(page - 1, PAGE_SIZE, params.toString());
+      const response = await productApi.searchProducts(page - 1, PAGE_SIZE, params.toString(), []);
 
       setProducts(response.content || []);
       setMaxPage(response.pagination?.totalPages ?? 1);

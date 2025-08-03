@@ -90,11 +90,11 @@ const WithdrawalModal = ({
   return (
     <>
       <dialog id="withdraw_modal" className={`modal ${isModalOpen ? 'modal-open' : ''}`}>
-        <div className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden">
-          <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
+        <div className="bg-white text-gray-800 rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden border border-orange-200">
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 px-6 py-4 flex justify-between items-center border-b border-orange-200">
             <div className="flex items-center">
               <svg
-                className="w-5 h-5 mr-2 text-[#121212]"
+                className="w-5 h-5 mr-2 text-orange-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -106,10 +106,10 @@ const WithdrawalModal = ({
                   d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
                 />
               </svg>
-              <h3 className="text-xl font-bold text-[#121212]">Rút tiền từ ví</h3>
+              <h3 className="text-xl font-bold text-gray-800">Rút tiền từ ví</h3>
             </div>
             <button
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-[#121212] hover:bg-white/40 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 transition-colors"
               onClick={() => setIsModalOpen(false)}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,10 +253,10 @@ const WithdrawalModal = ({
               </p>
             </div>
 
-            <div className="bg-[#FFD2B2]/20 border border-[#FFD2B2] rounded-lg p-4">
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-[#121212]" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className="h-5 w-5 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
                     <path
                       fillRule="evenodd"
                       d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
@@ -265,8 +265,8 @@ const WithdrawalModal = ({
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-[#121212]">Lưu ý quan trọng</h3>
-                  <div className="mt-2 text-sm text-[#525252]">
+                  <h3 className="text-sm font-medium text-gray-800">Lưu ý quan trọng</h3>
+                  <div className="mt-2 text-sm text-gray-600">
                     <ul className="list-disc list-inside space-y-1">
                       <li>Thời gian xử lý: 1-3 ngày làm việc</li>
                       <li>Kiểm tra kỹ thông tin tài khoản trước khi xác nhận</li>

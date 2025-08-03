@@ -1,14 +1,6 @@
 'use client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Activity,
-  ArrowDownRight,
-  ArrowUpRight,
-  DollarSign,
-  Package,
-  Store,
-  Users,
-} from 'lucide-react';
+import { useDashboardStats } from '@/hooks/use-dashboard-stats';
+import { Package, ShoppingCart, Store, Tag, Users } from 'lucide-react';
 import React from 'react';
 
 const StatCard = ({
@@ -24,163 +16,171 @@ const StatCard = ({
   icon: React.ElementType;
   trend?: 'up' | 'down';
 }) => (
-  <Card>
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
-      <Icon className="h-4 w-4 text-gray-500" />
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="flex items-center text-xs mt-1">
-        {trend === 'up' ? (
-          <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
-        ) : (
-          <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
-        )}
-        <span className={trend === 'up' ? 'text-green-500' : 'text-red-500'}>{change}</span>
+  <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="flex items-center justify-center mb-4">
+      <div className="p-2 bg-blue-100 rounded-lg">
+        <Icon className="h-6 w-6 text-blue-600" />
       </div>
-    </CardContent>
-  </Card>
-);
-
-const ActivityCard = ({
-  title,
-  items,
-}: {
-  title: string;
-  items: Array<{
-    title: string;
-    description: string;
-    time: string;
-    status: 'success' | 'warning' | 'error';
-  }>;
-}) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-4">
-        {items.map((item, index) => (
-          <div key={index} className="flex items-start space-x-4">
-            <div
-              className={`p-2 rounded-full ${
-                item.status === 'success'
-                  ? 'bg-green-100'
-                  : item.status === 'warning'
-                    ? 'bg-yellow-100'
-                    : 'bg-red-100'
-              }`}
-            >
-              <Activity
-                className={`h-4 w-4 ${
-                  item.status === 'success'
-                    ? 'text-green-600'
-                    : item.status === 'warning'
-                      ? 'text-yellow-600'
-                      : 'text-red-600'
-                }`}
-              />
-            </div>
-            <div className="flex-1 space-y-1">
-              <p className="text-sm font-medium leading-none">{item.title}</p>
-              <p className="text-sm text-gray-500">{item.description}</p>
-              <p className="text-xs text-gray-400">{item.time}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
+    </div>
+    <div className="text-center">
+      <div className="text-3xl font-bold text-gray-800 mb-1">{value}</div>
+      <div className="text-sm text-gray-600">{title}</div>
+    </div>
+  </div>
 );
 
 export default function AdminPage() {
+  const { stats, loading, error } = useDashboardStats();
+
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
+          <p className="text-lg opacity-90">Đang tải dữ liệu...</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-8 bg-gray-200 rounded mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm">!</span>
+            </div>
+            <div>
+              <h3 className="font-semibold text-red-800">Lỗi!</h3>
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="p-6">
+        <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
+          <p className="text-lg">Không có dữ liệu</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold">Tổng quan hệ thống</h2>
-        <p className="text-muted-foreground">Xem tổng quan về hoạt động của hệ thống admin</p>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
+        <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
+        <p className="text-lg opacity-90">Xem tổng quan về hoạt động của hệ thống admin</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Tổng số shop"
-          value="150"
-          change="+5% so với tháng trước"
-          icon={Store}
-          trend="up"
-        />
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
           title="Tổng số người dùng"
-          value="12,500"
-          change="+8% so với tháng trước"
+          value={stats.totalCustomers.toLocaleString()}
+          change=""
           icon={Users}
           trend="up"
         />
         <StatCard
-          title="Tổng số sản phẩm"
-          value="45,231"
-          change="+12% so với tháng trước"
+          title="Shop đang hoạt động"
+          value={stats.totalSellers.toLocaleString()}
+          change=""
+          icon={Store}
+          trend="up"
+        />
+        <StatCard
+          title="Sản phẩm đang bán"
+          value={stats.totalProducts.toLocaleString()}
+          change=""
           icon={Package}
           trend="up"
         />
         <StatCard
-          title="Doanh thu hệ thống"
-          value="1.2 tỷ"
-          change="+15% so với tháng trước"
-          icon={DollarSign}
+          title="Tổng đơn hàng"
+          value={stats.totalOrders.toLocaleString()}
+          change=""
+          icon={ShoppingCart}
+          trend="up"
+        />
+        <StatCard
+          title="Danh mục sản phẩm"
+          value={stats.totalCategories.toLocaleString()}
+          change=""
+          icon={Tag}
           trend="up"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivityCard
-          title="Hoạt động gần đây"
-          items={[
-            {
-              title: 'Shop mới đăng ký',
-              description: 'Shop Thời Trang ABC đã đăng ký thành công',
-              time: '2 phút trước',
-              status: 'success',
-            },
-            {
-              title: 'Cảnh báo hệ thống',
-              description: 'Phát hiện hoạt động bất thường từ IP 192.168.1.1',
-              time: '15 phút trước',
-              status: 'warning',
-            },
-            {
-              title: 'Lỗi thanh toán',
-              description: 'Giao dịch #12345 thất bại do lỗi kết nối',
-              time: '1 giờ trước',
-              status: 'error',
-            },
-          ]}
-        />
+      {/* Activity Section */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-lg font-bold text-gray-800 mb-4">Hoạt động gần đây</h2>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="w-2 h-2 rounded-full mt-2 bg-green-500"></div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-800 text-sm">Hệ thống hoạt động bình thường</p>
+              <p className="text-xs text-gray-500">Tất cả các dịch vụ đang hoạt động ổn định</p>
+              <p className="text-xs text-gray-400">2 phút trước</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="w-2 h-2 rounded-full mt-2 bg-green-500"></div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-800 text-sm">Cập nhật dữ liệu thành công</p>
+              <p className="text-xs text-gray-500">Đã cập nhật thống kê dashboard từ API</p>
+              <p className="text-xs text-gray-400">5 phút trước</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="w-2 h-2 rounded-full mt-2 bg-blue-500"></div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-800 text-sm">Hệ thống admin online</p>
+              <p className="text-xs text-gray-500">Admin dashboard đang hoạt động bình thường</p>
+              <p className="text-xs text-gray-400">10 phút trước</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <ActivityCard
-          title="Đơn hàng cần xử lý"
-          items={[
-            {
-              title: 'Đơn hàng #ORD1001',
-              description: 'Shop Thời Trang ABC - 2,990,000đ',
-              time: 'Cần xác nhận',
-              status: 'warning',
-            },
-            {
-              title: 'Đơn hàng #ORD1002',
-              description: 'Shop Mỹ Phẩm XYZ - 5,990,000đ',
-              time: 'Cần xử lý khiếu nại',
-              status: 'error',
-            },
-            {
-              title: 'Đơn hàng #ORD1003',
-              description: 'Shop Điện Tử 123 - 1,990,000đ',
-              time: 'Cần xác nhận',
-              status: 'warning',
-            },
-          ]}
-        />
+      {/* Quick Actions */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-6">Thao tác nhanh</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <Users className="h-6 w-6 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Người dùng</span>
+          </button>
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <Store className="h-6 w-6 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Shop</span>
+          </button>
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <Package className="h-6 w-6 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Sản phẩm</span>
+          </button>
+          <button className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <ShoppingCart className="h-6 w-6 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Đơn hàng</span>
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -6,94 +6,25 @@ on:
       - main
 
 jobs:
-  build-dev-images:
-    name: Build Dev Images
-    runs-on: ubuntu-latest
-    env:
-      REGISTRY: ghcr.io/${{ github.repository }}
-      TAG: nightly
-      API_BASE_URL: ${{ secrets.API_BASE_URL }}
-      SOCKET_URL: ${{ secrets.SOCKET_URL }}
-    continue-on-error: true
+  build-images:
+    name: Build Image
     permissions:
       contents: read
       packages: write
-    strategy:
-      matrix:
-        service: [customer, admin, seller]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    uses: ./.github/workflows/build-image.yaml
+    with:
+      actor: ${{ github.actor }}
+      repository: ${{ github.repository }}
+    secrets: inherit
 
-      - name: Login to GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push image
-        run: |
-          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} build
-          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} push
-
-  build-prod-images:
-    name: Build Prod Images
-    runs-on: ubuntu-latest
-    env:
-      REGISTRY: ghcr.io/${{ github.repository }}
-      TAG: prod
-      API_BASE_URL: ${{ secrets.API_BASE_URL }}
-      SOCKET_URL: ${{ secrets.SOCKET_URL }}
+  deploy-client:
+    name: Deploy Client
+    needs: build-images
     permissions:
       contents: read
       packages: write
-    strategy:
-      matrix:
-        service: [customer, admin, seller]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Login to GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push image
-        run: |
-          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} build
-          docker compose -f .docker/compose.build.yaml --profile ${{matrix.service}} push
-        continue-on-error: true
-
-  deploy-dev:
-    runs-on: retrade-dev
-    needs: [build-dev-images]
-    permissions:
-      contents: read
-      packages: write
-    env:
-      REGISTRY: ghcr.io/${{ github.repository }}
-      TAG: nightly
-      DOMAIN: ${{ secrets.DEV_HOST_DOMAIN }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Login to GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull nightly images
-        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod pull
-
-      - name: Clean Container, Image And Prepare For Deploy
-        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod up -d
-        continue-on-error: true
-
-      - name: Clean Old Images
-        run: docker image prune -a -f
-        continue-on-error: true
+    uses: ./.github/workflows/deploy-dev.yaml
+    with:
+      actor: ${{ github.actor }}
+      repository: ${{ github.repository }}
+    secrets: inherit

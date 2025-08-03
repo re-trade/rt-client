@@ -1,4 +1,4 @@
-import { unAuthApi } from '@retrade/util';
+import { authApi } from '@retrade/util';
 
 interface Category {
   id: string;
@@ -31,15 +31,14 @@ interface GetCategoriesParams {
 }
 
 const getAllCategories = async (): Promise<Category[]> => {
-  const response = await unAuthApi.default.get('/categories/all', { withCredentials: true });
+  const response = await authApi.default.get('/categories/all');
   return response.data.content;
 };
 
 const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<CategoriesResponse> => {
   try {
-    const response = await unAuthApi.default.get('/categories/search', {
+    const response = await authApi.default.get('/categories/search', {
       params,
-      withCredentials: true,
     });
     return response.data;
   } catch (error) {
@@ -49,9 +48,7 @@ const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<Cate
 
 const getCategoryByIdInternal = async (id: string): Promise<Category> => {
   try {
-    const response = await unAuthApi.default.get(`/categories/${id}`, {
-      withCredentials: true,
-    });
+    const response = await authApi.default.get(`/categories/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -61,11 +58,11 @@ const getCategoryByIdInternal = async (id: string): Promise<Category> => {
 const createCategory = async (data: {
   name: string;
   description?: string;
-  parentId?: string | null;
+  categoryParentId?: string | null;
   visible: boolean;
 }): Promise<Category> => {
   try {
-    const response = await unAuthApi.default.post('/categories', data, { withCredentials: true });
+    const response = await authApi.default.post('/categories', data);
     return response.data;
   } catch (error) {
     throw error;
@@ -74,14 +71,15 @@ const createCategory = async (data: {
 
 const updateCategory = async (
   id: string,
-  data: { name: string; description?: string; parentId?: string | null; visible: boolean },
+  data: { name: string; description?: string; categoryParentId?: string | null; visible: boolean },
 ): Promise<Category> => {
   try {
-    const response = await unAuthApi.default.put(`/categories/${id}`, data, {
-      withCredentials: true,
-    });
+    console.log('Updating category with data:', { id, data });
+    const response = await authApi.default.put(`/categories/${id}`, data);
+    console.log('Update response:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Update category error:', error);
     throw error;
   }
 };

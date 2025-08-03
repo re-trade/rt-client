@@ -49,7 +49,56 @@ export default function ShopManagementPage() {
     approveWithdraw,
   } = useWithdrawManager();
 
-  if (loading) return <div>Loading withdraws...</div>;
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-64 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-1 items-center space-x-2">
+              <div className="relative flex-1">
+                <div className="h-10 w-full bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center space-x-4 p-4 border-b">
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-12 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-8 w-20 bg-gray-200 rounded animate-pulse ml-auto"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   if (error) return <div>Error: {error}</div>;
 
   const handleViewDetails = (withdraw: TWithdrawProfile) => {
@@ -128,6 +177,8 @@ export default function ShopManagementPage() {
                 <TableHead>Số tiền</TableHead>
                 <TableHead>Trạng thái</TableHead>
                 <TableHead>Thời gian tạo</TableHead>
+                <TableHead>Ngân hàng</TableHead>
+                <TableHead>Bin</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
@@ -142,7 +193,10 @@ export default function ShopManagementPage() {
                   </TableCell>
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
                   <TableCell>{withdraw.status}</TableCell>
-                  <TableCell>{withdraw.timestamp}</TableCell>
+                  <TableCell>{withdraw.processedDate}</TableCell>
+                  <TableCell>{withdraw.bankName}</TableCell>
+                  <TableCell>{withdraw.bankBin}</TableCell>
+
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" onClick={() => handleViewDetails(withdraw)}>
                       Chi tiết
@@ -196,25 +250,25 @@ export default function ShopManagementPage() {
                     <p>{selectedWithdraw.id}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Tên người bán</p>
-                    <p>{selectedWithdraw.amount}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Số tiền</p>
+                    <p>{selectedWithdraw.amount.toLocaleString()}đ</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Mô tả</p>
+                    <p className="text-sm font-medium text-muted-foreground">Trạng thái</p>
                     <p>{selectedWithdraw.status}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Địa chỉ</p>
-                    <p>{selectedWithdraw.timestamp}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Ngân hàng</p>
+                    <p>{selectedWithdraw.bankName}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                    <p>{new Date(selectedWithdraw.bankName).toLocaleDateString('vi-VN')}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Mã ngân hàng</p>
+                    <p>{selectedWithdraw.bankBin}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Cập nhật lần cuối</p>
-                  <p>{new Date(selectedWithdraw.bankUrl).toLocaleDateString('vi-VN')}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Ngày xử lý</p>
+                  <p>{selectedWithdraw.processedDate}</p>
                 </div>
               </div>
             </div>

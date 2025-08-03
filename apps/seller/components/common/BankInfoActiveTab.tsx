@@ -98,7 +98,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         };
 
         setBankAccounts([...bankAccounts, newBank]);
-        // setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '', isDefault: false });
         setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
         setIsAddingBank(false);
       } catch (error) {
@@ -127,16 +126,12 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
       newBankInfo.userBankName
     ) {
       try {
-        // Call API to update bank
-        // await walletApi.updateBankInfo(editingBank.id, newBankInfo);
-
         setBankAccounts(
           bankAccounts.map((bank) =>
             bank.id === editingBank.id ? { ...bank, ...newBankInfo } : bank,
           ),
         );
         setEditingBank(null);
-        // setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', isDefault: false, bankBin: '' });
         setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
         setIsAddingBank(false);
       } catch (error) {
@@ -161,13 +156,9 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
 
   const handleSetDefault = async (bankId: string) => {
     try {
-      // Call API to set default bank
-      // await walletApi.setDefaultBank(bankId);
-
       setBankAccounts(
         bankAccounts.map((bank) => ({
           ...bank,
-          // isDefault: bank.id === bankId,
         })),
       );
     } catch (error) {
@@ -178,7 +169,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   const cancelBankForm = () => {
     setIsAddingBank(false);
     setEditingBank(null);
-    // setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', isDefault: false, bankBin: '' });
     setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
   };
 

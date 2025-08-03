@@ -1,0 +1,69 @@
+name: Deploy
+on:
+  workflow_call:
+    inputs:
+      actor:
+        required: true
+        type: string
+      repository:
+        required: true
+        type: string
+
+jobs:
+  deploy-dev:
+    name: Dev
+    runs-on: retrade-dev
+    env:
+      REGISTRY: ghcr.io/${{ inputs.repository }}
+      TAG: nightly
+      DOMAIN: ${{ secrets.DEV_HOST_DOMAIN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ inputs.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull nightly images
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile stag pull
+
+      - name: Clean Container, Image And Prepare For Deploy
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile stag up -d
+        continue-on-error: true
+
+      - name: Clean Old Images
+        run: docker image prune -a -f
+        continue-on-error: true
+
+  deploy-prod:
+    name: Prod
+    runs-on: retrade-prod
+    env:
+      REGISTRY: ghcr.io/${{ inputs.repository }}
+      TAG: prod
+      DOMAIN: ${{ secrets.HOST_DOMAIN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ inputs.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull nightly images
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod pull
+
+      - name: Clean Container, Image And Prepare For Deploy
+        run: docker compose -f .docker/compose.yaml -p retrade-service --profile prod up -d
+        continue-on-error: true
+
+      - name: Clean Old Images
+        run: docker image prune -a -f
+        continue-on-error: true

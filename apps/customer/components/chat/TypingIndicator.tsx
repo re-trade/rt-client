@@ -20,13 +20,11 @@ export function TypingIndicator({ isTyping, typingUser, className = '' }: Typing
       setVisible(true);
       setShowIndicator(true);
 
-      // Auto-hide after 5 seconds of continuous typing
       hideTimer = setTimeout(() => {
         setShowIndicator(false);
       }, 5000);
     } else {
       setShowIndicator(false);
-      // Delay hiding to allow for smooth fade out
       hideTimer = setTimeout(() => setVisible(false), 300);
     }
 

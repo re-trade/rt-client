@@ -65,11 +65,11 @@ const BankSelectionModal = ({
   }, [bankModalOpen, setBankSearch]);
   return (
     <dialog id="bank_modal" className={`modal ${bankModalOpen ? 'modal-open' : ''}`}>
-      <div className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden">
-        <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
+      <div className="bg-white text-gray-800 rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden border border-orange-200">
+        <div className="bg-gradient-to-r from-orange-50 to-orange-100 px-6 py-4 flex justify-between items-center border-b border-orange-200">
           <div className="flex items-center">
             <svg
-              className="w-5 h-5 mr-2 text-[#121212]"
+              className="w-5 h-5 mr-2 text-orange-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -81,10 +81,10 @@ const BankSelectionModal = ({
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h6m-6 4h6m-6 4h6"
               />
             </svg>
-            <h3 className="text-xl font-bold text-[#121212]">Chọn ngân hàng</h3>
+            <h3 className="text-xl font-bold text-gray-800">Chọn ngân hàng</h3>
           </div>
           <button
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-[#121212] hover:bg-white/40 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 transition-colors"
             onClick={() => setBankModalOpen(false)}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@ const BankSelectionModal = ({
 
         <div className="p-6">
           <div className="mb-6">
-            <label className="text-sm font-semibold text-[#121212] mb-1 block">
+            <label className="text-sm font-semibold text-gray-800 mb-1 block">
               Tìm kiếm ngân hàng
             </label>
             <div className="relative">
@@ -109,11 +109,11 @@ const BankSelectionModal = ({
                 placeholder="Nhập tên ngân hàng..."
                 value={bankSearch}
                 onChange={(e) => setBankSearch(e.target.value)}
-                className="input w-full px-4 py-2.5 border border-[#525252]/20 text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all pl-10"
+                className="input w-full px-4 py-2.5 border border-orange-200 text-gray-800 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all pl-10"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg
-                  className="h-5 w-5 text-[#525252]"
+                  className="h-5 w-5 text-gray-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -129,22 +129,22 @@ const BankSelectionModal = ({
             </div>
           </div>
 
-          <div className="max-h-80 overflow-y-auto border border-[#525252]/20 rounded-lg">
+          <div className="max-h-80 overflow-y-auto border border-orange-200 rounded-lg">
             {loading ? (
               <div className="py-8 text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFD2B2]"></div>
-                <p className="mt-3 text-[#525252] font-medium">Đang tải danh sách ngân hàng...</p>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                <p className="mt-3 text-gray-600 font-medium">Đang tải danh sách ngân hàng...</p>
               </div>
             ) : error ? (
               <div className="py-8 text-center">
                 <div className="text-red-500 font-medium">{error}</div>
-                <p className="text-[#525252] text-sm mt-1">Vui lòng thử lại sau</p>
+                <p className="text-gray-600 text-sm mt-1">Vui lòng thử lại sau</p>
               </div>
             ) : (
               banks.map((bank) => (
                 <div
                   key={bank.bin}
-                  className="p-4 cursor-pointer hover:bg-[#FFD2B2]/10 transition-all duration-200 border-b border-[#525252]/10 last:border-b-0"
+                  className="p-4 cursor-pointer hover:bg-orange-50 transition-all duration-200 border-b border-orange-100 last:border-b-0"
                   onClick={() => {
                     setSelectedBank(bank);
                     setBankModalOpen(false);
@@ -157,18 +157,18 @@ const BankSelectionModal = ({
                         height={40}
                         src={bank.url}
                         alt={bank.name}
-                        className="w-10 h-10 mr-4 object-contain rounded-lg border border-[#525252]/20"
+                        className="w-10 h-10 mr-4 object-contain rounded-lg border border-orange-200"
                       />
                     ) : (
-                      <div className="w-10 h-10 mr-4 bg-[#FFD2B2] rounded-lg flex items-center justify-center">
-                        <span className="text-sm font-bold text-[#121212]">
+                      <div className="w-10 h-10 mr-4 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <span className="text-sm font-bold text-orange-600">
                           {bank.name.charAt(0)}
                         </span>
                       </div>
                     )}
                     <div>
-                      <span className="font-semibold text-[#121212]">{bank.name}</span>
-                      <p className="text-sm text-[#525252]">Nhấn để chọn</p>
+                      <span className="font-semibold text-gray-800">{bank.name}</span>
+                      <p className="text-sm text-gray-600">Nhấn để chọn</p>
                     </div>
                   </div>
                 </div>
@@ -176,9 +176,9 @@ const BankSelectionModal = ({
             )}
             {!loading && !error && banks.length === 0 && (
               <div className="py-12 text-center">
-                <div className="w-16 h-16 mx-auto bg-[#FFD2B2] rounded-full flex items-center justify-center mb-4">
+                <div className="w-16 h-16 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
                   <svg
-                    className="w-8 h-8 text-[#121212]"
+                    className="w-8 h-8 text-orange-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -191,8 +191,8 @@ const BankSelectionModal = ({
                     />
                   </svg>
                 </div>
-                <p className="text-[#121212] font-medium">Không tìm thấy ngân hàng phù hợp</p>
-                <p className="text-[#525252] text-sm mt-1">Thử tìm kiếm với từ khóa khác</p>
+                <p className="text-gray-800 font-medium">Không tìm thấy ngân hàng phù hợp</p>
+                <p className="text-gray-600 text-sm mt-1">Thử tìm kiếm với từ khóa khác</p>
               </div>
             )}
           </div>

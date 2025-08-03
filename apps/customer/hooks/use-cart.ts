@@ -2,6 +2,7 @@
 import { cartApi, CartGroupResponse, CartResponse } from '@/services/cart.api';
 import { contactApi, TAddress } from '@/services/contact.api';
 import { productApi, TProduct } from '@/services/product.api';
+import { CreateOrderRequest, orderApi, OrderResponse } from '@services/order.api';
 import { useCallback, useEffect, useState } from 'react';
 
 type TCartSummary = {
@@ -27,6 +28,7 @@ function useCart() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [isCreateOrder, setIsCreateOrder] = useState<boolean>(false);
 
   const fetchCart = useCallback(async (silent = false) => {
     if (!silent) {
@@ -58,6 +60,20 @@ function useCart() {
     setSelectedAddressId(addressId);
   }, []);
 
+  const createOrder = useCallback(
+    async (payload: CreateOrderRequest): Promise<OrderResponse | null> => {
+      try {
+        setIsCreateOrder(true);
+        return await orderApi.createOrder(payload);
+        setIsCreateOrder(false);
+      } catch {
+        setIsCreateOrder(false);
+        return null;
+      }
+    },
+    [],
+  );
+
   const fetchAddresses = useCallback(async () => {
     try {
       const data = await contactApi.getContacts();
@@ -73,6 +89,7 @@ function useCart() {
       setProducts(data);
     } catch {
       setError('Không thể tải sản phẩm');
+      setProducts([]);
     }
   }, []);
 
@@ -217,6 +234,8 @@ function useCart() {
     removeFromCart,
     updateCartItemQuantity,
     clearCart,
+    createOrder,
+    isCreateOrder,
   };
 }
 

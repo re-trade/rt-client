@@ -1,6 +1,6 @@
 'use client';
 
-import type { Room } from '@/types/chat/chat';
+import type { Room } from '@retrade/util';
 import { IconSearch } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 
@@ -53,13 +53,13 @@ export function ContactsList({
           .filter((contact) => {
             if (!searchQuery) return true;
             const otherParticipant = contact.participants
-              .filter((item: any) => item.senderRole === 'seller')
+              .filter((item) => item.senderRole === 'seller')
               .pop();
             return otherParticipant?.name?.toLowerCase().includes(searchQuery.toLowerCase());
           })
           .map((contact) => {
             const otherParticipant = contact.participants
-              .filter((item: any) => item.senderRole === 'seller')
+              .filter((item) => item.senderRole === 'seller')
               .pop();
             return (
               <div
@@ -138,7 +138,7 @@ export function ContactsList({
           contacts.filter((contact) => {
             if (!searchQuery) return true;
             const otherParticipant = contact.participants
-              .filter((item: any) => item.senderRole === 'seller')
+              .filter((item) => item.senderRole === 'seller')
               .pop();
             return otherParticipant?.name?.toLowerCase().includes(searchQuery.toLowerCase());
           }).length === 0 && (
