@@ -266,7 +266,6 @@ export default function PurchasePage() {
                 <option value="Cancelled">Đã hủy</option>
                 <option value="Refunded">Đã hoàn tiền</option>
                 <option value="Returned">Đã trả hàng</option>
-
               </select>
             </div>
           </div>
