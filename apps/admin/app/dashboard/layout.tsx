@@ -14,6 +14,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/hooks/use-auth';
 import {
   Banknote,
   FileText,
@@ -29,7 +30,6 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
-import { useAuth } from '@/hooks/use-auth';
 
 const menuItems = [
   {
@@ -135,7 +135,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               </p>
             </div>
           </div>
-          
+
           <button
             onClick={logout}
             className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
