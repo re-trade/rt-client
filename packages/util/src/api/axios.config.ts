@@ -1,5 +1,5 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { IResponseObject } from '@/api/base.api';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 
 const BASE_API_URL: string = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
 const NODE_ENV: string = process.env.NEXT_PUBLIC_NODE_ENV ?? 'development';
