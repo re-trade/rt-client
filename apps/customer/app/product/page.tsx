@@ -159,6 +159,7 @@ export default function ProductListPage() {
                         brand={product.brand}
                         verified={product.verified}
                         sellerShopName={product.sellerShopName}
+                        viewMode={viewMode}
                       />
                     </motion.div>
                   ))}
