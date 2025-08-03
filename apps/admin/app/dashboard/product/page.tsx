@@ -34,6 +34,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const ProductStats = ({ products }: { products: any[] }) => {
   const totalProducts = products.length;
@@ -493,20 +494,36 @@ export default function ProductManagementPage() {
   };
 
   const handleVerify = async (productId: string) => {
-    const result = await verifyProduct(productId);
-    if (result.success) {
-      setDeleteSuccess('Xác minh sản phẩm thành công!');
-    } else {
-      setDeleteError(result.message || 'Lỗi xác minh sản phẩm');
+    try {
+      const result = await verifyProduct(productId);
+      if (result.success) {
+        toast.success('Xác minh sản phẩm thành công!', { position: 'top-right' });
+        setDeleteSuccess('Xác minh sản phẩm thành công!');
+      } else {
+        toast.error(result.message || 'Lỗi xác minh sản phẩm', { position: 'top-right' });
+        setDeleteError(result.message || 'Lỗi xác minh sản phẩm');
+      }
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || 'Lỗi xác minh sản phẩm';
+      toast.error(errorMessage, { position: 'top-right' });
+      setDeleteError(errorMessage);
     }
   };
 
   const handleReject = async (productId: string) => {
-    const result = await unverifyProduct(productId);
-    if (result.success) {
-      setDeleteSuccess('Hủy xác minh sản phẩm thành công!');
-    } else {
-      setDeleteError(result.message || 'Lỗi hủy xác minh sản phẩm');
+    try {
+      const result = await unverifyProduct(productId);
+      if (result.success) {
+        toast.success('Hủy xác minh sản phẩm thành công!', { position: 'top-right' });
+        setDeleteSuccess('Hủy xác minh sản phẩm thành công!');
+      } else {
+        toast.error(result.message || 'Lỗi hủy xác minh sản phẩm', { position: 'top-right' });
+        setDeleteError(result.message || 'Lỗi hủy xác minh sản phẩm');
+      }
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || 'Lỗi hủy xác minh sản phẩm';
+      toast.error(errorMessage, { position: 'top-right' });
+      setDeleteError(errorMessage);
     }
   };
 
