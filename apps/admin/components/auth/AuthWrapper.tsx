@@ -11,7 +11,9 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!loading) {
       if (!auth || !checkAdminRole()) {
-        router.replace('/login');
+        if (window.location.pathname !== '/login') {
+          router.replace('/login');
+        }
       }
     }
   }, [auth, loading, checkAdminRole, router]);
