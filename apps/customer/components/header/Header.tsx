@@ -1,13 +1,19 @@
 'use client';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { SELLER_ROUTES } from '@/lib/constants';
 import MobileMenu from '@components/header/MobileHeaderMenu';
 import SearchBar from '@components/header/SearchBar';
 import UserDropdown from '@components/header/UserHeaderDropdown';
-import { IconMenu2, IconShoppingCart, IconUser, IconX, IconBuildingStore } from '@tabler/icons-react';
+import {
+  IconBuildingStore,
+  IconMenu2,
+  IconShoppingCart,
+  IconUser,
+  IconX,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { SELLER_ROUTES } from '@/lib/constants';
 
 const Header = () => {
   const { auth, roles } = useAuth();
@@ -83,7 +89,7 @@ const Header = () => {
                   </span>
                 )}
               </Link>
-              
+
               {roles.includes('ROLE_SELLER') ? (
                 <button
                   onClick={() => window.open(SELLER_ROUTES.DASHBOARD, '_blank')}

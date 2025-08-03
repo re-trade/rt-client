@@ -2,8 +2,10 @@
 
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
+import { useAuth } from '@/hooks/use-auth';
 import { useProductHome } from '@/hooks/use-product-home';
 import { useProductList } from '@/hooks/use-product-list';
+import { SELLER_ROUTES } from '@/lib/constants';
 import { TProduct } from '@/services/product.api';
 import {
   ChevronRight,
@@ -16,14 +18,12 @@ import {
   ShoppingCart,
   Smile,
   Sparkles,
+  Store,
   TrendingUp,
   Upload,
   Users,
-  Store,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
-import { SELLER_ROUTES } from '@/lib/constants';
 export default function Home() {
   const {
     products,
@@ -205,7 +205,8 @@ export default function Home() {
                     Bạn có đồ cũ muốn bán?
                   </h2>
                   <p className="text-green-100 text-sm sm:text-base">
-                    Đăng ký trở thành người bán và kiếm thêm thu nhập từ những món đồ không còn sử dụng
+                    Đăng ký trở thành người bán và kiếm thêm thu nhập từ những món đồ không còn sử
+                    dụng
                   </p>
                 </div>
                 <div className="flex-shrink-0">

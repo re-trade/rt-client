@@ -1,9 +1,15 @@
 'use client';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/use-auth';
-import { IconLogout, IconPackage, IconShoppingCart, IconUser, IconBuildingStore } from '@tabler/icons-react';
-import Link from 'next/link';
 import { SELLER_ROUTES } from '@/lib/constants';
+import {
+  IconBuildingStore,
+  IconLogout,
+  IconPackage,
+  IconShoppingCart,
+  IconUser,
+} from '@tabler/icons-react';
+import Link from 'next/link';
 
 interface Props {
   open: boolean;

@@ -1,7 +1,7 @@
 'use client';
 
-import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import { useAuth } from '@/hooks/use-auth';
+import { useCustomerProfile } from '@/hooks/use-customer-profile';
 import { SELLER_ROUTES } from '@/lib/constants';
 import {
   Activity,
@@ -13,9 +13,9 @@ import {
   MapPin,
   Package,
   ShoppingBag,
+  Store,
   TrendingUp,
   User,
-  Store,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -122,23 +122,25 @@ const UserDashboard = () => {
       icon: <Gift className="w-5 h-5 sm:w-6 sm:h-6" />,
       href: '/user/vouchers',
     },
-    ...(roles.includes('ROLE_SELLER') ? [
-      {
-        title: 'Quản lý cửa hàng',
-        description: 'Quản lý sản phẩm và đơn hàng',
-        icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
-        href: SELLER_ROUTES.DASHBOARD,
-        external: true,
-      }
-    ] : [
-      {
-        title: 'Trở thành người bán',
-        description: 'Đăng ký bán hàng trên nền tảng',
-        icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
-        href: SELLER_ROUTES.REGISTER,
-        external: true,
-      }
-    ]),
+    ...(roles.includes('ROLE_SELLER')
+      ? [
+          {
+            title: 'Quản lý cửa hàng',
+            description: 'Quản lý sản phẩm và đơn hàng',
+            icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
+            href: SELLER_ROUTES.DASHBOARD,
+            external: true,
+          },
+        ]
+      : [
+          {
+            title: 'Trở thành người bán',
+            description: 'Đăng ký bán hàng trên nền tảng',
+            icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
+            href: SELLER_ROUTES.REGISTER,
+            external: true,
+          },
+        ]),
   ];
 
   return (
