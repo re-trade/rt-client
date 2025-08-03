@@ -100,6 +100,7 @@ export default function ProductFilter({
     [handleSelectedFilterChange],
   );
 
+  console.log('selectedFilter', selectedFilter);
   const hasActiveFilters =
     selectedFilter.categories.length > 0 ||
     selectedFilter.brands.length > 0 ||

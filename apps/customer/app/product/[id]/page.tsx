@@ -5,8 +5,10 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/context/ToastContext';
 import { useProductDetail } from '@/hooks/use-product-detail';
+import { reviewApi, ReviewResponse } from '@/services/product-review.api';
 import Chart from '@components/chart/chart';
 import BuyNowDialog from '@components/common/BuyNowDialog';
+import ReviewsList from '@components/common/review/ListReview';
 import ImageGallery from '@components/gallery/ImageGallery';
 import ContentSkeleton from '@components/product/ProductContentSkeleton';
 import { ProductHistoryList } from '@components/product/ProductHistoryList';
@@ -18,7 +20,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   MdAdd,
   MdAddShoppingCart,
@@ -46,6 +48,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
   const [showBuyNow, setShowBuyNow] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description',
   );
@@ -80,6 +83,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setStockWarning(false);
     }
   };
+  console.log('productDetail', productDetail);
 
   const buyNow = () => {
     if (!productDetail) return;
@@ -91,7 +95,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
       }).toString();
       router.push(`/checkout?${query}`);
     } catch (error) {
+      showToast('Không thể thêm vào giỏ hàng.', 'error');
       showToast('Có lỗi xảy ra khi chuyển đến trang thanh toán.', 'error');
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
@@ -115,6 +122,20 @@ function ProductDetail({ params }: { params: { id: string } }) {
   const handleGalleryIndexChange = (index: number) => {
     setGalleryIndex(index);
   };
+
+  useEffect(() => {
+    const fetching = async () => {
+      if (productDetail) {
+        try {
+          const reviewsData = await reviewApi.getReviews(productDetail.id);
+          setReviews(reviewsData);
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+        }
+      }
+    };
+    fetching();
+  }, [productDetail]);
 
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -765,13 +786,31 @@ function ProductDetail({ params }: { params: { id: string } }) {
 
             {activeTab === 'reviews' && (
               <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
-                  Đánh giá từ khách hàng
-                </h3>
-                <div className="text-center py-12 text-gray-500" style={{ color: '#6b7280' }}>
-                  <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-                  <p className="text-sm">Hãy là người đầu tiên đánh giá!</p>
+                <h3 className="text-xl font-bold text-gray-800">Đánh giá từ khách hàng</h3>
+                <div className="text-center py-12 text-gray-500">
+                  <ReviewsList />
+                  {/* {reviews.length === 0 ? (
+                    <>
+                      <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
+                      <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                    </>
+                  ) : (
+                    // <ReviewList reviews={reviews} />
+                    <div className="space-y-4">
+                      {reviews.map((review) => (
+                        <div key={review.id} className="p-4 bg-white rounded-lg shadow-sm">
+                          <div className="flex items-center gap-2 mb-2">
+                            <MdStar className="text-yellow-500" size={20} />
+                            <span className="font-semibold text-gray-800">{review.vote}</span>
+                          </div>
+                          <p className="text-gray-700">{review.content}</p>
+                          <div className="text-sm text-gray-500 mt-2">
+                            {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )} */}
                 </div>
               </div>
             )}
