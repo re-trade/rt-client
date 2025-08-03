@@ -46,7 +46,7 @@ function useAuth() {
   }, [checkAuth]);
 
   const handleLogout = useCallback(async () => {
-    localStorage.removeItem(ETokenName.ACCESS_TOKEN);
+    localStorage.clear();
     await logout();
     window.location.reload();
   }, []);
