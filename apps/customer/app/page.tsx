@@ -3,6 +3,7 @@
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductHome } from '@/hooks/use-product-home';
+import { useProductList } from '@/hooks/use-product-list';
 import { TProduct } from '@/services/product.api';
 import {
   ChevronRight,
@@ -15,13 +16,11 @@ import {
   ShoppingCart,
   Smile,
   Sparkles,
-  Star,
   TrendingUp,
   Upload,
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
 export default function Home() {
   const {
     products,
@@ -35,13 +34,13 @@ export default function Home() {
     error,
   } = useProductHome();
   const router = useRouter();
+  const { handleSelectedFilterChange } = useProductList();
 
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
-      router.push(`/category/${categoryId}`);
-    } else {
-      router.push('/products');
+      handleSelectedFilterChange('categories', [categoryId]);
     }
+    router.push(`/category/${categoryId || ''}`);
   };
 
   const ProductSection = ({
@@ -93,7 +92,7 @@ export default function Home() {
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-              Bỏ lọc
+              Xoá bộ lọc
             </button>
           )}
           <button className="text-[#121212] hover:text-[#525252] text-sm font-medium flex items-center gap-2 px-4 py-2 bg-[#FFD2B2] hover:bg-[#FFBB99] rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
@@ -170,7 +169,7 @@ export default function Home() {
           <p className="text-[#525252] mb-6 max-w-md mx-auto">
             {selectedCategoryId
               ? 'Thử chọn danh mục khác hoặc quay lại sau để khám phá thêm sản phẩm!'
-              : 'Hãy quay lại sau để xem thêm những món đồ cũ thú vị!'}
+              : 'Quay lại sau để khám phá thêm nhiều món đồ cũ thú vị!'}
           </p>
           {selectedCategoryId && (
             <button
@@ -267,6 +266,11 @@ export default function Home() {
                       ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
                       : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
                   }`}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
+                    selectedCategoryId === null
+                      ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
+                      : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
+                  }`}
                 >
                   Tất cả
                 </button>
@@ -275,6 +279,11 @@ export default function Home() {
                   <button
                     key={category.id}
                     onClick={() => handleSelectCategory(category.id)}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
+                      selectedCategoryId === category.id
+                        ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
+                        : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
+                    }`}
                     className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                       selectedCategoryId === category.id
                         ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
@@ -292,7 +301,7 @@ export default function Home() {
 
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         <ProductSection
-          title="Được mua nhiều"
+          title="Sản phẩm nổi bật"
           subtitle="Những sản phẩm hot nhất hiện tại"
           icon={<TrendingUp className="w-6 h-6" />}
           items={bestSellerProducts}
@@ -378,7 +387,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
+      {/*  <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="flex justify-center mb-6">
             <div className="p-3 bg-white/20 rounded-xl">
@@ -400,7 +409,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

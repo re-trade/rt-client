@@ -1,4 +1,4 @@
-import { unAuthApi } from '@retrade/util';
+import { authApi } from '@retrade/util';
 
 interface Category {
   id: string;
@@ -31,15 +31,14 @@ interface GetCategoriesParams {
 }
 
 const getAllCategories = async (): Promise<Category[]> => {
-  const response = await unAuthApi.default.get('/categories/all', { withCredentials: true });
+  const response = await authApi.default.get('/categories/all');
   return response.data.content;
 };
 
 const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<CategoriesResponse> => {
   try {
-    const response = await unAuthApi.default.get('/categories/search', {
+    const response = await authApi.default.get('/categories/search', {
       params,
-      withCredentials: true,
     });
     return response.data;
   } catch (error) {
@@ -49,9 +48,7 @@ const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<Cate
 
 const getCategoryByIdInternal = async (id: string): Promise<Category> => {
   try {
-    const response = await unAuthApi.default.get(`/categories/${id}`, {
-      withCredentials: true,
-    });
+    const response = await authApi.default.get(`/categories/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -65,7 +62,7 @@ const createCategory = async (data: {
   visible: boolean;
 }): Promise<Category> => {
   try {
-    const response = await unAuthApi.default.post('/categories', data, { withCredentials: true });
+    const response = await authApi.default.post('/categories', data);
     return response.data;
   } catch (error) {
     throw error;
@@ -78,9 +75,7 @@ const updateCategory = async (
 ): Promise<Category> => {
   try {
     console.log('Updating category with data:', { id, data });
-    const response = await unAuthApi.default.put(`/categories/${id}`, data, {
-      withCredentials: true,
-    });
+    const response = await authApi.default.put(`/categories/${id}`, data);
     console.log('Update response:', response.data);
     return response.data;
   } catch (error) {

@@ -64,7 +64,11 @@ export default function CategoryPage() {
       [name]:
         type === 'checkbox' && 'checked' in e.target
           ? (e.target as HTMLInputElement).checked
-          : value,
+          : name === 'categoryParentId'
+            ? value === ''
+              ? null
+              : value
+            : value,
     }));
   };
 
@@ -103,17 +107,30 @@ export default function CategoryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const payload = {
-      name: form.name,
-      description: form.description ?? undefined,
-      categoryParentId: form.categoryParentId ?? null,
-      visible: form.visible,
-    };
+
     try {
       if (openDialog === 'create') {
+        const payload = {
+          name: form.name,
+          description: form.description ?? undefined,
+          categoryParentId: form.categoryParentId ?? null,
+          visible: form.visible,
+        };
         await handleCreate(payload);
         toast.success('Thêm danh mục thành công!', { position: 'top-right' });
       } else if (openDialog === 'edit' && editingCategory) {
+        // Khi edit, chỉ gửi những field thay đổi
+        const payload: any = {
+          name: form.name,
+          description: form.description ?? undefined,
+          visible: form.visible,
+        };
+
+        // Chỉ gửi categoryParentId nếu nó thực sự thay đổi
+        if (form.categoryParentId !== editingCategory.parentId) {
+          payload.categoryParentId = form.categoryParentId;
+        }
+
         await handleUpdate(editingCategory.id, payload);
         toast.success('Cập nhật danh mục thành công!', { position: 'top-right' });
       }
@@ -395,6 +412,26 @@ export default function CategoryPage() {
                 placeholder="Mô tả danh mục (tùy chọn)"
               />
             </div>
+            {openDialog === 'create' && (
+              <div>
+                <Label className="block text-sm font-medium text-gray-700 mb-2">Danh mục cha</Label>
+                <select
+                  name="categoryParentId"
+                  value={form.categoryParentId || ''}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Không có danh mục cha</option>
+                  {categories
+                    .filter((cat) => !cat.parentId) // Chỉ hiển thị categories level 0
+                    .map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
             <div>
               <Label className="block text-sm font-medium text-gray-700 mb-2">Trạng thái</Label>
               <select
