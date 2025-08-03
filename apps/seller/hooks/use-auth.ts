@@ -48,7 +48,7 @@ function useAuth() {
   const handleLogout = useCallback(async () => {
     localStorage.clear();
     await logout();
-    window.location.reload();
+    window.location.href = '/';
   }, []);
 
   const login = useCallback(
