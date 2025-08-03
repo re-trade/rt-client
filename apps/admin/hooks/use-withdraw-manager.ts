@@ -2,6 +2,7 @@
 
 import { TWithdrawProfile, approveWithdraw, getWithdraws } from '@/services/withdraw.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 const useWithdrawManager = () => {
   const [withdraws, setWithdraws] = useState<TWithdrawProfile[]>([]);
@@ -40,10 +41,14 @@ const useWithdrawManager = () => {
           await fethWithdraw();
           return true;
         }
-        setError('Failed approve withdraw');
+        const errorMessage = 'Failed approve withdraw';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed approve withdraw');
+        const errorMessage = err instanceof Error ? err.message : 'Failed approve withdraw';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       }
     },
