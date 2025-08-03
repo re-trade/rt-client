@@ -1,4 +1,4 @@
-import { unAuthApi } from '@retrade/util';
+import { IResponseObject, unAuthApi } from '@retrade/util';
 
 interface Category {
   id: string;
@@ -51,10 +51,10 @@ const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<Cate
 
 const getCategoryByIdInternal = async (id: string): Promise<Category> => {
   try {
-    const response = await unAuthApi.default.get(`/categories/${id}`, {
+    const response = await unAuthApi.default.get<IResponseObject<Category>>(`/categories/${id}`, {
       withCredentials: true,
     });
-    return response.data;
+    return response.data.content;
   } catch (error) {
     throw error;
   }
