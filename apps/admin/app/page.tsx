@@ -9,8 +9,15 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('Home page - auth:', auth, 'loading:', loading, 'checkAdminRole:', checkAdminRole());
-    
+    console.log(
+      'Home page - auth:',
+      auth,
+      'loading:',
+      loading,
+      'checkAdminRole:',
+      checkAdminRole(),
+    );
+
     if (!loading) {
       if (auth && checkAdminRole()) {
         console.log('Redirecting to dashboard');
