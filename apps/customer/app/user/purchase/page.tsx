@@ -262,7 +262,11 @@ export default function PurchasePage() {
                 <option value="Preparing">Đang chuẩn bị</option>
                 <option value="Shipping">Đang giao</option>
                 <option value="Delivered">Đã giao</option>
+                <option value="Completed">Đã hoàn thành</option>
                 <option value="Cancelled">Đã hủy</option>
+                <option value="Refunded">Đã hoàn tiền</option>
+                <option value="Returned">Đã trả hàng</option>
+
               </select>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { useToast } from '@/context/ToastContext';
 import { useProductDetail } from '@/hooks/use-product-detail';
 import Chart from '@components/chart/chart';
+import BuyNowDialog from '@components/common/BuyNowDialog';
 import ContentSkeleton from '@components/product/ProductContentSkeleton';
 import { ProductHistoryList } from '@components/product/ProductHistoryList';
 import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
@@ -13,7 +14,7 @@ import RelatedProducts from '@components/related-product/RelatedProduct';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import {
   MdAdd,
   MdAddShoppingCart,
@@ -29,7 +30,8 @@ import {
 } from 'react-icons/md';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import BuyNowDialog from '@components/common/BuyNowDialog';
+import { reviewApi, ReviewResponse } from '@/services/product-review.api';
+import ReviewsList from '@components/common/review/ListReview';
 
 function ProductDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -40,6 +42,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [stockWarning, setStockWarning] = useState(false);
   const [showBuyNow, setShowBuyNow] = useState(false);
+  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description',
   );
@@ -74,6 +77,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setStockWarning(false);
     }
   };
+  console.log('productDetail', productDetail);
 
   const buyNow = () => {
     if (!productDetail) return;
@@ -90,6 +94,21 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setIsAddingToCart(false);
     }
   };
+
+  useEffect(() => {
+    const fetching = async () => {
+      if (productDetail) {
+        try {
+          const reviewsData = await reviewApi.getReviews(productDetail.id);
+          setReviews(reviewsData);
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+        }
+
+      }
+    }
+    fetching();
+  }, [productDetail]);
 
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -264,14 +283,14 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 >
                   {productDetail.name}
                 </h1>
-                <div className="flex gap-2 flex-shrink-0">
+                {/* <div className="flex gap-2 flex-shrink-0">
                   <button className="p-3 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors hover:scale-105">
                     <MdFavoriteBorder size={20} className="text-orange-600" />
                   </button>
                   <button className="p-3 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors hover:scale-105">
                     <MdShare size={20} className="text-orange-600" />
                   </button>
-                </div>
+                </div> */}
               </div>
 
               <div className="flex items-center gap-4 text-sm flex-wrap">
@@ -345,8 +364,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   </span>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${productDetail.quantity > 0
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
                       }`}
                     style={{
                       color: productDetail.quantity > 0 ? '#166534' : '#991b1b',
@@ -488,8 +507,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     setActiveTab(tab.key as 'description' | 'specifications' | 'reviews')
                   }
                   className={`px-6 py-4 font-semibold transition-colors relative ${activeTab === tab.key
-                      ? 'text-orange-600 border-b-2 border-orange-600'
-                      : 'text-gray-600 hover:text-orange-600'
+                    ? 'text-orange-600 border-b-2 border-orange-600'
+                    : 'text-gray-600 hover:text-orange-600'
                     }`}
                   style={{
                     color: activeTab === tab.key ? '#ea580c' : '#6b7280',
@@ -721,16 +740,37 @@ function ProductDetail({ params }: { params: { id: string } }) {
 
             {activeTab === 'reviews' && (
               <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
+                <h3 className="text-xl font-bold text-gray-800">
                   Đánh giá từ khách hàng
                 </h3>
-                <div className="text-center py-12 text-gray-500" style={{ color: '#6b7280' }}>
-                  <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-                  <p className="text-sm">Hãy là người đầu tiên đánh giá!</p>
+                <div className="text-center py-12 text-gray-500">
+                  <ReviewsList/>
+                  {/* {reviews.length === 0 ? (
+                    <>
+                      <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
+                      <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                    </>
+                  ) : (
+                    // <ReviewList reviews={reviews} />
+                    <div className="space-y-4">
+                      {reviews.map((review) => (
+                        <div key={review.id} className="p-4 bg-white rounded-lg shadow-sm">
+                          <div className="flex items-center gap-2 mb-2">
+                            <MdStar className="text-yellow-500" size={20} />
+                            <span className="font-semibold text-gray-800">{review.vote}</span>
+                          </div>
+                          <p className="text-gray-700">{review.content}</p>
+                          <div className="text-sm text-gray-500 mt-2">
+                            {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )} */}
                 </div>
               </div>
             )}
+
           </div>
         </div>
 

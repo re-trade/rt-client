@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
+import { useProductList } from '@/hooks/use-product-list';
 export default function Home() {
   const {
     products,
@@ -34,6 +34,18 @@ export default function Home() {
     error,
   } = useProductHome();
   const router = useRouter();
+    const {
+
+      isPaginating,
+      filter,
+      filterLoading,
+      handlePageChange,
+      handleFilterReset,
+      handleSelectedFilterChange,
+      selectedFilter,
+      page,
+      maxPage,
+    } = useProductList();
 
   const [productsBestSellers, setProducts] = useState<TProduct[]>([]);
   const [homeStats, setHomeStats] = useState<HomeStats | null>(null);
@@ -52,13 +64,13 @@ export default function Home() {
     fetching();
   }, []);
 
-  const handleSelectCategory = (categoryId: string | null) => {
-    if (categoryId) {
-      router.push(`/category/${categoryId}`);
-    } else {
-      router.push('/products');
-    }
-  };
+const handleSelectCategory = (categoryId: string | null) => {
+  if (categoryId) {
+    handleSelectedFilterChange('categories', [categoryId]);
+  }
+  router.push('/product');
+};
+
 
   const ProductSection = ({
     title,
@@ -278,11 +290,10 @@ export default function Home() {
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[#FFD2B2] scrollbar-track-[#FDFEF9]">
                 <button
                   onClick={() => handleSelectCategory}
-                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
-                    selectedCategoryId === null
+                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${selectedCategoryId === null
                       ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
                       : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                  }`}
+                    }`}
                 >
                   Tất cả
                 </button>
@@ -291,11 +302,10 @@ export default function Home() {
                   <button
                     key={category.id}
                     onClick={() => handleSelectCategory(category.id)}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
-                      selectedCategoryId === category.id
+                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${selectedCategoryId === category.id
                         ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
                         : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                    }`}
+                      }`}
                   >
                     {category.name}
                   </button>

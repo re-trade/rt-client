@@ -6,7 +6,13 @@ import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
 import { TProduct } from '@/services/product.api';
 import { CreateOrderRequest } from '@services/order.api';
-import { IconAlertTriangle, IconCheck, IconCreditCard, IconMapPin, IconX } from '@tabler/icons-react';
+import {
+    IconAlertTriangle,
+    IconCheck,
+    IconCreditCard,
+    IconMapPin,
+    IconX,
+} from '@tabler/icons-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -173,7 +179,9 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
             case 'result':
                 return (
                     <div className="p-8 text-center">
-                        <div className={`mx-auto flex items-center justify-center w-16 h-16 rounded-full mb-4 ${orderSuccess ? 'bg-green-100' : 'bg-red-100'}`}>
+                        <div
+                            className={`mx-auto flex items-center justify-center w-16 h-16 rounded-full mb-4 ${orderSuccess ? 'bg-green-100' : 'bg-red-100'}`}
+                        >
                             {orderSuccess ? (
                                 <IconCheck className="w-8 h-8 text-green-600" />
                             ) : (
@@ -186,9 +194,10 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                                 <h3 className="mb-2 text-xl font-bold text-gray-900">
                                     Đơn hàng đã được tạo thành công!
                                 </h3>
-                                <p className="mb-4 text-gray-600">
-                                    Mã đơn hàng: <span className="font-mono font-bold text-orange-600">{createdOrderId}</span>
-                                </p>
+                                {/* <p className="mb-4 text-gray-600">
+                                    Mã đơn hàng:{' '}
+                                    <span className="font-mono font-bold text-orange-600">{createdOrderId}</span>
+                                </p> */}
                                 <p className="mb-6 text-sm text-gray-600">
                                     Bạn sẽ được chuyển đến trang thanh toán trong giây lát...
                                 </p>
@@ -197,7 +206,9 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                             <div>
                                 <h3 className="mb-2 text-xl font-bold text-gray-900">Không thể tạo đơn hàng</h3>
                                 <p className="mb-6 text-gray-600">
-                                    {orderError || paymentError || 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại.'}
+                                    {orderError ||
+                                        paymentError ||
+                                        'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại.'}
                                 </p>
                                 <button
                                     onClick={() => setCurrentStep('details')}
@@ -245,50 +256,50 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                                     </div>
 
                                     {/* Quantity Selector */}
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Số lượng
-                                        </label>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center bg-white border-2 border-gray-200 rounded-lg overflow-hidden shadow-sm hover:border-orange-300 transition-colors">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleQuantityChange(quantity - 1)}
-                                                    disabled={quantity <= 1}
-                                                    className="flex items-center justify-center w-10 h-10 bg-gray-50 hover:bg-gray-100 text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200 hover:text-orange-600"
-                                                >
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                                                    </svg>
-                                                </button>
-
-                                                <div className="flex items-center justify-center min-w-[50px] h-10 px-3 bg-white border-x border-gray-200">
-                                                    <span className="font-semibold text-gray-900">{quantity}</span>
+                                    <div className="mt-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex items-center">
+                                                <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                                                    Số lượng:
+                                                </span>
+                                                <div className="flex items-center border border-orange-200 rounded-lg">
+                                                    <button
+                                                        onClick={() => handleQuantityChange(quantity - 1)}
+                                                        className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        disabled={quantity <= 1}
+                                                    >
+                                                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                                        </svg>
+                                                    </button>
+                                                    <input
+                                                        type="number"
+                                                        value={quantity}
+                                                        onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
+                                                        className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
+                                                        min="1"
+                                                        max={product.quantity}
+                                                    />
+                                                    <button
+                                                        onClick={() => handleQuantityChange(quantity + 1)}
+                                                        className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        disabled={quantity >= product.quantity}
+                                                    >
+                                                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleQuantityChange(quantity + 1)}
-                                                    disabled={quantity >= product.quantity}
-                                                    className="flex items-center justify-center w-10 h-10 bg-gray-50 hover:bg-gray-100 text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200 hover:text-orange-600"
-                                                >
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                </button>
                                             </div>
-
-                                            <div className="text-right">
-                                                <p className="text-sm text-gray-500 mb-1">Tổng cộng</p>
-                                                <p className="font-bold text-lg text-gray-900">
-                                                    {orderSummary.originalPrice.toLocaleString('vi-VN')}₫
-                                                </p>
-                                            </div>
+                                            <span className="text-sm text-gray-600">
+                                                Tổng: {orderSummary.originalPrice.toLocaleString('vi-VN')}₫
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
 
                         {/* Shipping Address */}
                         <div className="p-6 border-b border-gray-200">
@@ -322,7 +333,9 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                                                 {selectedAddress.customerName} - {selectedAddress.phone}
                                             </p>
                                             <p className="text-gray-600">
-                                                {selectedAddress.addressLine}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.state}, {selectedAddress.country}
+                                                {selectedAddress.addressLine}, {selectedAddress.ward},{' '}
+                                                {selectedAddress.district}, {selectedAddress.state},{' '}
+                                                {selectedAddress.country}
                                             </p>
                                         </div>
                                     </div>
@@ -395,7 +408,9 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                             <div className="space-y-2 mb-4">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Giá gốc</span>
-                                    <span className="text-gray-800">{orderSummary.originalPrice.toLocaleString('vi-VN')}₫</span>
+                                    <span className="text-gray-800">
+                                        {orderSummary.originalPrice.toLocaleString('vi-VN')}₫
+                                    </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Thuế (10%)</span>
@@ -403,7 +418,9 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                                 </div>
                                 <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
                                     <span className="text-gray-900">Tổng cộng</span>
-                                    <span className="text-orange-600">{orderSummary.total.toLocaleString('vi-VN')}₫</span>
+                                    <span className="text-orange-600">
+                                        {orderSummary.total.toLocaleString('vi-VN')}₫
+                                    </span>
                                 </div>
                             </div>
 
