@@ -1,8 +1,9 @@
 'use client';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/use-auth';
-import { IconLogout, IconPackage, IconShoppingCart, IconUser } from '@tabler/icons-react';
+import { IconLogout, IconPackage, IconShoppingCart, IconUser, IconBuildingStore } from '@tabler/icons-react';
 import Link from 'next/link';
+import { SELLER_ROUTES } from '@/lib/constants';
 
 interface Props {
   open: boolean;
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const MobileMenu = ({ open, setOpen }: Props) => {
-  const { auth, logout } = useAuth();
+  const { auth, logout, roles } = useAuth();
   const { cartGroups } = useCart();
 
   const totalCartItems = Object.values(cartGroups || {}).reduce(
@@ -60,6 +61,29 @@ const MobileMenu = ({ open, setOpen }: Props) => {
                 <IconPackage size={20} className="text-orange-500" />
                 Đơn hàng của tôi
               </Link>
+              {roles.includes('ROLE_SELLER') ? (
+                <button
+                  onClick={() => {
+                    window.open(SELLER_ROUTES.DASHBOARD, '_blank');
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200"
+                >
+                  <IconBuildingStore size={20} />
+                  Quản lý cửa hàng
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    window.open(SELLER_ROUTES.REGISTER, '_blank');
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200"
+                >
+                  <IconBuildingStore size={20} />
+                  Trở thành người bán
+                </button>
+              )}
               <Link
                 href="/cart"
                 className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-xl"

@@ -4,12 +4,13 @@ import { useCart } from '@/context/CartContext';
 import MobileMenu from '@components/header/MobileHeaderMenu';
 import SearchBar from '@components/header/SearchBar';
 import UserDropdown from '@components/header/UserHeaderDropdown';
-import { IconMenu2, IconShoppingCart, IconUser, IconX } from '@tabler/icons-react';
+import { IconMenu2, IconShoppingCart, IconUser, IconX, IconBuildingStore } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { SELLER_ROUTES } from '@/lib/constants';
 
 const Header = () => {
-  const { auth } = useAuth();
+  const { auth, roles } = useAuth();
   const { cartGroups, loading } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -62,25 +63,47 @@ const Header = () => {
 
         <div className="flex items-center space-x-2">
           {auth && (
-            <Link
-              href="/cart"
-              className="relative p-3 hover:bg-orange-50 rounded-xl group"
-              title="Giỏ hàng"
-            >
-              <IconShoppingCart
-                size={24}
-                className={`${
-                  totalCartItems > 0
-                    ? 'text-orange-600 group-hover:text-orange-700'
-                    : 'text-gray-600 group-hover:text-orange-600'
-                }`}
-              />
-              {totalCartItems > 0 && !loading && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold shadow-lg animate-pulse">
-                  {totalCartItems > 99 ? '99+' : totalCartItems}
-                </span>
+            <>
+              <Link
+                href="/cart"
+                className="relative p-3 hover:bg-orange-50 rounded-xl group"
+                title="Giỏ hàng"
+              >
+                <IconShoppingCart
+                  size={24}
+                  className={`${
+                    totalCartItems > 0
+                      ? 'text-orange-600 group-hover:text-orange-700'
+                      : 'text-gray-600 group-hover:text-orange-600'
+                  }`}
+                />
+                {totalCartItems > 0 && !loading && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold shadow-lg animate-pulse">
+                    {totalCartItems > 99 ? '99+' : totalCartItems}
+                  </span>
+                )}
+              </Link>
+              
+              {roles.includes('ROLE_SELLER') ? (
+                <button
+                  onClick={() => window.open(SELLER_ROUTES.DASHBOARD, '_blank')}
+                  className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-blue-700 font-medium shadow-lg transition-all duration-200"
+                  title="Quản lý cửa hàng"
+                >
+                  <IconBuildingStore size={18} />
+                  Quản lý cửa hàng
+                </button>
+              ) : (
+                <button
+                  onClick={() => window.open(SELLER_ROUTES.REGISTER, '_blank')}
+                  className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-green-700 font-medium shadow-lg transition-all duration-200"
+                  title="Trở thành người bán"
+                >
+                  <IconBuildingStore size={18} />
+                  Bán hàng
+                </button>
               )}
-            </Link>
+            </>
           )}
 
           {auth ? (
