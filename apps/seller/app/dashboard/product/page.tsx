@@ -56,12 +56,10 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
-import dynamic from 'next/dynamic';
+
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-
-const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface FilterState {
   search: string;
@@ -158,7 +156,11 @@ export default function ProductManagement() {
       // Price range filter
       if (filters.priceRange) {
         const [min, max] = filters.priceRange.split('-').map(Number);
-        if (product.currentPrice < min || product.currentPrice > max) {
+        if (
+          min !== undefined &&
+          max !== undefined &&
+          (product.currentPrice < min || product.currentPrice > max)
+        ) {
           return false;
         }
       }
@@ -200,10 +202,6 @@ export default function ProductManagement() {
     } finally {
       setRefreshing(false);
     }
-  };
-
-  const handleCreateProduct = () => {
-    setIsCreateOpen(false);
   };
 
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
