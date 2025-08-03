@@ -476,8 +476,8 @@ export default function SellerManagementPage() {
       const fieldB = b[sortField];
       if (sortField === 'createdAt') {
         return sortOrder === 'asc'
-          ? new Date(fieldA).getTime() - new Date(fieldB).getTime()
-          : new Date(fieldB).getTime() - new Date(fieldA).getTime();
+          ? new Date(fieldA as string).getTime() - new Date(fieldB as string).getTime()
+          : new Date(fieldB as string).getTime() - new Date(fieldA as string).getTime();
       }
       if (sortField === 'verified') {
         return sortOrder === 'asc'
