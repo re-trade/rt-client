@@ -1,6 +1,6 @@
 'use client';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
-import { Package, ShoppingCart, Store, Tag, TrendingDown, TrendingUp, Users } from 'lucide-react';
+import { Package, ShoppingCart, Store, Tag, Users } from 'lucide-react';
 import React from 'react';
 
 const StatCard = ({
@@ -17,17 +17,9 @@ const StatCard = ({
   trend?: 'up' | 'down';
 }) => (
   <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-    <div className="flex items-center justify-between mb-4">
+    <div className="flex items-center justify-center mb-4">
       <div className="p-2 bg-blue-100 rounded-lg">
         <Icon className="h-6 w-6 text-blue-600" />
-      </div>
-      <div className="flex items-center gap-1 text-sm">
-        {trend === 'up' ? (
-          <TrendingUp className="h-4 w-4 text-green-500" />
-        ) : (
-          <TrendingDown className="h-4 w-4 text-red-500" />
-        )}
-        <span className={trend === 'up' ? 'text-green-600' : 'text-red-600'}>{change}</span>
       </div>
     </div>
     <div className="text-center">
@@ -103,35 +95,35 @@ export default function AdminPage() {
         <StatCard
           title="Tổng số người dùng"
           value={stats.totalCustomers.toLocaleString()}
-          change="+5% so với tháng trước"
+          change=""
           icon={Users}
           trend="up"
         />
         <StatCard
           title="Shop đang hoạt động"
           value={stats.totalSellers.toLocaleString()}
-          change="+8% so với tháng trước"
+          change=""
           icon={Store}
           trend="up"
         />
         <StatCard
           title="Sản phẩm đang bán"
           value={stats.totalProducts.toLocaleString()}
-          change="+12% so với tháng trước"
+          change=""
           icon={Package}
           trend="up"
         />
         <StatCard
           title="Tổng đơn hàng"
           value={stats.totalOrders.toLocaleString()}
-          change="+15% so với tháng trước"
+          change=""
           icon={ShoppingCart}
           trend="up"
         />
         <StatCard
           title="Danh mục sản phẩm"
           value={stats.totalCategories.toLocaleString()}
-          change="+3% so với tháng trước"
+          change=""
           icon={Tag}
           trend="up"
         />
