@@ -1,6 +1,8 @@
 import {
   ClientToServerEvents,
   ETokenName,
+  getWebRTCConfig,
+  mediaConstraints,
   Message,
   Room,
   ServerToClientEvents,
@@ -21,66 +23,6 @@ export function useMessenger() {
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock data for testing - remove this when real data is working
-  const mockContacts: Room[] = [
-    {
-      id: '1',
-      isPrivate: true,
-      createdAt: new Date('2024-01-15T10:30:00Z'),
-      updatedAt: new Date('2024-01-15T14:45:00Z'),
-      sellerId: 'seller-1',
-      customerId: 'customer-1',
-      participants: [
-        {
-          id: 'customer-1',
-          username: 'customer1',
-          name: 'Nguyễn Văn A',
-          role: ['customer'],
-          senderRole: 'customer',
-          avatarUrl: '/placeholder.svg',
-          isOnline: true,
-        },
-        {
-          id: 'seller-1',
-          username: 'seller1',
-          name: 'Shop ABC',
-          role: ['seller'],
-          senderRole: 'seller',
-          avatarUrl: '/placeholder.svg',
-          isOnline: true,
-        },
-      ],
-    },
-    {
-      id: '2',
-      isPrivate: true,
-      createdAt: new Date('2024-01-14T09:15:00Z'),
-      updatedAt: new Date('2024-01-14T16:20:00Z'),
-      sellerId: 'seller-1',
-      customerId: 'customer-2',
-      participants: [
-        {
-          id: 'customer-2',
-          username: 'customer2',
-          name: 'Trần Thị B',
-          role: ['customer'],
-          senderRole: 'customer',
-          avatarUrl: '/placeholder.svg',
-          isOnline: false,
-        },
-        {
-          id: 'seller-1',
-          username: 'seller1',
-          name: 'Shop ABC',
-          role: ['seller'],
-          senderRole: 'seller',
-          avatarUrl: '/placeholder.svg',
-          isOnline: true,
-        },
-      ],
-    },
-  ];
-
   const [isVideoCall, setIsVideoCall] = useState(false);
   const [isAudioCall, setIsAudioCall] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
@@ -88,6 +30,14 @@ export function useMessenger() {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [incomingCall, setIncomingCall] = useState<{
+    callerId: string;
+    callerName: string;
+    roomId: string;
+  } | null>(null);
+  const [callState, setCallState] = useState<
+    'idle' | 'calling' | 'ringing' | 'connected' | 'ended'
+  >('idle');
 
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -119,7 +69,7 @@ export function useMessenger() {
 
         if (socketRef.current && selectedContact) {
           socketRef.current.emit('signal', {
-            to: selectedContact.customerId,
+            to: selectedChatId,
             type: 'answer',
             data: answer,
             roomId: selectedContact.id,
@@ -159,13 +109,6 @@ export function useMessenger() {
     const handleAuthSuccess = () => {
       setIsAuthenticated(true);
       socket.emit('getRooms');
-
-      // Fallback: If no rooms are received within 3 seconds, use mock data
-      setTimeout(() => {
-        if (contacts.length === 0) {
-          setContacts(mockContacts);
-        }
-      }, 3000);
     };
 
     const handleAuthError = (error: any) => {
@@ -181,7 +124,7 @@ export function useMessenger() {
       if (rooms && rooms.length > 0) {
         setContacts(rooms);
       } else {
-        setContacts(mockContacts);
+        setContacts([]);
       }
     });
     socket.on('roomJoined', (room) => {
@@ -192,12 +135,73 @@ export function useMessenger() {
       setMessages((prev) => [...prev, msg]);
     });
     socket.on('signal', (data) => handleSignalRef.current(data));
+
+    socket.on('incomingCall', (data) => {
+      setIncomingCall(data);
+      setCallState('ringing');
+    });
+
+    socket.on('callAccepted', async (data) => {
+      setCallState('connected');
+      setIsCalling(false);
+
+      if (!peerRef.current) {
+        await startCamera(isVideoCall);
+      }
+
+      if (peerRef.current) {
+        const offer = await peerRef.current.createOffer();
+        await peerRef.current.setLocalDescription(offer);
+
+        socket.emit('signal', {
+          to: data.acceptedId,
+          type: 'offer',
+          data: offer,
+          roomId: data.roomId,
+        });
+      }
+    });
+
+    socket.on('callRejected', (data) => {
+      setCallState('ended');
+      setIsCalling(false);
+      setIsVideoCall(false);
+      setIsAudioCall(false);
+      stopCamera();
+      console.log('Call rejected:', data.reason);
+    });
+
+    socket.on('call-ended', (data) => {
+      setCallState('ended');
+      setIsCalling(false);
+      setIsVideoCall(false);
+      setIsAudioCall(false);
+      setIncomingCall(null);
+      stopCamera();
+    });
+
+    socket.on('error', (error) => {
+      console.error('Socket error:', error);
+      if (error.code === 'USER_OFFLINE') {
+        alert('Khách hàng hiện không trực tuyến. Vui lòng thử lại sau.');
+      } else if (error.code === 'CALL_IN_PROGRESS') {
+        alert('Khách hàng đang trong cuộc gọi khác.');
+      } else if (error.code === 'AUTH_ERROR') {
+        alert('Lỗi xác thực. Vui lòng đăng nhập lại.');
+      } else {
+        alert('Có lỗi xảy ra khi thực hiện cuộc gọi.');
+      }
+      setCallState('idle');
+      setIsCalling(false);
+      setIsVideoCall(false);
+      setIsAudioCall(false);
+    });
+
     socket.on('typing', (data) => {
       setIsSomeoneTyping(data.isTyping);
       setTypingUser(data.isTyping ? data.username : null);
     });
 
-    // Trigger connection if not already connected
     if (!socket.connected) {
       socket.connect();
     }
@@ -205,11 +209,16 @@ export function useMessenger() {
     return () => {
       socket.disconnect();
       socket.off('authSuccess', handleAuthSuccess);
-      socket.off('authError', handleAuthError);
+      socket.off('error', handleAuthError);
       socket.off('rooms');
       socket.off('roomJoined');
       socket.off('message');
       socket.off('signal');
+      socket.off('incomingCall');
+      socket.off('callAccepted');
+      socket.off('callRejected');
+      socket.off('call-ended');
+      socket.off('error');
       socket.off('typing');
     };
   }, [router]);
@@ -270,80 +279,144 @@ export function useMessenger() {
 
   const startCamera = useCallback(
     async (withVideo: boolean) => {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: withVideo,
-        audio: true,
-      });
-      streamRef.current = stream;
-      if (videoRef.current && withVideo) videoRef.current.srcObject = stream;
+      try {
+        const constraints = withVideo ? mediaConstraints.video : mediaConstraints.audio;
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        streamRef.current = stream;
+        if (videoRef.current && withVideo) videoRef.current.srcObject = stream;
 
-      const remoteStream = new MediaStream();
-      remoteStreamRef.current = remoteStream;
-      if (remoteVideoRef.current && withVideo) {
-        remoteVideoRef.current.srcObject = remoteStream;
-      }
-
-      const peer = new RTCPeerConnection();
-      peerRef.current = peer;
-
-      stream.getTracks().forEach((track) => {
-        peer.addTrack(track, stream);
-      });
-
-      peer.ontrack = (event) => {
-        event.streams[0]?.getTracks().forEach((track) => {
-          remoteStream.addTrack(track);
-        });
-      };
-
-      peer.onicecandidate = (event) => {
-        if (event.candidate && socketRef.current && selectedContact) {
-          socketRef.current.emit('signal', {
-            to: selectedContact.customerId,
-            type: 'ice-candidate',
-            data: event.candidate,
-            roomId: selectedContact.id,
-          });
+        const remoteStream = new MediaStream();
+        remoteStreamRef.current = remoteStream;
+        if (remoteVideoRef.current && withVideo) {
+          remoteVideoRef.current.srcObject = remoteStream;
         }
-      };
 
-      return peer;
+        const webRTCConfig = getWebRTCConfig();
+        const peer = new RTCPeerConnection(webRTCConfig);
+        peerRef.current = peer;
+
+        peer.onconnectionstatechange = () => {
+          console.log('Connection state:', peer.connectionState);
+        };
+
+        peer.oniceconnectionstatechange = () => {
+          console.log('ICE connection state:', peer.iceConnectionState);
+        };
+
+        stream.getTracks().forEach((track) => {
+          peer.addTrack(track, stream);
+        });
+
+        peer.ontrack = (event) => {
+          event.streams[0]?.getTracks().forEach((track) => {
+            remoteStream.addTrack(track);
+          });
+        };
+
+        peer.onicecandidate = (event) => {
+          if (event.candidate && socketRef.current && selectedContact) {
+            const customerId =
+              selectedContact.participants?.find((p) => p.senderRole === 'customer')?.id ||
+              selectedContact.customerId;
+            socketRef.current.emit('signal', {
+              to: customerId,
+              type: 'ice-candidate',
+              data: event.candidate,
+              roomId: selectedContact.id,
+            });
+          }
+        };
+
+        return peer;
+      } catch (error) {
+        console.error('Failed to start camera:', error);
+        throw error;
+      }
     },
     [selectedContact],
   );
 
   const startVideoCall = async () => {
+    if (!socketRef.current || !selectedContact) return;
+
     setIsVideoCall(true);
     setIsCalling(true);
-    const peer = await startCamera(true);
-    const offer = await peer.createOffer();
-    await peer.setLocalDescription(offer);
+    setCallState('calling');
 
-    if (socketRef.current && selectedContact) {
-      socketRef.current.emit('signal', {
-        to: selectedContact.customerId,
-        type: 'offer',
-        data: offer,
-        roomId: selectedContact.id,
-      });
-    }
+    const callData = {
+      recipientId: selectedChatId,
+      roomId: selectedContact.id,
+    };
+
+    console.log('Starting audio call with data:', callData);
+    socketRef.current.emit('initiateCall', callData);
   };
 
   const startAudioCall = async () => {
+    if (!socketRef.current || !selectedContact) return;
+
     setIsAudioCall(true);
     setIsCalling(true);
-    const peer = await startCamera(false);
-    const offer = await peer.createOffer();
-    await peer.setLocalDescription(offer);
+    setCallState('calling');
 
+    // Find the customer ID for seller app
+    const customerId =
+      selectedContact.participants?.find((p) => p.senderRole === 'customer')?.id ||
+      selectedContact.customerId;
+
+    const callData = {
+      recipientId: customerId,
+      roomId: selectedContact.id,
+    };
+
+    console.log('Starting video call with data:', callData);
+    socketRef.current.emit('initiateCall', callData);
+  };
+
+  const acceptCall = async () => {
+    if (!incomingCall || !socketRef.current) return;
+
+    setCallState('connected');
+    setIsVideoCall(true);
+    setIncomingCall(null);
+
+    await startCamera(true);
+
+    socketRef.current.emit('acceptCall', {
+      callerId: incomingCall.callerId,
+      roomId: incomingCall.roomId,
+    });
+  };
+
+  const rejectCall = () => {
+    if (!incomingCall || !socketRef.current) return;
+
+    socketRef.current.emit('rejectCall', {
+      callerId: incomingCall.callerId,
+      reason: 'Call declined',
+    });
+
+    setIncomingCall(null);
+    setCallState('idle');
+  };
+
+  const endCall = () => {
     if (socketRef.current && selectedContact) {
-      socketRef.current.emit('signal', {
-        to: selectedContact.customerId,
-        type: 'offer',
-        data: offer,
+      socketRef.current.emit('endCall', {
         roomId: selectedContact.id,
       });
     }
+
+    setCallState('ended');
+    setIsCalling(false);
+    setIsVideoCall(false);
+    setIsAudioCall(false);
+    setIncomingCall(null);
+    setIsRecording(false);
+    setRecordingTime(0);
+    stopCamera();
+    peerRef.current?.close();
+    peerRef.current = null;
   };
 
   const stopCamera = () => {
@@ -351,17 +424,6 @@ export function useMessenger() {
     remoteStreamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     remoteStreamRef.current = null;
-  };
-
-  const endCall = () => {
-    setIsVideoCall(false);
-    setIsAudioCall(false);
-    setIsCalling(false);
-    setIsRecording(false);
-    setRecordingTime(0);
-    stopCamera();
-    peerRef.current?.close();
-    peerRef.current = null;
   };
 
   const toggleVideo = () => {
@@ -420,11 +482,15 @@ export function useMessenger() {
     recordingTime,
     startVideoCall,
     startAudioCall,
+    acceptCall,
+    rejectCall,
     endCall,
     toggleVideo,
     toggleAudio,
     startRecording,
     stopRecording,
     formatRecordingTime,
+    incomingCall,
+    callState,
   };
 }
