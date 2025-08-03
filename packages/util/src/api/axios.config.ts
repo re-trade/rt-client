@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
+import { IResponseObject } from '@/api/base.api';
 
 const BASE_API_URL: string = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
 const NODE_ENV: string = process.env.NEXT_PUBLIC_NODE_ENV ?? 'development';
@@ -79,18 +80,23 @@ export const createAuthApi = (
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
           try {
-            const refreshToken = localStorage.getItem(ETokenName.REFRESH_TOKEN);
-            const response = await createUnAuthApi().post('/auth/refresh-token', {
-              refreshToken,
-            });
+            const response = await createAuthApi().post<
+              IResponseObject<{
+                tokens: {
+                  ACCESS_TOKEN: string;
+                  REFRESH_TOKEN: string;
+                };
+                roles: string[];
+                twoFA: boolean;
+              }>
+            >('/auth/refresh-token');
 
-            const { accessToken, refreshToken: newRefreshToken } = response.data;
-            localStorage.setItem(ETokenName.ACCESS_TOKEN, accessToken);
-            localStorage.setItem(ETokenName.REFRESH_TOKEN, newRefreshToken);
+            const { tokens } = response.data.content;
+            localStorage.setItem(ETokenName.ACCESS_TOKEN, tokens.ACCESS_TOKEN);
 
             originalRequest.headers = {
               ...originalRequest.headers,
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${tokens.ACCESS_TOKEN}`,
             };
 
             return instance(originalRequest);
