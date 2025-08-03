@@ -23,6 +23,7 @@ import { useWithdrawManager } from '@/hooks/use-withdraw-manager';
 import { TWithdrawProfile } from '@/services/withdraw.api';
 import { AlertTriangle, Check, PauseCircle, Search, Store } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const statusLabels: Record<string, string> = {
   true: 'Đang hoạt động',
@@ -106,7 +107,13 @@ export default function ShopManagementPage() {
   };
 
   const handleApprove = async (productId: string) => {
-    await approveWithdraw(productId);
+    try {
+      await approveWithdraw(productId);
+      toast.success('Duyệt yêu cầu rút tiền thành công!', { position: 'top-right' });
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || 'Lỗi duyệt yêu cầu rút tiền';
+      toast.error(errorMessage, { position: 'top-right' });
+    }
   };
 
   return (
