@@ -5,8 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/context/ToastContext';
 import { useProductDetail } from '@/hooks/use-product-detail';
-import { reviewApi, ReviewResponse } from '@/services/product-review.api';
-import Chart from '@components/chart/chart';
+import { useSellerProfile } from '@/hooks/use-seller-profile';
+import { reviewApi } from '@/services/product-review.api';
 import BuyNowDialog from '@components/common/BuyNowDialog';
 import ReviewsList from '@components/common/review/ListReview';
 import ImageGallery from '@components/gallery/ImageGallery';
@@ -24,9 +24,7 @@ import { useEffect, useState } from 'react';
 import {
   MdAdd,
   MdAddShoppingCart,
-  MdAssignment,
   MdFavoriteBorder,
-  MdLocalShipping,
   MdRemove,
   MdSecurity,
   MdStar,
@@ -48,10 +46,12 @@ function ProductDetail({ params }: { params: { id: string } }) {
   const [showBuyNow, setShowBuyNow] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
+  const [totalReviews, setTotalReviews] = useState(0);
+
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description',
   );
+
   const { id } = params;
   const { productDetail, listImg, loading, relatedProducts, productHistories } =
     useProductDetail(id);
@@ -105,7 +105,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     setGalleryIndex(index);
     setShowGallery(true);
   };
-
+  const { sellerProfile } = useSellerProfile(productDetail?.sellerId || '');
   const closeGallery = () => {
     setShowGallery(false);
   };
@@ -126,11 +126,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
     const fetching = async () => {
       if (productDetail) {
         try {
-          const reviewsData = await reviewApi.getReviews(productDetail.id);
-          console.log('Fetched reviews id:', productDetail.id, reviewsData);
-
-          setReviews(reviewsData);
-          console.log('Fetched reviews:', reviewsData);
+          const response = await reviewApi.getTotalReviews(productDetail.id);
+          setTotalReviews(response);
         } catch (error) {
           console.error('Error fetching reviews:', error);
         }
@@ -337,7 +334,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   style={{ color: '#6b7280' }}
                 >
                   <MdStar className="text-yellow-400" size={16} />
-                  4.5 (256 đánh giá)
+                  {productDetail.avgVote} ({totalReviews} đánh giá)
                 </span>
                 <span className="text-gray-400" style={{ color: '#9ca3af' }}>
                   |
@@ -360,7 +357,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   <div className="flex items-center gap-1">
                     <MdStar className="text-yellow-500" size={16} />
                     <span className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
-                      4.8 (256 đánh giá)
+                      {sellerProfile?.avgVote || 0} (256 đánh giá)
                     </span>
                   </div>
                 </div>
@@ -502,7 +499,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
               initialQuantity={2}
             />
             {/* Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
                 <MdLocalShipping className="text-orange-500 flex-shrink-0" size={24} />
                 <div>
@@ -536,7 +533,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -546,7 +543,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
               {[
                 { key: 'description', label: 'Mô tả sản phẩm' },
                 { key: 'specifications', label: 'Thông số kỹ thuật' },
-                { key: 'reviews', label: 'Đánh giá (256)' },
+                { key: 'reviews', label: `Đánh giá (${totalReviews})` },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -823,7 +820,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
           <ProductHistoryList history={productHistories} />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-orange-100 mb-12">
+        {/* <div className="bg-white rounded-2xl shadow-lg border border-orange-100 mb-12">
           <div className="p-6 border-b border-orange-100">
             <h2 className="text-2xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
               Lịch sử giá
@@ -837,7 +834,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
               <Chart />
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100">
           <div className="p-6 border-b border-orange-100">
