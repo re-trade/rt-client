@@ -29,8 +29,6 @@ import {
   Search,
   Store,
   Tag,
-  TrendingDown,
-  TrendingUp,
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -49,10 +47,6 @@ const ProductStats = ({ products }: { products: any[] }) => {
           <div className="p-2 bg-blue-100 rounded-lg">
             <Package className="h-6 w-6 text-blue-600" />
           </div>
-          <div className="flex items-center gap-1 text-sm">
-            <TrendingUp className="h-4 w-4 text-green-500" />
-            <span className="text-green-600">+12% so với tháng trước</span>
-          </div>
         </div>
         <div className="text-center">
           <div className="text-3xl font-bold text-gray-800 mb-1">{totalProducts}</div>
@@ -64,10 +58,6 @@ const ProductStats = ({ products }: { products: any[] }) => {
         <div className="flex items-center justify-between mb-4">
           <div className="p-2 bg-green-100 rounded-lg">
             <CheckCircle className="h-6 w-6 text-green-600" />
-          </div>
-          <div className="flex items-center gap-1 text-sm">
-            <TrendingUp className="h-4 w-4 text-green-500" />
-            <span className="text-green-600">+8% so với tháng trước</span>
           </div>
         </div>
         <div className="text-center">
@@ -81,10 +71,6 @@ const ProductStats = ({ products }: { products: any[] }) => {
           <div className="p-2 bg-orange-100 rounded-lg">
             <AlertCircle className="h-6 w-6 text-orange-600" />
           </div>
-          <div className="flex items-center gap-1 text-sm">
-            <TrendingDown className="h-4 w-4 text-red-500" />
-            <span className="text-red-600">-5% so với tháng trước</span>
-          </div>
         </div>
         <div className="text-center">
           <div className="text-3xl font-bold text-gray-800 mb-1">{pendingProducts}</div>
@@ -96,10 +82,6 @@ const ProductStats = ({ products }: { products: any[] }) => {
         <div className="flex items-center justify-between mb-4">
           <div className="p-2 bg-purple-100 rounded-lg">
             <BarChart3 className="h-6 w-6 text-purple-600" />
-          </div>
-          <div className="flex items-center gap-1 text-sm">
-            <TrendingUp className="h-4 w-4 text-green-500" />
-            <span className="text-green-600">+15% so với tháng trước</span>
           </div>
         </div>
         <div className="text-center">
@@ -431,7 +413,7 @@ const ProductDetailModal = ({
   );
 };
 
-const ProductActions = ({ product, onView }: any) => {
+const ProductActions = ({ product, onView, onVerify, onUnverify }: any) => {
   return (
     <div className="flex items-center gap-2">
       <button
@@ -441,6 +423,24 @@ const ProductActions = ({ product, onView }: any) => {
         <Eye className="h-4 w-4 inline mr-1" />
         Xem
       </button>
+
+      {!product.verified ? (
+        <button
+          className="px-3 py-1 text-sm border border-green-500 text-green-600 rounded hover:bg-green-500 hover:text-white transition-colors"
+          onClick={() => onVerify(product.id)}
+        >
+          <CheckCircle className="h-4 w-4 inline mr-1" />
+          Duyệt
+        </button>
+      ) : (
+        <button
+          className="px-3 py-1 text-sm border border-red-500 text-red-600 rounded hover:bg-red-500 hover:text-white transition-colors"
+          onClick={() => onUnverify(product.id)}
+        >
+          <XCircle className="h-4 w-4 inline mr-1" />
+          Hủy duyệt
+        </button>
+      )}
     </div>
   );
 };
@@ -864,7 +864,12 @@ export default function ProductManagementPage() {
                         {new Date(product.createdAt).toLocaleDateString('vi-VN')}
                       </td>
                       <td className="px-6 py-4 text-center min-w-[120px]">
-                        <ProductActions product={product} onView={handleView} />
+                        <ProductActions
+                          product={product}
+                          onView={handleView}
+                          onVerify={handleVerify}
+                          onUnverify={handleReject}
+                        />
                       </td>
                     </tr>
                   ))}
