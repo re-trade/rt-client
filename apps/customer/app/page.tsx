@@ -195,8 +195,8 @@ export default function Home() {
           <CarouselComponent />
         </div>
 
-        {/* Banner CTA - Trở thành người bán */}
-        {!roles.includes('ROLE_SELLER') && (
+        {/* Banner - Trở thành người bán */}
+        {/* {!roles.includes('ROLE_SELLER') && (
           <div className="container mx-auto px-4 sm:px-6">
             <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 sm:p-8 mx-4 sm:mx-6 shadow-lg">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -221,7 +221,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
