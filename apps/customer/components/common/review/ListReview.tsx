@@ -120,7 +120,6 @@ const ReviewsList = ({ productId }: ReviewProps) => {
                     )}
                   </div>
 
-
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-semibold text-gray-900">{review.author.name}</h4>
@@ -139,9 +138,7 @@ const ReviewsList = ({ productId }: ReviewProps) => {
                 {/* Content */}
                 <div className="mb-4">
                   <p className="text-gray-700 text-start">
-                    {shouldTruncate && !isExpanded
-                      ? truncateText(review.content)
-                      : review.content}
+                    {shouldTruncate && !isExpanded ? truncateText(review.content) : review.content}
                   </p>
                   {shouldTruncate && (
                     <button
@@ -173,9 +170,7 @@ const ReviewsList = ({ productId }: ReviewProps) => {
                           src={url}
                           alt={`Hình đánh giá ${index + 1}`}
                           className="w-20 h-20 rounded-lg object-cover cursor-pointer hover:opacity-80"
-                          onClick={() =>
-                            setSelectedImages({ urls: review.imageUrls, index })
-                          }
+                          onClick={() => setSelectedImages({ urls: review.imageUrls, index })}
                         />
                       ))}
                     </div>
@@ -201,7 +196,7 @@ const ReviewsList = ({ productId }: ReviewProps) => {
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                   <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600 text-sm">
                     <ThumbsUp size={16} />
-                    Hữu ích ({review.helpful| 0})
+                    Hữu ích ({review.helpful | 0})
                   </button>
                 </div>
               </div>

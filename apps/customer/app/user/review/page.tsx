@@ -1,20 +1,16 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
 import {
-  Star,
-  StarIcon,
-  MessageCircle,
   Calendar,
+  MessageCircle,
   Package,
-  Search,
-  Filter,
   RefreshCw,
+  Search,
   Send,
+  Star,
   ThumbsUp,
-  Image as ImageIcon,
-  X
 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 // Mock data types
 interface Product {
@@ -47,7 +43,7 @@ const mockPendingProducts: Product[] = [
     image: '/api/placeholder/150/150',
     price: 159000,
     orderDate: '2024-01-15',
-    orderId: 'ORD001'
+    orderId: 'ORD001',
   },
   {
     id: '2',
@@ -55,7 +51,7 @@ const mockPendingProducts: Product[] = [
     image: '/api/placeholder/150/150',
     price: 299000,
     orderDate: '2024-01-10',
-    orderId: 'ORD002'
+    orderId: 'ORD002',
   },
   {
     id: '3',
@@ -63,8 +59,8 @@ const mockPendingProducts: Product[] = [
     image: '/api/placeholder/150/150',
     price: 35000,
     orderDate: '2024-01-08',
-    orderId: 'ORD003'
-  }
+    orderId: 'ORD003',
+  },
 ];
 
 const mockMyReviews: Review[] = [
@@ -78,7 +74,7 @@ const mockMyReviews: Review[] = [
     images: ['/api/placeholder/200/200', '/api/placeholder/200/200'],
     createdAt: '2024-01-20',
     orderId: 'ORD004',
-    helpful: 12
+    helpful: 12,
   },
   {
     id: '2',
@@ -90,8 +86,8 @@ const mockMyReviews: Review[] = [
     images: [],
     createdAt: '2024-01-18',
     orderId: 'ORD005',
-    helpful: 8
-  }
+    helpful: 8,
+  },
 ];
 
 export default function ReviewsPage() {
@@ -100,7 +96,7 @@ export default function ReviewsPage() {
   const [myReviews, setMyReviews] = useState<Review[]>(mockMyReviews);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
-  
+
   const formatPrice = useMemo(() => {
     return (price: number) => {
       return new Intl.NumberFormat('vi-VN', {
@@ -115,16 +111,18 @@ export default function ReviewsPage() {
   };
 
   const filteredPendingProducts = useMemo(() => {
-    return pendingProducts.filter(product =>
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.orderId.toLowerCase().includes(search.toLowerCase())
+    return pendingProducts.filter(
+      (product) =>
+        product.name.toLowerCase().includes(search.toLowerCase()) ||
+        product.orderId.toLowerCase().includes(search.toLowerCase()),
     );
   }, [pendingProducts, search]);
 
   const filteredMyReviews = useMemo(() => {
-    return myReviews.filter(review =>
-      review.productName.toLowerCase().includes(search.toLowerCase()) ||
-      review.orderId.toLowerCase().includes(search.toLowerCase())
+    return myReviews.filter(
+      (review) =>
+        review.productName.toLowerCase().includes(search.toLowerCase()) ||
+        review.orderId.toLowerCase().includes(search.toLowerCase()),
     );
   }, [myReviews, search]);
 
@@ -252,7 +250,7 @@ export default function ReviewsPage() {
 
           <div className="p-6">
             {activeTab === 'pending' ? (
-              <PendingReviewsTab 
+              <PendingReviewsTab
                 products={filteredPendingProducts}
                 formatPrice={formatPrice}
                 formatDate={formatDate}
@@ -261,24 +259,21 @@ export default function ReviewsPage() {
                   const newReview: Review = {
                     id: Date.now().toString(),
                     productId,
-                    productName: products.find(p => p.id === productId)?.name || '',
-                    productImage: products.find(p => p.id === productId)?.image || '',
+                    productName: products.find((p) => p.id === productId)?.name || '',
+                    productImage: products.find((p) => p.id === productId)?.image || '',
                     rating: reviewData.rating,
                     comment: reviewData.comment,
                     images: reviewData.images,
                     createdAt: new Date().toISOString(),
-                    orderId: products.find(p => p.id === productId)?.orderId || '',
-                    helpful: 0
+                    orderId: products.find((p) => p.id === productId)?.orderId || '',
+                    helpful: 0,
                   };
-                  setMyReviews(prev => [newReview, ...prev]);
-                  setPendingProducts(prev => prev.filter(p => p.id !== productId));
+                  setMyReviews((prev) => [newReview, ...prev]);
+                  setPendingProducts((prev) => prev.filter((p) => p.id !== productId));
                 }}
               />
             ) : (
-              <MyReviewsTab 
-                reviews={filteredMyReviews}
-                formatDate={formatDate}
-              />
+              <MyReviewsTab reviews={filteredMyReviews} formatDate={formatDate} />
             )}
           </div>
         </div>
@@ -288,11 +283,11 @@ export default function ReviewsPage() {
 }
 
 // Pending Reviews Tab Component
-function PendingReviewsTab({ 
-  products, 
-  formatPrice, 
+function PendingReviewsTab({
+  products,
+  formatPrice,
   formatDate,
-  onReviewSubmit 
+  onReviewSubmit,
 }: {
   products: Product[];
   formatPrice: (price: number) => string;
@@ -305,8 +300,12 @@ function PendingReviewsTab({
     return (
       <div className="text-center py-12">
         <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-600 mb-2">Không có sản phẩm nào chờ đánh giá</h3>
-        <p className="text-gray-500">Tất cả sản phẩm đã được đánh giá hoặc chưa có đơn hàng nào hoàn thành</p>
+        <h3 className="text-lg font-medium text-gray-600 mb-2">
+          Không có sản phẩm nào chờ đánh giá
+        </h3>
+        <p className="text-gray-500">
+          Tất cả sản phẩm đã được đánh giá hoặc chưa có đơn hàng nào hoàn thành
+        </p>
       </div>
     );
   }
@@ -314,7 +313,10 @@ function PendingReviewsTab({
   return (
     <div className="space-y-4">
       {products.map((product) => (
-        <div key={product.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+        <div
+          key={product.id}
+          className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
+        >
           <div className="flex items-start space-x-4">
             <img
               src={product.image}
@@ -331,7 +333,7 @@ function PendingReviewsTab({
                 <span>Mã đơn: {product.orderId}</span>
                 <span className="font-medium text-orange-600">{formatPrice(product.price)}</span>
               </div>
-              
+
               {selectedProduct === product.id ? (
                 <ReviewForm
                   product={product}
@@ -358,9 +360,9 @@ function PendingReviewsTab({
 }
 
 // My Reviews Tab Component
-function MyReviewsTab({ 
-  reviews, 
-  formatDate 
+function MyReviewsTab({
+  reviews,
+  formatDate,
 }: {
   reviews: Review[];
   formatDate: (date: string) => string;
@@ -387,7 +389,7 @@ function MyReviewsTab({
             />
             <div className="flex-1">
               <h3 className="font-semibold text-gray-800 mb-2">{review.productName}</h3>
-              
+
               <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
                 <div className="flex items-center space-x-1">
                   {[...Array(5)].map((_, i) => (
@@ -431,10 +433,10 @@ function MyReviewsTab({
 }
 
 // Review Form Component
-function ReviewForm({ 
-  product, 
-  onSubmit, 
-  onCancel 
+function ReviewForm({
+  product,
+  onSubmit,
+  onCancel,
 }: {
   product: Product;
   onSubmit: (reviewData: any) => void;
@@ -455,20 +457,18 @@ function ReviewForm({
       alert('Vui lòng viết đánh giá ít nhất 10 ký tự');
       return;
     }
-    
+
     onSubmit({
       rating,
       comment: comment.trim(),
-      images
+      images,
     });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-4 p-4 bg-gray-50 rounded-lg">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Đánh giá của bạn *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn *</label>
         <div className="flex items-center space-x-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -492,9 +492,7 @@ function ReviewForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Nhận xét của bạn *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Nhận xét của bạn *</label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
