@@ -80,19 +80,20 @@ export const reviewApi = {
     currentPage: number;
     pageSize: number;
   }> => {
-    const q = keyword ? `keyword=${encodeURIComponent(keyword)}` : undefined;
-    const response = await authApi.default.get<IResponseObject<ReviewResponse[]>>(
-      `/product-review/search`,
-      {
-        params: {
-          page,
-          size,
-          vote,
-          q,
-          isReply,
-        },
-      },
-    );
+    const query = new URLSearchParams();
+    query.set('page', page.toString());
+    query.set('size', size.toString());
+    if (vote) {
+      query.set('vote', vote.toString());
+    }
+    if (isReply) {
+      query.set('isReply', isReply);
+    }
+    if (keyword) {
+      query.set('q', `keyword=${encodeURIComponent(keyword)}`);
+    }
+    const url = `/product-review/search?${query.toString()}`;
+    const response = await authApi.default.get<IResponseObject<ReviewResponse[]>>(url);
     return {
       reviews: response.data.content,
       totalPages: response.data.pagination?.totalPages || 1,

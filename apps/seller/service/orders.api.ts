@@ -38,7 +38,8 @@ export const ordersApi = {
   async getAllOrdersBySeller(
     page: number = 0,
     size: number = 10,
-    query?: string,
+    keyword?: string,
+    status?: string,
   ): Promise<{
     orders: OrderResponse[];
     totalPages: number;
@@ -46,16 +47,19 @@ export const ordersApi = {
     currentPage: number;
     pageSize: number;
   }> {
-    const response = await authApi.default.get<IResponseObject<OrderResponse[]>>(
-      `/orders/seller/combo`,
-      {
-        params: {
-          page,
-          size,
-          ...(query ? { query } : {}),
-        },
-      },
-    );
+    const searchParams = new URLSearchParams();
+
+    searchParams.set('page', page.toString());
+    searchParams.set('size', size.toString());
+
+    if (keyword?.trim()) {
+      searchParams.set('q', `keyword=${keyword.trim()}`);
+    }
+    if (status && status !== 'all') {
+      searchParams.set('orderStatus', status);
+    }
+    const url = `/orders/seller/combo?${searchParams.toString()}`;
+    const response = await authApi.default.get<IResponseObject<OrderResponse[]>>(url);
     const orders = response.data.success ? response.data.content : [];
     return {
       orders,

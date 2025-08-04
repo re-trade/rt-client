@@ -3,6 +3,7 @@
 import { OrderDetailDialog } from '@/components/dialog-common/add/order-detail-dialog';
 import { OrderTable } from '@/components/dialog-common/view-update/order-table';
 import { UpdateStatusDialog } from '@/components/dialog-common/view-update/update-status-dialog';
+import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
@@ -14,10 +15,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { OrderResponse, ordersApi } from '@/service/orders.api';
-import { Search, ShoppingBag, Users } from 'lucide-react';
+import { RefreshCw, Search, ShoppingBag, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
@@ -28,15 +31,18 @@ export default function OrdersPage() {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesStatus = statusFilter === 'all' || order.orderStatus.code === statusFilter;
-    return matchesStatus;
-  });
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchOrders(1, pageSize, searchTerm);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -64,43 +70,52 @@ export default function OrdersPage() {
     setIsUpdateStatusOpen(true);
   };
 
-  const fetchOrders = async (
-    page: number = currentPage,
-    size: number = pageSize,
-    query?: string,
-  ) => {
+  const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await ordersApi.getAllOrdersBySeller(page - 1, size, query);
-      if (response.orders) {
+      setError(null);
+      console.log('Fetching orders with params:', {
+        page: currentPage - 1,
+        size: pageSize,
+        keyword: debouncedSearchTerm,
+        status: statusFilter,
+      });
+
+      const response = await ordersApi.getAllOrdersBySeller(
+        currentPage - 1,
+        pageSize,
+        debouncedSearchTerm,
+        statusFilter,
+      );
+
+      console.log('Orders API response:', response);
+
+      if (response && response.orders) {
         setOrders(response.orders);
         setTotalPages(response.totalPages);
         setTotalItems(response.totalElements);
+        console.log('Orders set successfully:', response.orders.length, 'orders');
+      } else {
+        console.warn('No orders in response or invalid response structure');
+        setOrders([]);
+        setTotalPages(1);
+        setTotalItems(0);
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Lỗi khi tải đơn hàng: ${errorMessage}`);
       setOrders([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOrders(1, pageSize);
-  }, []);
-
-  useEffect(() => {
-    if (currentPage > 0) {
-      fetchOrders(currentPage, pageSize, searchTerm);
-    }
-  }, [currentPage, pageSize]);
-
-  useEffect(() => {
-    if (!loading) {
-      setCurrentPage(1);
-      fetchOrders(1, pageSize, searchTerm);
-    }
-  }, [statusFilter]);
+    fetchOrders();
+  }, [currentPage, pageSize, debouncedSearchTerm, statusFilter]);
 
   const handleStatusUpdate = (
     comboId: string,
@@ -119,7 +134,7 @@ export default function OrdersPage() {
       ),
     );
     setSelectedOrder(null);
-    fetchOrders(currentPage, pageSize, searchTerm);
+    fetchOrders();
   };
 
   return (
@@ -139,9 +154,21 @@ export default function OrdersPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Users className="h-4 w-4" />
-            <span>{orders.length} đơn hàng</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Users className="h-4 w-4" />
+              <span>{orders.length} đơn hàng</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchOrders()}
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Làm mới
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -164,22 +191,49 @@ export default function OrdersPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value="pending">Chờ xác nhận</SelectItem>
-              <SelectItem value="confirmed">Đã xác nhận</SelectItem>
-              <SelectItem value="preparing">Đang chuẩn bị</SelectItem>
-              <SelectItem value="ready_to_ship">Sẵn sàng giao</SelectItem>
-              <SelectItem value="shipped">Đã giao shipper</SelectItem>
-              <SelectItem value="delivered">Đã giao hàng</SelectItem>
-              <SelectItem value="cancelled">Đã hủy</SelectItem>
+              <SelectItem value="PENDING">Chờ xác nhận</SelectItem>
+              <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
+              <SelectItem value="PREPARING">Đang chuẩn bị</SelectItem>
+              <SelectItem value="DELIVERING">Đã giao shipper</SelectItem>
+              <SelectItem value="DELIVERED">Đã giao hàng</SelectItem>
+              <SelectItem value="CANCELLED">Đã hủy</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </CardContent>
-      <OrderTable
-        orders={filteredOrders}
-        onViewDetail={handleViewDetail}
-        onUpdateStatus={handleUpdateStatus}
-      />
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <p className="text-sm text-muted-foreground">Đang tải đơn hàng...</p>
+          </div>
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Không có đơn hàng</h3>
+            <p className="text-sm text-gray-500">
+              {debouncedSearchTerm || statusFilter !== 'all'
+                ? 'Không tìm thấy đơn hàng phù hợp với bộ lọc hiện tại.'
+                : 'Chưa có đơn hàng nào được tạo.'}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <OrderTable
+          orders={orders}
+          onViewDetail={handleViewDetail}
+          onUpdateStatus={handleUpdateStatus}
+        />
+      )}
 
       <Pagination
         currentPage={currentPage}
