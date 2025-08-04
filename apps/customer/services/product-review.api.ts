@@ -49,5 +49,5 @@ export const reviewApi = {
       `/product-review/product/${productId}/count`,
     );
     return response.data.content;
-  }
+  },
 };
