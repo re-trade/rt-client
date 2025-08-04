@@ -180,7 +180,7 @@ export default function WithdrawManagementPage() {
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
                   <TableCell>{withdraw.status}</TableCell>
                   <TableCell>
-                    {withdraw.processedDate 
+                    {withdraw.processedDate
                       ? new Date(withdraw.processedDate).toLocaleString('vi-VN', {
                           day: '2-digit',
                           month: '2-digit',
@@ -189,8 +189,7 @@ export default function WithdrawManagementPage() {
                           minute: '2-digit',
                           hour12: false,
                         })
-                      : 'N/A'
-                    }
+                      : 'N/A'}
                   </TableCell>
                   <TableCell>{withdraw.bankName}</TableCell>
                   <TableCell>{withdraw.bankBin}</TableCell>
