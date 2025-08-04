@@ -5,7 +5,6 @@ import ProductCard from '@/components/product/ProductCard';
 import { useAuth } from '@/hooks/use-auth';
 import { useProductHome } from '@/hooks/use-product-home';
 import { useProductList } from '@/hooks/use-product-list';
-import { SELLER_ROUTES } from '@/lib/constants';
 import { TProduct } from '@/services/product.api';
 import {
   ChevronRight,
@@ -18,7 +17,6 @@ import {
   ShoppingCart,
   Smile,
   Sparkles,
-  Store,
   TrendingUp,
   Upload,
   Users,

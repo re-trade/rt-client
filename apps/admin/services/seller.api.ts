@@ -61,7 +61,7 @@ const getIdCardImage = async (id: string, cardType: 'FRONT' | 'BACK'): Promise<s
       params: { cardType },
       responseType: 'blob',
     });
-    
+
     if (result.status === 200) {
       const blob = new Blob([result.data], { type: 'image/jpeg' });
       return URL.createObjectURL(blob);
@@ -72,14 +72,18 @@ const getIdCardImage = async (id: string, cardType: 'FRONT' | 'BACK'): Promise<s
   return null;
 };
 
-const approveSeller = async (sellerId: string, approve: boolean, forced: boolean = true): Promise<IResponseObject<any> | undefined> => {
+const approveSeller = async (
+  sellerId: string,
+  approve: boolean,
+  forced: boolean = true,
+): Promise<IResponseObject<any> | undefined> => {
   try {
     const payload: ApproveSellerRequest = {
       sellerId,
       forced,
       approve,
     };
-    
+
     const result = await authApi.default.patch<IResponseObject<any>>(`/sellers/approve`, payload);
     if (result.data.success) {
       return result.data;
@@ -104,4 +108,4 @@ const unbanSeller = async (id: string): Promise<IResponseObject<null> | undefine
   } else return undefined;
 };
 
-export { banSeller, getSeller, getSellers, unbanSeller, getIdCardImage, approveSeller };
+export { approveSeller, banSeller, getIdCardImage, getSeller, getSellers, unbanSeller };
