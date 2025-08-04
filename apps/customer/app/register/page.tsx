@@ -1,181 +1,42 @@
 'use client';
-import { handlePhoneInput } from '@/components/input/InputHandle';
-import { registerInternal } from '@/services/auth.api';
-import { fileApi } from '@/services/file.api';
+import { useCustomerRegister } from '@/hooks/use-customer-register';
 import { IconUpload, IconUser, IconX } from '@tabler/icons-react';
-import Joi from 'joi';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
-const registerSchema = Joi.object({
-  username: Joi.string().required().min(3).max(30).alphanum().messages({
-    'string.empty': 'Tên đăng nhập không được để trống',
-    'string.min': 'Tên đăng nhập phải có ít nhất 3 ký tự',
-    'string.max': 'Tên đăng nhập không được vượt quá 30 ký tự',
-    'string.alphanum': 'Tên đăng nhập chỉ được chứa chữ cái và số',
-  }),
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required()
-    .messages({
-      'string.empty': 'Email không được để trống',
-      'string.email': 'Vui lòng nhập email hợp lệ',
-    }),
-  firstName: Joi.string().required().min(1).max(50).messages({
-    'string.empty': 'Họ không được để trống',
-    'string.max': 'Họ không được vượt quá 50 ký tự',
-  }),
-  lastName: Joi.string().required().min(1).max(50).messages({
-    'string.empty': 'Tên không được để trống',
-    'string.max': 'Tên không được vượt quá 50 ký tự',
-  }),
-  phone: Joi.string()
-    .required()
-    .pattern(/^[0-9]{10}$/)
-    .messages({
-      'string.empty': 'Số điện thoại không được để trống',
-      'string.pattern.base': 'Số điện thoại phải có đúng 10 chữ số',
-    }),
-  address: Joi.string().optional().allow('').max(200).messages({
-    'string.max': 'Địa chỉ không được vượt quá 200 ký tự',
-  }),
-  gender: Joi.number().valid(0, 1, 2).optional().allow('').messages({
-    'any.only': 'Vui lòng chọn giới tính hợp lệ',
-  }),
-  password: Joi.string().required().min(6).max(128).messages({
-    'string.empty': 'Mật khẩu không được để trống',
-    'string.min': 'Mật khẩu phải có ít nhất 6 ký tự',
-    'string.max': 'Mật khẩu không được vượt quá 128 ký tự',
-  }),
-  rePassword: Joi.string().required().valid(Joi.ref('password')).messages({
-    'string.empty': 'Xác nhận mật khẩu không được để trống',
-    'any.only': 'Mật khẩu và xác nhận mật khẩu không khớp',
-  }),
-  avatarUrl: Joi.string().optional().allow(''),
-});
-
 export default function Register() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    address: '',
-    gender: '',
-    avatarUrl: '',
-    password: '',
-    rePassword: '',
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string>('');
-  const [avatarError, setAvatarError] = useState<string>('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+  const {
+    // Form data
+    formData,
+    handleInputChange,
 
-  const togglePasswordVisibility = (field: 'password' | 'confirmPassword') => {
-    if (field === 'password') setShowPassword(!showPassword);
-    else setShowConfirmPassword(!showConfirmPassword);
-  };
+    // Validation states
+    usernameValidation,
+    emailValidation,
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
-  };
+    // Form errors
+    errors,
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setAvatarError('');
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        setAvatarError('Vui lòng chọn file hình ảnh hợp lệ.');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setAvatarError('Kích thước file không được vượt quá 5MB.');
-        return;
-      }
+    // Avatar handling
+    avatarFile,
+    avatarPreview,
+    avatarError,
+    handleAvatarUpload,
+    removeAvatar,
+    triggerFileInput,
+    fileInputRef,
 
-      setAvatarFile(file);
+    // Password visibility
+    showPassword,
+    showConfirmPassword,
+    togglePasswordVisibility,
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setAvatarPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeAvatar = () => {
-    setAvatarFile(null);
-    setAvatarPreview('');
-    setFormData((prev) => ({ ...prev, avatarUrl: '' }));
-    setAvatarError('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrors({});
-    setAvatarError('');
-
-    try {
-      if (!termsAccepted) {
-        setErrors((prev) => ({
-          ...prev,
-          terms: 'Bạn phải đồng ý với Điều khoản và Chính sách.',
-        }));
-        setIsLoading(false);
-        return;
-      }
-
-      const validation = registerSchema.validate(formData, { abortEarly: false });
-      if (validation.error) {
-        const newErrors: Record<string, string> = {};
-        validation.error.details.forEach((error) => {
-          if (error.path[0]) {
-            newErrors[error.path[0].toString()] = error.message;
-          }
-        });
-        setErrors(newErrors);
-        setIsLoading(false);
-        return;
-      }
-
-      let avatarUrl = formData.avatarUrl;
-      if (avatarFile) {
-        avatarUrl = await fileApi.fileUpload(avatarFile);
-      }
-      const submitData = {
-        ...formData,
-        gender: formData.gender ? Number(formData.gender) : undefined,
-        avatarUrl,
-      };
-
-      await registerInternal(submitData);
-      setTimeout(() => router.push('/login'), 2000);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra. Vui lòng thử lại.';
-      setErrors((prev) => ({ ...prev, general: errorMessage }));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // Terms and submission
+    termsAccepted,
+    setTermsAccepted,
+    isLoading,
+    handleSubmit,
+  } = useCustomerRegister();
 
   return (
     <section className="flex justify-center min-h-screen bg-gradient-to-br from-orange-50 to-white">
@@ -195,7 +56,7 @@ export default function Register() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-4">
                 Đăng ký tài khoản
               </h1>
-              <p className="text-gray-600">Bắt đầu hành trình "săn đồ" thông minh!</p>
+              <p className="text-gray-600">Bắt đầu hành trình &ldquo;săn đồ&rdquo; thông minh!</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -260,35 +121,81 @@ export default function Register() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Tên đăng nhập *</label>
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    placeholder="Nhập tên đăng nhập"
-                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
-                      errors.username
-                        ? 'border-red-500'
-                        : 'border-orange-200 focus:border-orange-400'
-                    }`}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleInputChange}
+                      placeholder="Nhập tên đăng nhập"
+                      className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                        errors.username || usernameValidation.isValid === false
+                          ? 'border-red-500'
+                          : usernameValidation.isValid === true
+                            ? 'border-green-500'
+                            : 'border-orange-200 focus:border-orange-400'
+                      }`}
+                      required
+                    />
+                    {usernameValidation.isValidating && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                      </div>
+                    )}
+                  </div>
                   {errors.username && <div className="text-red-500 text-sm">{errors.username}</div>}
+                  {!errors.username && usernameValidation.message && (
+                    <div
+                      className={`text-sm ${
+                        usernameValidation.isValid === true
+                          ? 'text-green-600'
+                          : usernameValidation.isValid === false
+                            ? 'text-red-500'
+                            : 'text-gray-500'
+                      }`}
+                    >
+                      {usernameValidation.message}
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Nhập email"
-                    className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
-                      errors.email ? 'border-red-500' : 'border-orange-200 focus:border-orange-400'
-                    }`}
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Nhập email"
+                      className={`w-full p-3 border-2 rounded-lg bg-white text-black focus:outline-none transition-colors ${
+                        errors.email || emailValidation.isValid === false
+                          ? 'border-red-500'
+                          : emailValidation.isValid === true
+                            ? 'border-green-500'
+                            : 'border-orange-200 focus:border-orange-400'
+                      }`}
+                      required
+                    />
+                    {emailValidation.isValidating && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                      </div>
+                    )}
+                  </div>
                   {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
+                  {!errors.email && emailValidation.message && (
+                    <div
+                      className={`text-sm ${
+                        emailValidation.isValid === true
+                          ? 'text-green-600'
+                          : emailValidation.isValid === false
+                            ? 'text-red-500'
+                            : 'text-gray-500'
+                      }`}
+                    >
+                      {emailValidation.message}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -341,7 +248,6 @@ export default function Register() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    onInput={handlePhoneInput}
                     placeholder="Nhập số điện thoại"
                     inputMode="numeric"
                     pattern="[0-9]*"
@@ -485,9 +391,19 @@ export default function Register() {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  usernameValidation.isValidating ||
+                  emailValidation.isValidating ||
+                  usernameValidation.isValid === false ||
+                  emailValidation.isValid === false
+                }
                 className={`w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg font-medium text-lg transition-all duration-200 ${
-                  isLoading
+                  isLoading ||
+                  usernameValidation.isValidating ||
+                  emailValidation.isValidating ||
+                  usernameValidation.isValid === false ||
+                  emailValidation.isValid === false
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:from-orange-600 hover:to-orange-700 hover:shadow-lg transform hover:-translate-y-0.5'
                 }`}
@@ -496,6 +412,11 @@ export default function Register() {
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Đang xử lý...
+                  </div>
+                ) : usernameValidation.isValidating || emailValidation.isValidating ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Đang kiểm tra...
                   </div>
                 ) : (
                   'Tạo tài khoản'
