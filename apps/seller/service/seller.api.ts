@@ -81,7 +81,7 @@ export const sellerApi = {
       const formData = new FormData();
       formData.append('frontSideIdentityCard', req.frontIdentity);
       formData.append('backSideIdentityCard', req.backIdentity);
-      const response = await authApi.default.post<IResponseObject<SellerProfileResponse>>(
+      const response = await authApi.default.put<IResponseObject<SellerProfileResponse>>(
         '/sellers/identity/submit',
         formData,
         {
