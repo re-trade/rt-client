@@ -72,24 +72,18 @@ const approveWithdraw = async (id: string): Promise<IResponseObject<null> | unde
   } else return undefined;
 };
 
-
-
 const withdrawQr = async (id: string): Promise<Blob | undefined> => {
   try {
-    const response = await authApi.default.get(
-      `/wallets/me/withdraw/${id}/qr`,
-      {
-        responseType: 'blob',
-        headers: {
-          Accept: 'image/png',
-        },
-        withCredentials: true,
+    const response = await authApi.default.get(`/wallets/me/withdraw/${id}/qr`, {
+      responseType: 'blob',
+      headers: {
+        Accept: 'image/png',
       },
-    );
+      withCredentials: true,
+    });
     return response.data;
   } catch {
     return undefined;
   }
 };
 export { approveWithdraw, getBanks, getWithdraws, withdrawQr };
-

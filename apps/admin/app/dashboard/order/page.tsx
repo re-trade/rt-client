@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -603,8 +602,7 @@ export default function OrderManagementPage() {
         combo.status.toLowerCase().includes(selectedCategory.toLowerCase()),
       );
     const orderLastUpdate = new Date(order.updatedAt);
-    const matchesLastUpdate =
-      !updatedAfter || orderLastUpdate >= new Date(updatedAfter);
+    const matchesLastUpdate = !updatedAfter || orderLastUpdate >= new Date(updatedAfter);
     return matchesCategory && matchesLastUpdate;
   });
 

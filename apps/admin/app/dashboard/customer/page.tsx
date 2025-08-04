@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -391,12 +390,10 @@ export default function CustomerManagementPage() {
       (selectedStatus === 'pending' && !customer.enabled);
 
     const normalizedGender = String(customer.gender);
-    const matchesGender =
-      selectedGender === 'all' || normalizedGender === selectedGender;
+    const matchesGender = selectedGender === 'all' || normalizedGender === selectedGender;
 
     const customerLastUpdate = new Date(customer.lastUpdate);
-    const matchesLastUpdate =
-      !updatedAfter || customerLastUpdate > new Date(updatedAfter);
+    const matchesLastUpdate = !updatedAfter || customerLastUpdate > new Date(updatedAfter);
 
     return matchesStatus && matchesGender && matchesLastUpdate;
   });

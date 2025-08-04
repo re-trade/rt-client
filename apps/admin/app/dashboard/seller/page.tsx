@@ -28,6 +28,7 @@ import {
 import { useSellerManager } from '@/hooks/use-seller-manager';
 import {
   AlertCircle,
+  Calendar,
   CheckCircle,
   Eye,
   Filter,
@@ -35,10 +36,8 @@ import {
   RefreshCw,
   Search,
   XCircle,
-  Calendar,
 } from 'lucide-react';
 import { useState } from 'react';
-import { format } from 'date-fns';
 
 interface TSellerProfile {
   id: string;
@@ -124,7 +123,7 @@ const AdvancedFilters = ({
   setEndDate: (date: string) => void;
   selectedState: string;
   setSelectedState: (state: string) => void;
-  sortField: keyof TSellerProfile; 
+  sortField: keyof TSellerProfile;
   setSortField: (field: keyof TSellerProfile) => void;
   sortOrder: 'asc' | 'desc';
   setSortOrder: (order: 'asc' | 'desc') => void;
@@ -203,8 +202,6 @@ const AdvancedFilters = ({
           </SelectContent>
         </Select>
 
-        
-
         <Select value={sortOrder} onValueChange={setSortOrder}>
           <SelectTrigger>
             <SelectValue placeholder="Thứ tự" />
@@ -214,8 +211,6 @@ const AdvancedFilters = ({
             <SelectItem value="desc">Giảm dần</SelectItem>
           </SelectContent>
         </Select>
-
-        
       </div>
     </Card>
   );
@@ -462,32 +457,27 @@ export default function SellerManagementPage() {
       return matchesStatus && matchesState && matchesDate && matchesSearch;
     })
     .sort((a, b) => {
-    const fieldA = a[sortField];
-    const fieldB = b[sortField];
+      const fieldA = a[sortField];
+      const fieldB = b[sortField];
 
-    // Handle date fields (createdAt, updatedAt)
-    if (sortField === 'createdAt' || sortField === 'updatedAt') {
-      const dateA = new Date(fieldA as string).getTime();
-      const dateB = new Date(fieldB as string).getTime();
-      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-    }
+      // Handle date fields (createdAt, updatedAt)
+      if (sortField === 'createdAt' || sortField === 'updatedAt') {
+        const dateA = new Date(fieldA as string).getTime();
+        const dateB = new Date(fieldB as string).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      }
 
-    // Handle boolean field (verified)
-    if (sortField === 'verified') {
-      const boolA = fieldA as boolean;
-      const boolB = fieldB as boolean;
-      return sortOrder === 'asc'
-        ? Number(boolA) - Number(boolB)
-        : Number(boolB) - Number(boolA);
-    }
+      // Handle boolean field (verified)
+      if (sortField === 'verified') {
+        const boolA = fieldA as boolean;
+        const boolB = fieldB as boolean;
+        return sortOrder === 'asc' ? Number(boolA) - Number(boolB) : Number(boolB) - Number(boolA);
+      }
 
-    // Handle string fields (all other fields)
-    const stringA = String(fieldA);
-    const stringB = String(fieldB);
-    return sortOrder === 'asc'
-      ? stringA.localeCompare(stringB)
-      : stringB.localeCompare(stringA);
-  
+      // Handle string fields (all other fields)
+      const stringA = String(fieldA);
+      const stringB = String(fieldB);
+      return sortOrder === 'asc' ? stringA.localeCompare(stringB) : stringB.localeCompare(stringA);
     });
 
   return (

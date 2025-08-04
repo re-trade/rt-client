@@ -224,12 +224,14 @@ export default function WithdrawManagementPage() {
         </div>
       </Card>
 
-       {selectedWithdraw && (
+      {selectedWithdraw && (
         <Dialog open={!!selectedWithdraw} onOpenChange={handleDialogClose}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="space-y-3">
               <DialogTitle className="text-2xl font-bold">Chi tiết yêu cầu rút tiền</DialogTitle>
-              <DialogDescription>Thông tin chi tiết và trạng thái của yêu cầu rút tiền</DialogDescription>
+              <DialogDescription>
+                Thông tin chi tiết và trạng thái của yêu cầu rút tiền
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 mt-6">
@@ -239,23 +241,25 @@ export default function WithdrawManagementPage() {
                   <Store className="h-8 w-8 text-green-600" />
                   <div>
                     <p className="text-sm text-muted-foreground">Số tiền yêu cầu</p>
-                    <p className="text-2xl font-bold text-green-600">{selectedWithdraw.amount.toLocaleString()} ₫</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {selectedWithdraw.amount.toLocaleString()} ₫
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground mb-2">Trạng thái</p>
                   <div
                     className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      selectedWithdraw.status === "PENDING"
-                        ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                        : selectedWithdraw.status === "APPROVED"
-                          ? "bg-green-100 text-green-800 border border-green-200"
-                          : "bg-red-100 text-red-800 border border-red-200"
+                      selectedWithdraw.status === 'PENDING'
+                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                        : selectedWithdraw.status === 'APPROVED'
+                          ? 'bg-green-100 text-green-800 border border-green-200'
+                          : 'bg-red-100 text-red-800 border border-red-200'
                     }`}
                   >
-                    {selectedWithdraw.status === "PENDING" && "⏳ Đang chờ"}
-                    {selectedWithdraw.status === "APPROVED" && "✅ Đã duyệt"}
-                    {selectedWithdraw.status === "REJECTED" && "❌ Từ chối"}
+                    {selectedWithdraw.status === 'PENDING' && '⏳ Đang chờ'}
+                    {selectedWithdraw.status === 'APPROVED' && '✅ Đã duyệt'}
+                    {selectedWithdraw.status === 'REJECTED' && '❌ Từ chối'}
                   </div>
                 </div>
               </div>
@@ -274,7 +278,9 @@ export default function WithdrawManagementPage() {
                       <AlertTriangle className="h-4 w-4" />
                       Mã yêu cầu
                     </div>
-                    <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">{selectedWithdraw.id}</p>
+                    <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
+                      {selectedWithdraw.id}
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -284,10 +290,11 @@ export default function WithdrawManagementPage() {
                     <p className="font-medium">
                       {selectedWithdraw.createdDate
                         ? (() => {
-                            const [year, month, day, hour, minute, second] = selectedWithdraw.createdDate
-                            return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year} ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")}`
+                            const [year, month, day, hour, minute, second] =
+                              selectedWithdraw.createdDate;
+                            return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
                           })()
-                        : "N/A"}
+                        : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -320,7 +327,7 @@ export default function WithdrawManagementPage() {
                       {selectedWithdraw.bankUrl ? (
                         <div className="flex items-center justify-center p-4 bg-white border-2 border-dashed border-gray-200 rounded-lg">
                           <img
-                            src={selectedWithdraw.bankUrl || "/placeholder.svg"}
+                            src={selectedWithdraw.bankUrl || '/placeholder.svg'}
                             alt={`${selectedWithdraw.bankName} Logo`}
                             className="max-w-[120px] max-h-[60px] object-contain"
                           />
@@ -353,9 +360,9 @@ export default function WithdrawManagementPage() {
                       <div>
                         <p className="font-medium text-red-800">Lỗi khi tải mã QR</p>
                         <p className="text-sm text-red-700 mt-1">
-                          {qrError === "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại."
+                          {qrError === 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
                             ? qrError
-                            : qrError || "Không thể tải mã QR"}
+                            : qrError || 'Không thể tải mã QR'}
                         </p>
                       </div>
                     </div>
@@ -363,7 +370,7 @@ export default function WithdrawManagementPage() {
                     <div className="flex justify-center">
                       <div className="p-4 bg-white border-2 border-gray-200 rounded-lg shadow-sm">
                         <img
-                          src={qrCodeUrl || "/placeholder.svg"}
+                          src={qrCodeUrl || '/placeholder.svg'}
                           alt="QR Code thanh toán"
                           className="max-w-[250px] rounded"
                         />
@@ -386,11 +393,11 @@ export default function WithdrawManagementPage() {
                 <Button variant="outline" onClick={handleDialogClose}>
                   Đóng
                 </Button>
-                {selectedWithdraw.status === "PENDING" && (
+                {selectedWithdraw.status === 'PENDING' && (
                   <Button
                     onClick={async () => {
                       if (selectedWithdraw) {
-                        await handleApprove(selectedWithdraw.id)
+                        await handleApprove(selectedWithdraw.id);
                       }
                     }}
                     className="bg-green-600 hover:bg-green-700"
@@ -404,7 +411,6 @@ export default function WithdrawManagementPage() {
           </DialogContent>
         </Dialog>
       )}
-
     </div>
   );
 }
