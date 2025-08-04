@@ -59,6 +59,13 @@ export interface PaginationInfo {
   totalElements: number;
 }
 
+export interface OrderStatsResponse {
+  totalOrders: number;
+  totalOrdersBeingDelivered: number;
+  totalOrdersCompleted: number;
+  totalPaymentCost: number;
+}
+
 export interface OrdersResponse {
   content: OrderCombo[];
   messages: string[];
@@ -110,6 +117,18 @@ export const orderApi = {
         return response.data;
       }
       throw new Error('Failed to fetch orders');
+    } catch (error) {
+      throw error;
+    }
+  },
+  async getOrderStats(): Promise<OrderStatsResponse> {
+    try {
+      const response =
+        await authApi.default.get<IResponseObject<OrderStatsResponse>>('/orders/customer-stats');
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to fetch order stats');
     } catch (error) {
       throw error;
     }
