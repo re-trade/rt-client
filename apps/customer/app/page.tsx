@@ -2,6 +2,7 @@
 
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
+import { useAuth } from '@/hooks/use-auth';
 import { useProductHome } from '@/hooks/use-product-home';
 import { useProductList } from '@/hooks/use-product-list';
 import { TProduct } from '@/services/product.api';
@@ -35,6 +36,7 @@ export default function Home() {
   } = useProductHome();
   const router = useRouter();
   const { handleSelectedFilterChange } = useProductList();
+  const { roles } = useAuth();
 
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
@@ -191,6 +193,34 @@ export default function Home() {
           <CarouselComponent />
         </div>
 
+        {/* Banner - Trở thành người bán */}
+        {/* {!roles.includes('ROLE_SELLER') && (
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 sm:p-8 mx-4 sm:mx-6 shadow-lg">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex-1 text-center sm:text-left">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                    Bạn có đồ cũ muốn bán?
+                  </h2>
+                  <p className="text-green-100 text-sm sm:text-base">
+                    Đăng ký trở thành người bán và kiếm thêm thu nhập từ những món đồ không còn sử
+                    dụng
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <button
+                    onClick={() => window.open(SELLER_ROUTES.REGISTER, '_blank')}
+                    className="bg-white text-green-600 hover:bg-green-50 px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                  >
+                    <Store className="w-5 h-5" />
+                    Trở thành người bán
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )} */}
+
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -260,12 +290,7 @@ export default function Home() {
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[#FFD2B2] scrollbar-track-[#FDFEF9]">
                 <button
-                  onClick={() => handleSelectCategory}
-                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
-                    selectedCategoryId === null
-                      ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
-                      : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                  }`}
+                  onClick={() => handleSelectCategory(null)}
                   className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                     selectedCategoryId === null
                       ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
@@ -279,11 +304,6 @@ export default function Home() {
                   <button
                     key={category.id}
                     onClick={() => handleSelectCategory(category.id)}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
-                      selectedCategoryId === category.id
-                        ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
-                        : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                    }`}
                     className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                       selectedCategoryId === category.id
                         ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'

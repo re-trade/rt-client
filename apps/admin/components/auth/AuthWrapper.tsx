@@ -11,7 +11,9 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!loading) {
       if (!auth || !checkAdminRole()) {
-        router.replace('/login');
+        if (window.location.pathname !== '/login') {
+          router.replace('/login');
+        }
       }
     }
   }, [auth, loading, checkAdminRole, router]);
@@ -24,12 +26,17 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Nếu đã xác thực và là admin thì render children
+  // Nếu đang ở trang login, luôn render children
+  if (window.location.pathname === '/login') {
+    return <>{children}</>;
+  }
+
+  // Nếu có auth và là admin, render children
   if (auth && checkAdminRole()) {
     return <>{children}</>;
   }
 
-  // Nếu không, trả về null (vì useEffect sẽ redirect)
+  // Nếu không có auth hoặc không phải admin, return null (sẽ redirect trong useEffect)
   return null;
 };
 

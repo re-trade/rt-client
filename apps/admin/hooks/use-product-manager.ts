@@ -2,6 +2,7 @@
 
 import { productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const useProductManager = () => {
   const [products, setProducts] = useState<TProduct[]>([]);
@@ -66,9 +67,11 @@ const useProductManager = () => {
       }
       return result;
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi xác minh sản phẩm';
+      toast.error(errorMessage, { position: 'top-right' });
       return {
         success: false,
-        message: err instanceof Error ? err.message : 'Lỗi xác minh sản phẩm',
+        message: errorMessage,
       };
     }
   };
@@ -81,9 +84,11 @@ const useProductManager = () => {
       }
       return result;
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi hủy xác minh sản phẩm';
+      toast.error(errorMessage, { position: 'top-right' });
       return {
         success: false,
-        message: err instanceof Error ? err.message : 'Lỗi hủy xác minh sản phẩm',
+        message: errorMessage,
       };
     }
   };

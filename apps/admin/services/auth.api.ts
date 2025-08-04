@@ -42,8 +42,13 @@ const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   );
   if (result.data.success && result.status === 200) {
     const { ACCESS_TOKEN } = result.data.content.tokens;
+    const { roles } = result.data.content;
+
     localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
     document.cookie = `${ETokenName.ACCESS_TOKEN}=${ACCESS_TOKEN}; path=/;`;
+
+    document.cookie = `token=${ACCESS_TOKEN}; path=/;`;
+    document.cookie = `role=${roles[0]}; path=/;`;
   }
 };
 

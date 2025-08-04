@@ -1,6 +1,8 @@
 'use client';
 
+import { useAuth } from '@/hooks/use-auth';
 import { useCustomerProfile } from '@/hooks/use-customer-profile';
+import { SELLER_ROUTES } from '@/lib/constants';
 import {
   Activity,
   ArrowRight,
@@ -11,6 +13,7 @@ import {
   MapPin,
   Package,
   ShoppingBag,
+  Store,
   TrendingUp,
   User,
 } from 'lucide-react';
@@ -19,6 +22,7 @@ import { useEffect, useState } from 'react';
 const UserDashboard = () => {
   const [greeting, setGreeting] = useState('');
   const { profile } = useCustomerProfile();
+  const { roles } = useAuth();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -118,6 +122,25 @@ const UserDashboard = () => {
       icon: <Gift className="w-5 h-5 sm:w-6 sm:h-6" />,
       href: '/user/vouchers',
     },
+    ...(roles.includes('ROLE_SELLER')
+      ? [
+          {
+            title: 'Quản lý cửa hàng',
+            description: 'Quản lý sản phẩm và đơn hàng',
+            icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
+            href: SELLER_ROUTES.DASHBOARD,
+            external: true,
+          },
+        ]
+      : [
+          {
+            title: 'Trở thành người bán',
+            description: 'Đăng ký bán hàng trên nền tảng',
+            icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
+            href: SELLER_ROUTES.REGISTER,
+            external: true,
+          },
+        ]),
   ];
 
   return (
@@ -192,6 +215,13 @@ const UserDashboard = () => {
                   <div
                     key={index}
                     className="group cursor-pointer p-3 sm:p-4 rounded-lg border border-orange-200 hover:border-orange-400 hover:shadow-md transition-all duration-300 bg-white"
+                    onClick={() => {
+                      if (action.external) {
+                        window.open(action.href, '_blank');
+                      } else {
+                        window.location.href = action.href;
+                      }
+                    }}
                   >
                     <div className="flex items-start space-x-3 sm:space-x-4">
                       <div className="p-2 sm:p-2.5 lg:p-3 rounded-lg bg-orange-100 text-orange-600 shadow-md flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors">
@@ -205,7 +235,9 @@ const UserDashboard = () => {
                           {action.description}
                         </p>
                         <div className="flex items-center mt-2 text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span className="text-xs sm:text-sm font-medium">Xem chi tiết</span>
+                          <span className="text-xs sm:text-sm font-medium">
+                            {action.external ? 'Mở trang mới' : 'Xem chi tiết'}
+                          </span>
                           <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
