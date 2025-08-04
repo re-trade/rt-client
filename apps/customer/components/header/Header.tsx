@@ -1,7 +1,6 @@
 'use client';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { SELLER_ROUTES } from '@/lib/constants';
 import MobileMenu from '@components/header/MobileHeaderMenu';
 import SearchBar from '@components/header/SearchBar';
 import UserDropdown from '@components/header/UserHeaderDropdown';
@@ -94,26 +93,6 @@ const Header = () => {
                   </span>
                 )}
               </Link>
-
-              {roles.includes('ROLE_SELLER') ? (
-                <button
-                  onClick={() => window.open(SELLER_ROUTES.DASHBOARD, '_blank')}
-                  className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-blue-700 font-medium shadow-lg transition-all duration-200"
-                  title="Quản lý cửa hàng"
-                >
-                  <IconBuildingStore size={18} />
-                  Quản lý cửa hàng
-                </button>
-              ) : (
-                <button
-                  onClick={() => window.open(SELLER_ROUTES.REGISTER, '_blank')}
-                  className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-green-700 font-medium shadow-lg transition-all duration-200"
-                  title="Trở thành người bán"
-                >
-                  <IconBuildingStore size={18} />
-                  Bán hàng
-                </button>
-              )}
             </>
           )}
 

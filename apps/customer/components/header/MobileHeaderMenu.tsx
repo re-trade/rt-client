@@ -1,6 +1,7 @@
 'use client';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/use-auth';
+import { SELLER_ROUTES } from '@/lib/constants';
 import {
   IconBuildingStore,
   IconLogout,
@@ -16,7 +17,7 @@ interface Props {
 }
 
 const MobileMenu = ({ open, setOpen }: Props) => {
-  const { auth, logout } = useAuth();
+  const { auth, logout, roles } = useAuth();
   const { cartGroups } = useCart();
 
   const totalCartItems = Object.values(cartGroups || {}).reduce(
@@ -81,16 +82,31 @@ const MobileMenu = ({ open, setOpen }: Props) => {
                   </span>
                 )}
               </Link>
-              <Link
-                href={process.env.NEXT_PUBLIC_SELLER_PORTAL_URL || 'http://localhost:3001'}
-                className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl"
-                onClick={() => setOpen(false)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <IconBuildingStore size={20} />
-                Tới trang người bán
-              </Link>
+              {roles.includes('ROLE_SELLER') ? (
+                <button
+                  onClick={() => {
+                    window.open(SELLER_ROUTES.DASHBOARD, '_blank');
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200"
+                  title="Quản lý cửa hàng"
+                >
+                  <IconBuildingStore size={20} />
+                  Quản lý cửa hàng
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    window.open(SELLER_ROUTES.REGISTER, '_blank');
+                    setOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200"
+                  title="Trở thành người bán"
+                >
+                  <IconBuildingStore size={20} />
+                  Bán hàng
+                </button>
+              )}
               <button
                 onClick={() => {
                   logout();

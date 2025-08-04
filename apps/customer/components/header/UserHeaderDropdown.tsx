@@ -2,6 +2,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useCustomerProfile } from '@/hooks/use-customer-profile';
+import { SELLER_ROUTES } from '@/lib/constants';
 import {
   IconBuildingStore,
   IconLogout,
@@ -13,7 +14,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 const UserHeaderDropdown = () => {
-  const { logout, account } = useAuth();
+  const { logout, account, roles } = useAuth();
   const { cartGroups } = useCart();
   const { profile } = useCustomerProfile();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -119,15 +120,25 @@ const UserHeaderDropdown = () => {
                 </span>
               )}
             </Link>
-            <Link
-              href={process.env.NEXT_PUBLIC_SELLER_PORTAL_URL || 'http://localhost:3001'}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 text-gray-700"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <IconBuildingStore size={18} className="text-orange-500" />
-              Tới trang người bán
-            </Link>
+            {roles.includes('ROLE_SELLER') ? (
+              <button
+                onClick={() => window.open(SELLER_ROUTES.DASHBOARD, '_blank')}
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 text-gray-700 transition-colors duration-150"
+                title="Quản lý cửa hàng"
+              >
+                <IconBuildingStore size={18} className="text-orange-500" />
+                Quản lý cửa hàng
+              </button>
+            ) : (
+              <button
+                onClick={() => window.open(SELLER_ROUTES.REGISTER, '_blank')}
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-green-600 transition-colors duration-150"
+                title="Trở thành người bán"
+              >
+                <IconBuildingStore size={18} className="text-green-500" />
+                Bán hàng
+              </button>
+            )}
             <div className="border-t border-orange-100 mt-2"></div>
             <button
               onClick={logout}
