@@ -1,6 +1,11 @@
 'use client';
 
-import { TWithdrawProfile, approveWithdraw, getWithdraws } from '@/services/withdraw.api';
+import {
+  TWithdrawProfile,
+  approveWithdraw,
+  getWithdraws,
+  withdrawQr,
+} from '@/services/withdraw.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const useWithdrawManager = () => {
@@ -10,6 +15,8 @@ const useWithdrawManager = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState<number>(0);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [qrError, setQrError] = useState<string | null>(null);
   const pageSize = 10;
 
   const fethWithdraw = useCallback(async () => {
@@ -50,6 +57,19 @@ const useWithdrawManager = () => {
     [fethWithdraw],
   );
 
+  const fetchWithdrawQr = useCallback(async (withdrawId: string) => {
+    try {
+      const qrBlob = await withdrawQr(withdrawId);
+      const url = URL.createObjectURL(qrBlob);
+      setQrCodeUrl(url);
+      return qrBlob; // Return the Blob instead of the URL for consistency
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to fetch QR code';
+      setQrError(errorMessage);
+      return null;
+    }
+  }, []);
+
   useEffect(() => {
     fethWithdraw();
   }, [fethWithdraw]);
@@ -79,6 +99,9 @@ const useWithdrawManager = () => {
     stats,
     refresh: fethWithdraw,
     approveWithdraw: handleApproveWithdraw,
+    fetchWithdrawQr,
+    qrCodeUrl,
+    qrError,
   };
 };
 

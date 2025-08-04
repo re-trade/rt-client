@@ -39,7 +39,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// Define the TSellerProfile interface
 interface TSellerProfile {
   id: string;
   shopName: string;
@@ -55,7 +54,6 @@ interface TSellerProfile {
   verified: boolean;
 }
 
-// SellerStats component (unchanged)
 const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   const totalSellers = sellers.length;
   const verifiedSellers = sellers.filter((p) => p.verified).length;
@@ -96,7 +94,6 @@ const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   );
 };
 
-// AdvancedFilters component (updated to use TSellerProfile)
 const AdvancedFilters = ({
   sellers,
   searchQuery,
@@ -126,7 +123,7 @@ const AdvancedFilters = ({
   setEndDate: (date: string) => void;
   selectedState: string;
   setSelectedState: (state: string) => void;
-  sortField: keyof TSellerProfile; // Use keyof TSellerProfile for type safety
+  sortField: keyof TSellerProfile;
   setSortField: (field: keyof TSellerProfile) => void;
   sortOrder: 'asc' | 'desc';
   setSortOrder: (order: 'asc' | 'desc') => void;
@@ -136,9 +133,15 @@ const AdvancedFilters = ({
 
   return (
     <Card className="p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-4 w-4" />
-        <h3 className="font-medium">Bộ lọc nâng cao</h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4" />
+          <h3 className="font-medium">Bộ lọc nâng cao</h3>
+        </div>
+        <Button variant="outline" size="sm" onClick={onClearFilters}>
+          <XCircle className="h-4 w-4 mr-2" />
+          Xóa bộ lọc
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -199,17 +202,6 @@ const AdvancedFilters = ({
           </SelectContent>
         </Select>
 
-        {/* <Select value={sortField} onValueChange={setSortField}>
-          <SelectTrigger>
-            <SelectValue placeholder="Sắp xếp theo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="shopName">Tên người bán</SelectItem>
-            <SelectItem value="createdAt">Ngày tạo</SelectItem>
-            <SelectItem value="verified">Trạng thái</SelectItem>
-          </SelectContent>
-        </Select> */}
-
         <Select value={sortOrder} onValueChange={setSortOrder}>
           <SelectTrigger>
             <SelectValue placeholder="Thứ tự" />
@@ -219,16 +211,11 @@ const AdvancedFilters = ({
             <SelectItem value="desc">Giảm dần</SelectItem>
           </SelectContent>
         </Select>
-
-        <Button variant="outline" onClick={onClearFilters}>
-          Xóa bộ lọc
-        </Button>
       </div>
     </Card>
   );
 };
 
-// SellerDetailModal (updated to use TSellerProfile)
 const SellerDetailModal = ({
   seller,
   isOpen,
@@ -327,7 +314,6 @@ const SellerDetailModal = ({
   );
 };
 
-// SellerActions (updated to use TSellerProfile)
 const SellerActions = ({
   seller,
   onVerify,
@@ -394,7 +380,7 @@ export default function SellerManagementPage() {
     searchSellers,
     handleBanSeller,
     handleUnbanSeller,
-  } = useSellerManager(); // Assume useSellerManager returns TSellerProfile[]
+  } = useSellerManager();
 
   const handleClearFilters = () => {
     setSearchQuery('');
@@ -450,7 +436,6 @@ export default function SellerManagementPage() {
     setIsDetailModalOpen(true);
   };
 
-  // Apply filters
   const filteredSellers = sellers
     .filter((seller) => {
       const matchesStatus =
@@ -474,19 +459,25 @@ export default function SellerManagementPage() {
     .sort((a, b) => {
       const fieldA = a[sortField];
       const fieldB = b[sortField];
-      if (sortField === 'createdAt') {
-        return sortOrder === 'asc'
-          ? new Date(fieldA).getTime() - new Date(fieldB).getTime()
-          : new Date(fieldB).getTime() - new Date(fieldA).getTime();
+
+      // Handle date fields (createdAt, updatedAt)
+      if (sortField === 'createdAt' || sortField === 'updatedAt') {
+        const dateA = new Date(fieldA as string).getTime();
+        const dateB = new Date(fieldB as string).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       }
+
+      // Handle boolean field (verified)
       if (sortField === 'verified') {
-        return sortOrder === 'asc'
-          ? Number(fieldA) - Number(fieldB)
-          : Number(fieldB) - Number(fieldA);
+        const boolA = fieldA as boolean;
+        const boolB = fieldB as boolean;
+        return sortOrder === 'asc' ? Number(boolA) - Number(boolB) : Number(boolB) - Number(boolA);
       }
-      return sortOrder === 'asc'
-        ? String(fieldA).localeCompare(String(fieldB))
-        : String(fieldB).localeCompare(String(fieldA));
+
+      // Handle string fields (all other fields)
+      const stringA = String(fieldA);
+      const stringB = String(fieldB);
+      return sortOrder === 'asc' ? stringA.localeCompare(stringB) : stringB.localeCompare(stringA);
     });
 
   return (
