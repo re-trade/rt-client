@@ -60,25 +60,25 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   const menuItems: TRouterItem[] = [
     {
-      name: 'Thông Báo',
+      name: 'Thông báo',
       icon: <Bell className="w-5 h-5" />,
       path: 'notification',
     },
     {
-      name: 'Tài Khoản Của Tôi',
+      name: 'Tài khoản của tôi',
       icon: <User className="w-5 h-5" />,
       path: 'profile',
       subMenu: [
-        { name: 'Hồ Sơ', icon: <User className="w-4 h-4" />, path: 'profile' },
-        { name: 'Địa Chỉ', icon: <MapPin className="w-4 h-4" />, path: 'address' },
-        { name: 'Bảo Mật', icon: <Shield className="w-4 h-4" />, path: 'security' },
+        { name: 'Hồ sơ', icon: <User className="w-4 h-4" />, path: 'profile' },
+        { name: 'Địa chỉ', icon: <MapPin className="w-4 h-4" />, path: 'address' },
+        { name: 'Bảo mật', icon: <Shield className="w-4 h-4" />, path: 'security' },
         {
-          name: 'Cài Đặt Thông Báo',
+          name: 'Cài đặt thông báo',
           icon: <Settings className="w-4 h-4" />,
           path: 'notification-settings',
         },
         {
-          name: 'Phương Thức Thanh Toán',
+          name: 'Phương thức thanh toán',
           icon: <Eye className="w-4 h-4" />,
           path: 'payment-methods',
         },
@@ -86,12 +86,12 @@ export default function UserLayout({ children }: UserLayoutProps) {
     },
 
     {
-      name: 'Đơn Mua',
+      name: 'Đơn mua',
       icon: <ShoppingBag className="w-5 h-5" />,
       path: 'purchase',
       subMenu: [
-        { name: 'Đơn Mua Của Tôi', icon: <ShoppingBag className="w-4 h-4" />, path: 'purchase' },
-        { name: 'Đánh giá Sản Phẩm', icon: <Eye className="w-4 h-4" />, path: 'review' },
+        { name: 'Đơn mua của tôi', icon: <ShoppingBag className="w-4 h-4" />, path: 'purchase' },
+        { name: 'Đánh giá sản phẩm', icon: <Eye className="w-4 h-4" />, path: 'review' },
       ],
     },
     {
@@ -148,14 +148,14 @@ export default function UserLayout({ children }: UserLayoutProps) {
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-base sm:text-lg font-semibold text-gray-800 truncate">
-              {profile?.username ?? 'N/A'}
+              {`${profile?.firstName ?? ''} ${profile?.lastName ?? ''}`.trim() || 'N/A'}
             </h2>
             <button
               onClick={() => router.push('/user/profile')}
               className="flex items-center text-gray-600 hover:text-orange-600 transition-colors text-xs sm:text-sm mt-1 group"
             >
               <Edit3 className="w-3 h-3 mr-1 flex-shrink-0 text-orange-500" />
-              <span className="truncate">Sửa Hồ Sơ</span>
+              <span className="truncate">Sửa hồ sơ</span>
               <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform flex-shrink-0 text-orange-400" />
             </button>
           </div>
@@ -235,7 +235,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
             {renderAvatar('w-8 h-8 text-sm')}
             <div>
               <h2 className="text-sm font-semibold text-gray-800 truncate">
-                {profile?.username ?? 'N/A'}
+                {`${profile?.firstName ?? ''} ${profile?.lastName ?? ''}`.trim() || 'N/A'}
               </h2>
             </div>
           </div>

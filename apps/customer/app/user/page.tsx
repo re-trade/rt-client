@@ -231,7 +231,6 @@ const UserDashboard = () => {
               <p className="text-gray-600 text-xs sm:text-sm font-medium leading-tight">
                 {stat.label}
               </p>
-              {stat.subtitle && <p className="text-xs text-gray-800 mt-1">{stat.subtitle}</p>}
             </div>
           ))}
         </div>
