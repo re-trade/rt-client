@@ -5,6 +5,7 @@ import { storageApi } from '@/service/storage.api';
 import axios from 'axios';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
+
 export interface Province {
   code: number;
   name: string;
@@ -140,7 +141,6 @@ export function useSellerRegistration() {
     const { name, files } = e.target;
     const file = files && files.length > 0 ? files[0] : null;
 
-    // Handle file size validation - max 5MB
     if (file && file.size > 5 * 1024 * 1024) {
       setErrors((prev) => ({
         ...prev,
@@ -149,8 +149,6 @@ export function useSellerRegistration() {
       return;
     }
 
-    // For identity images, we handle them differently than avatar/background
-    // Avatar and background are now handled in their own components with API uploads
     if (name === 'identityFrontImage' || name === 'identityBackImage') {
       setFormData((prev) => ({ ...prev, [name]: file }));
       setTouched((prev) => ({ ...prev, [name]: true }));
@@ -174,19 +172,19 @@ export function useSellerRegistration() {
   };
   const handleFieldBlur = (name: keyof SellerFormData) => {
     setTouched((prev) => ({ ...prev, [name]: true }));
-    validateField(name, formData[name]);
-    if (name === 'state' && !formData.state) {
+
+    const currentValue = formData[name];
+    validateField(name, currentValue);
+
+    if (name === 'state' && !currentValue) {
       setErrors((prev) => ({ ...prev, state: 'Vui lòng chọn Tỉnh/Thành phố' }));
-    }
-    if (name === 'district' && !formData.district) {
+    } else if (name === 'district' && !currentValue) {
       setErrors((prev) => ({ ...prev, district: 'Vui lòng chọn Quận/Huyện' }));
-    }
-    if (name === 'ward' && !formData.ward) {
+    } else if (name === 'ward' && !currentValue) {
       setErrors((prev) => ({ ...prev, ward: 'Vui lòng chọn Phường/Xã' }));
     }
   };
   const validateField = (name: keyof SellerFormData, value: any) => {
-    // Helper function to clear errors for a field
     const clearError = () => {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -196,13 +194,11 @@ export function useSellerRegistration() {
       return true;
     };
 
-    // Helper function to set an error message
     const setError = (message: string) => {
       setErrors((prev) => ({ ...prev, [name]: message }));
       return false;
     };
 
-    // Validate identity images
     if (name === 'identityFrontImage' || name === 'identityBackImage') {
       const file = formData[name];
       if (!file) {
@@ -215,7 +211,6 @@ export function useSellerRegistration() {
       return clearError();
     }
 
-    // Validate avatar and background
     if (name === 'avatarUrl' || name === 'background') {
       const file = formData[name];
       if (!file) {
