@@ -107,8 +107,21 @@ const register2FAInternal = async (width: number = 300, height: number = 300): P
 
   return response.data;
 };
+
+const callLogout = async (): Promise<boolean> => {
+  try {
+    const result = await authApi.default.get<IResponseObject<TAccountMeResponse>>('/auth/logout');
+    if (result.data.success && result.status === 200) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+};
 export {
   accountMe,
+  callLogout,
   checkUsernameAvailability,
   loginInternal,
   register2FAInternal,

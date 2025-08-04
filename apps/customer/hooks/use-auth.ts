@@ -1,5 +1,12 @@
 'use client';
-import { accountMe, loginInternal, TAccountMeResponse, TLocalLogin } from '@/services/auth.api';
+import {
+  accountMe,
+  callLogout,
+  loginInternal,
+  TAccountMeResponse,
+  TLocalLogin,
+} from '@/services/auth.api';
+import { ETokenName } from '@retrade/util';
 import { useCallback, useEffect, useState } from 'react';
 
 function useAuth() {
@@ -23,8 +30,9 @@ function useAuth() {
     isAuth();
   }, [isAuth]);
   const logout = useCallback(async () => {
-    localStorage.removeItem('access-token');
-    window.location.reload();
+    localStorage.removeItem(ETokenName.ACCESS_TOKEN);
+    await callLogout();
+    window.location.href = '/';
   }, []);
 
   const login = useCallback(
