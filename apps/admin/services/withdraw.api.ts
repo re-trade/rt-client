@@ -26,7 +26,7 @@ const getWithdraws = async (
 ): Promise<IResponseObject<TWithdrawProfile[]> | undefined> => {
   try {
     const result = await authApi.default.get<IResponseObject<TWithdrawProfile[]>>(
-      `/wallets/me/withdraw`,
+      `/wallets/withdraw`,
       {
         params: {
           page,
