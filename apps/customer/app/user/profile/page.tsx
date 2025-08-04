@@ -120,7 +120,7 @@ export default function ProfilePage() {
                   <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Hồ Sơ Cá Nhân</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Hồ sơ cá nhân</h1>
                   <p className="text-gray-600 mt-1 text-sm sm:text-base">
                     Quản lý thông tin và tùy chỉnh tài khoản của bạn
                   </p>

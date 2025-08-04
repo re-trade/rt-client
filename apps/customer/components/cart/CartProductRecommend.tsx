@@ -9,7 +9,7 @@ export default function CartProductRecommend({ products }: ReturnType<typeof use
         <ProductCard
           key={item.id}
           id={item.id}
-          image={item.productImages.pop() || ''}
+          image={item.thumbnail}
           name={item.name}
           price={item.currentPrice}
           brand={item.brand}
