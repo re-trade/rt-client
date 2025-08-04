@@ -2,7 +2,13 @@
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useCustomerProfile } from '@/hooks/use-customer-profile';
-import { IconLogout, IconPackage, IconShoppingCart, IconUser } from '@tabler/icons-react';
+import {
+  IconBuildingStore,
+  IconLogout,
+  IconPackage,
+  IconShoppingCart,
+  IconUser,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -112,6 +118,15 @@ const UserHeaderDropdown = () => {
                   {totalCartItems}
                 </span>
               )}
+            </Link>
+            <Link
+              href={process.env.NEXT_PUBLIC_SELLER_PORTAL_URL || 'http://localhost:3001'}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 text-gray-700"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconBuildingStore size={18} className="text-orange-500" />
+              Tới trang người bán
             </Link>
             <div className="border-t border-orange-100 mt-2"></div>
             <button

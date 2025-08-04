@@ -202,6 +202,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                     brand={product.brand}
                     verified={product.verified}
                     sellerShopName={product.sellerShopName}
+                    viewMode={viewMode}
                   />
                 </motion.div>
               ))}

@@ -1,6 +1,6 @@
 'use client';
 
-import { getCategoryByIdInternal } from '@/services/category.api';
+import { Category, getCategoryByIdInternal } from '@/services/category.api';
 import { productApi, TProduct } from '@/services/product.api';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -22,7 +22,7 @@ function useDebounce<T>(value: T, delay: number): T {
 
 export function useCategoryProducts(categoryId: string) {
   const [products, setProducts] = useState<TProduct[]>([]);
-  const [categoryInfo, setCategoryInfo] = useState<any>(null);
+  const [categoryInfo, setCategoryInfo] = useState<Category>();
   const [loading, setLoading] = useState<boolean>(true);
   const [isPaginating, setIsPaginating] = useState<boolean>(false);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
@@ -92,15 +92,10 @@ export function useCategoryProducts(categoryId: string) {
 
   useEffect(() => {
     if (categoryId) {
+      fetchProducts();
       fetchCategoryInfo();
     }
-  }, [categoryId, fetchCategoryInfo]);
-
-  useEffect(() => {
-    if (categoryId) {
-      fetchProducts();
-    }
-  }, [categoryId, fetchProducts]);
+  }, [categoryId, fetchProducts, fetchCategoryInfo]);
 
   return {
     loading,

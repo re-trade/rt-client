@@ -1,6 +1,11 @@
 'use client';
 
-import { getSellerProfile, TSellerProfile } from '@services/seller.api';
+import {
+  getSellerMetric,
+  getSellerProfile,
+  TSellerMetricResponse,
+  TSellerProfile,
+} from '@services/seller.api';
 import { useCallback, useEffect, useState } from 'react';
 
 type TAchievement = {
@@ -16,8 +21,10 @@ type TAchievement = {
 
 function useSellerProfile(id: string) {
   const [sellerProfile, setSellerProfile] = useState<TSellerProfile>();
+  const [sellerMetrics, setSellerMetrics] = useState<TSellerMetricResponse>();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMetrics, setLoadingMetrics] = useState(false);
   const [achievements, setAchievements] = useState<TAchievement[]>([]);
   const [loadingAchievements, setLoadingAchievements] = useState(false);
   const fetchSellerProfile = useCallback(async () => {
@@ -25,12 +32,24 @@ function useSellerProfile(id: string) {
     setError(null);
     try {
       const seller = await getSellerProfile(id);
-      console.log(seller);
       setSellerProfile(seller);
-      setLoading(false);
     } catch (error: any) {
-      console.error(error);
       setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  const fetchSellerMetrics = useCallback(async () => {
+    setLoadingMetrics(true);
+    setError(null);
+    try {
+      const metrics = await getSellerMetric(id);
+      setSellerMetrics(metrics);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoadingMetrics(false);
     }
   }, [id]);
 
@@ -95,12 +114,15 @@ function useSellerProfile(id: string) {
 
   useEffect(() => {
     fetchSellerProfile();
+    fetchSellerMetrics();
     fetchSellerAchievement();
-  }, [fetchSellerProfile, fetchSellerAchievement]);
+  }, [fetchSellerProfile, fetchSellerMetrics, fetchSellerAchievement]);
   return {
     error,
     sellerProfile,
+    sellerMetrics,
     loading,
+    loadingMetrics,
     achievements,
     loadingAchievements,
   };
