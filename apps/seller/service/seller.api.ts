@@ -39,6 +39,8 @@ type SellerProfileResponse = {
   state: string;
   avatarUrl: string;
   email: string;
+  avgVote: number;
+  identityVerifiedStatus: string;
   background: string;
   phoneNumber: string;
   verified: boolean;
