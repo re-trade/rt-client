@@ -123,9 +123,8 @@ export const orderApi = {
   },
   async getOrderStats(): Promise<OrderStatsResponse> {
     try {
-      const response = await authApi.default.get<IResponseObject<OrderStatsResponse>>(
-        '/orders/customer-stats',
-      );
+      const response =
+        await authApi.default.get<IResponseObject<OrderStatsResponse>>('/orders/customer-stats');
       if (response.data.success) {
         return response.data.content;
       }

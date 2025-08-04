@@ -84,10 +84,15 @@ export default function UserLayout({ children }: UserLayoutProps) {
         },
       ],
     },
+  
     {
       name: 'Đơn Mua',
       icon: <ShoppingBag className="w-5 h-5" />,
       path: 'purchase',
+      subMenu: [
+        {name : 'Đơn Mua Của Tôi', icon: <ShoppingBag className="w-4 h-4" />, path: 'purchase'},
+        {name: 'Đánh giá Sản Phẩm', icon: <Eye className="w-4 h-4" />, path: 'review'},
+      ]
     },
     {
       name: 'Ví của tôi',

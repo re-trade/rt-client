@@ -1,25 +1,23 @@
 'use client';
 
 import { useOrder } from '@/hooks/use-order';
-import { OrderCombo } from '@/services/order.api';
+import { orderApi, OrderCombo, OrderStatsResponse } from '@/services/order.api';
 import Pagination from '@components/common/Pagination';
 import PurchaseOrderEmpty from '@components/purchase/PurchaseOrderEmpty';
 import PurchaseOrderItem from '@components/purchase/PurchaseOrderItem';
 import PurchaseSkeleton from '@components/purchase/PurchaseSkeleton';
 import {
   CheckCircle,
+  ChevronDown,
   DollarSign,
   Filter,
   RefreshCw,
   Search,
   ShoppingBag,
-  XCircle,
   Truck,
-  ChevronDown
+  XCircle,
 } from 'lucide-react';
-import { memo, useMemo } from 'react';
-import { useEffect, useState,useRef } from 'react';
-import { orderApi, OrderStatsResponse } from '@/services/order.api';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 export default function PurchasePage() {
   const {
@@ -99,10 +97,7 @@ export default function PurchasePage() {
           </div>
         </div>
 
-        <StatsCards
-          orderStats={orderStats}
-          formatPrice={formatPrice}
-        />
+        <StatsCards orderStats={orderStats} formatPrice={formatPrice} />
 
         <SearchAndFilter
           search={search}
@@ -200,9 +195,7 @@ const SearchAndFilter = memo(
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const selectedStatus = selectedOrderStatuses 
-      ? orderStatusRecord[selectedOrderStatuses] 
-      : null;
+    const selectedStatus = selectedOrderStatuses ? orderStatusRecord[selectedOrderStatuses] : null;
 
     return (
       <div className="bg-white rounded-xl shadow-md p-6 border border-orange-200">
@@ -228,13 +221,13 @@ const SearchAndFilter = memo(
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center justify-between w-full pl-10 pr-4 py-3 border border-gray-200 text-black rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all bg-white hover:bg-gray-50"
             >
-              
-              
               <span className="flex items-center space-x-2 flex-1 min-w-0">
                 {selectedStatus ? (
                   <>
                     <selectedStatus.config.icon className="w-4 h-4 flex-shrink-0" />
-                    <span className={`px-2 py-1 rounded-md border text-xs font-medium ${selectedStatus.config.color} truncate`}>
+                    <span
+                      className={`px-2 py-1 rounded-md border text-xs font-medium ${selectedStatus.config.color} truncate`}
+                    >
                       {selectedStatus.config.label}
                     </span>
                   </>
@@ -245,8 +238,10 @@ const SearchAndFilter = memo(
                   </>
                 )}
               </span>
-              
-              <ChevronDown className={`w-4 h-4 transition-transform ml-2 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ml-2 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`}
+              />
             </button>
 
             {isDropdownOpen && (
@@ -262,7 +257,6 @@ const SearchAndFilter = memo(
                     !selectedOrderStatuses ? 'bg-amber-50 border-l-4 border-amber-500' : ''
                   }`}
                 >
-                 
                   <span className="text-gray-700 flex-1">Tất cả trạng thái</span>
                 </button>
 
@@ -278,7 +272,9 @@ const SearchAndFilter = memo(
                         setIsDropdownOpen(false);
                       }}
                       className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                        selectedOrderStatuses === key ? 'bg-amber-50 border-l-4 border-amber-500' : ''
+                        selectedOrderStatuses === key
+                          ? 'bg-amber-50 border-l-4 border-amber-500'
+                          : ''
                       }`}
                     >
                       <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
@@ -288,7 +284,9 @@ const SearchAndFilter = memo(
                           <Filter className="w-4 h-4 text-gray-400" />
                         )}
                       </div>
-                      <div className={`px-3 py-1 rounded-md border text-sm font-medium flex-1 ${status.config.color}`}>
+                      <div
+                        className={`px-3 py-1 rounded-md border text-sm font-medium flex-1 ${status.config.color}`}
+                      >
                         {status.config.label}
                       </div>
                     </button>
@@ -346,7 +344,9 @@ const StatsCards = memo(
             </div>
             <div>
               <p className="text-sm text-gray-600">Đang giao</p>
-              <p className="text-2xl font-bold text-gray-800">{orderStats?.totalOrdersBeingDelivered}</p>
+              <p className="text-2xl font-bold text-gray-800">
+                {orderStats?.totalOrdersBeingDelivered}
+              </p>
             </div>
           </div>
         </div>
@@ -358,7 +358,12 @@ const StatsCards = memo(
             </div>
             <div>
               <p className="text-sm text-gray-600">Tổng chi tiêu</p>
-              <p className="text-lg font-bold text-gray-800"> {orderStats?.totalPaymentCost != null ? formatPrice(orderStats.totalPaymentCost) : '0₫'}</p>
+              <p className="text-lg font-bold text-gray-800">
+                {' '}
+                {orderStats?.totalPaymentCost != null
+                  ? formatPrice(orderStats.totalPaymentCost)
+                  : '0₫'}
+              </p>
             </div>
           </div>
         </div>
