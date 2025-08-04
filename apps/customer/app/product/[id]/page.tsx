@@ -83,7 +83,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setStockWarning(false);
     }
   };
-  console.log('productDetail', productDetail);
 
   const buyNow = () => {
     if (!productDetail) return;
@@ -129,6 +128,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
         try {
           const reviewsData = await reviewApi.getReviews(productDetail.id);
           setReviews(reviewsData);
+          console.log('Fetched reviews:', reviewsData);
         } catch (error) {
           console.error('Error fetching reviews:', error);
         }

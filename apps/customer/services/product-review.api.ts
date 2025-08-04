@@ -34,7 +34,7 @@ export const reviewApi = {
     size: number = 4,
   ): Promise<ReviewResponse[]> => {
     const response = await unAuthApi.default.get<IResponseObject<ReviewResponse[]>>(
-      `/products/${productId}/reviews`,
+      `/product-review/product/${productId}`,
       {
         params: {
           page,

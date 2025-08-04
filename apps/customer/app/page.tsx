@@ -301,8 +301,8 @@ export default function Home() {
 
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         <ProductSection
-          title="Sản phẩm nổi bật"
-          subtitle="Những sản phẩm hot nhất hiện tại"
+          title="Sản phẩm bán chạy"
+          subtitle="Những sản phẩm được bán nhiều nhất"
           icon={<TrendingUp className="w-6 h-6" />}
           items={bestSellerProducts}
           showLoading={true}
