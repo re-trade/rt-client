@@ -2,6 +2,7 @@
 
 import { CallInterface } from '@/components/chat/CallInterface';
 import { ChatHeader } from '@/components/chat/ChatHeader';
+import { IncomingCallModal } from '@/components/chat/IncomingCallModal';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { MessagesList } from '@/components/chat/MessagesList';
 import { useMessengerContext } from '@/context/MessengerContext';
@@ -34,12 +35,16 @@ export default function MessageDetailPage() {
     typingUser,
     startVideoCall,
     startAudioCall,
+    acceptCall,
+    rejectCall,
     endCall,
     toggleVideo,
     toggleAudio,
     startRecording,
     stopRecording,
     formatRecordingTime,
+    incomingCall,
+    callState,
   } = useMessengerContext();
 
   const typingTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -91,26 +96,37 @@ export default function MessageDetailPage() {
     pathname.startsWith('/dashboard/chat/') && pathname !== '/dashboard/chat';
 
   return (
-    <div
-      className={`${isOnSpecificChatPage ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-white h-full`}
-    >
-      <ChatHeader
-        contact={selectedContact}
-        onAudioCall={startAudioCall}
-        onVideoCall={startVideoCall}
-      />
-      <div className="flex-1 min-h-0 overflow-hidden">
-        <MessagesList
-          messages={messages}
-          isSomeoneTyping={isSomeoneTyping}
-          typingUser={typingUser}
+    <>
+      <div
+        className={`${isOnSpecificChatPage ? 'flex' : 'hidden md:flex'} flex-1 flex-col bg-white h-full`}
+      >
+        <ChatHeader
+          contact={selectedContact}
+          onAudioCall={startAudioCall}
+          onVideoCall={startVideoCall}
+        />
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <MessagesList
+            messages={messages}
+            isSomeoneTyping={isSomeoneTyping}
+            typingUser={typingUser}
+          />
+        </div>
+        <MessageInput
+          message={newMessage}
+          onMessageChange={handleMessageChange}
+          onSendMessage={handleSendMessage}
         />
       </div>
-      <MessageInput
-        message={newMessage}
-        onMessageChange={handleMessageChange}
-        onSendMessage={handleSendMessage}
+
+      {/* Incoming Call Modal */}
+      <IncomingCallModal
+        isOpen={!!incomingCall}
+        callerName={incomingCall?.callerName || ''}
+        callerId={incomingCall?.callerId || ''}
+        onAccept={acceptCall}
+        onReject={rejectCall}
       />
-    </div>
+    </>
   );
 }

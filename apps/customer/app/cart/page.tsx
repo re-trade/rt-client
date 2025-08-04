@@ -10,7 +10,6 @@ import React from 'react';
 const ShoppingCart: React.FC = () => {
   const router = useRouter();
   const cartHook = useCart();
-
   const navigateHome = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push('/');

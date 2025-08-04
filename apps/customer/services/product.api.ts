@@ -33,7 +33,12 @@ export type TProductHistory = {
   ownerName: string;
   ownerAvatarUrl: string;
 };
-
+export type HomeStats = {
+  totalProducts: number;
+  totalSoldProducts: number;
+  totaOrders: number;
+  totalUsers: number;
+};
 export type TProductFilter = {
   categoriesAdvanceSearch: {
     id: string;
@@ -69,14 +74,22 @@ export const productApi = {
     page: number = 0,
     size: number = 10,
     query?: string,
+    sort: string[] = ['id,asc'],
   ): Promise<IResponseObject<TProduct[]>> {
-    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products/search', {
-      params: {
-        page,
-        size,
-        ...(query ? { q: query } : {}),
-      },
-    });
+    const params = new URLSearchParams();
+
+    params.set('page', page.toString());
+    params.set('size', size.toString());
+    for (const s of sort) {
+      params.append('sort', s);
+    }
+    if (query) {
+      params.set('q', query);
+    }
+
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>(
+      `/products/search?${params.toString()}`,
+    );
     return response.data;
   },
   async getProduct(id: string): Promise<TProduct> {
@@ -118,6 +131,18 @@ export const productApi = {
     });
     return response.data.content;
   },
+  async getproductBestSellers(page: number = 0, size: number = 8): Promise<TProduct[]> {
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>(
+      '/products/best-selling',
+      {
+        params: {
+          page,
+          size,
+        },
+      },
+    );
+    return response.data.content;
+  },
   async getProductHistory(
     productId: string,
     page: number = 0,
@@ -132,6 +157,14 @@ export const productApi = {
         },
       },
     );
+    return response.data.content;
+  },
+  async getHomeStats(): Promise<HomeStats> {
+    const response =
+      await unAuthApi.default.get<IResponseObject<HomeStats>>('/products/home-stats');
+    if (!response.data.success) {
+      throw new Error('Failed to fetch home stats');
+    }
     return response.data.content;
   },
 };

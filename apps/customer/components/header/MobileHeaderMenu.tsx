@@ -1,7 +1,13 @@
 'use client';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/use-auth';
-import { IconLogout, IconPackage, IconShoppingCart, IconUser } from '@tabler/icons-react';
+import {
+  IconBuildingStore,
+  IconLogout,
+  IconPackage,
+  IconShoppingCart,
+  IconUser,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 
 interface Props {
@@ -74,6 +80,16 @@ const MobileMenu = ({ open, setOpen }: Props) => {
                     {totalCartItems}
                   </span>
                 )}
+              </Link>
+              <Link
+                href={process.env.NEXT_PUBLIC_SELLER_PORTAL_URL || 'http://localhost:3001'}
+                className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl"
+                onClick={() => setOpen(false)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <IconBuildingStore size={20} />
+                Tới trang người bán
               </Link>
               <button
                 onClick={() => {

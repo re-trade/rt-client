@@ -6,7 +6,7 @@ import Joi from 'joi';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
 const loginSchema = Joi.object({
@@ -28,16 +28,8 @@ export default function Login() {
 
   const router = useRouter();
   const { showToast } = useToast();
-  const { login, auth, isLoading } = useAuth();
+  const { login, isLoading } = useAuth();
 
-  // Redirect to dashboard if already authenticated
-  useEffect(() => {
-    if (auth === true) {
-      router.push('/dashboard');
-    }
-  }, [auth, router]);
-
-  // Show loading spinner while checking initial auth state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

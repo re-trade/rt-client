@@ -3,21 +3,24 @@
 import CarouselComponent from '@/components/Carousel';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductHome } from '@/hooks/use-product-home';
+import { useProductList } from '@/hooks/use-product-list';
+import { TProduct } from '@/services/product.api';
 import {
   ChevronRight,
   Clock,
   Filter,
   Grid3X3,
-  Heart,
   MessageCircle,
   Package,
   Search,
+  ShoppingCart,
+  Smile,
   Sparkles,
-  Star,
   TrendingUp,
   Upload,
+  Users,
 } from 'lucide-react';
-
+import { useRouter } from 'next/navigation';
 export default function Home() {
   const {
     products,
@@ -26,19 +29,32 @@ export default function Home() {
     selectCategory,
     loading,
     categoriesLoading,
+    homeStats,
+    bestSellerProducts,
     error,
   } = useProductHome();
+  const router = useRouter();
+  const { handleSelectedFilterChange } = useProductList();
+
+  const handleSelectCategory = (categoryId: string | null) => {
+    if (categoryId) {
+      handleSelectedFilterChange('categories', [categoryId]);
+    }
+    router.push(`/category/${categoryId || ''}`);
+  };
 
   const ProductSection = ({
     title,
     showLoading = false,
     icon,
     subtitle,
+    items = [],
   }: {
     title: string;
     showLoading?: boolean;
     icon: React.ReactNode;
     subtitle?: string;
+    items?: TProduct[];
   }) => (
     <section className="bg-white p-6 sm:p-8 rounded-xl border border-orange-200 shadow-md hover:shadow-lg transition-shadow duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-4 sm:space-y-0">
@@ -47,7 +63,7 @@ export default function Home() {
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
               {title}
-              {title === 'Được quan tâm' && (
+              {title === 'Được mua nhiều' && (
                 <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium animate-pulse">
                   HOT
                 </span>
@@ -76,7 +92,7 @@ export default function Home() {
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
-              Bỏ lọc
+              Xoá bộ lọc
             </button>
           )}
           <button className="text-[#121212] hover:text-[#525252] text-sm font-medium flex items-center gap-2 px-4 py-2 bg-[#FFD2B2] hover:bg-[#FFBB99] rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
@@ -126,7 +142,7 @@ export default function Home() {
         </div>
       ) : products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {items.map((product) => (
             <ProductCard
               key={product.id}
               id={product.id}
@@ -153,7 +169,7 @@ export default function Home() {
           <p className="text-[#525252] mb-6 max-w-md mx-auto">
             {selectedCategoryId
               ? 'Thử chọn danh mục khác hoặc quay lại sau để khám phá thêm sản phẩm!'
-              : 'Hãy quay lại sau để xem thêm những món đồ cũ thú vị!'}
+              : 'Quay lại sau để khám phá thêm nhiều món đồ cũ thú vị!'}
           </p>
           {selectedCategoryId && (
             <button
@@ -178,10 +194,26 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: <Package className="w-5 h-5" />, count: '10K+', label: 'Sản phẩm' },
-              { icon: <Heart className="w-5 h-5" />, count: '5K+', label: 'Người dùng' },
-              { icon: <Star className="w-5 h-5" />, count: '4.8', label: 'Đánh giá' },
-              { icon: <TrendingUp className="w-5 h-5" />, count: '99%', label: 'Hài lòng' },
+              {
+                icon: <Package className="w-5 h-5" />,
+                count: homeStats?.totalProducts,
+                label: 'Sản phẩm',
+              },
+              {
+                icon: <Users className="w-5 h-5" />,
+                count: homeStats?.totalUsers,
+                label: 'Người dùng',
+              },
+              {
+                icon: <ShoppingCart className="w-5 h-5" />,
+                count: homeStats?.totalSoldProducts,
+                label: 'Sản phẩm đã bán',
+              },
+              {
+                icon: <Smile className="w-5 h-5" />,
+                count: homeStats?.totaOrders,
+                label: 'Đơn hàng',
+              },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -228,7 +260,12 @@ export default function Home() {
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[#FFD2B2] scrollbar-track-[#FDFEF9]">
                 <button
-                  onClick={() => selectCategory(null)}
+                  onClick={() => handleSelectCategory}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
+                    selectedCategoryId === null
+                      ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
+                      : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
+                  }`}
                   className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                     selectedCategoryId === null
                       ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
@@ -241,7 +278,12 @@ export default function Home() {
                 {categories.map((category) => (
                   <button
                     key={category.id}
-                    onClick={() => selectCategory(category.id)}
+                    onClick={() => handleSelectCategory(category.id)}
+                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
+                      selectedCategoryId === category.id
+                        ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
+                        : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
+                    }`}
                     className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
                       selectedCategoryId === category.id
                         ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
@@ -259,14 +301,16 @@ export default function Home() {
 
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl space-y-12">
         <ProductSection
-          title="Được quan tâm"
+          title="Sản phẩm nổi bật"
           subtitle="Những sản phẩm hot nhất hiện tại"
           icon={<TrendingUp className="w-6 h-6" />}
+          items={bestSellerProducts}
           showLoading={true}
         />
         <ProductSection
           title="Mới đăng gần đây"
           subtitle="Cập nhật liên tục từ cộng đồng"
+          items={products}
           icon={<Clock className="w-6 h-6" />}
         />
       </div>
@@ -343,7 +387,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
+      {/*  <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="flex justify-center mb-6">
             <div className="p-3 bg-white/20 rounded-xl">
@@ -365,7 +409,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

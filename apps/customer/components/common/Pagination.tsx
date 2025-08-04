@@ -3,14 +3,18 @@ import { memo } from 'react';
 
 export const paginationThemes = {
   default: {
-    container: 'bg-white rounded-xl shadow-md border border-gray-200 p-6',
+    container:
+      'bg-gradient-to-r from-white to-orange-50 rounded-lg border border-orange-200 p-6 shadow-sm',
     button:
-      'px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition-all duration-200',
-    activeButton: 'bg-blue-500 border-blue-500 text-white shadow-md',
-    disabledButton: 'opacity-50 cursor-not-allowed',
-    dotButton: 'border-transparent text-gray-400 cursor-default',
+      'px-3 py-2 rounded-lg border border-orange-200 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300 text-gray-600 transition-all duration-200 font-medium',
+    activeButton:
+      'bg-gradient-to-r from-orange-500 to-orange-600 border-orange-500 text-white shadow-md hover:from-orange-600 hover:to-orange-700',
+    disabledButton:
+      'opacity-50 cursor-not-allowed hover:bg-white hover:text-gray-600 hover:border-orange-200',
+    dotButton:
+      'border-transparent text-gray-400 cursor-default hover:bg-transparent hover:text-gray-400',
     infoText: 'text-sm text-gray-600',
-    loadingSpinner: 'border-blue-500',
+    loadingSpinner: 'border-orange-500',
   },
   purchase: {
     container: 'bg-white rounded-xl shadow-md border border-orange-200 p-6',
@@ -32,15 +36,6 @@ export const paginationThemes = {
     dotButton: 'border-transparent text-gray-400 cursor-default',
     infoText: 'text-sm text-gray-500',
     loadingSpinner: 'border-gray-900',
-  },
-  daisyui: {
-    container: 'flex justify-center mt-12',
-    button: 'btn btn-outline border-orange-200 hover:bg-orange-500 hover:border-orange-500',
-    activeButton: 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-orange-500',
-    disabledButton: 'disabled:opacity-50',
-    dotButton: 'btn-disabled',
-    infoText: 'text-sm text-gray-600',
-    loadingSpinner: 'border-orange-500',
   },
 } as const;
 
@@ -195,53 +190,7 @@ const Pagination = ({
     }
   };
 
-  // DaisyUI theme has different structure
-  if (theme === 'daisyui') {
-    const containerClasses = animated
-      ? `${themeConfig.container} motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-300`
-      : themeConfig.container;
-
-    return (
-      <div className={`${containerClasses} ${className}`}>
-        <div className="btn-group shadow-lg">
-          <button
-            className={`btn ${themeConfig.button} ${loading ? themeConfig.disabledButton : ''}`}
-            onClick={handlePrevious}
-            disabled={currentPage === 1 || loading}
-          >
-            «
-          </button>
-
-          {getVisiblePages().map((page, index) => (
-            <button
-              key={index}
-              className={`btn ${
-                page === currentPage
-                  ? themeConfig.activeButton
-                  : page === '...'
-                    ? themeConfig.dotButton
-                    : themeConfig.button
-              } ${loading ? themeConfig.disabledButton : ''}`}
-              onClick={() => handlePageClick(page)}
-              disabled={page === '...' || loading}
-            >
-              {page}
-            </button>
-          ))}
-
-          <button
-            className={`btn ${themeConfig.button} ${loading ? themeConfig.disabledButton : ''}`}
-            onClick={handleNext}
-            disabled={currentPage === totalPages || loading}
-          >
-            »
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Standard themes (default, purchase, minimal)
+  // All themes use the same structure
   const containerClasses = `${themeConfig.container} ${currentSizeConfig.container} ${className}`;
 
   return (
@@ -330,7 +279,11 @@ const Pagination = ({
 
       {/* Quick Jump (for larger datasets) */}
       {showQuickJump && totalPages > quickJumpThreshold && (
-        <div className="flex justify-center items-center gap-2 mt-4 pt-4 border-t border-gray-200">
+        <div
+          className={`flex justify-center items-center gap-2 mt-4 pt-4 ${
+            theme === 'default' ? 'border-t border-orange-200' : 'border-t border-gray-200'
+          }`}
+        >
           <span className={themeConfig.infoText}>{defaultLabels.goToPage}</span>
           <input
             type="number"
@@ -339,8 +292,10 @@ const Pagination = ({
             value={currentPage}
             onChange={handleQuickJump}
             disabled={loading}
-            className={`w-16 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-              theme === 'purchase' ? 'focus:ring-[#FFD2B2] focus:border-[#FFD2B2]' : ''
+            className={`w-16 px-2 py-1 text-sm border rounded-md text-center transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+              theme === 'purchase'
+                ? 'border-gray-300 focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2]'
+                : 'border-orange-200 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 text-gray-600'
             }`}
           />
           <span className={themeConfig.infoText}>/ {totalPages}</span>

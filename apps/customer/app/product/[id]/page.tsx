@@ -1,19 +1,26 @@
 'use client';
 
 import Toast from '@/components/toast/Toast';
+import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/context/ToastContext';
 import { useProductDetail } from '@/hooks/use-product-detail';
+import { reviewApi, ReviewResponse } from '@/services/product-review.api';
 import Chart from '@components/chart/chart';
+import BuyNowDialog from '@components/common/BuyNowDialog';
+import ReviewsList from '@components/common/review/ListReview';
+import ImageGallery from '@components/gallery/ImageGallery';
 import ContentSkeleton from '@components/product/ProductContentSkeleton';
 import { ProductHistoryList } from '@components/product/ProductHistoryList';
 import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
 import ProductInfoSkeleton from '@components/product/ProductInfoSkeleton';
 import RelatedProducts from '@components/related-product/RelatedProduct';
+import ShareButton from '@components/share/ShareButton';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   MdAdd,
   MdAddShoppingCart,
@@ -22,7 +29,6 @@ import {
   MdLocalShipping,
   MdRemove,
   MdSecurity,
-  MdShare,
   MdStar,
   MdVerified,
   MdWarning,
@@ -32,12 +38,17 @@ import remarkGfm from 'remark-gfm';
 
 function ProductDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const { auth } = useAuth();
   const { addToCart } = useCart();
   const { showToast, messages } = useToast();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [stockWarning, setStockWarning] = useState(false);
+  const [showBuyNow, setShowBuyNow] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>(
     'description',
   );
@@ -72,6 +83,59 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setStockWarning(false);
     }
   };
+  console.log('productDetail', productDetail);
+
+  const buyNow = () => {
+    if (!productDetail) return;
+    try {
+      const query = new URLSearchParams({
+        buyNow: 'true',
+        productId: productDetail.id,
+        quantity: quantity.toString(),
+      }).toString();
+      router.push(`/checkout?${query}`);
+    } catch (error) {
+      showToast('Không thể thêm vào giỏ hàng.', 'error');
+      showToast('Có lỗi xảy ra khi chuyển đến trang thanh toán.', 'error');
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  const openGallery = (index: number) => {
+    setGalleryIndex(index);
+    setShowGallery(true);
+  };
+
+  const closeGallery = () => {
+    setShowGallery(false);
+  };
+
+  const nextImage = () => {
+    setGalleryIndex((prev) => (prev + 1) % listImg.length);
+  };
+
+  const prevImage = () => {
+    setGalleryIndex((prev) => (prev - 1 + listImg.length) % listImg.length);
+  };
+
+  const handleGalleryIndexChange = (index: number) => {
+    setGalleryIndex(index);
+  };
+
+  useEffect(() => {
+    const fetching = async () => {
+      if (productDetail) {
+        try {
+          const reviewsData = await reviewApi.getReviews(productDetail.id);
+          setReviews(reviewsData);
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+        }
+      }
+    };
+    fetching();
+  }, [productDetail]);
 
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -193,7 +257,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div className="space-y-4">
-            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden border border-orange-100 bg-white shadow-lg group">
+            <button
+              onClick={() => openGallery(selectedImage)}
+              className="relative w-full h-[500px] rounded-2xl overflow-hidden border border-orange-100 bg-white shadow-lg group cursor-pointer"
+            >
               <Image
                 src={listImg[selectedImage] || '/image_login.jpg'}
                 alt={productDetail.name}
@@ -213,15 +280,18 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 </div>
               )}
               <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                Hover để phóng to
+                Nhấn để phóng to
               </div>
-            </div>
+            </button>
 
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-orange-400 scrollbar-track-orange-100">
               {listImg.map((img, index) => (
                 <button
                   key={index}
-                  onClick={() => setSelectedImage(index)}
+                  onClick={() => {
+                    setSelectedImage(index);
+                    openGallery(index);
+                  }}
                   className={`relative min-w-[100px] h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 hover:shadow-md
                     ${
                       selectedImage === index
@@ -231,7 +301,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 >
                   <Image src={img} alt={`Ảnh ${index + 1}`} fill className="object-cover" />
                   {selectedImage === index && (
-                    <div className="absolute inset-0 border border-orange-500" />
+                    <div className="absolute inset-0 bg-orange-500/10 border border-orange-500" />
                   )}
                 </button>
               ))}
@@ -251,9 +321,11 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   <button className="p-3 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors hover:scale-105">
                     <MdFavoriteBorder size={20} className="text-orange-600" />
                   </button>
-                  <button className="p-3 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors hover:scale-105">
-                    <MdShare size={20} className="text-orange-600" />
-                  </button>
+                  <ShareButton
+                    productName={productDetail.name}
+                    productDescription={productDetail.shortDescription}
+                    productImage={listImg[0]}
+                  />
                 </div>
               </div>
 
@@ -270,16 +342,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 </span>
                 <span className="text-gray-600" style={{ color: '#6b7280' }}>
                   Còn {productDetail.quantity} sản phẩm
-                </span>
-                <span className="text-gray-400" style={{ color: '#9ca3af' }}>
-                  |
-                </span>
-                <span
-                  className="flex items-center gap-1 text-gray-600"
-                  style={{ color: '#6b7280' }}
-                >
-                  <MdLocalShipping size={16} />
-                  Miễn phí vận chuyển
                 </span>
               </div>
 
@@ -383,32 +445,60 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 flex-1">
-                    <button
-                      onClick={handleAddToCart}
-                      disabled={isAddingToCart || productDetail.quantity === 0}
-                      className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {isAddingToCart ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                          Đang thêm...
-                        </>
-                      ) : (
-                        <>
-                          <MdAddShoppingCart size={20} />
-                          Thêm vào giỏ
-                        </>
-                      )}
-                    </button>
-                    <button className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors">
-                      Mua ngay
-                    </button>
-                  </div>
+                  {auth ? (
+                    <div className="flex gap-3 flex-1">
+                      <button
+                        onClick={handleAddToCart}
+                        disabled={isAddingToCart || productDetail.quantity === 0}
+                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {isAddingToCart ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                            Đang thêm...
+                          </>
+                        ) : (
+                          <>
+                            <MdAddShoppingCart size={20} />
+                            Thêm vào giỏ
+                          </>
+                        )}
+                      </button>
+                      <button
+                        className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors"
+                        onClick={() => setShowBuyNow(true)}
+                        disabled={productDetail.quantity === 0}
+                        style={{ color: '#ffffff' }}
+                      >
+                        Mua ngay
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex-1 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                      <div className="text-gray-600 mb-4">
+                        <MdSecurity size={32} className="mx-auto mb-2 text-gray-400" />
+                        <p className="font-semibold">Vui lòng đăng nhập để mua hàng</p>
+                        <p className="text-sm">
+                          Đăng nhập để thêm sản phẩm vào giỏ hàng và mua ngay
+                        </p>
+                      </div>
+                      <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                      >
+                        Đăng nhập ngay
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-
+            <BuyNowDialog
+              isOpen={showBuyNow}
+              onClose={() => setShowBuyNow(false)}
+              product={productDetail}
+              initialQuantity={2}
+            />
             {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
@@ -696,13 +786,31 @@ function ProductDetail({ params }: { params: { id: string } }) {
 
             {activeTab === 'reviews' && (
               <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
-                  Đánh giá từ khách hàng
-                </h3>
-                <div className="text-center py-12 text-gray-500" style={{ color: '#6b7280' }}>
-                  <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-                  <p className="text-sm">Hãy là người đầu tiên đánh giá!</p>
+                <h3 className="text-xl font-bold text-gray-800">Đánh giá từ khách hàng</h3>
+                <div className="text-center py-12 text-gray-500">
+                  <ReviewsList />
+                  {/* {reviews.length === 0 ? (
+                    <>
+                      <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
+                      <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                    </>
+                  ) : (
+                    // <ReviewList reviews={reviews} />
+                    <div className="space-y-4">
+                      {reviews.map((review) => (
+                        <div key={review.id} className="p-4 bg-white rounded-lg shadow-sm">
+                          <div className="flex items-center gap-2 mb-2">
+                            <MdStar className="text-yellow-500" size={20} />
+                            <span className="font-semibold text-gray-800">{review.vote}</span>
+                          </div>
+                          <p className="text-gray-700">{review.content}</p>
+                          <div className="text-sm text-gray-500 mt-2">
+                            {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )} */}
                 </div>
               </div>
             )}
@@ -743,6 +851,17 @@ function ProductDetail({ params }: { params: { id: string } }) {
           </div>
         </div>
       </div>
+
+      <ImageGallery
+        images={listImg}
+        currentIndex={galleryIndex}
+        isOpen={showGallery}
+        onClose={closeGallery}
+        onNext={nextImage}
+        onPrevious={prevImage}
+        onIndexChange={handleGalleryIndexChange}
+        productName={productDetail.name}
+      />
     </div>
   );
 }

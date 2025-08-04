@@ -1,5 +1,4 @@
 'use client';
-
 import { useSellerProfile } from '@/hooks/use-seller-profile';
 import {
   IconCalendar,
@@ -7,17 +6,24 @@ import {
   IconMail,
   IconMapPin,
   IconMedal,
+  IconPackage,
   IconPhone,
   IconShieldCheck,
   IconShieldX,
+  IconShoppingBag,
   IconStar,
   IconTrophy,
 } from '@tabler/icons-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function SellerDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const { sellerProfile, achievements, loading, error } = useSellerProfile(id);
+
+  const { sellerProfile, sellerMetrics, achievements, loading, loadingMetrics, error } =
+    useSellerProfile(id);
+
+  const router = useRouter();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
@@ -25,6 +31,20 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
       month: 'long',
       day: 'numeric',
     });
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k';
+    }
+    return num.toString();
+  };
+
+  const formatRating = (rating: number) => {
+    return rating.toFixed(1) + '/5';
   };
 
   if (loading) {
@@ -129,21 +149,58 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: 'Sản phẩm', value: '1,234', icon: IconStar },
-                { label: 'Đánh giá', value: '4.8/5', icon: IconStar },
-                { label: 'Người theo dõi', value: '12.5k', icon: IconShieldCheck },
-                { label: 'Phản hồi', value: '98%', icon: IconClock },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="bg-white rounded-2xl p-6 shadow-lg border border-orange-100 text-center"
-                >
-                  <stat.icon className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-gray-800 mb-1">{stat.value}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
+              {loadingMetrics ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-2xl p-6 shadow-lg border border-orange-100 text-center animate-pulse"
+                  >
+                    <div className="w-8 h-8 bg-gray-200 rounded mx-auto mb-3"></div>
+                    <div className="h-8 bg-gray-200 rounded mb-1"></div>
+                    <div className="h-4 bg-gray-200 rounded"></div>
+                  </div>
+                ))
+              ) : error && !sellerMetrics ? (
+                <div className="col-span-2 md:col-span-4 bg-white rounded-2xl p-6 shadow-lg border border-orange-100 text-center">
+                  <div className="text-gray-500 mb-2">
+                    <IconShieldX className="w-8 h-8 mx-auto mb-2" />
+                    Không thể tải thống kê
+                  </div>
+                  <p className="text-sm text-gray-400">Vui lòng thử lại sau</p>
                 </div>
-              ))}
+              ) : (
+                [
+                  {
+                    label: 'Sản phẩm',
+                    value: sellerMetrics ? formatNumber(sellerMetrics.productQuantity) : '0',
+                    icon: IconPackage,
+                  },
+                  {
+                    label: 'Đánh giá',
+                    value: sellerMetrics ? formatRating(sellerMetrics.avgVote) : '0/5',
+                    icon: IconStar,
+                  },
+                  {
+                    label: 'Tổng đơn hàng',
+                    value: sellerMetrics ? formatNumber(sellerMetrics.totalOrder) : '0',
+                    icon: IconShoppingBag,
+                  },
+                  {
+                    label: 'Đơn hàng thành công',
+                    value: sellerMetrics ? formatNumber(sellerMetrics.totalOrderSold) : '0',
+                    icon: IconShieldCheck,
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="bg-white rounded-2xl p-6 shadow-lg border border-orange-100 text-center"
+                  >
+                    <stat.icon className="w-8 h-8 text-orange-500 mx-auto mb-3" />
+                    <div className="text-2xl font-bold text-gray-800 mb-1">{stat.value}</div>
+                    <div className="text-sm text-gray-600">{stat.label}</div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="bg-white rounded-2xl p-8 shadow-lg border border-orange-100">
@@ -271,10 +328,19 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+              <button
+                onClick={() =>
+                  router.push(`/product?keyword=${encodeURIComponent(sellerProfile.shopName)}`)
+                }
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
                 Xem sản phẩm
               </button>
-              <button className="w-full border border-gray-300 text-gray-600 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200">
+
+              <button
+                onClick={() => router.push(`/chat/${sellerProfile.accountId}`)}
+                className="w-full border border-gray-300 text-gray-600 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200"
+              >
                 Chat với người bán
               </button>
             </div>

@@ -1,4 +1,3 @@
-// ProductManagement.tsx
 'use client';
 
 import { CreateProductDialog } from '@/components/dialog-common/add/create-product-dialog';
@@ -57,12 +56,10 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
-import dynamic from 'next/dynamic';
+
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-
-const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface FilterState {
   search: string;
@@ -159,7 +156,11 @@ export default function ProductManagement() {
       // Price range filter
       if (filters.priceRange) {
         const [min, max] = filters.priceRange.split('-').map(Number);
-        if (product.currentPrice < min || product.currentPrice > max) {
+        if (
+          min !== undefined &&
+          max !== undefined &&
+          (product.currentPrice < min || product.currentPrice > max)
+        ) {
           return false;
         }
       }
@@ -203,10 +204,6 @@ export default function ProductManagement() {
     }
   };
 
-  const handleCreateProduct = () => {
-    setIsCreateOpen(false);
-  };
-
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
     if (!selectedProduct) return;
 
@@ -234,9 +231,6 @@ export default function ProductManagement() {
 
   const handleDeleteProduct = async (product: TProduct) => {
     try {
-      // Add your delete API call here
-      // await productApi.deleteProduct(product.id);
-
       const updatedProducts = productList.filter((p) => p.id !== product.id);
       setProductList(updatedProducts);
       toast.success('Đã xoá sản phẩm thành công');
@@ -739,7 +733,6 @@ export default function ProductManagement() {
           open={isCreateOpen}
           onOpenChange={setIsCreateOpen}
           onSuccess={() => {
-            // Refresh product list after creation
             const fetchProducts = async () => {
               try {
                 const productList = await productApi.getProducts();

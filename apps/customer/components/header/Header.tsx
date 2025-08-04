@@ -4,7 +4,13 @@ import { useCart } from '@/context/CartContext';
 import MobileMenu from '@components/header/MobileHeaderMenu';
 import SearchBar from '@components/header/SearchBar';
 import UserDropdown from '@components/header/UserHeaderDropdown';
-import { IconBell, IconMenu2, IconShoppingCart, IconUser, IconX } from '@tabler/icons-react';
+import {
+  IconBuildingStore,
+  IconMenu2,
+  IconShoppingCart,
+  IconUser,
+  IconX,
+} from '@tabler/icons-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -23,14 +29,19 @@ const Header = () => {
       <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200 hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-2 text-sm flex justify-between items-center">
           <div className="flex items-center space-x-6">
-            <button className="text-orange-700 hover:text-orange-800 flex items-center gap-2 font-medium">
-              <IconBell size={16} />
-              Thông báo khuyến mãi
-            </button>
-            <span className="text-orange-600">|</span>
-            <Link href="/help" className="text-orange-700 hover:text-orange-800 font-medium">
-              Hỗ trợ khách hàng
-            </Link>
+            {auth && (
+              <>
+                <Link
+                  href={process.env.NEXT_PUBLIC_SELLER_PORTAL_URL || 'http://localhost:3001'}
+                  className="text-orange-700 hover:text-orange-800 flex items-center gap-2 font-medium transition-colors duration-200"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <IconBuildingStore size={16} />
+                  Tới trang người bán
+                </Link>
+              </>
+            )}
           </div>
           {!auth && (
             <div className="flex items-center space-x-4 text-orange-700">

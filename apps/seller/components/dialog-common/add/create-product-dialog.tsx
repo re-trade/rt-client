@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 interface CreateProductDialogProps {
   open: boolean;
-  onSuccess: boolean;
+  onSuccess: () => void;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -168,6 +168,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
       toast.success('Tạo sản phẩm thành công');
       onOpenChange(false);
       resetForm();
+      onSuccess();
     } catch (error) {
       console.error('Error creating product:', error);
       toast.error('Không thể tạo sản phẩm. Vui lòng thử lại.');

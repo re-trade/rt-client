@@ -22,7 +22,6 @@ export default function OrdersPage() {
   const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [paymentFilter, setPaymentFilter] = useState<string>('all');
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
@@ -57,7 +56,12 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  const handleStatusUpdate = (comboId: string, newStatus: string) => {
+  const handleStatusUpdate = (
+    comboId: string,
+    newStatus: OrderResponse['orderStatus'],
+    trackingNumber?: string,
+    notes?: string,
+  ) => {
     setOrders(
       orders.map((order) =>
         order.comboId === comboId
@@ -101,9 +105,9 @@ export default function OrdersPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Tìm kiếm theo tên khách hàng, SĐT..."
-              // value={searchTerm}
-              // onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
