@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
@@ -79,6 +80,10 @@ export default function ProductManagement() {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   const [filters, setFilters] = useState<FilterState>({
     search: '',
@@ -174,27 +179,41 @@ export default function ProductManagement() {
     return Object.values(filters).filter((value) => value !== '').length;
   }, [filters]);
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const productList = await productApi.getProducts();
-        setProductList(productList);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        toast.error('Lỗi khi tải danh sách sản phẩm');
-      } finally {
-        setLoading(false);
+  const fetchProducts = async (
+    page: number = currentPage,
+    size: number = pageSize,
+    query?: string,
+  ) => {
+    try {
+      setLoading(true);
+      const response = await productApi.getProducts(page - 1, size, query);
+      if (response.products) {
+        setProductList(response.products);
+        setTotalPages(response.totalPages);
+        setTotalItems(response.totalElements);
       }
-    };
-    fetchProduct();
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      toast.error('Lỗi khi tải danh sách sản phẩm');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(1, pageSize);
   }, []);
+
+  useEffect(() => {
+    if (currentPage > 0) {
+      fetchProducts(currentPage, pageSize, filters.search);
+    }
+  }, [currentPage, pageSize]);
 
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
-      const productList = await productApi.getProducts();
-      setProductList(productList);
+      await fetchProducts(currentPage, pageSize, filters.search);
       toast.success('Đã làm mới danh sách sản phẩm');
     } catch (error) {
       console.error('Error refreshing products:', error);
@@ -202,6 +221,15 @@ export default function ProductManagement() {
     } finally {
       setRefreshing(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
   };
 
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
@@ -218,6 +246,7 @@ export default function ProductManagement() {
     );
     setProductList(updatedProducts);
     setSelectedProduct(null);
+    fetchProducts(currentPage, pageSize, filters.search);
   };
 
   const handleEditProduct = (product: TProduct) => {
@@ -728,20 +757,23 @@ export default function ProductManagement() {
           </Card>
         )}
 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          loading={loading || refreshing}
+          pageSizeOptions={[10, 15, 20, 50]}
+        />
+
         {/* Dialogs */}
         <CreateProductDialog
           open={isCreateOpen}
           onOpenChange={setIsCreateOpen}
           onSuccess={() => {
-            const fetchProducts = async () => {
-              try {
-                const productList = await productApi.getProducts();
-                setProductList(productList);
-              } catch (error) {
-                console.error('Error fetching products:', error);
-              }
-            };
-            fetchProducts();
+            fetchProducts(currentPage, pageSize, filters.search);
           }}
         />
 

@@ -39,7 +39,13 @@ export const ordersApi = {
     page: number = 0,
     size: number = 10,
     query?: string,
-  ): Promise<OrderResponse[]> {
+  ): Promise<{
+    orders: OrderResponse[];
+    totalPages: number;
+    totalElements: number;
+    currentPage: number;
+    pageSize: number;
+  }> {
     const response = await authApi.default.get<IResponseObject<OrderResponse[]>>(
       `/orders/seller/combo`,
       {
@@ -50,6 +56,13 @@ export const ordersApi = {
         },
       },
     );
-    return response.data.success ? response.data.content : [];
+    const orders = response.data.success ? response.data.content : [];
+    return {
+      orders,
+      totalPages: response.data.pagination?.totalPages || 1,
+      totalElements: response.data.pagination?.totalElements || orders.length,
+      currentPage: (response.data.pagination?.page || 0) + 1,
+      pageSize: response.data.pagination?.size || size,
+    };
   },
 };

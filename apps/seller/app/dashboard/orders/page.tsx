@@ -5,6 +5,7 @@ import { OrderTable } from '@/components/dialog-common/view-update/order-table';
 import { UpdateStatusDialog } from '@/components/dialog-common/view-update/update-status-dialog';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
@@ -22,16 +23,36 @@ export default function OrdersPage() {
   const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.destination.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.destination.phone.includes(searchTerm);
-
     const matchesStatus = statusFilter === 'all' || order.orderStatus.code === statusFilter;
-
-    return matchesSearch && matchesStatus;
+    return matchesStatus;
   });
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchOrders(1, pageSize, searchTerm);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
 
   const handleViewDetail = (order: OrderResponse) => {
     setSelectedOrder(order);
@@ -43,18 +64,43 @@ export default function OrdersPage() {
     setIsUpdateStatusOpen(true);
   };
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await ordersApi.getAllOrdersBySeller();
-        console.log('Fetched orders:', response);
-        setOrders(response);
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
+  const fetchOrders = async (
+    page: number = currentPage,
+    size: number = pageSize,
+    query?: string,
+  ) => {
+    try {
+      setLoading(true);
+      const response = await ordersApi.getAllOrdersBySeller(page - 1, size, query);
+      if (response.orders) {
+        setOrders(response.orders);
+        setTotalPages(response.totalPages);
+        setTotalItems(response.totalElements);
       }
-    };
-    fetchOrders();
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders(1, pageSize);
   }, []);
+
+  useEffect(() => {
+    if (currentPage > 0) {
+      fetchOrders(currentPage, pageSize, searchTerm);
+    }
+  }, [currentPage, pageSize]);
+
+  useEffect(() => {
+    if (!loading) {
+      setCurrentPage(1);
+      fetchOrders(1, pageSize, searchTerm);
+    }
+  }, [statusFilter]);
 
   const handleStatusUpdate = (
     comboId: string,
@@ -73,6 +119,7 @@ export default function OrdersPage() {
       ),
     );
     setSelectedOrder(null);
+    fetchOrders(currentPage, pageSize, searchTerm);
   };
 
   return (
@@ -108,6 +155,7 @@ export default function OrdersPage() {
               className="pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={handleKeyPress}
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -131,6 +179,17 @@ export default function OrdersPage() {
         orders={filteredOrders}
         onViewDetail={handleViewDetail}
         onUpdateStatus={handleUpdateStatus}
+      />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={pageSize}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        loading={loading}
+        pageSizeOptions={[10, 20, 50]}
       />
 
       <OrderDetailDialog open={isDetailOpen} onOpenChange={setIsDetailOpen} order={selectedOrder} />

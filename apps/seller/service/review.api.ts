@@ -73,7 +73,13 @@ export const reviewApi = {
     vote?: number,
     keyword?: string,
     isReply?: 'REPLY' | 'NO_REPLY' | null,
-  ): Promise<ReviewResponse[]> => {
+  ): Promise<{
+    reviews: ReviewResponse[];
+    totalPages: number;
+    totalElements: number;
+    currentPage: number;
+    pageSize: number;
+  }> => {
     const q = keyword ? `keyword=${encodeURIComponent(keyword)}` : undefined;
     const response = await authApi.default.get<IResponseObject<ReviewResponse[]>>(
       `/product-review/search`,
@@ -87,7 +93,13 @@ export const reviewApi = {
         },
       },
     );
-    return response.data.content;
+    return {
+      reviews: response.data.content,
+      totalPages: response.data.pagination?.totalPages || 1,
+      totalElements: response.data.pagination?.totalElements || response.data.content.length,
+      currentPage: (response.data.pagination?.page || 0) + 1,
+      pageSize: response.data.pagination?.size || size,
+    };
   },
 
   getStatsReviewsSeller: async (): Promise<StatsReViewResponse> => {
