@@ -1,4 +1,4 @@
-import { authApi, IResponseObject } from '@retrade/util';
+import { authApi, IResponseObject, unAuthApi } from '@retrade/util';
 
 export type TBankProfile = {
   id: string;
@@ -12,7 +12,8 @@ export type TWithdrawProfile = {
   id: string;
   amount: number;
   status: string;
-  processedDate: string;
+  createdDate: string;
+  processedDate: string | null;
   bankBin: string;
   bankName: string;
   bankUrl: string;
@@ -48,7 +49,7 @@ const getBanks = async (
   query?: string,
 ): Promise<IResponseObject<TBankProfile[]> | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TBankProfile[]>>(`/wallets/banks`, {
+    const result = await unAuthApi.default.get<IResponseObject<TBankProfile[]>>(`/wallets/banks`, {
       params: {
         page,
         size,
@@ -63,7 +64,7 @@ const getBanks = async (
   }
 };
 const approveWithdraw = async (id: string): Promise<IResponseObject<null> | undefined> => {
-  const result = await authApi.default.put<IResponseObject<null>>(
+  const result = await unAuthApi.default.put<IResponseObject<null>>(
     `/wallets/withdraw/${id}/approve`,
   );
   if (result.data.success) {
@@ -71,4 +72,24 @@ const approveWithdraw = async (id: string): Promise<IResponseObject<null> | unde
   } else return undefined;
 };
 
-export { approveWithdraw, getBanks, getWithdraws };
+
+
+const withdrawQr = async (id: string): Promise<Blob | undefined> => {
+  try {
+    const response = await authApi.default.get(
+      `/wallets/me/withdraw/${id}/qr`,
+      {
+        responseType: 'blob',
+        headers: {
+          Accept: 'image/png',
+        },
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch {
+    return undefined;
+  }
+};
+export { approveWithdraw, getBanks, getWithdraws, withdrawQr };
+

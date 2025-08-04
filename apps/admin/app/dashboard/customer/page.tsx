@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -78,19 +79,50 @@ const CustomerStats = ({ customers }: { customers: any[] }) => {
   );
 };
 
-const AdvancedFilters = ({ searchQuery, onSearch, selectedStatus, setSelectedStatus }: any) => {
+const AdvancedFilters = ({
+  searchQuery,
+  onSearch,
+  selectedStatus,
+  setSelectedStatus,
+  selectedGender,
+  setSelectedGender,
+  updatedAfter,
+  setUpdatedAfter,
+}: {
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (status: string) => void;
+  selectedGender: string;
+  setSelectedGender: (gender: string) => void;
+  updatedAfter: string;
+  setUpdatedAfter: (date: string) => void;
+}) => {
+  const handleClearFilters = () => {
+    onSearch('');
+    setSelectedStatus('all');
+    setSelectedGender('all');
+    setUpdatedAfter('');
+  };
+
   return (
     <Card className="p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-4 w-4" />
-        <h3 className="font-medium">Bộ lọc nâng cao</h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4" />
+          <h3 className="font-medium">Bộ lọc nâng cao</h3>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleClearFilters}>
+          <XCircle className="h-4 w-4 mr-2" />
+          Xóa bộ lọc
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Tìm kiếm người bán..."
+            placeholder="Tìm kiếm..."
             value={searchQuery}
             onChange={(e) => onSearch(e.target.value)}
             className="pl-8"
@@ -107,6 +139,26 @@ const AdvancedFilters = ({ searchQuery, onSearch, selectedStatus, setSelectedSta
             <SelectItem value="pending">Chờ duyệt</SelectItem>
           </SelectContent>
         </Select>
+
+        <Select value={selectedGender} onValueChange={setSelectedGender}>
+          <SelectTrigger>
+            <SelectValue placeholder="Giới tính" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả</SelectItem>
+            <SelectItem value="0">Nam</SelectItem>
+            <SelectItem value="1">Nữ</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="space-y-2">
+          <Input
+            id="updatedAfter"
+            type="date"
+            value={updatedAfter}
+            onChange={(e) => setUpdatedAfter(e.target.value)}
+          />
+        </div>
       </div>
     </Card>
   );
@@ -255,6 +307,8 @@ const CustomerActions = ({ customer, onVerify, onPending, onView }: any) => {
 export default function CustomerManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedGender, setSelectedGender] = useState<string>('all');
+  const [updatedAfter, setUpdatedAfter] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -336,7 +390,15 @@ export default function CustomerManagementPage() {
       (selectedStatus === 'verified' && customer.enabled) ||
       (selectedStatus === 'pending' && !customer.enabled);
 
-    return matchesStatus;
+    const normalizedGender = String(customer.gender);
+    const matchesGender =
+      selectedGender === 'all' || normalizedGender === selectedGender;
+
+    const customerLastUpdate = new Date(customer.lastUpdate);
+    const matchesLastUpdate =
+      !updatedAfter || customerLastUpdate > new Date(updatedAfter);
+
+    return matchesStatus && matchesGender && matchesLastUpdate;
   });
 
   return (
@@ -403,6 +465,10 @@ export default function CustomerManagementPage() {
         onSearch={handleSearch}
         selectedStatus={selectedStatus}
         setSelectedStatus={setSelectedStatus}
+        selectedGender={selectedGender}
+        setSelectedGender={setSelectedGender}
+        updatedAfter={updatedAfter}
+        setUpdatedAfter={setUpdatedAfter}
       />
 
       <Card className="p-6">

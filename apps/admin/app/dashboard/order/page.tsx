@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -253,21 +254,43 @@ const AdvancedFilters = ({
   onSearch,
   selectedCategory,
   setSelectedCategory,
-  sortOption,
-  setSortOption,
+  sortField,
+  setSortField,
+  sortOrder,
+  setSortOrder,
+  updatedAfter,
+  setUpdatedAfter,
 }: {
   searchQuery: string;
   onSearch: (query: string) => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
-  sortOption: string;
-  setSortOption: (option: string) => void;
+  sortField: string;
+  setSortField: (field: string) => void;
+  sortOrder: 'asc' | 'desc';
+  setSortOrder: (order: 'asc' | 'desc') => void;
+  updatedAfter: string;
+  setUpdatedAfter: (date: string) => void;
 }) => {
+  const handleClearFilters = () => {
+    onSearch('');
+    setSelectedCategory('all');
+    setSortField('orderId');
+    setSortOrder('asc');
+    setUpdatedAfter('');
+  };
+
   return (
     <Card className="p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-4 w-4" />
-        <h3 className="font-medium">Bộ lọc nâng cao</h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4" />
+          <h3 className="font-medium">Bộ lọc nâng cao</h3>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleClearFilters}>
+          <XCircle className="h-4 w-4 mr-2" />
+          Xóa bộ lọc
+        </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
@@ -302,29 +325,38 @@ const AdvancedFilters = ({
             <SelectItem value="REFUNDED">Đã hoàn tiền</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={sortOption} onValueChange={setSortOption}>
+        <Select value={sortField} onValueChange={setSortField}>
           <SelectTrigger>
             <SelectValue placeholder="Sắp xếp theo" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="orderId-asc">ID (A-Z)</SelectItem>
-            <SelectItem value="orderId-desc">ID (Z-A)</SelectItem>
-            <SelectItem value="customerId-asc">ID Khách hàng (A-Z)</SelectItem>
-            <SelectItem value="customerId-desc">ID Khách hàng (Z-A)</SelectItem>
-            <SelectItem value="customerName-asc">Tên Khách hàng (A-Z)</SelectItem>
-            <SelectItem value="customerName-desc">Tên Khách hàng (Z-A)</SelectItem>
-            <SelectItem value="phone-asc">Số điện thoại (A-Z)</SelectItem>
-            <SelectItem value="phone-desc">Số điện thoại (Z-A)</SelectItem>
-            <SelectItem value="grandTotal-asc">Tổng số tiền (Thấp-Cao)</SelectItem>
-            <SelectItem value="grandTotal-desc">Tổng số tiền (Cao-Thấp)</SelectItem>
-            <SelectItem value="status-asc">Tình trạng (A-Z)</SelectItem>
-            <SelectItem value="status-desc">Tình trạng (Z-A)</SelectItem>
-            <SelectItem value="createdAt-asc">Ngày tạo (Cũ-Mới)</SelectItem>
-            <SelectItem value="createdAt-desc">Ngày tạo (Mới-Cũ)</SelectItem>
-            <SelectItem value="updatedAt-asc">Ngày cập nhật (Cũ-Mới)</SelectItem>
-            <SelectItem value="updatedAt-desc">Ngày cập nhật (Mới-Cũ)</SelectItem>
+            <SelectItem value="orderId">ID</SelectItem>
+            <SelectItem value="customerId">ID Khách hàng</SelectItem>
+            <SelectItem value="customerName">Tên Khách hàng</SelectItem>
+            <SelectItem value="phone">Số điện thoại</SelectItem>
+            <SelectItem value="grandTotal">Tổng số tiền</SelectItem>
+            <SelectItem value="status">Tình trạng</SelectItem>
+            <SelectItem value="createdAt">Ngày tạo</SelectItem>
+            <SelectItem value="updatedAt">Ngày cập nhật</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={sortOrder} onValueChange={setSortOrder}>
+          <SelectTrigger>
+            <SelectValue placeholder="Thứ tự" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="asc">Tăng dần</SelectItem>
+            <SelectItem value="desc">Giảm dần</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="space-y-2">
+          <Input
+            id="updatedAfter"
+            type="date"
+            value={updatedAfter}
+            onChange={(e) => setUpdatedAfter(e.target.value)}
+          />
+        </div>
       </div>
     </Card>
   );
@@ -409,8 +441,10 @@ const OrderDetailModal = ({
 export default function OrderManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [sortField, setSortField] = useState<string>('orderId');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [updatedAfter, setUpdatedAfter] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortOption, setSortOption] = useState<string>('orderId-asc'); // Default sort by orderId ascending
   const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -433,67 +467,35 @@ export default function OrderManagementPage() {
     cancelOrder,
   } = useOrderManager();
 
-  const handleSort = (option: string) => {
-    setSortOption(option);
-  };
-
-  const [sortField, sortOrder] = sortOption.split('-') as [string, 'asc' | 'desc'];
-
-  const sortedOrders = [...orders].sort((a: TOrder, b: TOrder) => {
-    let valueA: any;
-    let valueB: any;
-
-    switch (sortField) {
-      case 'orderId':
-        valueA = a.orderId.toLowerCase();
-        valueB = b.orderId.toLowerCase();
-        break;
-      case 'customerId':
-        valueA = a.customerId.toLowerCase();
-        valueB = b.customerId.toLowerCase();
-        break;
-      case 'customerName':
-        valueA = a.customerName.toLowerCase();
-        valueB = b.customerName.toLowerCase();
-        break;
-      case 'phone':
-        valueA = a.destination.phone.toLowerCase();
-        valueB = b.destination.phone.toLowerCase();
-        break;
-      case 'grandTotal':
-        valueA = a.grandTotal;
-        valueB = b.grandTotal;
-        break;
-      case 'status':
-        valueA = a.orderCombos[0]?.status?.toLowerCase() || '';
-        valueB = b.orderCombos[0]?.status?.toLowerCase() || '';
-        break;
-      case 'createdAt':
-        valueA = new Date(a.createdAt).getTime();
-        valueB = new Date(b.createdAt).getTime();
-        break;
-      case 'updatedAt':
-        valueA = new Date(a.updatedAt).getTime();
-        valueB = new Date(b.updatedAt).getTime();
-        break;
-      default:
-        return 0;
-    }
-
-    if (valueA === valueB) return 0;
-    if (!valueA) return 1;
-    if (!valueB) return -1;
-
-    return sortOrder === 'asc' ? (valueA < valueB ? -1 : 1) : valueA > valueB ? -1 : 1;
-  });
-
-  const handleRefresh = () => {
-    refetch();
-  };
-
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+    setCurrentPage(1); // Reset to page 1
     searchOrders(query);
+    goToPage(1, query); // Trigger pagination to page 1
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1); // Reset to page 1
+    goToPage(1, searchQuery); // Trigger pagination to page 1
+  };
+
+  const handleSortFieldChange = (field: string) => {
+    setSortField(field);
+    setCurrentPage(1); // Reset to page 1
+    goToPage(1, searchQuery); // Trigger pagination to page 1
+  };
+
+  const handleSortOrderChange = (order: 'asc' | 'desc') => {
+    setSortOrder(order);
+    setCurrentPage(1); // Reset to page 1
+    goToPage(1, searchQuery); // Trigger pagination to page 1
+  };
+
+  const handleUpdatedAfterChange = (date: string) => {
+    setUpdatedAfter(date);
+    setCurrentPage(1); // Reset to page 1
+    goToPage(1, searchQuery); // Trigger pagination to page 1
   };
 
   const handlePageChange = (newPage: number) => {
@@ -546,13 +548,64 @@ export default function OrderManagementPage() {
     }));
   };
 
+  const sortedOrders = [...orders].sort((a: TOrder, b: TOrder) => {
+    let valueA: any;
+    let valueB: any;
+
+    switch (sortField) {
+      case 'orderId':
+        valueA = a.orderId.toLowerCase();
+        valueB = b.orderId.toLowerCase();
+        break;
+      case 'customerId':
+        valueA = a.customerId.toLowerCase();
+        valueB = b.customerId.toLowerCase();
+        break;
+      case 'customerName':
+        valueA = a.customerName.toLowerCase();
+        valueB = b.customerName.toLowerCase();
+        break;
+      case 'phone':
+        valueA = a.destination.phone.toLowerCase();
+        valueB = b.destination.phone.toLowerCase();
+        break;
+      case 'grandTotal':
+        valueA = a.grandTotal;
+        valueB = b.grandTotal;
+        break;
+      case 'status':
+        valueA = a.orderCombos[0]?.status?.toLowerCase() || '';
+        valueB = b.orderCombos[0]?.status?.toLowerCase() || '';
+        break;
+      case 'createdAt':
+        valueA = new Date(a.createdAt).getTime();
+        valueB = new Date(b.createdAt).getTime();
+        break;
+      case 'updatedAt':
+        valueA = new Date(a.updatedAt).getTime();
+        valueB = new Date(b.updatedAt).getTime();
+        break;
+      default:
+        return 0;
+    }
+
+    if (valueA === valueB) return 0;
+    if (!valueA) return 1;
+    if (!valueB) return -1;
+
+    return sortOrder === 'asc' ? (valueA < valueB ? -1 : 1) : valueA > valueB ? -1 : 1;
+  });
+
   const filteredOrders = sortedOrders.filter((order: TOrder) => {
     const matchesCategory =
       selectedCategory === 'all' ||
       order.orderCombos.some((combo) =>
         combo.status.toLowerCase().includes(selectedCategory.toLowerCase()),
       );
-    return matchesCategory;
+    const orderLastUpdate = new Date(order.updatedAt);
+    const matchesLastUpdate =
+      !updatedAfter || orderLastUpdate >= new Date(updatedAfter);
+    return matchesCategory && matchesLastUpdate;
   });
 
   const getStatusColor = (status?: string): string => {
@@ -637,9 +690,13 @@ export default function OrderManagementPage() {
         searchQuery={searchQuery}
         onSearch={handleSearch}
         selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        sortOption={sortOption}
-        setSortOption={handleSort}
+        setSelectedCategory={handleCategoryChange} // Updated handler
+        sortField={sortField}
+        setSortField={handleSortFieldChange} // Updated handler
+        sortOrder={sortOrder}
+        setSortOrder={handleSortOrderChange} // Updated handler
+        updatedAfter={updatedAfter}
+        setUpdatedAfter={handleUpdatedAfterChange} // Updated handler
       />
       <Card className="p-6">
         <div className="mt-6">
