@@ -83,7 +83,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setStockWarning(false);
     }
   };
-  console.log('productDetail', productDetail);
 
   const buyNow = () => {
     if (!productDetail) return;
@@ -128,7 +127,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
       if (productDetail) {
         try {
           const reviewsData = await reviewApi.getReviews(productDetail.id);
+          console.log('Fetched reviews id:', productDetail.id, reviewsData);
+          
           setReviews(reviewsData);
+          console.log('Fetched reviews:', reviewsData);
         } catch (error) {
           console.error('Error fetching reviews:', error);
         }
@@ -788,7 +790,9 @@ function ProductDetail({ params }: { params: { id: string } }) {
               <div className="space-y-6">
                 <h3 className="text-xl font-bold text-gray-800">Đánh giá từ khách hàng</h3>
                 <div className="text-center py-12 text-gray-500">
-                  <ReviewsList />
+                  <ReviewsList
+                  productId={productDetail.id}
+                   />
                   {/* {reviews.length === 0 ? (
                     <>
                       <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
