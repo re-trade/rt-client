@@ -5,9 +5,65 @@ import CartSkeleton from '@/components/cart/CartSkeleton';
 import Checkbox from '@/components/reusable/checkbox';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/context/CartContext';
-import { IconAlertTriangle, IconCheck, IconMinus, IconPlus, IconTrash } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconChevronDown,
+  IconChevronUp,
+  IconMinus,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons-react';
 import Image from 'next/image';
 import { useState } from 'react';
+
+function ProductDescription({
+  description,
+  className = '',
+  maxLength = 100,
+}: {
+  description: string;
+  className?: string;
+  maxLength?: number;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!description) return null;
+
+  const shouldTruncate = description.length > maxLength;
+  const displayText =
+    shouldTruncate && !isExpanded ? description.slice(0, maxLength) + '...' : description;
+
+  return (
+    <div className={className}>
+      <p className="text-gray-600 leading-tight">
+        {displayText}
+        {shouldTruncate && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
+            className="ml-1 text-orange-600 hover:text-orange-700 font-medium inline-flex items-center transition-colors"
+            style={{ fontSize: '0.7rem' }}
+          >
+            {isExpanded ? (
+              <>
+                <span>Thu gọn</span>
+                <IconChevronUp size={10} className="ml-0.5" />
+              </>
+            ) : (
+              <>
+                <span>Xem thêm</span>
+                <IconChevronDown size={10} className="ml-0.5" />
+              </>
+            )}
+          </button>
+        )}
+      </p>
+    </div>
+  );
+}
 
 export default function CartSection({
   cartGroups,
@@ -332,7 +388,11 @@ export default function CartSection({
                               <p className="text-xs text-gray-800 border border-orange-200 bg-orange-100 inline-block px-2 py-1 rounded-lg">
                                 {item.productBrand}
                               </p>
-                              <p className="text-xs text-gray-600 truncate">{item.description}</p>
+                              <ProductDescription
+                                description={item.description}
+                                className="text-xs"
+                                maxLength={50}
+                              />
                               <div className="flex items-center gap-2">
                                 <button
                                   onClick={handleDecrement}
@@ -402,7 +462,11 @@ export default function CartSection({
                                 <p className="text-sm text-gray-800 border border-orange-200 bg-orange-100 inline-block px-2 py-1 rounded-lg">
                                   {item.productBrand}
                                 </p>
-                                <p className="text-sm text-gray-600 truncate">{item.description}</p>
+                                <ProductDescription
+                                  description={item.description}
+                                  className="text-sm"
+                                  maxLength={80}
+                                />
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={handleDecrement}
