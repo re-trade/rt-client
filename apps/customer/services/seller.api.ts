@@ -14,6 +14,7 @@ export type TSellerProfile = {
   background: string;
   phoneNumber: string;
   verified: boolean;
+  avgVote: number;
   createdAt: string;
   updatedAt: string;
 };

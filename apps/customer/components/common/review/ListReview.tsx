@@ -1,30 +1,33 @@
 'use client';
 
 import { reviewApi, ReviewResponse } from '@/services/product-review.api';
-import { Calendar, ChevronDown, ChevronUp, MessageCircle, Star, ThumbsUp, X } from 'lucide-react';
+import ImageGallery from '@components/gallery/ImageGallery';
+import { Calendar, ChevronDown, ChevronUp, MessageCircle, Star, ThumbsUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ReviewProps {
   productId: string;
 }
 
-type SelectedImage = {
-  urls: string[];
-  index: number;
-} | null;
-
 const ReviewsList = ({ productId }: ReviewProps) => {
   const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
-  const [selectedImages, setSelectedImages] = useState<SelectedImage>(null);
+  const [showGallery, setShowGallery] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
+        setLoading(true);
         const data = await reviewApi.getReviews(productId);
+        console.log('Fetched reviews:', data);
         setReviews(data);
       } catch (error) {
         console.error('Error fetching reviews:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -54,22 +57,33 @@ const ReviewsList = ({ productId }: ReviewProps) => {
       month: 'long',
       day: 'numeric',
     });
+
   const getBgColor = (name: string) => {
     const colors = [
-      'bg-red-500',
+      'bg-orange-500',
       'bg-blue-500',
       'bg-green-500',
-      'bg-yellow-500',
-      'bg-pink-500',
+      'bg-red-500',
       'bg-purple-500',
       'bg-indigo-500',
       'bg-emerald-500',
+      'bg-pink-500',
     ];
     const index = name?.charCodeAt(0) % colors.length;
     return colors[index];
   };
+
   const getColorFromName = (name: string) => {
-    const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#6366f1'];
+    const colors = [
+      '#ea580c',
+      '#3b82f6',
+      '#10b981',
+      '#ef4444',
+      '#8b5cf6',
+      '#6366f1',
+      '#059669',
+      '#ec4899',
+    ];
     const index = name?.charCodeAt(0) % colors.length;
     return colors[index];
   };
@@ -77,159 +91,237 @@ const ReviewsList = ({ productId }: ReviewProps) => {
   const truncateText = (text: string, maxLength = 150) =>
     text.length <= maxLength ? text : `${text.substring(0, maxLength)}...`;
 
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+  const openGallery = (images: string[], index: number) => {
+    setGalleryImages(images);
+    setGalleryIndex(index);
+    setShowGallery(true);
+  };
+
+  const closeGallery = () => {
+    setShowGallery(false);
+  };
+
+  const nextImage = () => {
+    setGalleryIndex((prev) => (prev + 1) % galleryImages.length);
+  };
+
+  const prevImage = () => {
+    setGalleryIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
+
+  const handleGalleryIndexChange = (index: number) => {
+    setGalleryIndex(index);
+  };
+
+  if (loading) {
+    return (
       <div className="space-y-6">
-        {reviews.map((review) => {
-          const isExpanded = expandedReviews.has(review.id);
-          const shouldTruncate = review.content.length > 150;
+        {[...Array(3)].map((_, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-200 via-orange-300 to-orange-200 animate-pulse rounded-full" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gradient-to-r from-orange-200 via-orange-300 to-orange-200 animate-pulse rounded w-24" />
+                <div className="h-3 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse rounded w-32" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse rounded w-full" />
+              <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse rounded w-3/4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
-          return (
-            <div
-              key={review.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200"
-            >
-              <div className="p-6">
-                {/* Author Info */}
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm shrink-0">
-                    {review.author.avatarUrl ? (
-                      <img
-                        src={review.author.avatarUrl}
-                        alt={review.author.name}
-                        className="w-full h-full object-cover rounded-full"
-                        onError={(e) => {
-                          // Ẩn ảnh khi bị lỗi và hiển thị fallback bằng cách xóa src
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.style.display = 'none';
+  if (reviews.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Star size={32} className="text-orange-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2" style={{ color: '#1f2937' }}>
+          Chưa có đánh giá nào
+        </h3>
+        <p className="text-gray-600" style={{ color: '#6b7280' }}>
+          Hãy là người đầu tiên đánh giá sản phẩm này.
+        </p>
+      </div>
+    );
+  }
 
-                          // Thêm fallback vào element cha
-                          const parent = e.currentTarget.parentElement;
-                          if (parent) {
-                            parent.style.backgroundColor = getColorFromName(review.author.name);
-                            parent.textContent = review.author.name?.charAt(0).toUpperCase();
-                          }
-                        }}
-                      />
-                    ) : (
-                      <div
-                        className={`${getBgColor(review.author.name)} w-full h-full flex items-center justify-center`}
-                      >
-                        {review.author.name?.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
+  return (
+    <div className="space-y-6">
+      {reviews.map((review) => {
+        const isExpanded = expandedReviews.has(review.id);
+        const shouldTruncate = review.content.length > 150;
 
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-gray-900">{review.author.name}</h4>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">{renderStars(review.vote)}</div>
-                      <span className="text-sm text-gray-500">•</span>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                        <Calendar size={12} />
-                        {formatDate(review.createdAt)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="mb-4">
-                  <p className="text-gray-700 text-start">
-                    {shouldTruncate && !isExpanded ? truncateText(review.content) : review.content}
-                  </p>
-                  {shouldTruncate && (
-                    <button
-                      onClick={() => toggleExpand(review.id)}
-                      className="text-blue-600 hover:text-blue-800 text-sm mt-2 flex items-center gap-1"
+        return (
+          <div
+            key={review.id}
+            className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden hover:shadow-md hover:border-orange-200 transition-all duration-200"
+          >
+            <div className="p-6">
+              {/* Author Info */}
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-md">
+                  {review.author.avatarUrl ? (
+                    <img
+                      src={review.author.avatarUrl}
+                      alt={review.author.name}
+                      className="w-full h-full object-cover rounded-full"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          parent.style.backgroundColor = getColorFromName(review.author.name);
+                          parent.textContent = review.author.name?.charAt(0).toUpperCase();
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className={`${getBgColor(review.author.name)} w-full h-full flex items-center justify-center`}
                     >
-                      {isExpanded ? (
-                        <>
-                          <ChevronUp size={16} />
-                          Thu gọn
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown size={16} />
-                          Xem thêm
-                        </>
-                      )}
-                    </button>
+                      {review.author.name?.charAt(0).toUpperCase()}
+                    </div>
                   )}
                 </div>
 
-                {/* Images */}
-                {Array.isArray(review.imageUrls) && review.imageUrls.length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex gap-2 flex-wrap">
-                      {review.imageUrls.map((url, index) => (
-                        <img
-                          key={index}
-                          src={url}
-                          alt={`Hình đánh giá ${index + 1}`}
-                          className="w-20 h-20 rounded-lg object-cover cursor-pointer hover:opacity-80"
-                          onClick={() => setSelectedImages({ urls: review.imageUrls, index })}
-                        />
-                      ))}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="font-semibold text-gray-900" style={{ color: '#111827' }}>
+                      {review.author.name}
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-1">{renderStars(review.vote)}</div>
+                    <span className="text-sm text-gray-400" style={{ color: '#9ca3af' }}>
+                      •
+                    </span>
+                    <div
+                      className="flex items-center gap-1 text-sm text-gray-600"
+                      style={{ color: '#6b7280' }}
+                    >
+                      <Calendar size={12} />
+                      {formatDate(review.createdAt)}
                     </div>
                   </div>
-                )}
-
-                {/* Reply */}
-                {review.reply && (
-                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <MessageCircle size={16} className="text-blue-600" />
-                      <span className="font-semibold text-blue-900 text-sm">Phản hồi từ shop</span>
-                      <span className="text-xs text-gray-500">•</span>
-                      <span className="text-xs text-gray-500">
-                        {formatDate(review.reply.createdAt)}
-                      </span>
-                    </div>
-                    <p className="text-gray-700 text-sm">{review.reply.content}</p>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600 text-sm">
-                    <ThumbsUp size={16} />
-                    Hữu ích ({review.helpful | 0})
-                  </button>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* Image Modal */}
-      {selectedImages && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-3xl max-h-full">
-            <img
-              src={selectedImages.urls[selectedImages.index]}
-              alt="Hình đánh giá"
-              className="max-w-full max-h-full object-contain rounded-lg"
-            />
-            <button
-              onClick={() => setSelectedImages(null)}
-              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full p-2"
-            >
-              <X size={20} />
-            </button>
+              {/* Content */}
+              <div className="mb-4">
+                <p
+                  className="text-gray-700 leading-relaxed text-start"
+                  style={{ color: '#374151' }}
+                >
+                  {shouldTruncate && !isExpanded ? truncateText(review.content) : review.content}
+                </p>
+                {shouldTruncate && (
+                  <button
+                    onClick={() => toggleExpand(review.id)}
+                    className="text-orange-600 hover:text-orange-700 text-sm mt-2 flex items-center gap-1 font-medium transition-colors"
+                    style={{ color: '#ea580c' }}
+                  >
+                    {isExpanded ? (
+                      <>
+                        <ChevronUp size={16} />
+                        Thu gọn
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown size={16} />
+                        Xem thêm
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* Images */}
+              {Array.isArray(review.images) && review.images.length > 0 && (
+                <div className="mb-4">
+                  <div className="flex gap-3 flex-wrap">
+                    {review.images.map((url, index) => (
+                      <div
+                        key={index}
+                        className="relative group cursor-pointer"
+                        onClick={() => openGallery(review.images, index)}
+                      >
+                        <img
+                          src={url}
+                          alt={`Hình đánh giá ${index + 1}`}
+                          className="w-20 h-20 rounded-lg object-cover border border-orange-100 group-hover:border-orange-300 transition-all duration-200 group-hover:scale-105 shadow-sm"
+                        />
+                        {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all duration-200" /> */}
+                        <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white px-1 py-0.5 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                          {index + 1}/{review.images.length}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Reply */}
+              {review.reply && (
+                <div className="bg-gradient-to-r from-orange-50 to-orange-25 border-l-4 border-orange-400 p-4 rounded-r-xl mb-4 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageCircle size={16} className="text-orange-600" />
+                    <span
+                      className="font-semibold text-orange-900 text-sm"
+                      style={{ color: '#9a3412' }}
+                    >
+                      Phản hồi từ shop
+                    </span>
+                    <span className="text-xs text-gray-400" style={{ color: '#9ca3af' }}>
+                      •
+                    </span>
+                    <span className="text-xs text-gray-600" style={{ color: '#6b7280' }}>
+                      {formatDate(review.reply.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed" style={{ color: '#374151' }}>
+                    {review.reply.content}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center justify-between pt-4 border-t border-orange-100">
+                <button className="flex items-center gap-2 text-gray-500 hover:text-orange-600 text-sm font-medium transition-colors group">
+                  <ThumbsUp size={16} className="group-hover:scale-110 transition-transform" />
+                  Hữu ích ({review.helpful || 0})
+                </button>
+              </div>
+            </div>
           </div>
+        );
+      })}
+
+      {/* Image Gallery */}
+      <ImageGallery
+        images={galleryImages}
+        currentIndex={galleryIndex}
+        isOpen={showGallery}
+        onClose={closeGallery}
+        onNext={nextImage}
+        onPrevious={prevImage}
+        onIndexChange={handleGalleryIndexChange}
+        productName="Hình ảnh đánh giá"
+      />
+
+      {/* Load more button */}
+      {reviews.length > 0 && (
+        <div className="text-center pt-6">
+          <button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105">
+            Xem thêm đánh giá
+          </button>
         </div>
       )}
-
-      {/* Load more (chưa xử lý logic phân trang) */}
-      <div className="mt-8 text-center">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
-          Xem thêm đánh giá
-        </button>
-      </div>
     </div>
   );
 };

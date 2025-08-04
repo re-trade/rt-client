@@ -19,7 +19,7 @@ export type ReviewResponse = {
   updatedAt: string;
   orderId: string;
   helpful: number;
-  imageUrls: string[];
+  images: string[];
   reply?: {
     content: string;
     createdAt: string;
