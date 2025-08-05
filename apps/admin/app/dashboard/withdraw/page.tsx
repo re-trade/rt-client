@@ -55,14 +55,9 @@ export default function WithdrawManagementPage() {
   const fetchQr = async (withdrawId: string) => {
     try {
       const qrBlob = await fetchWithdrawQr(withdrawId);
-      if (qrBlob) {
-        const url = URL.createObjectURL(qrBlob);
-        setQrCodeUrl(url);
-        return qrBlob;
-      } else {
-        setQrError('Không thể tải mã QR');
-        return null;
-      }
+      const url = URL.createObjectURL(qrBlob);
+      setQrCodeUrl(url);
+      return qrBlob;
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to fetch QR code';
       setQrError(errorMessage);
@@ -180,16 +175,14 @@ export default function WithdrawManagementPage() {
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
                   <TableCell>{withdraw.status}</TableCell>
                   <TableCell>
-                    {withdraw.processedDate
-                      ? new Date(withdraw.processedDate).toLocaleString('vi-VN', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: false,
-                        })
-                      : 'N/A'}
+                    {new Date(withdraw.createdDate).toLocaleString('vi-VN', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                    })}
                   </TableCell>
                   <TableCell>{withdraw.bankName}</TableCell>
                   <TableCell>{withdraw.bankBin}</TableCell>
