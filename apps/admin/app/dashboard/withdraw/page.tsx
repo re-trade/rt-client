@@ -54,24 +54,24 @@ export default function WithdrawManagementPage() {
 
   const [isQrLoading, setIsQrLoading] = useState(false);
 
-const fetchQr = async (withdrawId: string) => {
-  try {
-    setIsQrLoading(true);
-    const qrBlob = await fetchWithdrawQr(withdrawId);
-    if (!qrBlob) {
-      throw new Error('No QR code data returned');
+  const fetchQr = async (withdrawId: string) => {
+    try {
+      setIsQrLoading(true);
+      const qrBlob = await fetchWithdrawQr(withdrawId);
+      if (!qrBlob) {
+        throw new Error('No QR code data returned');
+      }
+      const url = URL.createObjectURL(qrBlob);
+      setQrCodeUrl(url);
+      return qrBlob;
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to fetch QR code';
+      setQrError(errorMessage);
+      return null;
+    } finally {
+      setIsQrLoading(false);
     }
-    const url = URL.createObjectURL(qrBlob);
-    setQrCodeUrl(url);
-    return qrBlob;
-  } catch (err: any) {
-    const errorMessage = err.message || 'Failed to fetch QR code';
-    setQrError(errorMessage);
-    return null;
-  } finally {
-    setIsQrLoading(false);
-  }
-};
+  };
 
   const handleViewDetails = async (withdraw: TWithdrawProfile) => {
     setSelectedWithdraw(withdraw);
