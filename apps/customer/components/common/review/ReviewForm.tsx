@@ -81,7 +81,10 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
         productId: product.product.id,
       };
       console.log('data send create review', request);
-      await reviewApi.createReview(request);
+      const response = await reviewApi.createReview(request);
+      if (response === null) {
+        console.log("lỗi")
+      }
       await onSubmit({
         rating,
         comment: comment.trim(),
@@ -132,11 +135,10 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
                   className="focus:outline-none"
                 >
                   <Star
-                    className={`w-8 h-8 transition-colors ${
-                      star <= (hoveredRating || rating)
+                    className={`w-8 h-8 transition-colors ${star <= (hoveredRating || rating)
                         ? 'fill-yellow-400 text-yellow-400'
                         : 'text-gray-300 hover:text-yellow-300'
-                    }`}
+                      }`}
                   />
                 </button>
               ))}
@@ -171,9 +173,8 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
             {/* Upload Button */}
             <div className="flex items-center">
               <label
-                className={`cursor-pointer bg-white border-2 border-dashed border-gray-300 rounded-lg px-4 py-2 hover:border-orange-300 transition-colors flex items-center space-x-2 ${
-                  isUploading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`cursor-pointer bg-white border-2 border-dashed border-gray-300 rounded-lg px-4 py-2 hover:border-orange-300 transition-colors flex items-center space-x-2 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
               >
                 <Upload className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-600">

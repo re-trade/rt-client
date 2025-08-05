@@ -68,7 +68,7 @@ export default function ImageGallery({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center"
+        className="fixed inset-0 bg-white bg-opacity-95 z-50 flex items-center justify-center"
         onClick={onClose}
       >
         <div

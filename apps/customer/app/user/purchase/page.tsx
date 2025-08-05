@@ -219,17 +219,17 @@ const SearchAndFilter = memo(
             <button
               type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center justify-between w-full pl-10 pr-4 py-3 border border-gray-200 text-black rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all bg-white hover:bg-gray-50"
+              className="flex items-center justify-between w-full pl-4 pr-4 py-3 border border-gray-200 text-black rounded-xl focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition-all bg-white hover:bg-gray-50"
             >
-              <span className="flex items-center space-x-2 flex-1 min-w-0">
+              <div className="flex items-center space-x-2 flex-1 min-w-0">
                 {selectedStatus ? (
                   <>
-                    <selectedStatus.config.icon className="w-4 h-4 flex-shrink-0" />
-                    <span
-                      className={`px-2 py-1 rounded-md border text-xs font-medium ${selectedStatus.config.color} truncate`}
+                    <selectedStatus.config.icon className="w-4 h-4 flex-shrink-0 text-gray-600" />
+                    <div
+                      className={`w-full px-3 py-1 rounded-md text-sm font-medium ${selectedStatus.config.color} text-center`}
                     >
                       {selectedStatus.config.label}
-                    </span>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -237,10 +237,10 @@ const SearchAndFilter = memo(
                     <span className="text-gray-500 truncate">Tất cả trạng thái</span>
                   </>
                 )}
-              </span>
+              </div>
 
               <ChevronDown
-                className={`w-4 h-4 transition-transform ml-2 flex-shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 transition-transform ml-2 flex-shrink-0 text-gray-500 ${isDropdownOpen ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -257,7 +257,8 @@ const SearchAndFilter = memo(
                     !selectedOrderStatuses ? 'bg-amber-50 border-l-4 border-amber-500' : ''
                   }`}
                 >
-                  <span className="text-gray-700 flex-1">Tất cả trạng thái</span>
+                  <Filter className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-700 flex-1 font-medium">Tất cả trạng thái</span>
                 </button>
 
                 {/* Các option trạng thái */}
@@ -279,15 +280,17 @@ const SearchAndFilter = memo(
                     >
                       <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
                         {IconComponent ? (
-                          <IconComponent className="w-4 h-4" />
+                          <IconComponent className="w-4 h-4 text-gray-600" />
                         ) : (
                           <Filter className="w-4 h-4 text-gray-400" />
                         )}
                       </div>
-                      <div
-                        className={`px-3 py-1 rounded-md border text-sm font-medium flex-1 ${status.config.color}`}
-                      >
-                        {status.config.label}
+                      <div className="flex-1">
+                        <div
+                          className={`w-full px-3 py-1 rounded-md text-sm font-medium ${status.config.color} text-center`}
+                        >
+                          {status.config.label}
+                        </div>
                       </div>
                     </button>
                   );
