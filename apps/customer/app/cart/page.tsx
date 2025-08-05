@@ -39,10 +39,10 @@ const ShoppingCart: React.FC = () => {
               Trang chủ
             </button>
             <span>/</span>
-            <span className="font-medium text-orange-600">Giỏ Hàng</span>
+            <span className="font-medium text-orange-600">Giỏ hàng</span>
           </div>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
-            Giỏ Hàng
+            Giỏ hàng
           </h1>
           <div className="w-16 md:w-20 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
         </div>

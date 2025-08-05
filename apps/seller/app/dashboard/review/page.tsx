@@ -7,6 +7,7 @@ import { ReviewTable } from '@/components/dialog-common/view-update/review-table
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
@@ -26,18 +27,23 @@ export default function ReviewsPage() {
   const [ratingFilter, setRatingFilter] = useState<string>('all');
   const [replyFilter, setReplyFilter] = useState<string>('all');
   const [productReviews, setProductReviews] = useState<ReviewResponse[]>([]);
-  const [loading, setLoading] = useState(true); // Chỉ cho initial load
-  const [isSearching, setIsSearching] = useState(false); // Cho search button
-  const [isFiltering, setIsFiltering] = useState(false); // Cho filter changes
+  const [loading, setLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   const fetchReviews = async (
     vote?: number,
     q?: string,
     reply?: string,
     loadingType: 'initial' | 'search' | 'filter' = 'search',
+    page: number = currentPage,
+    size: number = pageSize,
   ) => {
     try {
-      // Set loading state dựa trên loại action
       switch (loadingType) {
         case 'initial':
           setLoading(true);
@@ -55,47 +61,55 @@ export default function ReviewsPage() {
         reply?.trim() === 'REPLY' || reply?.trim() === 'NO_REPLY'
           ? (reply.trim() as 'REPLY' | 'NO_REPLY')
           : null;
-      const reviews = await reviewApi.getAllReviewsBySeller(0, 10, vote, trimmedQ, isReply);
 
-      if (Array.isArray(reviews)) {
-        setProductReviews(reviews);
-        console.log('Fetched reviews:', reviews);
+      const response = await reviewApi.getAllReviewsBySeller(
+        page - 1,
+        size,
+        vote,
+        trimmedQ,
+        isReply,
+      );
+
+      if (response.reviews && Array.isArray(response.reviews)) {
+        setProductReviews(response.reviews);
+        setTotalPages(response.totalPages);
+        setTotalItems(response.totalElements);
       } else {
-        console.warn('Unexpected reviews data:', reviews);
         setProductReviews([]);
+        setTotalPages(1);
+        setTotalItems(0);
       }
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
       setProductReviews([]);
+      setTotalPages(1);
+      setTotalItems(0);
     } finally {
-      // Reset tất cả loading states
       setLoading(false);
       setIsSearching(false);
       setIsFiltering(false);
     }
   };
 
-  // Initial load khi component mount
   useEffect(() => {
-    fetchReviews(undefined, undefined, undefined, 'initial');
+    fetchReviews(undefined, undefined, undefined, 'initial', 1, pageSize);
   }, []);
 
-  // Filter changes - không reload page, chỉ hiển thị loading indicator nhỏ
   useEffect(() => {
-    // Skip nếu đang trong initial load
     if (loading) return;
 
     const vote = ratingFilter === 'all' ? undefined : Number(ratingFilter);
     const q = searchTerm || undefined;
     const reply = replyFilter === 'all' ? undefined : replyFilter;
-    fetchReviews(vote, q, reply, 'filter');
-  }, [ratingFilter, replyFilter]);
+    fetchReviews(vote, q, reply, 'filter', currentPage, pageSize);
+  }, [ratingFilter, replyFilter, currentPage, pageSize]);
 
   const handleSearch = () => {
     const vote = ratingFilter === 'all' ? undefined : Number(ratingFilter);
     const q = searchTerm || undefined;
     const reply = replyFilter === 'all' ? undefined : replyFilter;
-    fetchReviews(vote, q, reply, 'search');
+    setCurrentPage(1);
+    fetchReviews(vote, q, reply, 'search', 1, pageSize);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -108,8 +122,17 @@ export default function ReviewsPage() {
     setSearchTerm('');
     setRatingFilter('all');
     setReplyFilter('all');
-    // Gọi API với tất cả filter = default
-    fetchReviews(undefined, undefined, undefined, 'search');
+    setCurrentPage(1);
+    fetchReviews(undefined, undefined, undefined, 'search', 1, pageSize);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
   };
 
   const handleViewDetail = (review: ReviewResponse) => {
@@ -358,6 +381,17 @@ export default function ReviewsPage() {
             onReply={handleReply}
           />
         </div>
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          loading={isFiltering || isSearching}
+          pageSizeOptions={[10, 20, 50]}
+        />
 
         {/* Dialogs */}
         <ReviewDetailDialog

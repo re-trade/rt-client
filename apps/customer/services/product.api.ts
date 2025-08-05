@@ -22,6 +22,7 @@ export type TProduct = {
   verified: boolean;
   createdAt: string;
   updatedAt: string;
+  avgVote: number;
 };
 
 export type TProductHistory = {

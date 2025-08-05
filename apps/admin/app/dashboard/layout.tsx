@@ -14,11 +14,13 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/hooks/use-auth';
 import {
   Banknote,
   FileText,
   Flag,
   LayoutDashboard,
+  LogOut,
   Package,
   Settings,
   ShoppingCart,
@@ -76,6 +78,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const { logout } = useAuth();
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
@@ -119,17 +122,27 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       )}
 
       <main className="flex-grow p-8 transition-all duration-300">
-        <div className="flex items-center gap-4 mb-8">
-          <SidebarTrigger className="bg-white shadow-sm hover:bg-gray-50" />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {menuItems.flatMap((g) => g.items).find((item) => item.href === pathname)?.title ||
-                'Dashboard'}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {pathname === '/dashboard' ? 'Tổng quan hệ thống' : 'Quản lý và giám sát'}
-            </p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger className="bg-white shadow-sm hover:bg-gray-50" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {menuItems.flatMap((g) => g.items).find((item) => item.href === pathname)?.title ||
+                  'Dashboard'}
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {pathname === '/dashboard' ? 'Tổng quan hệ thống' : 'Quản lý và giám sát'}
+              </p>
+            </div>
           </div>
+
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Đăng xuất
+          </button>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-6">{children}</div>
       </main>

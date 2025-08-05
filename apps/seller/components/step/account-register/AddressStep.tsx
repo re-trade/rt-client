@@ -47,7 +47,8 @@ export default function AddressStep({
     } as React.ChangeEvent<HTMLSelectElement>;
 
     handleChange(event);
-    handleFieldBlur(name);
+
+    // Update local display state
     if (name === 'state') {
       setSelectedProvince(provinces.find((p) => p.code.toString() === value)?.name || '');
       setSelectedDistrict('');
@@ -58,6 +59,12 @@ export default function AddressStep({
     } else if (name === 'ward') {
       setSelectedWard(wards.find((w) => w.code.toString() === value)?.name || '');
     }
+
+    // Only trigger field blur validation after a short delay to ensure form data is updated
+    // This prevents false validation warnings when a valid selection is made
+    setTimeout(() => {
+      handleFieldBlur(name);
+    }, 0);
   };
 
   useEffect(() => {

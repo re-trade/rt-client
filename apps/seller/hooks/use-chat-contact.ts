@@ -10,6 +10,8 @@ import {
 } from '@retrade/util';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { refreshTokenCall } from '@/service/auth.api';
 import { Socket } from 'socket.io-client';
 
 export function useMessenger() {
@@ -94,9 +96,13 @@ export function useMessenger() {
 
     const token = localStorage.getItem(ETokenName.ACCESS_TOKEN);
     if (!token) {
-      socket.disconnect();
-      router.push('/login');
-      return;
+      refreshTokenCall();
+      if (!token) {
+        localStorage.removeItem(ETokenName.ACCESS_TOKEN);
+        socket.disconnect();
+        router.push('/login');
+        return;
+      }
     }
 
     socket.on('connect', () => {

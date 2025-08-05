@@ -2,6 +2,7 @@
 
 import { banSeller, getSellers, TSellerProfile, unbanSeller } from '@/services/seller.api';
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const useSellerManager = () => {
   const [sellers, setSellers] = useState<TSellerProfile[]>([]);
@@ -63,10 +64,14 @@ const useSellerManager = () => {
           await fetchSellers();
           return true;
         }
-        setError('Failed to ban seller');
+        const errorMessage = 'Failed to ban seller';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to ban seller');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to ban seller';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       }
     },
@@ -81,10 +86,14 @@ const useSellerManager = () => {
           await fetchSellers();
           return true;
         }
-        setError('Failed to unban seller');
+        const errorMessage = 'Failed to unban seller';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to unban seller');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to unban seller';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       }
     },

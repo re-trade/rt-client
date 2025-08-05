@@ -1,24 +1,34 @@
 'use client';
 
+import Tooltip from '@/components/ui/Tooltip';
+import { useAuth } from '@/hooks/use-auth';
+import { useCustomerMetrics } from '@/hooks/use-customer-metrics';
 import { useCustomerProfile } from '@/hooks/use-customer-profile';
+import { SELLER_ROUTES } from '@/lib/constants';
+import { formatCurrencyAbbreviated, formatCurrencyFull } from '@/lib/utils';
 import {
   Activity,
   ArrowRight,
   Bell,
   Calendar,
   Gift,
-  Heart,
   MapPin,
   Package,
   ShoppingBag,
+  Store,
   TrendingUp,
   User,
+  Wallet,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const UserDashboard = () => {
   const [greeting, setGreeting] = useState('');
   const { profile } = useCustomerProfile();
+  const { roles } = useAuth();
+  const router = useRouter();
+  const { metrics, loading: metricsLoading, error: metricsError } = useCustomerMetrics();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -43,32 +53,37 @@ const UserDashboard = () => {
   const stats = [
     {
       label: 'Sản phẩm đã mua',
-      value: '24',
+      value: metricsLoading ? '...' : metrics?.boughtItems?.toString() || '0',
       icon: <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
     },
     {
-      label: 'Sản phẩm yêu thích',
-      value: '12',
-      icon: <Heart className="w-5 h-5 sm:w-6 sm:h-6" />,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
-    },
-    {
       label: 'Đơn hàng đã đặt',
-      value: '5',
+      value: metricsLoading ? '...' : metrics?.orderPlace?.toString() || '0',
       icon: <Package className="w-5 h-5 sm:w-6 sm:h-6" />,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
     },
     {
-      label: 'Sản phẩm đã trao đổi',
-      value: '8',
+      label: 'Đơn hàng hoàn thành',
+      value: metricsLoading ? '...' : metrics?.orderComplete?.toString() || '0',
       icon: <Gift className="w-5 h-5 sm:w-6 sm:h-6" />,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
-      subtitle: 'món đồ',
+    },
+    {
+      label: 'Số dư ví',
+      value: metricsLoading
+        ? '...'
+        : metrics
+          ? formatCurrencyAbbreviated(metrics.walletBalance)
+          : '0 VND',
+      fullValue: metrics ? formatCurrencyFull(metrics.walletBalance) : '0 VND',
+      icon: <Wallet className="w-5 h-5 sm:w-6 sm:h-6" />,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-100',
+      isWallet: true,
     },
   ];
 
@@ -113,11 +128,30 @@ const UserDashboard = () => {
       href: '/user/address',
     },
     {
-      title: 'Kho voucher',
-      description: 'Xem ưu đâi hiện có',
-      icon: <Gift className="w-5 h-5 sm:w-6 sm:h-6" />,
-      href: '/user/vouchers',
+      title: 'Ví của tôi',
+      description: 'Quản lý số dư và giao dịch',
+      icon: <Wallet className="w-5 h-5 sm:w-6 sm:h-6" />,
+      href: '/user/wallet',
     },
+    ...(roles.includes('ROLE_SELLER')
+      ? [
+          {
+            title: 'Quản lý cửa hàng',
+            description: 'Quản lý sản phẩm và đơn hàng',
+            icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
+            href: SELLER_ROUTES.DASHBOARD,
+            external: true,
+          },
+        ]
+      : [
+          {
+            title: 'Trở thành người bán',
+            description: 'Đăng ký bán hàng trên nền tảng',
+            icon: <Store className="w-5 h-5 sm:w-6 sm:h-6" />,
+            href: SELLER_ROUTES.REGISTER,
+            external: true,
+          },
+        ]),
   ];
 
   return (
@@ -154,6 +188,21 @@ const UserDashboard = () => {
             </div>
           </div>
         </div>
+        {metricsError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-red-600 text-sm">⚠</span>
+                </div>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-red-800">Không thể tải dữ liệu thống kê</p>
+                <p className="text-sm text-red-600 mt-1">{metricsError}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {stats.map((stat, index) => (
             <div
@@ -169,12 +218,19 @@ const UserDashboard = () => {
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 opacity-60" />
               </div>
               <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-1">
-                {stat.value}
+                {metricsLoading ? (
+                  <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+                ) : stat.isWallet ? (
+                  <Tooltip content={stat.fullValue || stat.value} position="top">
+                    <span className="cursor-help">{stat.value}</span>
+                  </Tooltip>
+                ) : (
+                  stat.value
+                )}
               </h3>
               <p className="text-gray-600 text-xs sm:text-sm font-medium leading-tight">
                 {stat.label}
               </p>
-              {stat.subtitle && <p className="text-xs text-gray-800 mt-1">{stat.subtitle}</p>}
             </div>
           ))}
         </div>
@@ -192,6 +248,13 @@ const UserDashboard = () => {
                   <div
                     key={index}
                     className="group cursor-pointer p-3 sm:p-4 rounded-lg border border-orange-200 hover:border-orange-400 hover:shadow-md transition-all duration-300 bg-white"
+                    onClick={() => {
+                      if (action.external) {
+                        window.open(action.href, '_blank');
+                      } else {
+                        router.push(action.href);
+                      }
+                    }}
                   >
                     <div className="flex items-start space-x-3 sm:space-x-4">
                       <div className="p-2 sm:p-2.5 lg:p-3 rounded-lg bg-orange-100 text-orange-600 shadow-md flex-shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors">
@@ -205,7 +268,9 @@ const UserDashboard = () => {
                           {action.description}
                         </p>
                         <div className="flex items-center mt-2 text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span className="text-xs sm:text-sm font-medium">Xem chi tiết</span>
+                          <span className="text-xs sm:text-sm font-medium">
+                            {action.external ? 'Mở trang mới' : 'Xem chi tiết'}
+                          </span>
                           <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>

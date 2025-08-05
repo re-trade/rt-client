@@ -19,7 +19,7 @@ export type ReviewResponse = {
   updatedAt: string;
   orderId: string;
   helpful: number;
-  imageUrls: string[];
+  images: string[];
   reply?: {
     content: string;
     createdAt: string;
@@ -30,17 +30,23 @@ export type ReviewResponse = {
 export const reviewApi = {
   getReviews: async (
     productId: string,
-    page: number = 1,
+    page: number = 0,
     size: number = 4,
   ): Promise<ReviewResponse[]> => {
     const response = await unAuthApi.default.get<IResponseObject<ReviewResponse[]>>(
-      `/products/${productId}/reviews`,
+      `/product-review/product/${productId}`,
       {
         params: {
           page,
           size,
         },
       },
+    );
+    return response.data.content;
+  },
+  getTotalReviews: async (productId: string): Promise<number> => {
+    const response = await unAuthApi.default.get<IResponseObject<number>>(
+      `/product-review/product/${productId}/count`,
     );
     return response.data.content;
   },

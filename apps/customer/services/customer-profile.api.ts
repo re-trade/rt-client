@@ -1,4 +1,4 @@
-import { IResponseObject, authApi } from '@retrade/util';
+import { authApi, IResponseObject } from '@retrade/util';
 
 type TCustomerProfileResponse = {
   id: string;
@@ -13,10 +13,16 @@ type TCustomerProfileResponse = {
   lastUpdate: string;
 };
 
+type TCustomerBaseMetricResponse = {
+  boughtItems: number;
+  orderPlace: number;
+  orderComplete: number;
+  walletBalance: number;
+};
+
 type TCustomerProfileRequest = Omit<
   TCustomerProfileResponse,
-  'id' | 'lastUpdate' | 'gender' | 'email',
-  'username'
+  'id' | 'lastUpdate' | 'email' | 'username'
 >;
 
 const profileApi = {
@@ -70,6 +76,19 @@ const profileApi = {
       },
     );
   },
+
+  async getCustomerBaseMetric(): Promise<TCustomerBaseMetricResponse | undefined> {
+    try {
+      const result =
+        await authApi.default.get<IResponseObject<TCustomerBaseMetricResponse>>(
+          '/customers/metric',
+        );
+      if (result.data.success && result.status === 200) {
+        const { content } = result.data;
+        return content;
+      }
+    } catch {}
+  },
 };
 export { profileApi };
-export type { TCustomerProfileRequest, TCustomerProfileResponse };
+export type { TCustomerBaseMetricResponse, TCustomerProfileRequest, TCustomerProfileResponse };

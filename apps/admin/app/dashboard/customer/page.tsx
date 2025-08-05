@@ -37,6 +37,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const CustomerStats = ({ customers }: { customers: any[] }) => {
   const totalCustomers = customers.length;
@@ -361,20 +362,36 @@ export default function CustomerManagementPage() {
   };
 
   const handleVerify = async (customerId: string) => {
-    const result = await handleUnbanCustomer(customerId);
-    if (result) {
-      setDeleteSuccess('Xác minh người bán thành công!');
-    } else {
-      setDeleteError('Lỗi xác minh người bán');
+    try {
+      const result = await handleUnbanCustomer(customerId);
+      if (result) {
+        toast.success('Xác minh khách hàng thành công!', { position: 'top-right' });
+        setDeleteSuccess('Xác minh khách hàng thành công!');
+      } else {
+        toast.error('Lỗi xác minh khách hàng', { position: 'top-right' });
+        setDeleteError('Lỗi xác minh khách hàng');
+      }
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || 'Lỗi xác minh khách hàng';
+      toast.error(errorMessage, { position: 'top-right' });
+      setDeleteError(errorMessage);
     }
   };
 
   const handleReject = async (customerId: string) => {
-    const result = await handleBanCustomer(customerId);
-    if (result) {
-      setDeleteSuccess('hủy xác minh người bán thành công!');
-    } else {
-      setDeleteError(result || 'Lỗi hủy xác minh người bán');
+    try {
+      const result = await handleBanCustomer(customerId);
+      if (result) {
+        toast.success('Hủy xác minh khách hàng thành công!', { position: 'top-right' });
+        setDeleteSuccess('Hủy xác minh khách hàng thành công!');
+      } else {
+        toast.error(result || 'Lỗi hủy xác minh khách hàng', { position: 'top-right' });
+        setDeleteError(result || 'Lỗi hủy xác minh khách hàng');
+      }
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || 'Lỗi hủy xác minh khách hàng';
+      toast.error(errorMessage, { position: 'top-right' });
+      setDeleteError(errorMessage);
     }
   };
 
