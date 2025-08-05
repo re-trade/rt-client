@@ -64,7 +64,7 @@ const getBanks = async (
   }
 };
 const approveWithdraw = async (id: string): Promise<IResponseObject<null> | undefined> => {
-  const result = await unAuthApi.default.put<IResponseObject<null>>(
+  const result = await authApi.default.put<IResponseObject<null>>(
     `/wallets/withdraw/${id}/approve`,
   );
   if (result.data.success) {
