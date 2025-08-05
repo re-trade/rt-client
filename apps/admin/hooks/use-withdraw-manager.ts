@@ -63,16 +63,16 @@ const useWithdrawManager = () => {
   );
 
   const fetchWithdrawQr = useCallback(async (withdrawId: string) => {
-  try {
-    const qrBlob = await withdrawQr(withdrawId);
-    return qrBlob; // Return Blob, let fetchQr handle URL creation
-  } catch (err: any) {
-    const errorMessage = err.message || 'Failed to fetch QR code';
-    setQrError(errorMessage);
-    toast.error(errorMessage, { position: 'top-right' });
-    return null;
-  }
-}, []);
+    try {
+      const qrBlob = await withdrawQr(withdrawId);
+      return qrBlob; // Return Blob, let fetchQr handle URL creation
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to fetch QR code';
+      setQrError(errorMessage);
+      toast.error(errorMessage, { position: 'top-right' });
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     fethWithdraw();
