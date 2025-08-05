@@ -4,7 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useAddressData } from '@/hooks/use-address-data';
 import { sellerApi, SellerProfileResponse, SellerProfileUpdateRequest } from '@/service/seller.api';
 import { storageApi } from '@/service/storage.api';
 import {
@@ -16,6 +24,9 @@ import {
   Package,
   Phone,
   Save,
+  Shield,
+  ShieldCheck,
+  ShieldX,
   ShoppingCart,
   Star,
   Upload,
@@ -45,6 +56,19 @@ export default function ShopInfoManagement() {
     status: 'active',
   });
 
+  const {
+    provinces,
+    districts,
+    wards,
+    loading: addressLoading,
+    error: addressError,
+    fetchDistricts,
+    fetchWards,
+    getProvinceByName,
+    getDistrictByName,
+    getWardByName,
+  } = useAddressData();
+
   useEffect(() => {
     (async () => {
       const response = await sellerApi.sellerInformation();
@@ -53,7 +77,24 @@ export default function ShopInfoManagement() {
     })();
   }, []);
 
-  // Check if there are any changes
+  useEffect(() => {
+    if (formData?.state && provinces.length > 0) {
+      const province = getProvinceByName(formData.state);
+      if (province) {
+        fetchDistricts(province.code.toString());
+      }
+    }
+  }, [formData?.state, provinces, getProvinceByName, fetchDistricts]);
+
+  useEffect(() => {
+    if (formData?.district && districts.length > 0) {
+      const district = getDistrictByName(formData.district);
+      if (district) {
+        fetchWards(district.code.toString());
+      }
+    }
+  }, [formData?.district, districts, getDistrictByName, fetchWards]);
+
   const hasChanges = useMemo(() => {
     if (!sellerInfo || !formData) return false;
 
@@ -82,6 +123,41 @@ export default function ShopInfoManagement() {
   const handleInputChange = (field: keyof SellerProfileResponse, value: string) => {
     if (!formData) return;
     setFormData({ ...formData, [field]: value });
+  };
+
+  const handleAddressChange = (field: 'state' | 'district' | 'ward', value: string) => {
+    if (!formData) return;
+
+    if (field === 'state') {
+      const province = provinces.find((p) => p.code.toString() === value);
+      if (province) {
+        setFormData({
+          ...formData,
+          state: province.name,
+          district: '',
+          ward: '',
+        });
+        fetchDistricts(value);
+      }
+    } else if (field === 'district') {
+      const district = districts.find((d) => d.code.toString() === value);
+      if (district) {
+        setFormData({
+          ...formData,
+          district: district.name,
+          ward: '',
+        });
+        fetchWards(value);
+      }
+    } else if (field === 'ward') {
+      const ward = wards.find((w) => w.code.toString() === value);
+      if (ward) {
+        setFormData({
+          ...formData,
+          ward: ward.name,
+        });
+      }
+    }
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,6 +277,51 @@ export default function ShopInfoManagement() {
     }
   };
 
+  const getVerificationStatusColor = (status: string) => {
+    switch (status) {
+      case 'VERIFIED':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'PENDING':
+        return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'REJECTED':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'UNVERIFIED':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getVerificationStatusText = (status: string) => {
+    switch (status) {
+      case 'VERIFIED':
+        return 'Đã xác minh';
+      case 'PENDING':
+        return 'Chờ xác minh';
+      case 'REJECTED':
+        return 'Bị từ chối';
+      case 'UNVERIFIED':
+        return 'Chưa xác minh';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const getVerificationIcon = (status: string) => {
+    switch (status) {
+      case 'VERIFIED':
+        return ShieldCheck;
+      case 'PENDING':
+        return Shield;
+      case 'REJECTED':
+        return ShieldX;
+      case 'UNVERIFIED':
+        return Shield;
+      default:
+        return Shield;
+    }
+  };
+
   if (!formData || !sellerInfo) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -313,12 +434,41 @@ export default function ShopInfoManagement() {
                         <div className="flex items-center gap-2">
                           <Star className="h-5 w-5 fill-amber-500 text-amber-500" />
                           <span className="text-2xl font-bold text-amber-900">
-                            {statisticals.rating}/5.0
+                            {formData.avgVote ? formData.avgVote.toFixed(1) : '0.0'}/5.0
                           </span>
                         </div>
                       </div>
                       <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center">
                         <Star className="h-6 w-6 fill-amber-500 text-amber-500" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="group relative bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border-l-4 border-emerald-500 hover:shadow-lg transition-all duration-300">
+                    <div className="flex justify-between items-center">
+                      <div className="space-y-1">
+                        <span className="text-sm font-medium text-emerald-700">
+                          Xác minh danh tính
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {(() => {
+                            const VerificationIcon = getVerificationIcon(
+                              formData.identityVerifiedStatus,
+                            );
+                            return <VerificationIcon className="h-5 w-5 text-emerald-600" />;
+                          })()}
+                          <span className="text-lg font-bold text-emerald-900">
+                            {getVerificationStatusText(formData.identityVerifiedStatus)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                        {(() => {
+                          const VerificationIcon = getVerificationIcon(
+                            formData.identityVerifiedStatus,
+                          );
+                          return <VerificationIcon className="h-6 w-6 text-emerald-600" />;
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -420,7 +570,21 @@ export default function ShopInfoManagement() {
                       <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-xl border border-amber-200 shadow-sm">
                         <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
                         <span className="text-sm font-semibold text-amber-700">
-                          {statisticals.rating}/5.0
+                          {formData.avgVote ? formData.avgVote.toFixed(1) : '0.0'}/5.0
+                        </span>
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border shadow-sm ${getVerificationStatusColor(formData.identityVerifiedStatus)}`}
+                      >
+                        {(() => {
+                          const VerificationIcon = getVerificationIcon(
+                            formData.identityVerifiedStatus,
+                          );
+                          return <VerificationIcon className="h-5 w-5" />;
+                        })()}
+                        <span className="text-sm font-semibold">
+                          {getVerificationStatusText(formData.identityVerifiedStatus)}
                         </span>
                       </div>
 
@@ -595,15 +759,82 @@ export default function ShopInfoManagement() {
                     </div>
                     Địa chỉ cửa hàng
                   </h3>
+                  {addressError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <p className="text-red-600 text-sm">{addressError}</p>
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Tỉnh/Thành phố */}
+                    <div className="space-y-3">
+                      <Label className="text-gray-700 font-semibold text-lg">Tỉnh/Thành phố</Label>
+                      {isEditing ? (
+                        <Select
+                          value={
+                            formData.state
+                              ? getProvinceByName(formData.state)?.code.toString() || ''
+                              : ''
+                          }
+                          onValueChange={(value) => handleAddressChange('state', value)}
+                          disabled={addressLoading || provinces.length === 0}
+                        >
+                          <SelectTrigger className="border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px]">
+                            <SelectValue placeholder="Chọn tỉnh/thành phố">
+                              {formData.state || 'Chọn tỉnh/thành phố'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {provinces.map((province) => (
+                              <SelectItem
+                                key={province.code}
+                                value={province.code.toString()}
+                                className="hover:bg-blue-50"
+                              >
+                                {province.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
+                          <p className="text-gray-800 text-lg font-medium">
+                            {formData.state || 'Chưa thiết lập'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="space-y-3">
                       <Label className="text-gray-700 font-semibold text-lg">Quận/Huyện</Label>
                       {isEditing ? (
-                        <Input
-                          value={formData.district || ''}
-                          onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                          className="border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px]"
-                        />
+                        <Select
+                          value={
+                            formData.district
+                              ? getDistrictByName(formData.district)?.code.toString() || ''
+                              : ''
+                          }
+                          onValueChange={(value) => handleAddressChange('district', value)}
+                          disabled={addressLoading || districts.length === 0 || !formData.state}
+                        >
+                          <SelectTrigger
+                            className={`border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px] ${!formData.state ? 'bg-gray-50 text-gray-400' : ''}`}
+                          >
+                            <SelectValue placeholder="Chọn quận/huyện">
+                              {formData.district || 'Chọn quận/huyện'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {districts.map((district) => (
+                              <SelectItem
+                                key={district.code}
+                                value={district.code.toString()}
+                                className="hover:bg-blue-50"
+                              >
+                                {district.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       ) : (
                         <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
                           <p className="text-gray-800 text-lg font-medium">
@@ -612,35 +843,40 @@ export default function ShopInfoManagement() {
                         </div>
                       )}
                     </div>
+
                     <div className="space-y-3">
                       <Label className="text-gray-700 font-semibold text-lg">Phường/Xã</Label>
                       {isEditing ? (
-                        <Input
-                          value={formData.ward || ''}
-                          onChange={(e) => setFormData({ ...formData, ward: e.target.value })}
-                          className="border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px]"
-                        />
+                        <Select
+                          value={
+                            formData.ward ? getWardByName(formData.ward)?.code.toString() || '' : ''
+                          }
+                          onValueChange={(value) => handleAddressChange('ward', value)}
+                          disabled={addressLoading || wards.length === 0 || !formData.district}
+                        >
+                          <SelectTrigger
+                            className={`border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px] ${!formData.district ? 'bg-gray-50 text-gray-400' : ''}`}
+                          >
+                            <SelectValue placeholder="Chọn phường/xã">
+                              {formData.ward || 'Chọn phường/xã'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {wards.map((ward) => (
+                              <SelectItem
+                                key={ward.code}
+                                value={ward.code.toString()}
+                                className="hover:bg-blue-50"
+                              >
+                                {ward.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       ) : (
                         <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
                           <p className="text-gray-800 text-lg font-medium">
                             {formData.ward || 'Chưa thiết lập'}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                    {/* Tỉnh/Thành phố */}
-                    <div className="space-y-3">
-                      <Label className="text-gray-700 font-semibold text-lg">Tỉnh/Thành phố</Label>
-                      {isEditing ? (
-                        <Input
-                          value={formData.state || ''}
-                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                          className="border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px]"
-                        />
-                      ) : (
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
-                          <p className="text-gray-800 text-lg font-medium">
-                            {formData.state || 'Chưa thiết lập'}
                           </p>
                         </div>
                       )}

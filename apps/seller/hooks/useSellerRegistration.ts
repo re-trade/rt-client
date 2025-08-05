@@ -1,10 +1,12 @@
 'use client';
 
+import { useToast } from '@/hooks/use-toast';
 import { sellerApi, SellerProfileRegisterRequest } from '@/service/seller.api';
 import { storageApi } from '@/service/storage.api';
 import axios from 'axios';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
+
 export interface Province {
   code: number;
   name: string;
@@ -98,6 +100,7 @@ const sellerSchema = Joi.object({
 });
 
 export function useSellerRegistration() {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<SellerFormData>(defaultFormData);
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -140,7 +143,6 @@ export function useSellerRegistration() {
     const { name, files } = e.target;
     const file = files && files.length > 0 ? files[0] : null;
 
-    // Handle file size validation - max 5MB
     if (file && file.size > 5 * 1024 * 1024) {
       setErrors((prev) => ({
         ...prev,
@@ -149,8 +151,6 @@ export function useSellerRegistration() {
       return;
     }
 
-    // For identity images, we handle them differently than avatar/background
-    // Avatar and background are now handled in their own components with API uploads
     if (name === 'identityFrontImage' || name === 'identityBackImage') {
       setFormData((prev) => ({ ...prev, [name]: file }));
       setTouched((prev) => ({ ...prev, [name]: true }));
@@ -174,19 +174,19 @@ export function useSellerRegistration() {
   };
   const handleFieldBlur = (name: keyof SellerFormData) => {
     setTouched((prev) => ({ ...prev, [name]: true }));
-    validateField(name, formData[name]);
-    if (name === 'state' && !formData.state) {
+
+    const currentValue = formData[name];
+    validateField(name, currentValue);
+
+    if (name === 'state' && !currentValue) {
       setErrors((prev) => ({ ...prev, state: 'Vui lòng chọn Tỉnh/Thành phố' }));
-    }
-    if (name === 'district' && !formData.district) {
+    } else if (name === 'district' && !currentValue) {
       setErrors((prev) => ({ ...prev, district: 'Vui lòng chọn Quận/Huyện' }));
-    }
-    if (name === 'ward' && !formData.ward) {
+    } else if (name === 'ward' && !currentValue) {
       setErrors((prev) => ({ ...prev, ward: 'Vui lòng chọn Phường/Xã' }));
     }
   };
   const validateField = (name: keyof SellerFormData, value: any) => {
-    // Helper function to clear errors for a field
     const clearError = () => {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -196,13 +196,11 @@ export function useSellerRegistration() {
       return true;
     };
 
-    // Helper function to set an error message
     const setError = (message: string) => {
       setErrors((prev) => ({ ...prev, [name]: message }));
       return false;
     };
 
-    // Validate identity images
     if (name === 'identityFrontImage' || name === 'identityBackImage') {
       const file = formData[name];
       if (!file) {
@@ -215,7 +213,6 @@ export function useSellerRegistration() {
       return clearError();
     }
 
-    // Validate avatar and background
     if (name === 'avatarUrl' || name === 'background') {
       const file = formData[name];
       if (!file) {
@@ -440,19 +437,30 @@ export function useSellerRegistration() {
       let avatarUrl = '';
       let background = '';
 
-      if (formData.avatarUrl instanceof File) {
-        avatarUrl = await storageApi.fileUpload(formData.avatarUrl);
-      } else if (typeof formData.avatarUrl === 'string') {
-        avatarUrl = formData.avatarUrl;
-      }
+      try {
+        if (formData.avatarUrl instanceof File) {
+          avatarUrl = await storageApi.fileUpload(formData.avatarUrl);
+        } else if (typeof formData.avatarUrl === 'string') {
+          avatarUrl = formData.avatarUrl;
+        }
 
-      if (formData.background instanceof File) {
-        background = await storageApi.fileUpload(formData.background);
-      } else if (typeof formData.background === 'string') {
-        background = formData.background;
+        if (formData.background instanceof File) {
+          background = await storageApi.fileUpload(formData.background);
+        } else if (typeof formData.background === 'string') {
+          background = formData.background;
+        }
+      } catch (uploadError) {
+        console.error('File upload error:', uploadError);
+        showToast('Tải lên hình ảnh không thành công. Vui lòng thử lại.', 'error');
+        return false;
       }
 
       if (!avatarUrl || !background) {
+        const missingFiles = [];
+        if (!avatarUrl) missingFiles.push('ảnh đại diện');
+        if (!background) missingFiles.push('ảnh bìa');
+
+        showToast(`Vui lòng tải lên ${missingFiles.join(' và ')}.`, 'error');
         setErrors((prev) => ({
           ...prev,
           ...(!avatarUrl ? { avatarUrl: 'Ảnh đại diện là bắt buộc' } : {}),
@@ -475,7 +483,7 @@ export function useSellerRegistration() {
       };
       const result = await sellerApi.registerSeller(requestBody);
       if (!result) {
-        alert('Đăng ký không thành công!');
+        showToast('Đăng ký không thành công! Vui lòng kiểm tra thông tin và thử lại.', 'error');
         return false;
       }
       if (!formData.identityBackImage || !formData.identityFrontImage) {
@@ -495,13 +503,39 @@ export function useSellerRegistration() {
         frontIdentity: formData.identityFrontImage,
       });
       if (!verifiUpload) {
-        alert('Đăng ký không thành công!');
+        showToast('Tải lên giấy tờ xác minh không thành công! Vui lòng thử lại.', 'error');
         return false;
       }
+
+      showToast('Đăng ký thành công! Tài khoản của bạn đang được xem xét.', 'success');
       return true;
     } catch (error) {
       console.error('Error submitting form:', error);
-      setErrors((prev) => ({ ...prev, general: 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.' }));
+
+      let errorMessage = 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.';
+
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'NETWORK_ERROR' || !error.response) {
+          errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet và thử lại.';
+        } else if (error.response?.status === 400) {
+          errorMessage =
+            'Thông tin đăng ký không hợp lệ. Vui lòng kiểm tra lại các trường thông tin.';
+        } else if (error.response?.status === 409) {
+          errorMessage =
+            'Email hoặc số điện thoại đã được sử dụng. Vui lòng sử dụng thông tin khác.';
+        } else if (error.response?.status === 500) {
+          errorMessage = 'Lỗi hệ thống. Vui lòng thử lại sau ít phút.';
+        } else if (error.response?.status >= 400 && error.response?.status < 500) {
+          errorMessage = 'Yêu cầu không hợp lệ. Vui lòng kiểm tra thông tin và thử lại.';
+        }
+      } else if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối internet.';
+        }
+      }
+
+      showToast(errorMessage, 'error');
+      setErrors((prev) => ({ ...prev, general: errorMessage }));
       return false;
     } finally {
       setIsSubmitting(false);

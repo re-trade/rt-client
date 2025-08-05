@@ -24,14 +24,21 @@ import { TWithdrawProfile } from '@/services/withdraw.api';
 import { AlertTriangle, Check, PauseCircle, Search, Store } from 'lucide-react';
 import { useState } from 'react';
 
+// Status mappings for display
 const statusLabels: Record<string, string> = {
-  true: 'Đang hoạt động',
-  false: 'Không hoạt động',
+  '0': 'Yêu cầu đã thực hiện',
+  PENDING: 'Đang chờ',
+  APPROVED: 'Đã duyệt',
+  REJECTED: 'Từ chối',
+  COMPLETED: 'Hoàn thành',
 };
 
 const statusColors: Record<string, string> = {
-  true: 'bg-green-100 text-green-800',
-  false: 'bg-red-100 text-yellow-800',
+  '0': 'bg-blue-100 text-blue-800 border border-blue-200',
+  PENDING: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+  APPROVED: 'bg-green-100 text-green-800 border border-green-200',
+  REJECTED: 'bg-red-100 text-red-800 border border-red-200',
+  COMPLETED: 'bg-blue-100 text-blue-800 border border-blue-200',
 };
 
 export default function WithdrawManagementPage() {
@@ -52,21 +59,24 @@ export default function WithdrawManagementPage() {
     fetchWithdrawQr,
   } = useWithdrawManager();
 
+  const [isQrLoading, setIsQrLoading] = useState(false);
+
   const fetchQr = async (withdrawId: string) => {
     try {
+      setIsQrLoading(true);
       const qrBlob = await fetchWithdrawQr(withdrawId);
-      if (qrBlob) {
-        const url = URL.createObjectURL(qrBlob);
-        setQrCodeUrl(url);
-        return qrBlob;
-      } else {
-        setQrError('Không thể tải mã QR');
-        return null;
+      if (!qrBlob) {
+        throw new Error('No QR code data returned');
       }
+      const url = URL.createObjectURL(qrBlob);
+      setQrCodeUrl(url);
+      return qrBlob;
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to fetch QR code';
       setQrError(errorMessage);
       return null;
+    } finally {
+      setIsQrLoading(false);
     }
   };
 
@@ -74,7 +84,9 @@ export default function WithdrawManagementPage() {
     setSelectedWithdraw(withdraw);
     setQrCodeUrl(null);
     setQrError(null);
-    await fetchQr(withdraw.id);
+    if (withdraw.status !== '0') {
+      await fetchQr(withdraw.id);
+    }
   };
 
   const handleApprove = async (productId: string) => {
@@ -178,18 +190,16 @@ export default function WithdrawManagementPage() {
                     {withdraw.id}
                   </TableCell>
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
-                  <TableCell>{withdraw.status}</TableCell>
+                  <TableCell>{statusLabels[withdraw.status] || withdraw.status}</TableCell>
                   <TableCell>
-                    {withdraw.processedDate
-                      ? new Date(withdraw.processedDate).toLocaleString('vi-VN', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: false,
-                        })
-                      : 'N/A'}
+                    {new Date(withdraw.createdDate).toLocaleString('vi-VN', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                    })}
                   </TableCell>
                   <TableCell>{withdraw.bankName}</TableCell>
                   <TableCell>{withdraw.bankBin}</TableCell>
@@ -261,12 +271,17 @@ export default function WithdrawManagementPage() {
                         ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                         : selectedWithdraw.status === 'APPROVED'
                           ? 'bg-green-100 text-green-800 border border-green-200'
-                          : 'bg-red-100 text-red-800 border border-red-200'
+                          : selectedWithdraw.status === 'REJECTED'
+                            ? 'bg-red-100 text-red-800 border border-red-200'
+                            : selectedWithdraw.status === 'COMPLETED'
+                              ? 'bg-green-100 text-green-800 border border-green-200'
+                              : 'bg-gray-100 text-gray-800 border border-gray-200'
                     }`}
                   >
                     {selectedWithdraw.status === 'PENDING' && '⏳ Đang chờ'}
                     {selectedWithdraw.status === 'APPROVED' && '✅ Đã duyệt'}
                     {selectedWithdraw.status === 'REJECTED' && '❌ Từ chối'}
+                    {selectedWithdraw.status === 'COMPLETED' && '✅ Đã thanh toán'}
                   </div>
                 </div>
               </div>
@@ -361,7 +376,14 @@ export default function WithdrawManagementPage() {
                   </h3>
                 </div>
                 <div className="p-4">
-                  {qrError ? (
+                  {selectedWithdraw.status === 'COMPLETED' ? (
+                    <div className="flex items-center justify-center p-8 bg-green-50 border-2 border-dashed border-green-200 rounded-lg">
+                      <div className="text-center">
+                        <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                        <p className="text-sm font-medium text-green-700">Đã thanh toán</p>
+                      </div>
+                    </div>
+                  ) : qrError ? (
                     <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
                       <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
                       <div>

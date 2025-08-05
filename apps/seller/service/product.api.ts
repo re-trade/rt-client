@@ -61,7 +61,17 @@ export type UpdateProductDto = {
 };
 
 export const productApi = {
-  async getProducts(page: number = 0, size: number = 15, query?: string): Promise<TProduct[]> {
+  async getProducts(
+    page: number = 0,
+    size: number = 15,
+    query?: string,
+  ): Promise<{
+    products: TProduct[];
+    totalPages: number;
+    totalElements: number;
+    currentPage: number;
+    pageSize: number;
+  }> {
     const response = await authApi.default.get<IResponseObject<TProduct[]>>(
       `/products/my-products`,
       {
@@ -72,7 +82,14 @@ export const productApi = {
         },
       },
     );
-    return response.data.success ? response.data.content : [];
+    const products = response.data.success ? response.data.content : [];
+    return {
+      products,
+      totalPages: response.data.pagination?.totalPages || 1,
+      totalElements: response.data.pagination?.totalElements || products.length,
+      currentPage: (response.data.pagination?.page || 0) + 1,
+      pageSize: response.data.pagination?.size || size,
+    };
   },
   async getProduct(id: string): Promise<TProduct> {
     try {

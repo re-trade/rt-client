@@ -64,7 +64,7 @@ const getBanks = async (
   }
 };
 const approveWithdraw = async (id: string): Promise<IResponseObject<null> | undefined> => {
-  const result = await unAuthApi.default.put<IResponseObject<null>>(
+  const result = await authApi.default.post<IResponseObject<null>>(
     `/wallets/withdraw/${id}/approve`,
   );
   if (result.data.success) {
@@ -82,8 +82,11 @@ const withdrawQr = async (id: string): Promise<Blob | undefined> => {
       withCredentials: true,
     });
     return response.data;
-  } catch {
-    return undefined;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+    }
+    throw new Error(error.message || 'Failed to fetch QR code');
   }
 };
 export { approveWithdraw, getBanks, getWithdraws, withdrawQr };
