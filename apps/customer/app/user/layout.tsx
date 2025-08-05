@@ -10,6 +10,7 @@ import {
   Settings,
   Shield,
   ShoppingBag,
+  Star,
   User,
   Wallet,
   X,
@@ -91,7 +92,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
       path: 'purchase',
       subMenu: [
         { name: 'Đơn mua của tôi', icon: <ShoppingBag className="w-4 h-4" />, path: 'purchase' },
-        { name: 'Đánh giá sản phẩm', icon: <Eye className="w-4 h-4" />, path: 'review' },
+        { name: 'Đánh giá sản phẩm', icon: <Star className="w-4 h-4" />, path: 'review' },
       ],
     },
     {
