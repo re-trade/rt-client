@@ -109,9 +109,10 @@ export const reviewApi = {
     return response.data.content;
   },
   replyReview: async (reviewId: string, content: string): Promise<ReviewResponse> => {
+    const query = new URLSearchParams();
+    query.set('content', content);
     const response = await authApi.default.patch<IResponseObject<ReviewResponse>>(
-      `/product-review/${reviewId}/create-reply`,
-      { content: content },
+      `/product-review/${reviewId}/create-reply/${query.toString()}`,
     );
     return response.data.content;
   },
