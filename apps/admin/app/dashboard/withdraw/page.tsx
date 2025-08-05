@@ -175,7 +175,7 @@ export default function WithdrawManagementPage() {
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
                   <TableCell>{withdraw.status}</TableCell>
                   <TableCell>
-                    {new Date(withdraw.processedDate).toLocaleString('vi-VN', {
+                    {new Date(withdraw.createdDate).toLocaleString('vi-VN', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric',
