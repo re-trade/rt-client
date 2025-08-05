@@ -91,28 +91,12 @@ const logout = async (): Promise<boolean> => {
   return false;
 };
 
-export const AuthSellerApi = {
-  async register(): Promise<TSeller> {
-    const response = await authApi.default.post<TSeller>('/auth/seller/register');
-    if (response.status === 200) {
-      return response.data;
-    }
-    throw new Error('Failed to register seller');
-  },
-  async getShopSeller(id: string): Promise<TSeller> {
-    const response = await authApi.default.get<TSeller>(`/auth/seller/${id}`);
-    if (response.status === 200) {
-      return response.data;
-    }
-    throw new Error('Failed to get seller seller');
-  },
-  async updateShopSeller(id: string, data: Partial<TSeller>): Promise<TSeller> {
-    const response = await authApi.default.put<TSeller>(`/auth/seller/${id}`, data);
-    if (response.status === 200) {
-      return response.data;
-    }
-    throw new Error('Failed to update seller seller');
-  },
+const refreshTokenCall = async () => {
+  const result = await authApi.default.post<IResponseObject<TTokenResponse>>('/auth/refresh-token');
+  if (result.data.success && result.status === 200) {
+    const { ACCESS_TOKEN } = result.data.content.tokens;
+    localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
+  }
 };
 
-export { accountMe, loginInternal, logout };
+export { accountMe, loginInternal, logout, refreshTokenCall };

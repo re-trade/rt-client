@@ -1,4 +1,4 @@
-import { TCustomerProfileResponse, profileApi } from '@services/customer-profile.api';
+import { profileApi, TCustomerProfileResponse } from '@services/customer-profile.api';
 import { useCallback, useEffect, useState } from 'react';
 
 function useCustomerProfile() {
@@ -35,6 +35,7 @@ function useCustomerProfile() {
           phone: updateProfileForm.phone,
           avatarUrl: updateProfileForm.avatarUrl,
           address: updateProfileForm.address,
+          gender: updateProfileForm.gender,
         }
       : null;
 

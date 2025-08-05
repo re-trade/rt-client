@@ -47,7 +47,7 @@ export default function NotificationPage() {
                   <Bell className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-800">Thông Báo</h1>
+                  <h1 className="text-2xl font-bold text-gray-800">Thông báo</h1>
                   <p className="text-gray-600 mt-1">
                     Thông báo từ hệ thống và các cập nhật mới nhất
                   </p>

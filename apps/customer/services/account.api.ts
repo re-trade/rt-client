@@ -1,4 +1,4 @@
-import { authApi, IResponseObject } from '@retrade/util';
+import { authApi, IResponseObject, unAuthApi } from '@retrade/util';
 
 type TCustomerProfile = {
   id: string;
@@ -23,4 +23,36 @@ const getCustomerProfile = async (): Promise<TCustomerProfile | undefined> => {
   }
 };
 
-export { getCustomerProfile };
+const checkUsernameAvailability = async (username: string): Promise<boolean> => {
+  try {
+    const result = await unAuthApi.default.get<IResponseObject<{ existed: boolean }>>(
+      `/accounts/check-username?username=${username}`,
+    );
+    if (result.data.success && result.status === 200) {
+      const { content } = result.data;
+      return !content.existed;
+    } else {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+};
+
+const checkEmailAvailability = async (email: string): Promise<boolean> => {
+  try {
+    const result = await unAuthApi.default.get<IResponseObject<{ existed: boolean }>>(
+      `/accounts/check-email?email=${email}`,
+    );
+    if (result.data.success && result.status === 200) {
+      const { content } = result.data;
+      return !content.existed;
+    } else {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+};
+
+export { checkEmailAvailability, checkUsernameAvailability, getCustomerProfile };

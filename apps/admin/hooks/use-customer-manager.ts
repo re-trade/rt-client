@@ -7,6 +7,7 @@ import {
   TCustomerProfile,
 } from '@/services/customer.api';
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const useCustomerManager = () => {
   const [customers, setCustomers] = useState<TCustomerProfile[]>([]);
@@ -68,10 +69,14 @@ const useCustomerManager = () => {
           await fetchCustomers();
           return true;
         }
-        setError('Failed to ban customer');
+        const errorMessage = 'Failed to ban customer';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to ban customer');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to ban customer';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       }
     },
@@ -86,10 +91,14 @@ const useCustomerManager = () => {
           await fetchCustomers();
           return true;
         }
-        setError('Failed to unban customer');
+        const errorMessage = 'Failed to unban customer';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to unban customer');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to unban customer';
+        setError(errorMessage);
+        toast.error(errorMessage, { position: 'top-right' });
         return false;
       }
     },

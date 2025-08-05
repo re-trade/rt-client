@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SellerFormData } from '@/hooks/useSellerRegistration';
 import { Camera, CheckCircle2, Shield, Upload, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type IdentityInfoStepProps = {
   formData: SellerFormData;
@@ -26,22 +26,45 @@ export default function IdentityInfoStep({
   const [frontPreview, setFrontPreview] = useState<string | null>(null);
   const [backPreview, setBackPreview] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (formData.identityFrontImage && !frontPreview) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFrontPreview(reader.result as string);
+      };
+      reader.readAsDataURL(formData.identityFrontImage);
+    } else if (!formData.identityFrontImage && frontPreview) {
+      setFrontPreview(null);
+    }
+
+    if (formData.identityBackImage && !backPreview) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setBackPreview(reader.result as string);
+      };
+      reader.readAsDataURL(formData.identityBackImage);
+    } else if (!formData.identityBackImage && backPreview) {
+      setBackPreview(null);
+    }
+  }, [formData.identityFrontImage, formData.identityBackImage, frontPreview, backPreview]);
+
   const handleFrontImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
-      // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        // Handle file size error - you might want to show a toast or set an error state
         return;
       }
 
+      // First update the form data
+      handleFileChange(e);
+
+      // Then update the preview
       const reader = new FileReader();
       reader.onload = () => {
         setFrontPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      handleFileChange(e);
     }
   };
 
@@ -55,25 +78,32 @@ export default function IdentityInfoStep({
         return;
       }
 
+      // First update the form data
+      handleFileChange(e);
+
+      // Then update the preview
       const reader = new FileReader();
       reader.onload = () => {
         setBackPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      handleFileChange(e);
     }
   };
 
   const removeFrontImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Clear the preview first
     setFrontPreview(null);
 
+    // Clear the input element
     const inputElement = document.getElementById('identityFrontImage') as HTMLInputElement;
     if (inputElement) {
       inputElement.value = '';
     }
 
+    // Update form data to remove the file
     const event = {
       target: {
         name: 'identityFrontImage',
@@ -86,13 +116,17 @@ export default function IdentityInfoStep({
   const removeBackImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Clear the preview first
     setBackPreview(null);
 
+    // Clear the input element
     const inputElement = document.getElementById('identityBackImage') as HTMLInputElement;
     if (inputElement) {
       inputElement.value = '';
     }
 
+    // Update form data to remove the file
     const event = {
       target: {
         name: 'identityBackImage',
