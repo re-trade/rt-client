@@ -43,24 +43,9 @@ import {
   Truck,
   XCircle,
 } from 'lucide-react';
-import { JSX, useState } from 'react';
+import { JSX } from 'react';
+
 type PaymentStatus = 'PENDING' | 'PAYMENT_CONFIRMATION' | 'PAYMENT_FAILED' | 'PAYMENT_CANCELLED';
-type OrderStatus =
-  | 'PENDING'
-  | 'PREPARING'
-  | 'DELIVERING'
-  | 'DELIVERED'
-  | 'CANCELLED'
-  | 'RETURNING'
-  | 'REFUNDED'
-  | 'RETURN_REJECTED'
-  | 'RETURN_REQUESTED'
-  | 'COMPLETED'
-  | 'RETURNED'
-  | 'RETURN_APPROVED'
-  | 'PAYMENT_CONFIRMATION'
-  | 'PAYMENT_FAILED'
-  | 'PAYMENT_CANCELLED';
 interface OrderTableProps {
   orders: OrderResponse[];
   onViewDetail: (order: OrderResponse) => void;
@@ -68,7 +53,6 @@ interface OrderTableProps {
 }
 
 export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableProps) {
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const getStatusConfig = (status: OrderResponse['orderStatus']) => {
     const configs = {
       PENDING: {
@@ -164,7 +148,7 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
     };
 
     return (
-      configs[status.code] || {
+      configs[status.code as keyof typeof configs] || {
         color: 'bg-gray-50 text-gray-700 border-gray-200 shadow-gray-100',
         icon: <AlertCircle className="h-3.5 w-3.5" />,
         text: 'Không xác định',

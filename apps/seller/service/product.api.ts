@@ -1,5 +1,7 @@
 import { authApi, IResponseObject } from '@retrade/util';
 
+export type TProductStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED' | 'INIT' | 'DRAFT';
+
 export type TProduct = {
   id: string;
   name: string;
@@ -22,7 +24,7 @@ export type TProduct = {
   tags: string[];
   verified: boolean;
   condition: string;
-  status: string;
+  status: TProductStatus;
   avgVote: number;
   createdAt: string;
   updatedAt: string;
@@ -42,7 +44,7 @@ export type CreateProductDto = {
   condition: string;
   categoryIds: string[];
   tags: string[];
-  status: string;
+  status: TProductStatus;
 };
 export type UpdateProductDto = {
   name: string;

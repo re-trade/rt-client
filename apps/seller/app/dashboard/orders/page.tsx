@@ -3,17 +3,13 @@
 import { OrderDetailDialog } from '@/components/dialog-common/add/order-detail-dialog';
 import { OrderTable } from '@/components/dialog-common/view-update/order-table';
 import { UpdateStatusDialog } from '@/components/dialog-common/view-update/update-status-dialog';
+import OrderListEmpty from '@/components/order/OrderListEmpty';
+import OrderListSkeleton from '@/components/order/OrderListSkeleton';
+import OrderStatusDropdown from '@/components/order/OrderStatusDropdown';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { OrderResponse, ordersApi } from '@/service/orders.api';
 import { RefreshCw, Search, ShoppingBag, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -117,12 +113,7 @@ export default function OrdersPage() {
     fetchOrders();
   }, [currentPage, pageSize, debouncedSearchTerm, statusFilter]);
 
-  const handleStatusUpdate = (
-    comboId: string,
-    newStatus: OrderResponse['orderStatus'],
-    trackingNumber?: string,
-    notes?: string,
-  ) => {
+  const handleStatusUpdate = (comboId: string, newStatus: OrderResponse['orderStatus']) => {
     setOrders(
       orders.map((order) =>
         order.comboId === comboId
@@ -182,23 +173,10 @@ export default function OrdersPage() {
               className="pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyUp={handleKeyPress}
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Trạng thái đơn hàng" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value="PENDING">Chờ xác nhận</SelectItem>
-              <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
-              <SelectItem value="PREPARING">Đang chuẩn bị</SelectItem>
-              <SelectItem value="DELIVERING">Đã giao shipper</SelectItem>
-              <SelectItem value="DELIVERED">Đã giao hàng</SelectItem>
-              <SelectItem value="CANCELLED">Đã hủy</SelectItem>
-            </SelectContent>
-          </Select>
+          <OrderStatusDropdown setStatusFilter={setStatusFilter} statusFilter={statusFilter} />
         </div>
       </CardContent>
 
@@ -209,24 +187,9 @@ export default function OrdersPage() {
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p className="text-sm text-muted-foreground">Đang tải đơn hàng...</p>
-          </div>
-        </div>
+        <OrderListSkeleton />
       ) : orders.length === 0 ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Không có đơn hàng</h3>
-            <p className="text-sm text-gray-500">
-              {debouncedSearchTerm || statusFilter !== 'all'
-                ? 'Không tìm thấy đơn hàng phù hợp với bộ lọc hiện tại.'
-                : 'Chưa có đơn hàng nào được tạo.'}
-            </p>
-          </div>
-        </div>
+        <OrderListEmpty debouncedSearchTerm={debouncedSearchTerm} statusFilter={statusFilter} />
       ) : (
         <OrderTable
           orders={orders}
