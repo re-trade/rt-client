@@ -242,204 +242,204 @@ export default function WithdrawManagementPage() {
       </Card>
 
       {selectedWithdraw && (
-  <Dialog open={!!selectedWithdraw} onOpenChange={handleDialogClose}>
-    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-      <DialogHeader className="space-y-3">
-        <DialogTitle className="text-2xl font-bold">Chi tiết yêu cầu rút tiền</DialogTitle>
-        <DialogDescription>
-          Thông tin chi tiết và trạng thái của yêu cầu rút tiền
-        </DialogDescription>
-      </DialogHeader>
+        <Dialog open={!!selectedWithdraw} onOpenChange={handleDialogClose}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="space-y-3">
+              <DialogTitle className="text-2xl font-bold">Chi tiết yêu cầu rút tiền</DialogTitle>
+              <DialogDescription>
+                Thông tin chi tiết và trạng thái của yêu cầu rút tiền
+              </DialogDescription>
+            </DialogHeader>
 
-      <div className="space-y-6 mt-6">
-        {/* Status and Amount Header */}
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border">
-          <div className="flex items-center gap-3">
-            <Store className="h-8 w-8 text-green-600" />
-            <div>
-              <p className="text-sm text-muted-foreground">Số tiền yêu cầu</p>
-              <p className="text-2xl font-bold text-green-600">
-                {selectedWithdraw.amount.toLocaleString()} ₫
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground mb-2">Trạng thái</p>
-            <div
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                selectedWithdraw.status === 'PENDING'
-                  ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                  : selectedWithdraw.status === 'APPROVED'
-                    ? 'bg-green-100 text-green-800 border border-green-200'
-                    : selectedWithdraw.status === 'REJECTED'
-                      ? 'bg-red-100 text-red-800 border border-red-200'
-                      : selectedWithdraw.status === 'COMPLETED'
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-gray-100 text-gray-800 border border-gray-200'
-              }`}
-            >
-              {selectedWithdraw.status === 'PENDING' && '⏳ Đang chờ'}
-              {selectedWithdraw.status === 'APPROVED' && '✅ Đã duyệt'}
-              {selectedWithdraw.status === 'REJECTED' && '❌ Từ chối'}
-              {selectedWithdraw.status === 'COMPLETED' && '✅ Đã thanh toán'}
-            </div>
-          </div>
-        </div>
-
-        {/* Request Information */}
-        <Card>
-          <div className="p-4 border-b">
-            <h3 className="font-semibold flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Thông tin yêu cầu
-            </h3>
-          </div>
-          <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <AlertTriangle className="h-4 w-4" />
-                Mã yêu cầu
-              </div>
-              <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
-                {selectedWithdraw.id}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <PauseCircle className="h-4 w-4" />
-                Ngày tạo
-              </div>
-              <p className="font-medium">
-                {selectedWithdraw.createdDate
-                  ? (() => {
-                      const [year, month, day, hour, minute, second] =
-                        selectedWithdraw.createdDate;
-                      return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
-                    })()
-                  : 'N/A'}
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Bank Information */}
-        <Card>
-          <div className="p-4 border-b">
-            <h3 className="font-semibold flex items-center gap-2">
-              <Store className="h-5 w-5" />
-              Thông tin ngân hàng
-            </h3>
-          </div>
-          <div className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Tên ngân hàng</p>
-                  <p className="font-semibold text-lg">{selectedWithdraw.bankName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Mã BIN</p>
-                  <p className="font-mono text-sm bg-gray-50 p-2 rounded border inline-block">
-                    {selectedWithdraw.bankBin}
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Logo ngân hàng</p>
-                {selectedWithdraw.bankUrl ? (
-                  <div className="flex items-center justify-center p-4 bg-white border-2 border-dashed border-gray-200 rounded-lg">
-                    <img
-                      src={selectedWithdraw.bankUrl || '/placeholder.svg'}
-                      alt={`${selectedWithdraw.bankName} Logo`}
-                      className="max-w-[120px] max-h-[60px] object-contain"
-                    />
+            <div className="space-y-6 mt-6">
+              {/* Status and Amount Header */}
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border">
+                <div className="flex items-center gap-3">
+                  <Store className="h-8 w-8 text-green-600" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Số tiền yêu cầu</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {selectedWithdraw.amount.toLocaleString()} ₫
+                    </p>
                   </div>
-                ) : (
-                  <div className="flex items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg">
-                    <div className="text-center">
-                      <Store className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">Không có logo</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground mb-2">Trạng thái</p>
+                  <div
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedWithdraw.status === 'PENDING'
+                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                        : selectedWithdraw.status === 'APPROVED'
+                          ? 'bg-green-100 text-green-800 border border-green-200'
+                          : selectedWithdraw.status === 'REJECTED'
+                            ? 'bg-red-100 text-red-800 border border-red-200'
+                            : selectedWithdraw.status === 'COMPLETED'
+                              ? 'bg-green-100 text-green-800 border border-green-200'
+                              : 'bg-gray-100 text-gray-800 border border-gray-200'
+                    }`}
+                  >
+                    {selectedWithdraw.status === 'PENDING' && '⏳ Đang chờ'}
+                    {selectedWithdraw.status === 'APPROVED' && '✅ Đã duyệt'}
+                    {selectedWithdraw.status === 'REJECTED' && '❌ Từ chối'}
+                    {selectedWithdraw.status === 'COMPLETED' && '✅ Đã thanh toán'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Request Information */}
+              <Card>
+                <div className="p-4 border-b">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    Thông tin yêu cầu
+                  </h3>
+                </div>
+                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <AlertTriangle className="h-4 w-4" />
+                      Mã yêu cầu
+                    </div>
+                    <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
+                      {selectedWithdraw.id}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <PauseCircle className="h-4 w-4" />
+                      Ngày tạo
+                    </div>
+                    <p className="font-medium">
+                      {selectedWithdraw.createdDate
+                        ? (() => {
+                            const [year, month, day, hour, minute, second] =
+                              selectedWithdraw.createdDate;
+                            return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+                          })()
+                        : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Bank Information */}
+              <Card>
+                <div className="p-4 border-b">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Store className="h-5 w-5" />
+                    Thông tin ngân hàng
+                  </h3>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Tên ngân hàng</p>
+                        <p className="font-semibold text-lg">{selectedWithdraw.bankName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">Mã BIN</p>
+                        <p className="font-mono text-sm bg-gray-50 p-2 rounded border inline-block">
+                          {selectedWithdraw.bankBin}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Logo ngân hàng</p>
+                      {selectedWithdraw.bankUrl ? (
+                        <div className="flex items-center justify-center p-4 bg-white border-2 border-dashed border-gray-200 rounded-lg">
+                          <img
+                            src={selectedWithdraw.bankUrl || '/placeholder.svg'}
+                            alt={`${selectedWithdraw.bankName} Logo`}
+                            className="max-w-[120px] max-h-[60px] object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg">
+                          <div className="text-center">
+                            <Store className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-muted-foreground">Không có logo</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              </Card>
+
+              {/* QR Code Section */}
+              <Card>
+                <div className="p-4 border-b">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    Mã QR thanh toán
+                  </h3>
+                </div>
+                <div className="p-4">
+                  {selectedWithdraw.status === 'COMPLETED' ? (
+                    <div className="flex items-center justify-center p-8 bg-green-50 border-2 border-dashed border-green-200 rounded-lg">
+                      <div className="text-center">
+                        <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                        <p className="text-sm font-medium text-green-700">Đã thanh toán</p>
+                      </div>
+                    </div>
+                  ) : qrError ? (
+                    <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-red-800">Lỗi khi tải mã QR</p>
+                        <p className="text-sm text-red-700 mt-1">
+                          {qrError === 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+                            ? qrError
+                            : qrError || 'Không thể tải mã QR'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : qrCodeUrl ? (
+                    <div className="flex justify-center">
+                      <div className="p-4 bg-white border-2 border-gray-200 rounded-lg shadow-sm">
+                        <img
+                          src={qrCodeUrl || '/placeholder.svg'}
+                          alt="QR Code thanh toán"
+                          className="max-w-[250px] rounded"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-2"></div>
+                        <p className="text-sm text-muted-foreground">Đang tải mã QR...</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
             </div>
-          </div>
-        </Card>
 
-        {/* QR Code Section */}
-        <Card>
-          <div className="p-4 border-b">
-            <h3 className="font-semibold flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Mã QR thanh toán
-            </h3>
-          </div>
-          <div className="p-4">
-            {selectedWithdraw.status === 'COMPLETED' ? (
-              <div className="flex items-center justify-center p-8 bg-green-50 border-2 border-dashed border-green-200 rounded-lg">
-                <div className="text-center">
-                  <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-green-700">Đã thanh toán</p>
-                </div>
-              </div>
-            ) : qrError ? (
-              <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-red-800">Lỗi khi tải mã QR</p>
-                  <p className="text-sm text-red-700 mt-1">
-                    {qrError === 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
-                      ? qrError
-                      : qrError || 'Không thể tải mã QR'}
-                  </p>
-                </div>
-              </div>
-            ) : qrCodeUrl ? (
-              <div className="flex justify-center">
-                <div className="p-4 bg-white border-2 border-gray-200 rounded-lg shadow-sm">
-                  <img
-                    src={qrCodeUrl || '/placeholder.svg'}
-                    alt="QR Code thanh toán"
-                    className="max-w-[250px] rounded"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-2"></div>
-                  <p className="text-sm text-muted-foreground">Đang tải mã QR...</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </Card>
-      </div>
-
-      <div className="border-t pt-4 mt-6">
-        <DialogFooter className="gap-3">
-          <Button variant="outline" onClick={handleDialogClose}>
-            Đóng
-          </Button>
-          {selectedWithdraw.status === 'PENDING' && (
-            <Button
-              onClick={async () => {
-                if (selectedWithdraw) {
-                  await handleApprove(selectedWithdraw.id);
-                }
-              }}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Check className="h-4 w-4 mr-2" />
-              Xác nhận duyệt
-            </Button>
-          )}
-        </DialogFooter>
-      </div>
-    </DialogContent>
-  </Dialog>
-)}
+            <div className="border-t pt-4 mt-6">
+              <DialogFooter className="gap-3">
+                <Button variant="outline" onClick={handleDialogClose}>
+                  Đóng
+                </Button>
+                {selectedWithdraw.status === 'PENDING' && (
+                  <Button
+                    onClick={async () => {
+                      if (selectedWithdraw) {
+                        await handleApprove(selectedWithdraw.id);
+                      }
+                    }}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Xác nhận duyệt
+                  </Button>
+                )}
+              </DialogFooter>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
