@@ -82,8 +82,11 @@ const withdrawQr = async (id: string): Promise<Blob | undefined> => {
       withCredentials: true,
     });
     return response.data;
-  } catch {
-    return undefined;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+    }
+    throw new Error(error.message || 'Failed to fetch QR code');
   }
 };
 export { approveWithdraw, getBanks, getWithdraws, withdrawQr };
