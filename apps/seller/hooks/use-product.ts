@@ -1,4 +1,5 @@
 'use client';
+import { dashboardApi, SellerProductMetricResponse } from '@/service/dashboard.api';
 import { productApi, TProduct } from '@/service/product.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -18,6 +19,12 @@ export default function useProduct() {
   const [showFilters, setShowFilters] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [productMetric, setProductMetric] = useState<SellerProductMetricResponse>({
+    productActivate: 0,
+    productQuantity: 0,
+    productApprove: 0,
+    totalPrice: 0,
+  });
   const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
@@ -70,6 +77,13 @@ export default function useProduct() {
     }
   }, [currentPage, pageSize, filter]);
 
+  const fetchProductMetric = useCallback(async () => {
+    const response = await dashboardApi().fetchSellerProductMetric();
+    if (response) {
+      setProductMetric(response);
+    }
+  }, []);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -106,6 +120,10 @@ export default function useProduct() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  useEffect(() => {
+    fetchProductMetric();
+  }, [fetchProductMetric]);
 
   const filteredProducts = useMemo(() => {
     return productList.filter((product) => {
@@ -195,6 +213,7 @@ export default function useProduct() {
     currentPage,
     pageSize,
     totalPages,
+    productMetric,
     totalItems,
     setShowFilters,
     setRefreshing,

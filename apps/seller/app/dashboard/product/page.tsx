@@ -64,6 +64,7 @@ export default function ProductManagement() {
     handleRefresh,
     clearFilters,
     fetchProducts,
+    productMetric,
   } = useProduct();
 
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
@@ -152,7 +153,9 @@ export default function ProductManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-600">Tổng sản phẩm</p>
-                  <p className="text-2xl font-bold text-slate-900">{stats.totalProducts}</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {productMetric.productQuantity}
+                  </p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
                   <Package className="h-6 w-6 text-blue-600" />
@@ -166,7 +169,9 @@ export default function ProductManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-600">Đang hoạt động</p>
-                  <p className="text-2xl font-bold text-slate-900">{stats.activeProducts}</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {productMetric.productActivate}
+                  </p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
                   <TrendingUp className="h-6 w-6 text-emerald-600" />
@@ -180,7 +185,9 @@ export default function ProductManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-600">Đã xác minh</p>
-                  <p className="text-2xl font-bold text-slate-900">{stats.verifiedProducts}</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {productMetric.productApprove}
+                  </p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center">
                   <Star className="h-6 w-6 text-amber-600" />
@@ -195,7 +202,7 @@ export default function ProductManagement() {
                 <div>
                   <p className="text-sm font-medium text-slate-600">Tổng giá trị</p>
                   <p className="text-2xl font-bold text-slate-900">
-                    {stats.totalValue.toLocaleString('vi-VN')}đ
+                    {productMetric.totalPrice.toLocaleString('vi-VN')}đ
                   </p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
