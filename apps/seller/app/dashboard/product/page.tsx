@@ -50,7 +50,6 @@ export default function ProductManagement() {
     filter,
     setFilter,
     activeFiltersCount,
-    stats,
     loading,
     showFilters,
     setShowFilters,
@@ -146,7 +145,6 @@ export default function ProductManagement() {
           </div>
         </div>
 
-        {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="border-0 shadow-lg shadow-slate-200/50 bg-gradient-to-br from-blue-50 to-indigo-50">
             <CardContent className="p-6">

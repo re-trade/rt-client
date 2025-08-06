@@ -1,6 +1,6 @@
 'use client';
 import { dashboardApi, SellerProductMetricResponse } from '@/service/dashboard.api';
-import { productApi, TProduct } from '@/service/product.api';
+import { productApi, ProductFilterResponse, TProduct } from '@/service/product.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,6 +19,7 @@ export default function useProduct() {
   const [showFilters, setShowFilters] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterAvaliable, setFilterAvaliable] = useState<ProductFilterResponse[]>([]);
   const [productMetric, setProductMetric] = useState<SellerProductMetricResponse>({
     productActivate: 0,
     productQuantity: 0,
@@ -185,20 +186,6 @@ export default function useProduct() {
     return Object.values(filter).filter((value) => value !== '').length;
   }, [filter]);
 
-  const stats = useMemo(() => {
-    const totalProducts = productList.length;
-    const activeProducts = productList.filter((p) => p.status === 'ACTIVE').length;
-    const verifiedProducts = productList.filter((p) => p.verified).length;
-    const totalValue = productList.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0);
-
-    return {
-      totalProducts,
-      activeProducts,
-      verifiedProducts,
-      totalValue,
-    };
-  }, [productList]);
-
   return {
     productList,
     filteredProducts,
@@ -206,7 +193,6 @@ export default function useProduct() {
     filter,
     setFilter,
     activeFiltersCount,
-    stats,
     loading,
     showFilters,
     refreshing,

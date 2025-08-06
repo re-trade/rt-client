@@ -54,12 +54,27 @@ export type UpdateProductDto = {
   productImages: string[];
   brandId: string;
   quantity: number;
-  warrantyExpiryDate: string; // ISO date string (e.g., "2025-07-06")
+  warrantyExpiryDate: string;
   condition: string;
   model: string;
   currentPrice: number;
   categoryIds: string[];
   tags: string[];
+};
+
+export type ProductFilterResponse = {
+  categoriesAdvanceSearch: {
+    id: string;
+    name: string;
+  }[];
+  brands: {
+    id: string;
+    name: string;
+    imgUrl: string;
+  }[];
+  states: string[];
+  minPrice: number;
+  maxPrice: number;
 };
 
 export const productApi = {
@@ -121,6 +136,15 @@ export const productApi = {
       return response.data.content;
     }
     throw new Error('Failed to update product');
+  },
+
+  async getProductFilter(): Promise<ProductFilterResponse | undefined> {
+    const response =
+      await authApi.default.get<IResponseObject<ProductFilterResponse>>(`/products/seller/filter`);
+    if (response.data.success) {
+      return response.data.content;
+    }
+    return undefined;
   },
 
   async deleteProduct(id: string): Promise<TProduct> {
