@@ -5,55 +5,50 @@ import { OrderTable } from '@/components/dialog-common/view-update/order-table';
 import { UpdateStatusDialog } from '@/components/dialog-common/view-update/update-status-dialog';
 import OrderListEmpty from '@/components/order/OrderListEmpty';
 import OrderListSkeleton from '@/components/order/OrderListSkeleton';
+import OrderMetrics from '@/components/order/OrderMetrics';
 import OrderStatusDropdown from '@/components/order/OrderStatusDropdown';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
-import { OrderResponse, ordersApi } from '@/service/orders.api';
+import { useOrder } from '@/hooks/use-order';
+import { OrderResponse } from '@/service/orders.api';
 import { RefreshCw, Search, ShoppingBag, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<OrderResponse[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    orders,
+    orderMetric,
+    isLoading,
+    error,
+    page,
+    pageSize,
+    total,
+    totalPage,
+    searchTerm,
+    statusFilter,
+    refreshing,
+    setPage,
+    setPageSize,
+    setSearchTerm,
+    setStatusFilter,
+    handleRefresh,
+    handleKeyPress,
+    handleStatusUpdate,
+  } = useOrder();
+
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const handleSearch = () => {
-    setCurrentPage(1);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
-    setCurrentPage(1);
+    setPage(1);
   };
 
   const handleViewDetail = (order: OrderResponse) => {
@@ -66,70 +61,13 @@ export default function OrdersPage() {
     setIsUpdateStatusOpen(true);
   };
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log('Fetching orders with params:', {
-        page: currentPage - 1,
-        size: pageSize,
-        keyword: debouncedSearchTerm,
-        status: statusFilter,
-      });
-
-      const response = await ordersApi.getAllOrdersBySeller(
-        currentPage - 1,
-        pageSize,
-        debouncedSearchTerm,
-        statusFilter,
-      );
-
-      console.log('Orders API response:', response);
-
-      if (response && response.orders) {
-        setOrders(response.orders);
-        setTotalPages(response.totalPages);
-        setTotalItems(response.totalElements);
-        console.log('Orders set successfully:', response.orders.length, 'orders');
-      } else {
-        console.warn('No orders in response or invalid response structure');
-        setOrders([]);
-        setTotalPages(1);
-        setTotalItems(0);
-      }
-    } catch (error) {
-      console.error('Failed to fetch orders:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      setError(`Lỗi khi tải đơn hàng: ${errorMessage}`);
-      setOrders([]);
-      setTotalPages(1);
-      setTotalItems(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, [currentPage, pageSize, debouncedSearchTerm, statusFilter]);
-
-  const handleStatusUpdate = (comboId: string, newStatus: OrderResponse['orderStatus']) => {
-    setOrders(
-      orders.map((order) =>
-        order.comboId === comboId
-          ? {
-              ...order,
-              orderStatus: newStatus,
-            }
-          : order,
-      ),
-    );
+  const handleOrderStatusUpdate = (comboId: string, newStatus: OrderResponse['orderStatus']) => {
+    handleStatusUpdate(comboId, newStatus);
     setSelectedOrder(null);
-    fetchOrders();
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-6">
       <CardHeader className="border-b border-gray-100 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -153,16 +91,18 @@ export default function OrdersPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => fetchOrders()}
-              disabled={loading}
+              onClick={handleRefresh}
+              disabled={refreshing || isLoading}
               className="flex items-center gap-2"
             >
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 ${refreshing || isLoading ? 'animate-spin' : ''}`} />
               Làm mới
             </Button>
           </div>
         </div>
       </CardHeader>
+
+      {orderMetric && <OrderMetrics metrics={orderMetric} loading={isLoading} />}
 
       <CardContent>
         <div className="flex flex-col sm:flex-row gap-4">
@@ -186,10 +126,10 @@ export default function OrdersPage() {
         </div>
       )}
 
-      {loading ? (
+      {isLoading ? (
         <OrderListSkeleton />
       ) : orders.length === 0 ? (
-        <OrderListEmpty debouncedSearchTerm={debouncedSearchTerm} statusFilter={statusFilter} />
+        <OrderListEmpty debouncedSearchTerm={searchTerm} statusFilter={statusFilter} />
       ) : (
         <OrderTable
           orders={orders}
@@ -199,13 +139,13 @@ export default function OrdersPage() {
       )}
 
       <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
+        currentPage={page}
+        totalPages={totalPage}
+        totalItems={total}
         itemsPerPage={pageSize}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
-        loading={loading}
+        loading={isLoading}
         pageSizeOptions={[10, 20, 50]}
       />
 
@@ -215,7 +155,7 @@ export default function OrdersPage() {
         open={isUpdateStatusOpen}
         onOpenChange={setIsUpdateStatusOpen}
         order={selectedOrder}
-        onUpdateStatus={handleStatusUpdate}
+        onUpdateStatus={handleOrderStatusUpdate}
       />
     </div>
   );
