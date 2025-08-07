@@ -1,19 +1,8 @@
 'use client';
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-  useSidebar,
-} from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
+import { cn } from '@/lib/utils';
 import {
   DollarSign,
   LayoutDashboard,
@@ -24,7 +13,6 @@ import {
   Star,
   Store,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
@@ -118,10 +106,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                       'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
                       pathname === item.href
                         ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600',
                     )}
                   >
-                    <item.icon className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')} />
+                    <item.icon
+                      className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
+                    />
                     <span className="font-medium">{item.title}</span>
                   </Link>
                 ))}
@@ -160,13 +150,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   'flex flex-col items-center justify-center px-2 py-2 rounded-lg transition-all duration-200',
                   pathname === item.href
                     ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600 shadow-md'
-                    : 'text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600'
+                    : 'text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600',
                 )}
               >
-                <item.icon className={cn(
-                  'h-5 w-5',
-                  pathname === item.href ? 'text-white' : 'text-gray-600'
-                )} />
+                <item.icon
+                  className={cn('h-5 w-5', pathname === item.href ? 'text-white' : 'text-gray-600')}
+                />
                 <span className="text-xs mt-1 font-medium">{item.title.split(' ')[0]}</span>
               </Link>
             ))}
@@ -198,7 +187,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       >
         <div className="absolute right-0 top-0 bottom-0 w-3/4 max-w-xs bg-gradient-to-r from-white to-orange-50 shadow-xl p-6 overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">Menu</h3>
+            <h3 className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+              Menu
+            </h3>
             <button
               className="p-2 rounded-full hover:bg-orange-100 text-orange-600"
               onClick={() => {
@@ -206,7 +197,21 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 document.getElementById('mobile-menu-drawer')?.classList.add('translate-x-full');
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-5 h-5"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           </div>
 
@@ -219,14 +224,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                   'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
                   pathname === item.href
                     ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600'
+                    : 'text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600',
                 )}
                 onClick={() => {
                   document.body.classList.remove('overflow-hidden');
                   document.getElementById('mobile-menu-drawer')?.classList.add('translate-x-full');
                 }}
               >
-                <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-white" : "")} />
+                <item.icon className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')} />
                 <span>{item.title}</span>
               </Link>
             ))}

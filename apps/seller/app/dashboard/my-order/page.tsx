@@ -1,9 +1,7 @@
-'use client'
+'use client';
 
 const MyOrderPage = () => {
-  return (
-    <div>My Order Page</div>
-  );
-}
+  return <div>My Order Page</div>;
+};
 
-export default MyOrderPage
+export default MyOrderPage;
