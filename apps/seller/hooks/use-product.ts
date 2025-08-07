@@ -4,13 +4,15 @@ import { productApi, ProductFilterResponse, TProduct } from '@/service/product.a
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-interface FilterState {
+export interface FilterState {
   search: string;
   status: string;
   verified: string;
   category: string;
   brand: string;
   priceRange: string;
+  minPrice: number;
+  maxPrice: number;
 }
 
 export default function useProduct() {
@@ -19,7 +21,7 @@ export default function useProduct() {
   const [showFilters, setShowFilters] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterAvaliable, setFilterAvaliable] = useState<ProductFilterResponse[]>([]);
+  const [filterOptions, setFilterOptions] = useState<ProductFilterResponse | null>(null);
   const [productMetric, setProductMetric] = useState<SellerProductMetricResponse>({
     productActivate: 0,
     productQuantity: 0,
@@ -31,33 +33,48 @@ export default function useProduct() {
   const [totalItems, setTotalItems] = useState(0);
   const [filter, setFilter] = useState<FilterState>({
     search: '',
-    status: '',
-    verified: '',
-    category: '',
-    brand: '',
-    priceRange: '',
+    status: 'all',
+    verified: 'all',
+    category: 'all',
+    brand: 'all',
+    priceRange: 'all',
+    minPrice: 0,
+    maxPrice: 0,
   });
+
+  const fetchFilterOptions = useCallback(async () => {
+    try {
+      const filterData = await productApi.getProductFilter();
+      if (filterData) {
+        setFilterOptions(filterData);
+      }
+    } catch (error) {
+      console.error('Error fetching filter options:', error);
+      toast.error('Lỗi khi tải tùy chọn lọc');
+    }
+  }, []);
 
   const fetchProducts = useCallback(async () => {
     try {
       const queryBuilder = new URLSearchParams();
       if (filter.search) {
-        queryBuilder.set('search', filter.search);
+        queryBuilder.set('keyword', filter.search);
       }
-      if (filter.status) {
+      if (filter.status && filter.status !== 'all') {
         queryBuilder.set('status', filter.status);
       }
-      if (filter.verified) {
+      if (filter.verified && filter.verified !== 'all') {
         queryBuilder.set('verified', filter.verified);
       }
-      if (filter.category) {
-        queryBuilder.set('category', filter.category);
+      if (filter.category && filter.category !== 'all') {
+        queryBuilder.set('categoryId', filter.category);
       }
-      if (filter.brand) {
+      if (filter.brand && filter.brand !== 'all') {
         queryBuilder.set('brand', filter.brand);
       }
-      if (filter.priceRange) {
-        queryBuilder.set('basePrice', filter.priceRange);
+      if (filter.priceRange && filter.priceRange !== 'all') {
+        const [min, max] = filter.priceRange.split('-');
+        queryBuilder.set('currentPrice', `${min}..${max}`);
       }
       setLoading(true);
       const query = queryBuilder.toString();
@@ -110,86 +127,63 @@ export default function useProduct() {
   const clearFilters = () => {
     setFilter({
       search: '',
-      status: '',
-      verified: '',
-      category: '',
-      brand: '',
-      priceRange: '',
+      status: 'all',
+      verified: 'all',
+      category: 'all',
+      brand: 'all',
+      priceRange: 'all',
+      minPrice: 0,
+      maxPrice: 0,
     });
   };
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+    fetchFilterOptions();
+  }, [fetchProducts, fetchFilterOptions]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [filter, currentPage, pageSize, fetchProducts]);
 
   useEffect(() => {
     fetchProductMetric();
   }, [fetchProductMetric]);
 
-  const filteredProducts = useMemo(() => {
-    return productList.filter((product) => {
-      if (filter.search && !product.name.toLowerCase().includes(filter.search.toLowerCase())) {
-        return false;
-      }
+  const availableFilterOptions = useMemo(() => {
+    const maxPrice = filterOptions?.maxPrice || 10000000;
+    const minPrice = filterOptions?.minPrice || 0;
+    const brands = filterOptions?.brands || [];
+    const categories = filterOptions?.categoriesAdvanceSearch || [];
+    const states = filterOptions?.states || [];
 
-      if (filter.status && product.status !== filter.status) {
-        return false;
-      }
-
-      if (filter.verified) {
-        const isVerified = filter.verified === 'true';
-        if (product.verified !== isVerified) {
-          return false;
-        }
-      }
-
-      if (filter.category && !product.categories.some((c) => c.name === filter.category)) {
-        return false;
-      }
-
-      if (filter.brand && product.brand !== filter.brand) {
-        return false;
-      }
-
-      if (filter.priceRange) {
-        const [min, max] = filter.priceRange.split('-').map(Number);
-        if (
-          min !== undefined &&
-          max !== undefined &&
-          (product.currentPrice < min || product.currentPrice > max)
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [productList, filter]);
-
-  const filterOptions = useMemo(() => {
-    const brands = [...new Set(productList.map((p) => p.brand))];
-    const categories = [...new Set(productList.flatMap((p) => p.categories.map((c) => c.name)))];
     return {
       brands,
       categories,
+      states,
+      minPrice,
+      maxPrice,
       priceRanges: [
-        { label: 'Dưới 100,000đ', value: '0-100000' },
+        { label: 'Dưới 100,000đ', value: `0-${Math.min(100000, maxPrice)}` },
         { label: '100,000đ - 500,000đ', value: '100000-500000' },
         { label: '500,000đ - 1,000,000đ', value: '500000-1000000' },
         { label: '1,000,000đ - 5,000,000đ', value: '1000000-5000000' },
-        { label: 'Trên 5,000,000đ', value: '5000000-999999999' },
+        { label: `Trên 5,000,000đ`, value: `5000000-${maxPrice}` },
       ],
     };
-  }, [productList]);
+  }, [filterOptions]);
 
   const activeFiltersCount = useMemo(() => {
-    return Object.values(filter).filter((value) => value !== '').length;
+    return Object.entries(filter).filter(([key, value]) => {
+      if (key === 'search') return value !== '';
+      if (key === 'minPrice' || key === 'maxPrice') return value !== 0;
+      return value !== 'all';
+    }).length;
   }, [filter]);
 
   return {
     productList,
-    filteredProducts,
-    filterOptions,
+    filterOptions: availableFilterOptions,
     filter,
     setFilter,
     activeFiltersCount,
@@ -199,7 +193,6 @@ export default function useProduct() {
     currentPage,
     pageSize,
     totalPages,
-    productMetric,
     totalItems,
     setShowFilters,
     setRefreshing,
@@ -208,5 +201,6 @@ export default function useProduct() {
     handleRefresh,
     clearFilters,
     fetchProducts,
+    productMetric,
   };
 }

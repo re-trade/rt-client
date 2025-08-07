@@ -95,7 +95,7 @@ export const productApi = {
         params: {
           page,
           size,
-          ...(query ? { query } : {}),
+          ...(query ? { q: query } : {}),
         },
       },
     );
