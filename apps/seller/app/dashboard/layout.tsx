@@ -24,6 +24,7 @@ import {
   Star,
   Store,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
@@ -102,49 +103,148 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full">
       {state === 'expanded' && (
-        <div className="w-64 shrink-0 transition-all duration-300">
-          <Sidebar>
-            <SidebarContent>
-              <SidebarGroup>
-                <SidebarGroupLabel>Dashboard Người Bán</SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {menuItems.map((item) => (
-                      <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton asChild isActive={pathname === item.href}>
-                          <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                    <SidebarMenuItem>
-                      <SidebarMenuButton
-                        onClick={handleLogout}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        <span>Đăng xuất</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            </SidebarContent>
-          </Sidebar>
+        <div className="w-64 shrink-0 transition-all duration-300 hidden md:block">
+          <div className="h-full bg-gradient-to-r from-white to-orange-50 border-r border-orange-200 shadow-sm">
+            <div className="p-6">
+              <h2 className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-4">
+                Dashboard Người Bán
+              </h2>
+              <div className="space-y-2 mt-6">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                      pathname === item.href
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                    )}
+                  >
+                    <item.icon className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')} />
+                    <span className="font-medium">{item.title}</span>
+                  </Link>
+                ))}
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50 hover:shadow-sm w-full text-left mt-6 border border-red-100"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span className="font-medium">Đăng xuất</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      <main className="flex-grow p-6 transition-all duration-300">
+      <main className="flex-grow p-6 transition-all duration-300 pb-24 md:pb-6">
         <div className="flex items-center gap-4 mb-6">
-          <SidebarTrigger />
-          <h1 className="text-2xl font-bold">
+          <SidebarTrigger className="md:flex hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md border-none" />
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
             {menuItems.find((item) => item.href === pathname)?.title || 'Dashboard'}
           </h1>
         </div>
         {children}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 md:hidden z-30">
+        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-200 shadow-lg">
+          <nav className="flex justify-around items-center h-16 px-2">
+            {menuItems.slice(0, 5).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex flex-col items-center justify-center px-2 py-2 rounded-lg transition-all duration-200',
+                  pathname === item.href
+                    ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600 shadow-md'
+                    : 'text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600'
+                )}
+              >
+                <item.icon className={cn(
+                  'h-5 w-5',
+                  pathname === item.href ? 'text-white' : 'text-gray-600'
+                )} />
+                <span className="text-xs mt-1 font-medium">{item.title.split(' ')[0]}</span>
+              </Link>
+            ))}
+
+            <button
+              className="flex flex-col items-center justify-center px-2 py-2 text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600 rounded-lg transition-all duration-200"
+              onClick={() => {
+                document.body.classList.add('overflow-hidden');
+                document.getElementById('mobile-menu-drawer')?.classList.remove('translate-x-full');
+              }}
+            >
+              <Package className="h-5 w-5 text-gray-600" />
+              <span className="text-xs mt-1 font-medium">Khác</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      {/* Mobile Menu Drawer */}
+      <div
+        id="mobile-menu-drawer"
+        className="fixed inset-0 bg-black/50 z-50 transform translate-x-full transition-transform duration-300 md:hidden"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            document.body.classList.remove('overflow-hidden');
+            document.getElementById('mobile-menu-drawer')?.classList.add('translate-x-full');
+          }
+        }}
+      >
+        <div className="absolute right-0 top-0 bottom-0 w-3/4 max-w-xs bg-gradient-to-r from-white to-orange-50 shadow-xl p-6 overflow-y-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">Menu</h3>
+            <button
+              className="p-2 rounded-full hover:bg-orange-100 text-orange-600"
+              onClick={() => {
+                document.body.classList.remove('overflow-hidden');
+                document.getElementById('mobile-menu-drawer')?.classList.add('translate-x-full');
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                  pathname === item.href
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600'
+                )}
+                onClick={() => {
+                  document.body.classList.remove('overflow-hidden');
+                  document.getElementById('mobile-menu-drawer')?.classList.add('translate-x-full');
+                }}
+              >
+                <item.icon className={cn("h-5 w-5", pathname === item.href ? "text-white" : "")} />
+                <span>{item.title}</span>
+              </Link>
+            ))}
+
+            <button
+              onClick={() => {
+                handleLogout();
+                document.body.classList.remove('overflow-hidden');
+                document.getElementById('mobile-menu-drawer')?.classList.add('translate-x-full');
+              }}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50 hover:shadow-sm w-full text-left mt-4 border border-red-100"
+            >
+              <LogOut className="h-5 w-5" />
+              <span>Đăng xuất</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
