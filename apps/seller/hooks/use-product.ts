@@ -15,6 +15,11 @@ export interface FilterState {
   maxPrice: number;
 }
 
+export interface SortState {
+  field: string;
+  direction: 'asc' | 'desc' | null;
+}
+
 export default function useProduct() {
   const [productList, setProductList] = useState<TProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +36,7 @@ export default function useProduct() {
   const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
+  const [sort, setSort] = useState<SortState>({ field: '', direction: null });
   const [filter, setFilter] = useState<FilterState>({
     search: '',
     status: 'all',
@@ -49,7 +55,6 @@ export default function useProduct() {
         setFilterOptions(filterData);
       }
     } catch (error) {
-      console.error('Error fetching filter options:', error);
       toast.error('Lỗi khi tải tùy chọn lọc');
     }
   }, []);
@@ -77,11 +82,14 @@ export default function useProduct() {
         queryBuilder.set('currentPrice', `${min}..${max}`);
       }
       setLoading(true);
-      const query = queryBuilder.toString();
+      const sortParams: { field: string; direction: 'asc' | 'desc' | null }[] =
+        sort.field && sort.direction ? [{ field: sort.field, direction: sort.direction }] : [];
+
       const response = await productApi.getProducts(
         currentPage - 1,
         pageSize,
-        query ? query : undefined,
+        sortParams,
+        queryBuilder.toString(),
       );
       if (response.products) {
         setProductList(response.products);
@@ -93,7 +101,7 @@ export default function useProduct() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, pageSize, filter]);
+  }, [currentPage, pageSize, filter, sort]);
 
   const fetchProductMetric = useCallback(async () => {
     const response = await dashboardApi().fetchSellerProductMetric();
@@ -117,7 +125,6 @@ export default function useProduct() {
       await fetchProducts();
       toast.success('Đã làm mới danh sách sản phẩm');
     } catch (error) {
-      console.error('Error refreshing products:', error);
       toast.error('Lỗi khi làm mới danh sách sản phẩm');
     } finally {
       setRefreshing(false);
@@ -144,11 +151,41 @@ export default function useProduct() {
 
   useEffect(() => {
     fetchProducts();
-  }, [filter, currentPage, pageSize, fetchProducts]);
+  }, [filter, currentPage, pageSize, sort, fetchProducts]);
 
   useEffect(() => {
     fetchProductMetric();
   }, [fetchProductMetric]);
+
+  type PriceRange = { label: string; value: string };
+
+  function generatePriceRanges(minPrice: number, maxPrice: number): PriceRange[] {
+    const ranges: PriceRange[] = [];
+    const step = Math.ceil((maxPrice - minPrice) / 5);
+
+    for (let i = 0; i < 5; i++) {
+      const start = minPrice + step * i;
+      const end = i === 4 ? maxPrice : start + step;
+
+      const label =
+        i === 4
+          ? `Trên ${formatCurrency(start)}`
+          : `${formatCurrency(start)} - ${formatCurrency(end)}`;
+      const value = `${start}-${end}`;
+
+      ranges.push({ label, value });
+    }
+
+    return ranges;
+  }
+
+  function formatCurrency(amount: number): string {
+    return amount.toLocaleString('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      maximumFractionDigits: 0,
+    });
+  }
 
   const availableFilterOptions = useMemo(() => {
     const maxPrice = filterOptions?.maxPrice || 10000000;
@@ -157,21 +194,17 @@ export default function useProduct() {
     const categories = filterOptions?.categoriesAdvanceSearch || [];
     const states = filterOptions?.states || [];
 
+    const priceRanges = generatePriceRanges(minPrice, maxPrice);
+
     return {
       brands,
       categories,
       states,
       minPrice,
       maxPrice,
-      priceRanges: [
-        { label: 'Dưới 100,000đ', value: `0-${Math.min(100000, maxPrice)}` },
-        { label: '100,000đ - 500,000đ', value: '100000-500000' },
-        { label: '500,000đ - 1,000,000đ', value: '500000-1000000' },
-        { label: '1,000,000đ - 5,000,000đ', value: '1000000-5000000' },
-        { label: `Trên 5,000,000đ`, value: `5000000-${maxPrice}` },
-      ],
+      priceRanges,
     };
-  }, [filterOptions]);
+  }, []);
 
   const activeFiltersCount = useMemo(() => {
     return Object.entries(filter).filter(([key, value]) => {
@@ -181,8 +214,19 @@ export default function useProduct() {
     }).length;
   }, [filter]);
 
+  const handleSortChange = (field: string) => {
+    if (sort.field === field) {
+      const nextDirection =
+        sort.direction === 'asc' ? 'desc' : sort.direction === 'desc' ? null : 'asc';
+      setSort({ field, direction: nextDirection });
+    } else {
+      setSort({ field, direction: 'asc' });
+    }
+  };
+
   return {
     productList,
+    setProductList,
     filterOptions: availableFilterOptions,
     filter,
     setFilter,
@@ -202,5 +246,8 @@ export default function useProduct() {
     clearFilters,
     fetchProducts,
     productMetric,
+    sort,
+    setSort,
+    handleSortChange,
   };
 }

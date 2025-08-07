@@ -33,7 +33,6 @@ interface ProductFilterProps {
   };
   activeFiltersCount: number;
   clearFilters: () => void;
-  filteredProductsCount: number;
   totalProductsCount: number;
 }
 
@@ -45,7 +44,7 @@ export default function ProductFilter({
   filterOptions,
   activeFiltersCount,
   clearFilters,
-  filteredProductsCount,
+  totalProductsCount,
 }: ProductFilterProps) {
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     setFilter((prev) => ({ ...prev, [key]: value === 'all' ? '' : value }));
@@ -67,7 +66,7 @@ export default function ProductFilter({
           <div className="flex items-center gap-3 text-sm text-slate-600 mt-2 md:mt-0">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              <span className="font-medium">{filteredProductsCount} sản phẩm</span>
+              <span className="font-medium">{totalProductsCount} sản phẩm</span>
             </div>
             {activeFiltersCount > 0 && (
               <Button
@@ -207,12 +206,6 @@ export default function ProductFilter({
                     ))
                   ) : (
                     <Skeleton className="h-8 w-full" />
-                  )}
-                  {filterOptions.minPrice !== undefined && filterOptions.maxPrice !== undefined && (
-                    <SelectItem value={`${filterOptions.minPrice}-${filterOptions.maxPrice}`}>
-                      Tất cả ({filterOptions.minPrice.toLocaleString('vi-VN')}đ -{' '}
-                      {filterOptions.maxPrice.toLocaleString('vi-VN')}đ)
-                    </SelectItem>
                   )}
                 </SelectContent>
               </Select>

@@ -77,10 +77,18 @@ export type ProductFilterResponse = {
   maxPrice: number;
 };
 
+interface QueryParams {
+  page: number;
+  size: number;
+  q?: string;
+  sort?: string;
+}
+
 export const productApi = {
   async getProducts(
-    page: number = 0,
-    size: number = 15,
+    page = 0,
+    size = 15,
+    sort: { field: string; direction: 'asc' | 'desc' | null }[],
     query?: string,
   ): Promise<{
     products: TProduct[];
@@ -89,17 +97,33 @@ export const productApi = {
     currentPage: number;
     pageSize: number;
   }> {
+    const params: Record<string, string | number> = {
+      page,
+      size,
+    };
+
+    if (query) {
+      params.q = query;
+    }
+
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.append(key, value.toString());
+    });
+
+    sort.forEach((s) => {
+      if (s.field && s.direction) {
+        searchParams.append('sort', `${s.field},${s.direction}`);
+      }
+    });
+
     const response = await authApi.default.get<IResponseObject<TProduct[]>>(
-      `/products/my-products`,
-      {
-        params: {
-          page,
-          size,
-          ...(query ? { q: query } : {}),
-        },
-      },
+      `/products/my-products?${searchParams.toString()}`,
     );
+
     const products = response.data.success ? response.data.content : [];
+
     return {
       products,
       totalPages: response.data.pagination?.totalPages || 1,

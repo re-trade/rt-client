@@ -1,9 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TProduct, TProductStatus } from '@/service/product.api';
 import {
   AlertCircle,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Edit,
   Eye,
@@ -118,6 +121,8 @@ interface ProductTableProps {
   pageSize: number;
   handlePageChange: (page: number) => void;
   handlePageSizeChange: (pageSize: number) => void;
+  sort?: { field: string; direction: 'asc' | 'desc' | null };
+  handleSortChange?: (field: string) => void;
 }
 
 const ProductTable = ({
@@ -135,6 +140,8 @@ const ProductTable = ({
   pageSize,
   handlePageChange,
   handlePageSizeChange,
+  sort = { field: '', direction: null },
+  handleSortChange,
 }: ProductTableProps) => {
   if (loading) {
     return <ProductListSkeleton />;
@@ -155,17 +162,165 @@ const ProductTable = ({
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-slate-200 bg-slate-50/50">
+                <TableRow className="border-slate-200 bg-slate-50/50 select-none">
                   <TableHead className="w-20 font-semibold text-slate-700">Hình ảnh</TableHead>
-                  <TableHead className="min-w-40 font-semibold text-slate-700">
-                    Tên sản phẩm
+                  <TableHead
+                    className="min-w-40 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => handleSortChange && handleSortChange('name')}
+                  >
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 group">
+                            Tên sản phẩm
+                            {sort.field === 'name' && sort.direction ? (
+                              sort.direction === 'asc' ? (
+                                <ChevronUp className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-blue-600" />
+                              )
+                            ) : (
+                              <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click để sắp xếp theo tên sản phẩm</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableHead>
-                  <TableHead className="w-32 font-semibold text-slate-700">Giá</TableHead>
-                  <TableHead className="w-32 font-semibold text-slate-700">Thương hiệu</TableHead>
-                  <TableHead className="w-20 font-semibold text-slate-700">Số lượng</TableHead>
+                  <TableHead
+                    className="w-32 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => handleSortChange && handleSortChange('currentPrice')}
+                  >
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 group">
+                            Giá
+                            {sort.field === 'currentPrice' && sort.direction ? (
+                              sort.direction === 'asc' ? (
+                                <ChevronUp className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-blue-600" />
+                              )
+                            ) : (
+                              <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click để sắp xếp theo giá</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableHead>
+                  <TableHead
+                    className="w-32 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => handleSortChange && handleSortChange('brand')}
+                  >
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 group">
+                            Thương hiệu
+                            {sort.field === 'brand' && sort.direction ? (
+                              sort.direction === 'asc' ? (
+                                <ChevronUp className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-blue-600" />
+                              )
+                            ) : (
+                              <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click để sắp xếp theo thương hiệu</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableHead>
+                  <TableHead
+                    className="w-20 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => handleSortChange && handleSortChange('quantity')}
+                  >
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 group">
+                            Số lượng
+                            {sort.field === 'quantity' && sort.direction ? (
+                              sort.direction === 'asc' ? (
+                                <ChevronUp className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-blue-600" />
+                              )
+                            ) : (
+                              <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click để sắp xếp theo số lượng</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableHead>
                   <TableHead className="min-w-40 font-semibold text-slate-700">Danh mục</TableHead>
-                  <TableHead className="w-36 font-semibold text-slate-700">Trạng thái</TableHead>
-                  <TableHead className="w-36 font-semibold text-slate-700">Xác minh</TableHead>
+                  <TableHead
+                    className="w-36 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => handleSortChange && handleSortChange('status')}
+                  >
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 group">
+                            Trạng thái
+                            {sort.field === 'status' && sort.direction ? (
+                              sort.direction === 'asc' ? (
+                                <ChevronUp className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-blue-600" />
+                              )
+                            ) : (
+                              <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click để sắp xếp theo trạng thái</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableHead>
+                  <TableHead
+                    className="w-36 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
+                    onClick={() => handleSortChange && handleSortChange('verified')}
+                  >
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1 group">
+                            Xác minh
+                            {sort.field === 'verified' && sort.direction ? (
+                              sort.direction === 'asc' ? (
+                                <ChevronUp className="h-4 w-4 text-blue-600" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-blue-600" />
+                              )
+                            ) : (
+                              <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click để sắp xếp theo trạng thái xác minh</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableHead>
                   <TableHead className="w-24 font-semibold text-slate-700">Thao tác</TableHead>
                 </TableRow>
               </TableHeader>

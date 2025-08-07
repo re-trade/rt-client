@@ -41,6 +41,8 @@ export default function ProductManagement() {
     clearFilters,
     fetchProducts,
     productMetric,
+    sort,
+    handleSortChange,
   } = useProduct();
 
   const handleUpdateProduct = (updatedData: Partial<CreateProductDto>) => {
@@ -60,7 +62,6 @@ export default function ProductManagement() {
 
   const handleDeleteProduct = async (product: TProduct) => {
     try {
-      const updatedProducts = productList.filter((p) => p.id !== product.id);
       toast.success('Đã xoá sản phẩm thành công');
       fetchProducts();
     } catch (error) {
@@ -71,7 +72,6 @@ export default function ProductManagement() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       <div className="space-y-8 p-6 max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
@@ -176,11 +176,9 @@ export default function ProductManagement() {
           filterOptions={filterOptions}
           activeFiltersCount={activeFiltersCount}
           clearFilters={clearFilters}
-          filteredProductsCount={productList.length}
           totalProductsCount={productList.length}
         />
 
-        {/* Products Table */}
         <ProductTable
           products={productList}
           loading={loading}
@@ -196,9 +194,10 @@ export default function ProductManagement() {
           totalItems={totalItems}
           handlePageChange={handlePageChange}
           handlePageSizeChange={handlePageSizeChange}
+          sort={sort}
+          handleSortChange={handleSortChange}
         />
 
-        {/* Dialogs */}
         <CreateProductDialog
           open={isCreateOpen}
           onOpenChange={setIsCreateOpen}

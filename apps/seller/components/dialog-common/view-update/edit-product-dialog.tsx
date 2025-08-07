@@ -63,7 +63,6 @@ export function EditProductDialog({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
-  // Helper function to format date from array to string
   const formatDateFromArray = (dateInput: number[] | string): string => {
     if (Array.isArray(dateInput) && dateInput.length === 3) {
       const [year, month, day] = dateInput;
@@ -79,7 +78,6 @@ export function EditProductDialog({
 
   useEffect(() => {
     if (product) {
-      console.log('Editing product:', product);
       const updatedForm = {
         name: product.name || '',
         shortDescription: product.shortDescription || '',
@@ -219,13 +217,11 @@ export function EditProductDialog({
       let thumbnailUrl = formData.thumbnail;
       let productImageUrls = imagePreviews;
 
-      // Upload new thumbnail if changed
       if (thumbnailFile) {
         const res = await storageApi.fileUpload(thumbnailFile);
         thumbnailUrl = res;
       }
 
-      // Upload new product images if any
       if (selectedFiles.length > 0) {
         const res = await storageApi.fileBulkUpload(selectedFiles);
         // Filter out blob URLs and add new uploaded URLs
