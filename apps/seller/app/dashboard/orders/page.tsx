@@ -29,6 +29,7 @@ export default function OrdersPage() {
     searchTerm,
     statusFilter,
     refreshing,
+    sort,
     setPage,
     setPageSize,
     setSearchTerm,
@@ -36,6 +37,7 @@ export default function OrdersPage() {
     handleRefresh,
     handleKeyPress,
     handleStatusUpdate,
+    handleSortChange,
   } = useOrder();
 
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
@@ -135,6 +137,8 @@ export default function OrdersPage() {
           orders={orders}
           onViewDetail={handleViewDetail}
           onUpdateStatus={handleUpdateStatus}
+          sort={sort}
+          handleSortChange={handleSortChange}
         />
       )}
 

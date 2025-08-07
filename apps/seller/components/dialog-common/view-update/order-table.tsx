@@ -18,8 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { OrderResponse } from '@/service/orders.api';
+import { OrderResponse, SortState } from '@/service/orders.api';
 import { snipppetCode } from '@/service/snippetCode';
 import {
   AlertCircle,
@@ -28,6 +29,8 @@ import {
   Calendar,
   CheckCheck,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Clock,
   CreditCard,
   DollarSign,
@@ -50,9 +53,17 @@ interface OrderTableProps {
   orders: OrderResponse[];
   onViewDetail: (order: OrderResponse) => void;
   onUpdateStatus: (order: OrderResponse) => void;
+  sort?: SortState;
+  handleSortChange?: (field: string) => void;
 }
 
-export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableProps) {
+export function OrderTable({
+  orders,
+  onViewDetail,
+  onUpdateStatus,
+  sort = { field: '', direction: null },
+  handleSortChange,
+}: OrderTableProps) {
   const getStatusConfig = (status: OrderResponse['orderStatus']) => {
     const configs = {
       PENDING: {
@@ -254,13 +265,113 @@ export function OrderTable({ orders, onViewDetail, onUpdateStatus }: OrderTableP
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent border-gray-100">
-                <TableHead className="font-semibold text-gray-700 py-4">Mã đơn hàng</TableHead>
+                <TableHead
+                  className="font-semibold text-gray-700 py-4 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  onClick={() => handleSortChange && handleSortChange('id')}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1 group">
+                          Mã đơn hàng
+                          {sort.field === 'id' && sort.direction ? (
+                            sort.direction === 'asc' ? (
+                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                            )
+                          ) : (
+                            <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click để sắp xếp theo mã đơn hàng</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableHead>
                 <TableHead className="font-semibold text-gray-700">Khách hàng</TableHead>
                 <TableHead className="font-semibold text-gray-700">Sản phẩm</TableHead>
-                <TableHead className="font-semibold text-gray-700">Tổng tiền</TableHead>
+                <TableHead
+                  className="font-semibold text-gray-700 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  onClick={() => handleSortChange && handleSortChange('grandPrice')}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1 group">
+                          Tổng tiền
+                          {sort.field === 'grandPrice' && sort.direction ? (
+                            sort.direction === 'asc' ? (
+                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                            )
+                          ) : (
+                            <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click để sắp xếp theo tổng tiền</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableHead>
                 <TableHead className="font-semibold text-gray-700">Thanh toán</TableHead>
-                <TableHead className="font-semibold text-gray-700">Trạng thái</TableHead>
-                <TableHead className="font-semibold text-gray-700">Ngày tạo</TableHead>
+                <TableHead
+                  className="font-semibold text-gray-700 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  onClick={() => handleSortChange && handleSortChange('orderStatus')}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1 group">
+                          Trạng thái
+                          {sort.field === 'orderStatus' && sort.direction ? (
+                            sort.direction === 'asc' ? (
+                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                            )
+                          ) : (
+                            <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click để sắp xếp theo trạng thái đơn hàng</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableHead>
+                <TableHead
+                  className="font-semibold text-gray-700 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  onClick={() => handleSortChange && handleSortChange('createdDate')}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1 group">
+                          Ngày tạo
+                          {sort.field === 'createdDate' && sort.direction ? (
+                            sort.direction === 'asc' ? (
+                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                            )
+                          ) : (
+                            <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click để sắp xếp theo ngày tạo</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableHead>
                 <TableHead className="font-semibold text-gray-700 text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>

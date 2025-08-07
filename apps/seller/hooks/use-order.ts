@@ -1,6 +1,6 @@
 'use client';
 import { dashboardApi, OrderMetricResponse } from '@/service/dashboard.api';
-import { OrderResponse, ordersApi } from '@/service/orders.api';
+import { OrderResponse, ordersApi, SortState } from '@/service/orders.api';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -17,6 +17,10 @@ export function useOrder() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [sort, setSort] = useState<SortState>({
+    field: '',
+    direction: null,
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -31,11 +35,15 @@ export function useOrder() {
     setError(null);
 
     try {
+      const sortParams: SortState[] =
+        sort.field && sort.direction ? [{ field: sort.field, direction: sort.direction }] : [];
+
       const response = await ordersApi.getAllOrdersBySeller(
         page - 1,
         pageSize,
         debouncedSearchTerm,
         statusFilter,
+        sortParams,
       );
 
       if (response && response.orders) {
@@ -56,7 +64,7 @@ export function useOrder() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, debouncedSearchTerm, statusFilter]);
+  }, [page, pageSize, debouncedSearchTerm, statusFilter, sort]);
 
   const fetchOrderMetric = useCallback(async () => {
     try {
@@ -96,6 +104,16 @@ export function useOrder() {
 
   const handleSearch = () => {
     setPage(1);
+  };
+
+  const handleSortChange = (field: string) => {
+    if (sort.field === field) {
+      const nextDirection =
+        sort.direction === 'asc' ? 'desc' : sort.direction === 'desc' ? null : 'asc';
+      setSort({ field, direction: nextDirection });
+    } else {
+      setSort({ field, direction: 'asc' });
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -138,6 +156,7 @@ export function useOrder() {
     searchTerm,
     statusFilter,
     refreshing,
+    sort,
     setPage,
     setPageSize,
     setSearchTerm,
@@ -147,5 +166,6 @@ export function useOrder() {
     handleSearch,
     handleKeyPress,
     handleStatusUpdate,
+    handleSortChange,
   };
 }
