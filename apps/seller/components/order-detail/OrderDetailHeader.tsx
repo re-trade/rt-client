@@ -6,7 +6,12 @@ import { useState } from 'react';
 
 interface OrderDetailHeaderProps {
   orderId: string;
-  status: any;
+  status: {
+    label: string;
+    description: string;
+    color: string;
+    icon: React.ElementType;
+  };
   createDate?: string;
   formatDate: (date: string) => string;
 }

@@ -1,7 +1,12 @@
 import { Clock } from 'lucide-react';
 
 interface OrderStatusCardProps {
-  statusDisplay: any;
+  statusDisplay: {
+    label: string;
+    description: string;
+    color: string;
+    icon: React.ElementType;
+  };
 }
 
 export function OrderStatusCard({ statusDisplay }: OrderStatusCardProps) {
