@@ -89,7 +89,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const { handleLogout } = useAuth();
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full bg-gray-50">
       {state === 'expanded' && (
         <div className="w-64 shrink-0 transition-all duration-300 hidden md:block">
           <div className="h-full bg-gradient-to-r from-white to-orange-50 border-r border-orange-200 shadow-sm">
@@ -128,7 +128,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <main className="flex-grow p-6 transition-all duration-300 pb-24 md:pb-6">
+      <main className="flex-grow p-6 transition-all duration-300 pb-24 md:pb-6 overflow-auto bg-gray-50">
         <div className="flex items-center gap-4 mb-6">
           <SidebarTrigger className="md:flex hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md border-none" />
           <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">

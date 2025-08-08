@@ -67,91 +67,91 @@ export function OrderTable({
   const getStatusConfig = (status: OrderResponse['orderStatus']) => {
     const configs = {
       PENDING: {
-        color: 'bg-amber-50 text-amber-700 border-amber-200 shadow-amber-100',
+        color: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
         icon: <Clock className="h-3.5 w-3.5" />,
         text: 'Chờ xác nhận',
         pulse: true,
       },
       PREPARING: {
-        color: 'bg-violet-50 text-violet-700 border-violet-200 shadow-violet-100',
+        color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
         icon: <Package className="h-3.5 w-3.5" />,
         text: 'Đang chuẩn bị',
         pulse: true,
       },
       DELIVERING: {
-        color: 'bg-orange-50 text-orange-700 border-orange-200 shadow-orange-100',
+        color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
         icon: <Truck className="h-3.5 w-3.5" />,
         text: 'Đang giao hàng',
         pulse: true,
       },
       DELIVERED: {
-        color: 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-emerald-100',
+        color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
         icon: <PackageCheck className="h-3.5 w-3.5" />,
         text: 'Đã giao hàng',
         pulse: false,
       },
       CANCELLED: {
-        color: 'bg-red-50 text-red-700 border-red-200 shadow-red-100',
+        color: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
         icon: <Ban className="h-3.5 w-3.5" />,
         text: 'Đã hủy',
         pulse: false,
       },
       RETURNING: {
-        color: 'bg-orange-50 text-orange-700 border-orange-200 shadow-orange-100',
+        color: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
         icon: <RefreshCw className="h-3.5 w-3.5" />,
         text: 'Đang hoàn trả',
         pulse: true,
       },
       REFUNDED: {
-        color: 'bg-indigo-50 text-indigo-700 border-indigo-200 shadow-indigo-100',
+        color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
         icon: <DollarSign className="h-3.5 w-3.5" />,
         text: 'Đã hoàn tiền',
         pulse: false,
       },
       RETURN_REJECTED: {
-        color: 'bg-red-50 text-red-700 border-red-200 shadow-red-100',
+        color: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
         icon: <XCircle className="h-3.5 w-3.5" />,
         text: 'Từ chối hoàn trả',
         pulse: false,
       },
       RETURN_REQUESTED: {
-        color: 'bg-yellow-50 text-yellow-700 border-yellow-200 shadow-yellow-100',
+        color: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
         icon: <RotateCcw className="h-3.5 w-3.5" />,
         text: 'Yêu cầu hoàn trả',
         pulse: true,
       },
       COMPLETED: {
-        color: 'bg-green-50 text-green-700 border-green-200 shadow-green-100',
+        color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
         icon: <CheckCircle className="h-3.5 w-3.5" />,
         text: 'Đã hoàn tất',
         pulse: false,
       },
       RETURNED: {
-        color: 'bg-slate-50 text-slate-700 border-slate-200 shadow-slate-100',
+        color: 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100',
         icon: <PackageX className="h-3.5 w-3.5" />,
         text: 'Đã trả hàng',
         pulse: false,
       },
       RETURN_APPROVED: {
-        color: 'bg-teal-50 text-teal-700 border-teal-200 shadow-teal-100',
+        color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
         icon: <CheckCheck className="h-3.5 w-3.5" />,
         text: 'Chấp nhận hoàn trả',
         pulse: false,
       },
       PAYMENT_CONFIRMATION: {
-        color: 'bg-green-50 text-green-700 border-green-200 shadow-green-100',
+        color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
         icon: <CreditCard className="h-3.5 w-3.5" />,
         text: 'Đã thanh toán',
         pulse: false,
       },
       PAYMENT_FAILED: {
-        color: 'bg-red-50 text-red-700 border-red-200 shadow-red-100',
+        color: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
         icon: <AlertTriangle className="h-3.5 w-3.5" />,
         text: 'Thanh toán thất bại',
         pulse: false,
       },
       PAYMENT_CANCELLED: {
-        color: 'bg-gray-50 text-gray-700 border-gray-200 shadow-gray-100',
+        color: 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100',
         icon: <XCircle className="h-3.5 w-3.5" />,
         text: 'Thanh toán đã huỷ',
         pulse: false,
@@ -179,25 +179,25 @@ export function OrderTable({
       }
     > = {
       PENDING: {
-        color: 'bg-amber-50 text-amber-700 border-amber-200 shadow-amber-100',
+        color: 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
         icon: <Clock className="h-3.5 w-3.5" />,
         text: 'Chờ thanh toán',
         pulse: true,
       },
       PAYMENT_CONFIRMATION: {
-        color: 'bg-green-50 text-green-700 border-green-200 shadow-green-100',
+        color: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
         icon: <CheckCircle className="h-3.5 w-3.5" />,
         text: 'Đã thanh toán',
         pulse: false,
       },
       PAYMENT_FAILED: {
-        color: 'bg-red-50 text-red-700 border-red-200 shadow-red-100',
+        color: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
         icon: <AlertTriangle className="h-3.5 w-3.5" />,
         text: 'Thất bại',
         pulse: false,
       },
       PAYMENT_CANCELLED: {
-        color: 'bg-gray-50 text-gray-700 border-gray-200 shadow-gray-100',
+        color: 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100',
         icon: <XCircle className="h-3.5 w-3.5" />,
         text: 'Đã hủy thanh toán',
         pulse: false,
@@ -209,7 +209,7 @@ export function OrderTable({
     }
 
     return {
-      color: 'bg-gray-50 text-gray-700 border-gray-200 shadow-gray-100',
+      color: 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100',
       icon: <AlertCircle className="h-3.5 w-3.5" />,
       text: 'Không xác định',
       pulse: false,
@@ -259,14 +259,14 @@ export function OrderTable({
   }
 
   return (
-    <Card className="shadow-sm border-0 bg-white/60 backdrop-blur-sm">
+    <Card className="border-0 shadow-lg shadow-slate-200/50 bg-white/80 backdrop-blur-sm">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent border-gray-100">
+              <TableRow className="border-slate-200 bg-slate-50/50 select-none">
                 <TableHead
-                  className="font-semibold text-gray-700 py-4 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  className="font-semibold text-slate-700 py-4 cursor-pointer hover:bg-slate-100 transition-colors"
                   onClick={() => handleSortChange && handleSortChange('id')}
                 >
                   <TooltipProvider>
@@ -276,9 +276,9 @@ export function OrderTable({
                           Mã đơn hàng
                           {sort.field === 'id' && sort.direction ? (
                             sort.direction === 'asc' ? (
-                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                              <ChevronUp className="h-4 w-4 text-orange-600" />
                             ) : (
-                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                              <ChevronDown className="h-4 w-4 text-orange-600" />
                             )
                           ) : (
                             <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
@@ -291,10 +291,10 @@ export function OrderTable({
                     </Tooltip>
                   </TooltipProvider>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-700">Khách hàng</TableHead>
-                <TableHead className="font-semibold text-gray-700">Sản phẩm</TableHead>
+                <TableHead className="font-semibold text-slate-700">Khách hàng</TableHead>
+                <TableHead className="font-semibold text-slate-700">Sản phẩm</TableHead>
                 <TableHead
-                  className="font-semibold text-gray-700 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  className="font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
                   onClick={() => handleSortChange && handleSortChange('grandPrice')}
                 >
                   <TooltipProvider>
@@ -304,9 +304,9 @@ export function OrderTable({
                           Tổng tiền
                           {sort.field === 'grandPrice' && sort.direction ? (
                             sort.direction === 'asc' ? (
-                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                              <ChevronUp className="h-4 w-4 text-orange-600" />
                             ) : (
-                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                              <ChevronDown className="h-4 w-4 text-orange-600" />
                             )
                           ) : (
                             <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
@@ -319,9 +319,9 @@ export function OrderTable({
                     </Tooltip>
                   </TooltipProvider>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-700">Thanh toán</TableHead>
+                <TableHead className="font-semibold text-slate-700">Thanh toán</TableHead>
                 <TableHead
-                  className="font-semibold text-gray-700 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  className="font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
                   onClick={() => handleSortChange && handleSortChange('orderStatus')}
                 >
                   <TooltipProvider>
@@ -331,9 +331,9 @@ export function OrderTable({
                           Trạng thái
                           {sort.field === 'orderStatus' && sort.direction ? (
                             sort.direction === 'asc' ? (
-                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                              <ChevronUp className="h-4 w-4 text-orange-600" />
                             ) : (
-                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                              <ChevronDown className="h-4 w-4 text-orange-600" />
                             )
                           ) : (
                             <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
@@ -347,7 +347,7 @@ export function OrderTable({
                   </TooltipProvider>
                 </TableHead>
                 <TableHead
-                  className="font-semibold text-gray-700 cursor-pointer hover:bg-gray-50/50 transition-colors"
+                  className="font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
                   onClick={() => handleSortChange && handleSortChange('createdDate')}
                 >
                   <TooltipProvider>
@@ -357,9 +357,9 @@ export function OrderTable({
                           Ngày tạo
                           {sort.field === 'createdDate' && sort.direction ? (
                             sort.direction === 'asc' ? (
-                              <ChevronUp className="h-4 w-4 text-blue-600" />
+                              <ChevronUp className="h-4 w-4 text-orange-600" />
                             ) : (
-                              <ChevronDown className="h-4 w-4 text-blue-600" />
+                              <ChevronDown className="h-4 w-4 text-orange-600" />
                             )
                           ) : (
                             <ChevronDown className="h-4 w-4 opacity-0 group-hover:opacity-50" />
@@ -372,7 +372,7 @@ export function OrderTable({
                     </Tooltip>
                   </TooltipProvider>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-700 text-right">Thao tác</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -383,11 +383,11 @@ export function OrderTable({
                 return (
                   <TableRow
                     key={order.comboId}
-                    className="hover:bg-gray-50/50 transition-colors duration-200 border-gray-100"
+                    className="hover:bg-slate-50/50 transition-colors duration-200 border-slate-200"
                   >
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600 text-xs font-medium">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-orange-600 text-xs font-medium">
                           #{index + 1}
                         </div>
                         <div>
@@ -401,15 +401,15 @@ export function OrderTable({
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                          <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                          <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
                             {getCustomerInitials(order.destination.customerName)}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-slate-900">
                             {order.destination.customerName}
                           </div>
-                          <div className="text-sm text-gray-500">{order.destination.phone}</div>
+                          <div className="text-sm text-slate-500">{order.destination.phone}</div>
                         </div>
                       </div>
                     </TableCell>
@@ -417,13 +417,13 @@ export function OrderTable({
                     <TableCell className="py-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <Package className="h-4 w-4 text-gray-400" />
+                          <Package className="h-4 w-4 text-slate-400" />
                           <span className="text-sm font-medium">{order.items.length} sản phẩm</span>
                         </div>
-                        <div className="text-xs text-gray-500 max-w-[190px] line-clamp-2">
+                        <div className="text-xs text-slate-500 max-w-[190px] line-clamp-2">
                           {order.items[0]?.itemName || 'Không có tên sản phẩm'}
                           {order.items.length > 1 && (
-                            <span className="ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-xs">
+                            <span className="ml-1 px-1.5 py-0.5 bg-slate-100 rounded text-xs">
                               +{order.items.length - 1} khác
                             </span>
                           )}
@@ -433,7 +433,7 @@ export function OrderTable({
 
                     <TableCell className="py-4">
                       <div className="text-left">
-                        <div className="text-lg font-bold text-gray-900">
+                        <div className="text-lg font-bold text-slate-900">
                           {formatCurrency(order.grandPrice)}
                         </div>
                       </div>
@@ -442,7 +442,7 @@ export function OrderTable({
                     <TableCell className="py-4">
                       <Badge
                         className={cn(
-                          'flex items-center gap-1.5 w-fit shadow-sm',
+                          'flex items-center gap-1.5 w-fit',
                           paymentStatus.color,
                           paymentStatus.pulse && 'animate-pulse',
                         )}
@@ -455,7 +455,7 @@ export function OrderTable({
                     <TableCell className="py-4">
                       <Badge
                         className={cn(
-                          'flex items-center gap-1.5 w-fit shadow-sm',
+                          'flex items-center gap-1.5 w-fit',
                           orderStatus.color,
                           orderStatus.pulse && 'animate-pulse',
                         )}
@@ -466,8 +466,8 @@ export function OrderTable({
                     </TableCell>
 
                     <TableCell className="py-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="h-4 w-4 text-gray-400" />
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Calendar className="h-4 w-4 text-slate-400" />
                         {formatDate(order.createDate)}
                       </div>
                     </TableCell>
@@ -479,7 +479,7 @@ export function OrderTable({
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-gray-100 transition-colors"
+                              className="h-8 w-8 p-0 hover:bg-slate-100 transition-colors"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>

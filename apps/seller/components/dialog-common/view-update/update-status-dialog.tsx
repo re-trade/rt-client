@@ -271,7 +271,7 @@ export function UpdateStatusDialog({
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
                 <Avatar className="h-12 w-12 border-2 border-white shadow-md">
-                  <AvatarFallback className="text-sm font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                  <AvatarFallback className="text-sm font-medium bg-orange-500 text-white">
                     {getCustomerInitials(order.destination.customerName)}
                   </AvatarFallback>
                 </Avatar>

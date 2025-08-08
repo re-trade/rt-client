@@ -9,13 +9,13 @@ const LoadingIndicator = () => {
   return (
     <div className="flex justify-center items-center h-60">
       <div className="relative">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
         <div
-          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 absolute top-0 left-0"
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 absolute top-0 left-0"
           style={{ animationDirection: 'reverse', opacity: 0.7, animationDuration: '1.5s' }}
         ></div>
       </div>
-      <span className="ml-3 text-gray-600 font-medium">Đang tải dữ liệu...</span>
+      <span className="ml-3 text-gray-700 font-medium">Đang tải dữ liệu...</span>
     </div>
   );
 };
@@ -54,10 +54,10 @@ export default function RecentOrdersWidget() {
   };
 
   return (
-    <Card className="bg-white shadow-lg border-0 overflow-hidden h-full">
-      <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-        <CardTitle className="flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" />
+    <Card className="border border-gray-200 shadow-md overflow-hidden h-full bg-white">
+      <CardHeader className="border-b-2 border-gray-200">
+        <CardTitle className="flex items-center gap-2 text-gray-800">
+          <ShoppingCart className="h-5 w-5 text-emerald-600" />
           Đơn hàng gần đây
         </CardTitle>
       </CardHeader>
@@ -70,10 +70,10 @@ export default function RecentOrdersWidget() {
               {recentOrders.map((order, index) => (
                 <div
                   key={order.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors shadow-sm"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white">
+                    <div className="w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center text-emerald-600">
                       <Package className="h-5 w-5" />
                     </div>
                     <div>
@@ -104,7 +104,7 @@ export default function RecentOrdersWidget() {
           <div className="mt-4 pt-4 border-t border-gray-200">
             <a
               href="/dashboard/orders"
-              className="text-sm text-teal-600 hover:text-teal-800 font-medium flex items-center justify-center"
+              className="text-sm text-emerald-600 hover:text-emerald-800 font-medium flex items-center justify-center"
             >
               Xem tất cả đơn hàng
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

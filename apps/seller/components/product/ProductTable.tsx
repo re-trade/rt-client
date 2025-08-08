@@ -157,7 +157,7 @@ const ProductTable = ({
   }
   return (
     <div>
-      <Card className="border-0 shadow-lg shadow-slate-200/50 bg-white/80 backdrop-blur-sm">
+      <Card className="border shadow bg-white overflow-hidden">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>

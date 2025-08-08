@@ -240,7 +240,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
         <DialogHeader className="border-b border-gray-100 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
+              <div className="p-3 bg-orange-500 rounded-xl">
                 <ShoppingBag className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -353,7 +353,7 @@ export function OrderDetailDialog({ open, onOpenChange, order }: OrderDetailDial
             <CardContent className="pt-4 space-y-4">
               <div className="flex items-center gap-4 py-2">
                 <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                  <AvatarFallback className="text-sm font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                  <AvatarFallback className="text-sm font-medium bg-orange-500 text-white">
                     {getCustomerInitials(order.destination.customerName)}
                   </AvatarFallback>
                 </Avatar>

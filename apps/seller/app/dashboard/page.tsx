@@ -59,13 +59,11 @@ const Dashboard = () => {
   }, [isLoading, refreshDashboard]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="space-y-6 bg-gray-50 p-4">
+      <div className="bg-gray-50 rounded-lg p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Tổng quan Dashboard
-            </h1>
+            <h1 className="text-3xl font-bold text-orange-600">Tổng quan Dashboard</h1>
             <p className="text-gray-600 mt-1">Xem tổng quan về hoạt động kinh doanh của bạn</p>
           </div>
           <div className="flex items-center gap-3">
@@ -86,19 +84,21 @@ const Dashboard = () => {
             </select>
             <button
               onClick={handleRefresh}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center hover:bg-orange-700 transition-colors disabled:opacity-50 shadow-sm"
               disabled={isLoading}
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing || isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${isRefreshing || isLoading ? 'animate-spin' : ''}`}
+              />
               {isLoading ? 'Đang tải...' : 'Làm mới'}
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {isLoading ? (
             <div className="col-span-full flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
               <span className="ml-3">Đang tải dữ liệu...</span>
             </div>
           ) : (
@@ -139,10 +139,10 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
           {isLoading ? (
             <div className="col-span-full flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
               <span className="ml-3">Đang tải dữ liệu...</span>
             </div>
           ) : (
@@ -183,12 +183,12 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <RevenueChart />
           <OrderStatusChart />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <BestProductsChart />
           <RecentOrdersWidget />
         </div>

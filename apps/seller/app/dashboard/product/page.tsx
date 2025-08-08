@@ -70,11 +70,11 @@ export default function ProductManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       <div className="space-y-8 p-6 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-orange-500 border-b-2 border-orange-400 pb-2 inline-block">
               Quản lý sản phẩm
             </h1>
             <p className="text-slate-600 flex items-center gap-2">
@@ -94,7 +94,7 @@ export default function ProductManagement() {
             </Button>
             <Button
               onClick={() => setIsCreateOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/20"
+              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
             >
               <Plus className="w-4 h-4" />
               Tạo sản phẩm mới
@@ -103,7 +103,7 @@ export default function ProductManagement() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-lg shadow-slate-200/50 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <Card className="border shadow bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -119,7 +119,7 @@ export default function ProductManagement() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg shadow-slate-200/50 bg-gradient-to-br from-emerald-50 to-green-50">
+          <Card className="border shadow bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -135,7 +135,7 @@ export default function ProductManagement() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg shadow-slate-200/50 bg-gradient-to-br from-amber-50 to-orange-50">
+          <Card className="border shadow bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -151,7 +151,7 @@ export default function ProductManagement() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg shadow-slate-200/50 bg-gradient-to-br from-purple-50 to-pink-50">
+          <Card className="border shadow bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

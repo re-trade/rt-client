@@ -51,14 +51,14 @@ export default function ProductFilter({
   };
 
   return (
-    <Card className="border-0 shadow-lg shadow-slate-200/50 bg-white/80 backdrop-blur-sm">
+    <Card className="border shadow bg-white">
       <CardHeader className="pb-4">
         <div className="flex flex-col md:flex-row gap-4 w-full">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
             <Input
               placeholder="Tìm kiếm sản phẩm theo tên..."
-              className="w-full flex-1 pl-10 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 h-9"
+              className="w-full flex-1 pl-10 border-gray-200 h-9"
               value={filter.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
             />
@@ -84,14 +84,14 @@ export default function ProductFilter({
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
-              className="relative border-slate-200 hover:bg-slate-50 flex items-center gap-2 transition-colors"
+              className="relative border-gray-200 hover:bg-gray-50 flex items-center gap-2 transition-colors"
             >
               <FilterIcon className="w-4 h-4 mr-1" /> Bộ lọc
               <ChevronDown
                 className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`}
               />
               {activeFiltersCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center">
+                <Badge className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center">
                   {activeFiltersCount}
                 </Badge>
               )}
@@ -110,7 +110,7 @@ export default function ProductFilter({
                 value={filter.status}
                 onValueChange={(value) => handleFilterChange('status', value)}
               >
-                <SelectTrigger className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 h-9">
+                <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
                   <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent>
@@ -128,7 +128,7 @@ export default function ProductFilter({
                 value={filter.verified}
                 onValueChange={(value) => handleFilterChange('verified', value)}
               >
-                <SelectTrigger className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 h-9">
+                <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
                   <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent>
@@ -145,7 +145,7 @@ export default function ProductFilter({
                 value={filter.category}
                 onValueChange={(value) => handleFilterChange('category', value)}
               >
-                <SelectTrigger className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 h-9">
+                <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
                   <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent>
@@ -169,7 +169,7 @@ export default function ProductFilter({
                 value={filter.brand}
                 onValueChange={(value) => handleFilterChange('brand', value)}
               >
-                <SelectTrigger className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 h-9">
+                <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
                   <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent>
@@ -193,7 +193,7 @@ export default function ProductFilter({
                 value={filter.priceRange}
                 onValueChange={(value) => handleFilterChange('priceRange', value)}
               >
-                <SelectTrigger className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 h-9">
+                <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
                   <SelectValue placeholder="Chọn khoảng giá" />
                 </SelectTrigger>
                 <SelectContent>

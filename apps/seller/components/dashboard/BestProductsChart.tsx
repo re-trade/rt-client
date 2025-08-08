@@ -19,13 +19,13 @@ const LoadingIndicator = () => {
   return (
     <div className="flex justify-center items-center h-60">
       <div className="relative">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
         <div
-          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 absolute top-0 left-0"
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 absolute top-0 left-0"
           style={{ animationDirection: 'reverse', opacity: 0.7, animationDuration: '1.5s' }}
         ></div>
       </div>
-      <span className="ml-3 text-gray-600 font-medium">Đang tải dữ liệu...</span>
+      <span className="ml-3 text-gray-700 font-medium">Đang tải dữ liệu...</span>
     </div>
   );
 };
@@ -35,10 +35,10 @@ export default function BestProductsChart() {
     useSellerBestProducts();
 
   return (
-    <Card className="bg-white shadow-lg border-0 overflow-hidden h-full">
-      <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5" />
+    <Card className="border border-gray-200 shadow-md overflow-hidden h-full bg-white">
+      <CardHeader className="border-b-2 border-gray-200">
+        <CardTitle className="flex items-center gap-2 text-gray-800">
+          <BarChart3 className="h-5 w-5 text-purple-600" />
           Top sản phẩm
         </CardTitle>
       </CardHeader>
@@ -48,13 +48,13 @@ export default function BestProductsChart() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Tổng doanh thu</p>
-                <p className="text-xl font-bold text-purple-700">{formattedTotalRevenue}</p>
+              <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Tổng doanh thu</p>
+                <p className="text-xl font-bold text-gray-800">{formattedTotalRevenue}</p>
               </div>
-              <div className="p-4 bg-pink-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Số lượng đã bán</p>
-                <p className="text-xl font-bold text-pink-700">{totalQuantitySold}</p>
+              <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Số lượng đã bán</p>
+                <p className="text-xl font-bold text-gray-800">{totalQuantitySold}</p>
               </div>
             </div>
 
@@ -139,7 +139,7 @@ export default function BestProductsChart() {
                 {bestProductsByQuantity.slice(0, 5).map((product, index) => (
                   <div
                     key={index}
-                    className="p-2 bg-gray-50 rounded-md flex justify-between items-center"
+                    className="p-2 border border-gray-200 rounded-md flex justify-between items-center shadow-sm hover:bg-gray-50 transition-colors"
                   >
                     <div>
                       <p className="text-sm font-medium text-gray-900">{product.productName}</p>

@@ -91,7 +91,7 @@ export function Pagination({
               onValueChange={(value) => onPageSizeChange(parseInt(value))}
               disabled={loading}
             >
-              <SelectTrigger className="w-20 h-8">
+              <SelectTrigger className="w-20 h-8 border-gray-200 focus:border-orange-500 focus:ring-orange-500/20">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -112,7 +112,7 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1 || loading || totalPages <= 1}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -137,7 +137,11 @@ export function Pagination({
                 size="sm"
                 onClick={() => onPageChange(pageNumber)}
                 disabled={loading || totalPages <= 1}
-                className={cn('h-8 w-8 p-0', isCurrentPage && 'bg-primary text-primary-foreground')}
+                className={cn(
+                  'h-8 w-8 p-0',
+                  isCurrentPage && 'bg-orange-500 text-white hover:bg-orange-600',
+                  !isCurrentPage && 'border-gray-200 hover:bg-gray-50 hover:border-gray-300',
+                )}
               >
                 {pageNumber}
               </Button>
@@ -150,7 +154,7 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages || loading || totalPages <= 1}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
