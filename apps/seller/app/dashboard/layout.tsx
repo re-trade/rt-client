@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sid
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import {
+  ChevronDown,
   DollarSign,
   LayoutDashboard,
   LogOut,
@@ -16,62 +17,93 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
+import { useEffect, useState } from 'react';
 
 const menuItems = [
   {
-    title: 'Tổng quan',
-    icon: LayoutDashboard,
-    href: '/dashboard',
+    group: 'Tổng quan',
+    items: [
+      {
+        title: 'Tổng quan',
+        icon: LayoutDashboard,
+        href: '/dashboard',
+      },
+      {
+        title: 'Quản lý doanh thu',
+        icon: DollarSign,
+        href: '/dashboard/revenue',
+      },
+    ],
   },
   {
-    title: 'Quản lý doanh thu',
-    icon: DollarSign,
-    href: '/dashboard/revenue',
+    group: 'Thông tin cửa hàng',
+    items: [
+      {
+        title: 'Thông tin seller',
+        icon: Store,
+        href: '/dashboard/seller-info',
+      },
+      {
+        title: 'Quản lý đánh giá',
+        icon: Star,
+        href: '/dashboard/review',
+      },
+    ],
   },
   {
-    title: 'Thông tin seller',
-    icon: Store,
-    href: '/dashboard/seller-info',
+    group: 'Sản phẩm & Đơn hàng',
+    items: [
+      {
+        title: 'Quản lý sản phẩm',
+        icon: Package,
+        href: '/dashboard/product',
+      },
+      {
+        title: 'Quản lý đơn hàng',
+        icon: ShoppingCart,
+        href: '/dashboard/orders',
+      },
+      {
+        title: 'Đơn hàng của tôi',
+        icon: ShoppingCart,
+        href: '/dashboard/my-order',
+      },
+    ],
   },
   {
-    title: 'Quản lý đánh giá',
-    icon: Star,
-    href: '/dashboard/review',
-  },
-  {
-    title: 'Quản lý sản phẩm',
-    icon: Package,
-    href: '/dashboard/product',
-  },
-  {
-    title: 'Quản lý đơn hàng',
-    icon: ShoppingCart,
-    href: '/dashboard/orders',
-  },
-  {
-    title: 'Chat với khách hàng',
-    icon: MessageCircle,
-    href: '/dashboard/chat',
+    group: 'Liên hệ & Hỗ trợ',
+    items: [
+      {
+        title: 'Chat với khách hàng',
+        icon: MessageCircle,
+        href: '/dashboard/chat',
+      },
+    ],
   },
   // {
-  //   title: 'Quản lý voucher',
-  //   icon: Ticket,
-  //   href: '/dashboard/voucher-management',
-  // },
-  // {
-  //   title: 'Phương thức vận chuyển',
-  //   icon: Truck,
-  //   href: '/dashboard/shipping-management',
-  // },
-  // {
-  //   title: 'Quản lý địa chỉ',
-  //   icon: MapPin,
-  //   href: '/dashboard/address-management',
-  // },
-  // {
-  //   title: 'Bảo mật',
-  //   icon: ShieldEllipsis,
-  //   href: '/dashboard/security',
+  //   group: 'Cấu hình thêm',
+  //   items: [
+  //     {
+  //       title: 'Quản lý voucher',
+  //       icon: Ticket,
+  //       href: '/dashboard/voucher-management',
+  //     },
+  //     {
+  //       title: 'Phương thức vận chuyển',
+  //       icon: Truck,
+  //       href: '/dashboard/shipping-management',
+  //     },
+  //     {
+  //       title: 'Quản lý địa chỉ',
+  //       icon: MapPin,
+  //       href: '/dashboard/address-management',
+  //     },
+  //     {
+  //       title: 'Bảo mật',
+  //       icon: ShieldEllipsis,
+  //       href: '/dashboard/security',
+  //     },
+  //   ],
   // },
 ];
 
@@ -87,6 +119,27 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
   const { handleLogout } = useAuth();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (index: number) => {
+    setOpenGroups((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  useEffect(() => {
+    // Automatically open the dropdown for the active route
+    const activeGroup = menuItems.findIndex((group) =>
+      group.items.some((item) => item.href === pathname),
+    );
+    if (activeGroup !== -1) {
+      setOpenGroups((prev) => ({
+        ...prev,
+        [activeGroup]: true,
+      }));
+    }
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
@@ -97,23 +150,46 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               <h2 className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-4">
                 Dashboard Người Bán
               </h2>
-              <div className="space-y-2 mt-6">
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                      pathname === item.href
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600',
-                    )}
-                  >
-                    <item.icon
-                      className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
-                    />
-                    <span className="font-medium">{item.title}</span>
-                  </Link>
+              <div className="space-y-4 mt-6">
+                {menuItems.map((group, groupIndex) => (
+                  <div key={groupIndex} className="space-y-1">
+                    <button
+                      onClick={() => toggleGroup(groupIndex)}
+                      className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-orange-50 rounded-lg"
+                    >
+                      <span>{group.group}</span>
+                      <ChevronDown
+                        className={cn(
+                          'h-4 w-4 transition-transform duration-200',
+                          openGroups[groupIndex] ? 'transform rotate-180' : '',
+                        )}
+                      />
+                    </button>
+                    <div
+                      className={cn(
+                        'space-y-1 overflow-hidden transition-all duration-200',
+                        openGroups[groupIndex] ? 'max-h-96' : 'max-h-0',
+                      )}
+                    >
+                      {group.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                            'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                            pathname === item.href
+                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600',
+                          )}
+                        >
+                          <item.icon
+                            className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
+                          />
+                          <span className="font-medium">{item.title}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 ))}
                 <button
                   onClick={handleLogout}
@@ -132,7 +208,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-4 mb-6">
           <SidebarTrigger className="md:flex hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md border-none" />
           <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-            {menuItems.find((item) => item.href === pathname)?.title || 'Dashboard'}
+            {menuItems.flatMap((group) => group.items).find((item) => item.href === pathname)
+              ?.title || 'Dashboard'}
           </h1>
         </div>
         {children}
@@ -142,23 +219,29 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <div className="fixed bottom-0 left-0 right-0 md:hidden z-30">
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-200 shadow-lg">
           <nav className="flex justify-around items-center h-16 px-2">
-            {menuItems.slice(0, 5).map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex flex-col items-center justify-center px-2 py-2 rounded-lg transition-all duration-200',
-                  pathname === item.href
-                    ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600 shadow-md'
-                    : 'text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600',
-                )}
-              >
-                <item.icon
-                  className={cn('h-5 w-5', pathname === item.href ? 'text-white' : 'text-gray-600')}
-                />
-                <span className="text-xs mt-1 font-medium">{item.title.split(' ')[0]}</span>
-              </Link>
-            ))}
+            {menuItems
+              .flatMap((group) => group.items)
+              .slice(0, 5)
+              .map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex flex-col items-center justify-center px-2 py-2 rounded-lg transition-all duration-200',
+                    pathname === item.href
+                      ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600 shadow-md'
+                      : 'text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600',
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      'h-5 w-5',
+                      pathname === item.href ? 'text-white' : 'text-gray-600',
+                    )}
+                  />
+                  <span className="text-xs mt-1 font-medium">{item.title.split(' ')[0]}</span>
+                </Link>
+              ))}
 
             <button
               className="flex flex-col items-center justify-center px-2 py-2 text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600 rounded-lg transition-all duration-200"
@@ -215,25 +298,52 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             </button>
           </div>
 
-          <div className="space-y-2">
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                  pathname === item.href
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600',
-                )}
-                onClick={() => {
-                  document.body.classList.remove('overflow-hidden');
-                  document.getElementById('mobile-menu-drawer')?.classList.add('translate-x-full');
-                }}
-              >
-                <item.icon className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')} />
-                <span>{item.title}</span>
-              </Link>
+          <div className="space-y-4">
+            {menuItems.map((group, groupIndex) => (
+              <div key={groupIndex} className="space-y-1">
+                <button
+                  onClick={() => toggleGroup(groupIndex)}
+                  className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-orange-50 rounded-lg"
+                >
+                  <span>{group.group}</span>
+                  <ChevronDown
+                    className={cn(
+                      'h-4 w-4 transition-transform duration-200',
+                      openGroups[groupIndex] ? 'transform rotate-180' : '',
+                    )}
+                  />
+                </button>
+                <div
+                  className={cn(
+                    'space-y-1 overflow-hidden transition-all duration-200',
+                    openGroups[groupIndex] ? 'max-h-96' : 'max-h-0',
+                  )}
+                >
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                        pathname === item.href
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                          : 'text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600',
+                      )}
+                      onClick={() => {
+                        document.body.classList.remove('overflow-hidden');
+                        document
+                          .getElementById('mobile-menu-drawer')
+                          ?.classList.add('translate-x-full');
+                      }}
+                    >
+                      <item.icon
+                        className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
+                      />
+                      <span>{item.title}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
 
             <button
