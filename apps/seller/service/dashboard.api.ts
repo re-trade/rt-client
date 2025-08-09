@@ -39,6 +39,20 @@ type DashboardRevenueResponse = {
   total: number;
 };
 
+type SellerProductMetricResponse = {
+  totalPrice: number;
+  productApprove: number;
+  productActivate: number;
+  productQuantity: number;
+};
+
+type OrderMetricResponse = {
+  totalOrder: number;
+  orderCompleted: number;
+  orderCancelled: number;
+  totalPaymentReceived: number;
+};
+
 const dashboardApi = () => {
   const fetchSellerDashboardMetric = async (fromDate: Date, toDate: Date) => {
     const fromDateISO = fromDate.toISOString().slice(0, 19);
@@ -104,12 +118,31 @@ const dashboardApi = () => {
     return [];
   };
 
+  const fetchSellerProductMetric = async () => {
+    const response = await authApi.default.get<IResponseObject<SellerProductMetricResponse>>(
+      '/dashboard/seller/product/metric',
+    );
+    if (response.data.success) {
+      return response.data.content;
+    }
+    return undefined;
+  };
+
+  const fetchOrderBasicMetric = async () => {
+    const response = await authApi.default.get<IResponseObject<OrderMetricResponse>>(
+      `/dashboard/seller/order/metric`,
+    );
+    return response.data.success ? response.data.content : undefined;
+  };
+
   return {
     fetchSellerDashboardMetric,
     fetchSellerOrders,
     fetchSellerOrderCount,
     fetchSellerBestProduct,
     fetchSellerRevenue,
+    fetchSellerProductMetric,
+    fetchOrderBasicMetric,
   };
 };
 
@@ -122,4 +155,6 @@ export type {
   DashboardOrderCountResponse,
   DashboardOrderResponse,
   DashboardRevenueResponse,
+  OrderMetricResponse,
+  SellerProductMetricResponse,
 };

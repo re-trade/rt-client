@@ -6,6 +6,8 @@ const authApi: Record<string, AxiosInstance> & {
   voucher: AxiosInstance;
   imageSearch: AxiosInstance;
   storage: AxiosInstance;
+  notification: AxiosInstance;
+  province: AxiosInstance;
 } = {
   get default() {
     return createAuthApi();
@@ -19,6 +21,12 @@ const authApi: Record<string, AxiosInstance> & {
   get storage() {
     return createAuthApi(EApiService.STORAGE);
   },
+  get notification() {
+    return createUnAuthApi(EApiService.NOTIFICATION);
+  },
+  get province() {
+    return createUnAuthApi(EApiService.PROVINCE);
+  },
 };
 
 const unAuthApi: Record<string, AxiosInstance> & {
@@ -26,6 +34,8 @@ const unAuthApi: Record<string, AxiosInstance> & {
   voucher: AxiosInstance;
   imageSearch: AxiosInstance;
   storage: AxiosInstance;
+  notification: AxiosInstance;
+  province: AxiosInstance;
 } = {
   get default() {
     return createUnAuthApi();
@@ -38,6 +48,12 @@ const unAuthApi: Record<string, AxiosInstance> & {
   },
   get storage() {
     return createUnAuthApi(EApiService.STORAGE);
+  },
+  get notification() {
+    return createUnAuthApi(EApiService.NOTIFICATION);
+  },
+  get province() {
+    return createUnAuthApi(EApiService.PROVINCE);
   },
 };
 

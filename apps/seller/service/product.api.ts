@@ -1,5 +1,7 @@
 import { authApi, IResponseObject } from '@retrade/util';
 
+export type TProductStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED' | 'INIT' | 'DRAFT';
+
 export type TProduct = {
   id: string;
   name: string;
@@ -22,7 +24,7 @@ export type TProduct = {
   tags: string[];
   verified: boolean;
   condition: string;
-  status: string;
+  status: TProductStatus;
   avgVote: number;
   createdAt: string;
   updatedAt: string;
@@ -42,7 +44,7 @@ export type CreateProductDto = {
   condition: string;
   categoryIds: string[];
   tags: string[];
-  status: string;
+  status: TProductStatus;
 };
 export type UpdateProductDto = {
   name: string;
@@ -52,7 +54,7 @@ export type UpdateProductDto = {
   productImages: string[];
   brandId: string;
   quantity: number;
-  warrantyExpiryDate: string; // ISO date string (e.g., "2025-07-06")
+  warrantyExpiryDate: string;
   condition: string;
   model: string;
   currentPrice: number;
@@ -60,10 +62,33 @@ export type UpdateProductDto = {
   tags: string[];
 };
 
+export type ProductFilterResponse = {
+  categoriesAdvanceSearch: {
+    id: string;
+    name: string;
+  }[];
+  brands: {
+    id: string;
+    name: string;
+    imgUrl: string;
+  }[];
+  states: string[];
+  minPrice: number;
+  maxPrice: number;
+};
+
+interface QueryParams {
+  page: number;
+  size: number;
+  q?: string;
+  sort?: string;
+}
+
 export const productApi = {
   async getProducts(
-    page: number = 0,
-    size: number = 15,
+    page = 0,
+    size = 15,
+    sort: { field: string; direction: 'asc' | 'desc' | null }[],
     query?: string,
   ): Promise<{
     products: TProduct[];
@@ -72,17 +97,33 @@ export const productApi = {
     currentPage: number;
     pageSize: number;
   }> {
+    const params: Record<string, string | number> = {
+      page,
+      size,
+    };
+
+    if (query) {
+      params.q = query;
+    }
+
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.append(key, value.toString());
+    });
+
+    sort.forEach((s) => {
+      if (s.field && s.direction) {
+        searchParams.append('sort', `${s.field},${s.direction}`);
+      }
+    });
+
     const response = await authApi.default.get<IResponseObject<TProduct[]>>(
-      `/products/my-products`,
-      {
-        params: {
-          page,
-          size,
-          ...(query ? { query } : {}),
-        },
-      },
+      `/products/my-products?${searchParams.toString()}`,
     );
+
     const products = response.data.success ? response.data.content : [];
+
     return {
       products,
       totalPages: response.data.pagination?.totalPages || 1,
@@ -119,6 +160,15 @@ export const productApi = {
       return response.data.content;
     }
     throw new Error('Failed to update product');
+  },
+
+  async getProductFilter(): Promise<ProductFilterResponse | undefined> {
+    const response =
+      await authApi.default.get<IResponseObject<ProductFilterResponse>>(`/products/seller/filter`);
+    if (response.data.success) {
+      return response.data.content;
+    }
+    return undefined;
   },
 
   async deleteProduct(id: string): Promise<TProduct> {

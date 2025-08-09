@@ -76,7 +76,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
   };
 
   const handleRemoveImage = (index: number) => {
-    URL.revokeObjectURL(imagePreviews[index]);
+    URL.revokeObjectURL(imagePreviews[index] || '');
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };

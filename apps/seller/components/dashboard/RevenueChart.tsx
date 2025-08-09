@@ -31,7 +31,7 @@ const LoadingIndicator = () => {
           style={{ animationDirection: 'reverse', opacity: 0.7, animationDuration: '1.5s' }}
         ></div>
       </div>
-      <span className="ml-3 text-gray-600 font-medium">Đang tải dữ liệu...</span>
+      <span className="ml-3 text-gray-700 font-medium">Đang tải dữ liệu...</span>
     </div>
   );
 };
@@ -55,15 +55,15 @@ export default function RevenueChart() {
   };
 
   return (
-    <Card className="bg-white shadow-lg border-0 overflow-hidden h-full">
-      <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+    <Card className="border border-gray-200 shadow-md overflow-hidden h-full bg-white">
+      <CardHeader className="border-b-2 border-gray-200">
         <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-gray-800">
+            <BarChart3 className="h-5 w-5 text-blue-600" />
             Doanh thu
           </CardTitle>
           <Select value={selectedYear.toString()} onValueChange={handleYearChange}>
-            <SelectTrigger className="w-[80px] bg-white text-gray-900 border-0 text-sm">
+            <SelectTrigger className="w-[80px] bg-white text-gray-900 border border-gray-200 text-sm">
               <SelectValue placeholder={selectedYear.toString()} />
             </SelectTrigger>
             <SelectContent>
@@ -82,25 +82,23 @@ export default function RevenueChart() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Tổng doanh thu {selectedYear}</p>
-                <p className="text-xl font-bold text-blue-700">{formattedTotalRevenue}</p>
+              <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Tổng doanh thu {selectedYear}</p>
+                <p className="text-xl font-bold text-gray-800">{formattedTotalRevenue}</p>
               </div>
 
-              <div className="p-4 bg-green-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Tháng cao nhất</p>
-                <p className="text-xl font-bold text-green-700">
+              <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Tháng cao nhất</p>
+                <p className="text-xl font-bold text-gray-800">
                   {highestMonth
                     ? `${highestMonth.monthName}: ${highestMonth.formattedTotal}`
                     : 'Không có dữ liệu'}
                 </p>
               </div>
 
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Trung bình/tháng</p>
-                <p className="text-xl font-bold text-purple-700">
-                  {formattedAverageMonthlyRevenue}
-                </p>
+              <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Trung bình/tháng</p>
+                <p className="text-xl font-bold text-gray-800">{formattedAverageMonthlyRevenue}</p>
               </div>
             </div>
 
@@ -108,7 +106,7 @@ export default function RevenueChart() {
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6} />
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
@@ -132,10 +130,10 @@ export default function RevenueChart() {
                   type="monotone"
                   dataKey="total"
                   name="Doanh thu"
-                  stroke="#3b82f6"
-                  fillOpacity={0.8}
+                  stroke="#2563eb"
+                  fillOpacity={0.5}
                   fill="url(#colorRevenue)"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                 />
               </AreaChart>
             </ResponsiveContainer>

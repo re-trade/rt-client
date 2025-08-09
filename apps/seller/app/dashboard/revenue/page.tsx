@@ -65,7 +65,9 @@ export default function RevenueManagement() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Quản lý Doanh thu</h1>
+            <h1 className="text-3xl font-bold text-orange-500 border-b-2 border-orange-400 pb-2 inline-block">
+              Quản lý Doanh thu
+            </h1>
             <p className="text-gray-600 mt-1">Theo dõi và quản lý doanh thu từ việc bán đồ cũ</p>
           </div>
           <div className="flex gap-3">
@@ -75,7 +77,7 @@ export default function RevenueManagement() {
             </Button>
             <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
+                <Button className="bg-green-600 hover:bg-green-700 flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-300">
                   <Wallet className="h-4 w-4" />
                   Rút tiền
                 </Button>
@@ -86,23 +88,23 @@ export default function RevenueManagement() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <Card className="border-0 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <Card className="border shadow bg-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-blue-100">Tổng doanh thu</CardTitle>
-              <DollarSign className="h-5 w-5 text-blue-200" />
+              <CardTitle className="text-sm font-medium text-gray-600">Tổng doanh thu</CardTitle>
+              <DollarSign className="h-5 w-5 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-gray-800">
                 {revenueStats.totalRevenue.toLocaleString('vi-VN')}₫
               </div>
               <div className="flex items-center mt-1">
-                <ArrowUpRight className="h-4 w-4 mr-1" />
-                <span className="text-sm text-blue-100">+20.1% so với tháng trước</span>
+                <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
+                <span className="text-sm text-gray-500">+20.1% so với tháng trước</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border shadow bg-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Số dư khả dụng</CardTitle>
               <Banknote className="h-5 w-5 text-green-600" />
@@ -115,7 +117,7 @@ export default function RevenueManagement() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border shadow bg-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Tổng đơn hàng</CardTitle>
               <ShoppingCart className="h-5 w-5 text-orange-600" />
@@ -129,7 +131,7 @@ export default function RevenueManagement() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border shadow bg-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
                 Tổng sản phẩm đã bán
@@ -145,7 +147,7 @@ export default function RevenueManagement() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg">
+          <Card className="border shadow bg-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Giá trị TB/đơn</CardTitle>
               <TrendingUp className="h-5 w-5 text-purple-600" />
@@ -170,7 +172,7 @@ export default function RevenueManagement() {
                 onClick={() => setActiveTab('revenue')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'revenue'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-orange-500 text-orange-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -180,7 +182,7 @@ export default function RevenueManagement() {
                 onClick={() => setActiveTab('bank')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'bank'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-orange-500 text-orange-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -190,7 +192,7 @@ export default function RevenueManagement() {
                 onClick={() => setActiveTab('withdraw')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'withdraw'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-orange-500 text-orange-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >

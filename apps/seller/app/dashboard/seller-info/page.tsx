@@ -324,7 +324,7 @@ export default function ShopInfoManagement() {
 
   if (!formData || !sellerInfo) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto" />
           <p className="text-gray-600 font-medium">Đang tải thông tin của bạn...</p>
@@ -334,11 +334,11 @@ export default function ShopInfoManagement() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div className="space-y-2 text-left">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-orange-400 pb-2 inline-block">
               Thông tin của bạn
             </h1>
             <p className="text-gray-600">Quản lý thông tin và thiết lập trang bán của bạn</p>
@@ -348,7 +348,7 @@ export default function ShopInfoManagement() {
           {!isEditing ? (
             <Button
               onClick={handleEdit}
-              className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-3 px-6 text-base font-semibold"
+              className="bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300 py-3 px-6 text-base font-semibold"
             >
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa thông tin
@@ -360,7 +360,7 @@ export default function ShopInfoManagement() {
                 disabled={!hasChanges}
                 className={`${
                   hasChanges
-                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl'
+                    ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-md hover:shadow-lg'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 } transition-all duration-300 py-3 px-6 text-base font-semibold`}
               >
@@ -382,18 +382,18 @@ export default function ShopInfoManagement() {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Statistics Sidebar */}
           <div className="xl:order-2 space-y-6">
-            <Card className="overflow-hidden shadow-2xl border-0 bg-white/90 backdrop-blur-xl">
-              <CardHeader className="bg-gradient-to-r from-emerald-500 to-green-500 text-white">
-                <CardTitle className="flex items-center gap-3 text-xl">
-                  <div className="p-2 bg-white/20 rounded-xl">
-                    <Star className="h-6 w-6" />
+            <Card className="overflow-hidden shadow border bg-white">
+              <CardHeader className="bg-white border-b">
+                <CardTitle className="flex items-center gap-3 text-xl text-gray-800">
+                  <div className="p-2 bg-gray-100 rounded-xl">
+                    <Star className="h-6 w-6 text-orange-500" />
                   </div>
                   Thống kê tổng quan
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <div className="space-y-4">
-                  <div className="group relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-l-4 border-blue-500 hover:shadow-lg transition-all duration-300">
+                  <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all duration-300">
                     <div className="flex justify-between items-center">
                       <div className="space-y-1">
                         <span className="text-sm font-medium text-blue-700">Tổng sản phẩm</span>
@@ -410,7 +410,7 @@ export default function ShopInfoManagement() {
                     </div>
                   </div>
 
-                  <div className="group relative bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-l-4 border-purple-500 hover:shadow-lg transition-all duration-300">
+                  <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-purple-200 hover:shadow-md transition-all duration-300">
                     <div className="flex justify-between items-center">
                       <div className="space-y-1">
                         <span className="text-sm font-medium text-purple-700">Tổng đơn hàng</span>
@@ -427,7 +427,7 @@ export default function ShopInfoManagement() {
                     </div>
                   </div>
 
-                  <div className="group relative bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 border-l-4 border-amber-500 hover:shadow-lg transition-all duration-300">
+                  <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-amber-200 hover:shadow-md transition-all duration-300">
                     <div className="flex justify-between items-center">
                       <div className="space-y-1">
                         <span className="text-sm font-medium text-amber-700">Đánh giá</span>
@@ -444,7 +444,7 @@ export default function ShopInfoManagement() {
                     </div>
                   </div>
 
-                  <div className="group relative bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border-l-4 border-emerald-500 hover:shadow-lg transition-all duration-300">
+                  <div className="group relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-emerald-200 hover:shadow-md transition-all duration-300">
                     <div className="flex justify-between items-center">
                       <div className="space-y-1">
                         <span className="text-sm font-medium text-emerald-700">
@@ -479,7 +479,7 @@ export default function ShopInfoManagement() {
 
           {/* Main Content */}
           <div className="xl:col-span-3 xl:order-1">
-            <Card className="overflow-hidden shadow-2xl border-0 bg-white/90 backdrop-blur-xl">
+            <Card className="overflow-hidden shadow border bg-white">
               <CardContent className="p-8 space-y-10">
                 {/* Cover Image */}
                 <div className="relative group">
@@ -491,8 +491,7 @@ export default function ShopInfoManagement() {
                       alt="Cover"
                       className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20" />
+                    {/* Removed gradient overlays */}
                     {isEditing && (
                       <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <Input
@@ -504,7 +503,7 @@ export default function ShopInfoManagement() {
                         />
                         <Button
                           size="sm"
-                          className="bg-white/95 hover:bg-white text-gray-800 shadow-xl backdrop-blur-sm border-0 px-6 py-3 font-semibold"
+                          className="bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 hover:border-orange-300 px-6 py-3 font-semibold"
                           onClick={() => document.getElementById('background-upload')?.click()}
                         >
                           <Upload className="h-4 w-4 mr-2" />
@@ -524,7 +523,7 @@ export default function ShopInfoManagement() {
                           src={avatarFile ? URL.createObjectURL(avatarFile) : formData.avatarUrl}
                           className="object-cover"
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-2xl font-bold">
+                        <AvatarFallback className="bg-gray-100 text-gray-700 text-2xl font-bold">
                           {formData.shopName?.charAt(0) || 'S'}
                         </AvatarFallback>
                       </Avatar>
@@ -539,7 +538,7 @@ export default function ShopInfoManagement() {
                           />
                           <Button
                             size="sm"
-                            className="h-10 w-10 p-0 bg-blue-600 hover:bg-blue-700 text-white shadow-2xl rounded-full"
+                            className="h-10 w-10 p-0 bg-orange-500 hover:bg-orange-600 text-white shadow-md rounded-full"
                             onClick={() => document.getElementById('avatar-upload')?.click()}
                           >
                             <Upload className="h-5 w-5" />
@@ -617,7 +616,7 @@ export default function ShopInfoManagement() {
                 {/* Description */}
                 <div className="space-y-4">
                   <Label className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <div className="w-2 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+                    <div className="w-2 h-8 bg-orange-400 rounded-full"></div>
                     Mô tả cửa hàng
                   </Label>
                   {isEditing ? (
@@ -628,7 +627,7 @@ export default function ShopInfoManagement() {
                       placeholder="Mô tả về cửa hàng của bạn..."
                     />
                   ) : (
-                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6 border-l-4 border-blue-500 shadow-inner min-h-[140px] flex items-start">
+                    <div className="bg-white rounded-2xl p-6 border border-gray-200 min-h-[140px] flex items-start">
                       <p className="text-gray-700 leading-relaxed text-lg">
                         {formData.description || 'Chưa có mô tả'}
                       </p>
@@ -639,7 +638,7 @@ export default function ShopInfoManagement() {
                 {/* Contact Information */}
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
+                    <div className="p-3 bg-orange-500 rounded-xl">
                       <Mail className="h-6 w-6 text-white" />
                     </div>
                     Thông tin liên hệ
@@ -678,7 +677,7 @@ export default function ShopInfoManagement() {
                           </div>
                         ) : (
                           <div className="flex items-center gap-3">
-                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
+                            <div className="flex-1 bg-white rounded-xl border border-gray-200 h-[56px] flex items-center px-4">
                               <p className="text-gray-800 text-lg font-medium">
                                 {formData.email || 'Chưa thiết lập'}
                               </p>
@@ -686,7 +685,7 @@ export default function ShopInfoManagement() {
                             <Button
                               size="sm"
                               onClick={() => setIsEditingEmail(true)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-[56px]"
+                              className="bg-orange-500 hover:bg-orange-600 text-white px-4 h-[56px]"
                             >
                               <Edit className="h-4 w-4 mr-2" />
                               Sửa
@@ -731,7 +730,7 @@ export default function ShopInfoManagement() {
                           </div>
                         ) : (
                           <div className="flex items-center gap-3">
-                            <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
+                            <div className="flex-1 bg-white rounded-xl border border-gray-200 h-[56px] flex items-center px-4">
                               <p className="text-gray-800 text-lg font-medium">
                                 {formData.phoneNumber || 'Chưa thiết lập'}
                               </p>
@@ -739,7 +738,7 @@ export default function ShopInfoManagement() {
                             <Button
                               size="sm"
                               onClick={() => setIsEditingPhone(true)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-[56px]"
+                              className="bg-orange-500 hover:bg-orange-600 text-white px-4 h-[56px]"
                             >
                               <Edit className="h-4 w-4 mr-2" />
                               Sửa
@@ -754,7 +753,7 @@ export default function ShopInfoManagement() {
                 {/* Address Information */}
                 <div className="space-y-6">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl">
+                    <div className="p-3 bg-orange-500 rounded-xl">
                       <MapPin className="h-6 w-6 text-white" />
                     </div>
                     Địa chỉ cửa hàng
@@ -796,7 +795,7 @@ export default function ShopInfoManagement() {
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
+                        <div className="bg-white rounded-xl border border-gray-200 h-[56px] flex items-center px-4">
                           <p className="text-gray-800 text-lg font-medium">
                             {formData.state || 'Chưa thiết lập'}
                           </p>
@@ -836,7 +835,7 @@ export default function ShopInfoManagement() {
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
+                        <div className="bg-white rounded-xl border border-gray-200 h-[56px] flex items-center px-4">
                           <p className="text-gray-800 text-lg font-medium">
                             {formData.district || 'Chưa thiết lập'}
                           </p>
@@ -874,7 +873,7 @@ export default function ShopInfoManagement() {
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
+                        <div className="bg-white rounded-xl border border-gray-200 h-[56px] flex items-center px-4">
                           <p className="text-gray-800 text-lg font-medium">
                             {formData.ward || 'Chưa thiết lập'}
                           </p>
@@ -894,7 +893,7 @@ export default function ShopInfoManagement() {
                           className="border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px]"
                         />
                       ) : (
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 h-[56px] flex items-center px-4">
+                        <div className="bg-white rounded-xl border border-gray-200 h-[56px] flex items-center px-4">
                           <p className="text-gray-800 text-lg font-medium">
                             {formData.addressLine || 'Chưa thiết lập'}
                           </p>

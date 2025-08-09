@@ -167,7 +167,7 @@ export function RevenueTableActiveTab() {
                 <TableCell className="py-4">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                      <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                      <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
                         {getCustomerInitials(revenue.destination.customerName)}
                       </AvatarFallback>
                     </Avatar>

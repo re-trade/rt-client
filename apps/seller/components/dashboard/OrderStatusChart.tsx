@@ -11,13 +11,13 @@ const LoadingIndicator = () => {
   return (
     <div className="flex justify-center items-center h-60">
       <div className="relative">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
         <div
-          className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 absolute top-0 left-0"
+          className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 absolute top-0 left-0"
           style={{ animationDirection: 'reverse', opacity: 0.7, animationDuration: '1.5s' }}
         ></div>
       </div>
-      <span className="ml-3 text-gray-600 font-medium">Đang tải dữ liệu...</span>
+      <span className="ml-3 text-gray-700 font-medium">Đang tải dữ liệu...</span>
     </div>
   );
 };
@@ -27,10 +27,10 @@ export default function OrderStatusChart() {
   const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <Card className="bg-white shadow-lg border-0 overflow-hidden h-full">
-      <CardHeader className="bg-gradient-to-r from-green-500 to-teal-600 text-white">
-        <CardTitle className="flex items-center gap-2">
-          <PieChart className="h-5 w-5" />
+    <Card className="border border-gray-200 shadow-md overflow-hidden h-full bg-white">
+      <CardHeader className="border-b-2 border-gray-200">
+        <CardTitle className="flex items-center gap-2 text-gray-800">
+          <PieChart className="h-5 w-5 text-green-600" />
           Đơn hàng
         </CardTitle>
       </CardHeader>
@@ -68,17 +68,17 @@ export default function OrderStatusChart() {
               )}
             </div>
             <div className="w-full lg:w-1/2 space-y-3">
-              <div className="p-3 bg-gray-50 rounded-lg mb-3">
+              <div className="p-3 border border-gray-200 rounded-lg mb-3 bg-white shadow-sm">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-xs text-gray-500">Tổng đơn hàng</p>
-                    <p className="text-xl font-bold text-gray-900">{totalOrders}</p>
+                    <p className="text-xs text-gray-600">Tổng đơn hàng</p>
+                    <p className="text-xl font-bold text-gray-800">{totalOrders}</p>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowDetails(!showDetails)}
-                    className="flex items-center gap-1 text-xs"
+                    className="flex items-center gap-1 text-xs text-green-600 hover:text-green-800 hover:bg-green-100"
                   >
                     <Filter className="h-3 w-3" />
                     {showDetails ? 'Thu gọn' : 'Chi tiết'}
@@ -88,7 +88,7 @@ export default function OrderStatusChart() {
 
               {formattedOrderCounts.map((item, index) => (
                 <div key={index}>
-                  <div className="flex items-center justify-between p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center justify-between p-2 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
                     <div className="flex items-center gap-2">
                       <div
                         className="w-3 h-3 rounded-full"

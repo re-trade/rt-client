@@ -106,7 +106,7 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto p-0">
         {/* Header */}
-        <DialogHeader className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+        <DialogHeader className="px-6 py-4 bg-orange-500 text-white">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
             <Package className="w-6 h-6" />
             Chi tiết sản phẩm
@@ -211,7 +211,7 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
               </div>
 
               {/* Price and Quantity */}
-              <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-5 border border-green-100 shadow-sm">
+              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-black flex items-center gap-1">
@@ -233,7 +233,7 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
               </div>
 
               {/* Rating */}
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-5 border border-yellow-100 shadow-sm">
+              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
                   <p className="text-sm text-black">Đánh giá trung bình:</p>

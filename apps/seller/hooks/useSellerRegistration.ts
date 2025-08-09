@@ -3,6 +3,7 @@
 import { useToast } from '@/hooks/use-toast';
 import { sellerApi, SellerProfileRegisterRequest } from '@/service/seller.api';
 import { storageApi } from '@/service/storage.api';
+import { unAuthApi } from '@retrade/util';
 import axios from 'axios';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
@@ -110,8 +111,6 @@ export function useSellerRegistration() {
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const PROVINCES_API_URL = 'https://provinces.open-api.vn/api/p/';
 
   const updateField = (name: keyof SellerFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -285,7 +284,7 @@ export function useSellerRegistration() {
   const fetchProvinces = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(PROVINCES_API_URL);
+      const response = await unAuthApi.province.get<Province[]>('/p/');
       setProvinces(response.data);
     } catch (error) {
       console.error('Failed to fetch provinces:', error);
@@ -304,7 +303,7 @@ export function useSellerRegistration() {
 
     try {
       setLoading(true);
-      const response = await axios.get(`${PROVINCES_API_URL}${provinceCode}?depth=2`);
+      const response = await unAuthApi.province.get<Province>(`/p/${provinceCode}?depth=2`);
       setDistricts(response.data.districts || []);
       setWards([]);
     } catch (error) {
@@ -322,9 +321,7 @@ export function useSellerRegistration() {
     }
     try {
       setLoading(true);
-      const response = await axios.get(
-        `https://provinces.open-api.vn/api/d/${districtCode}?depth=2`,
-      );
+      const response = await unAuthApi.province.get<District>(`/d/${districtCode}?depth=3`);
       setWards(response.data.wards || []);
     } catch (error) {
       console.error('Failed to fetch wards:', error);
