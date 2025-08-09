@@ -1,5 +1,6 @@
 'use client';
 
+import { unAuthApi } from '@retrade/util';
 import { useCallback, useEffect, useState } from 'react';
 
 export interface Province {
@@ -19,8 +20,6 @@ export interface Ward {
   name: string;
 }
 
-const PROVINCES_API_URL = 'https://provinces.open-api.vn/api/p/';
-
 export function useAddressData() {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
@@ -32,9 +31,8 @@ export function useAddressData() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(PROVINCES_API_URL);
-      const data = await response.json();
-      setProvinces(data);
+      const response = await unAuthApi.province.get<Province[]>('/p/');
+      setProvinces(response.data || []);
     } catch {
       setError('Không thể tải danh sách tỉnh/thành phố');
     } finally {
@@ -51,9 +49,8 @@ export function useAddressData() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${PROVINCES_API_URL}${provinceCode}?depth=2`);
-      const data = await response.json();
-      setDistricts(data.districts || []);
+      const response = await unAuthApi.province.get<Province>(`/p/${provinceCode}?depth=2`);
+      setDistricts(response.data.districts || []);
       setWards([]);
     } catch {
       setError('Không thể tải danh sách quận/huyện');
@@ -70,9 +67,8 @@ export function useAddressData() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`);
-      const data = await response.json();
-      setWards(data.wards || []);
+      const response = await unAuthApi.province.get<District>(`/d/${districtCode}?depth=2`);
+      setWards(response.data.wards || []);
     } catch {
       setError('Không thể tải danh sách phường/xã');
     } finally {

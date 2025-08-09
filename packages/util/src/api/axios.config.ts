@@ -13,6 +13,8 @@ export enum EApiService {
   VOUCHER = 'user',
   IMAGE_SEARCH = 'image-search',
   STORAGE = 'storage',
+  PROVINCE = 'province',
+  NOTIFICATION = 'feedback-notification',
 }
 
 export type CustomAxiosRequestConfig = AxiosRequestConfig & {

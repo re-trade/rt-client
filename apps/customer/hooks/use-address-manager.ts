@@ -2,7 +2,7 @@
 
 import { getInputHandler } from '@/components/input/getInputHandle';
 import { contactApi, TAddress } from '@/services/contact.api';
-import axios from 'axios';
+import { unAuthApi } from '@retrade/util';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -48,8 +48,6 @@ export interface AddressFormData {
   isDefault: boolean;
   type: number;
 }
-
-const PROVINCES_API_URL = 'https://provinces.open-api.vn/api/p/';
 
 const addressSchema = Joi.object({
   customerName: Joi.string().trim().min(1).required().messages({
@@ -155,7 +153,7 @@ export function useAddressManager() {
   const fetchProvinces = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(PROVINCES_API_URL);
+      const response = await unAuthApi.province.get<Province[]>('/p/');
       setProvinces(response.data);
     } catch {
       setErrors({ general: 'Không thể tải danh sách tỉnh/thành phố' });
@@ -172,7 +170,7 @@ export function useAddressManager() {
     }
     try {
       setLoading(true);
-      const response = await axios.get(`${PROVINCES_API_URL}${provinceCode}?depth=2`);
+      const response = await unAuthApi.province.get<Province>(`/p/${provinceCode}?depth=2`);
       setDistricts(response.data.districts || []);
       setWards([]);
     } catch {
@@ -189,9 +187,7 @@ export function useAddressManager() {
     }
     try {
       setLoading(true);
-      const response = await axios.get(
-        `https://provinces.open-api.vn/api/d/${districtCode}?depth=2`,
-      );
+      const response = await unAuthApi.province.get<District>(`/d/${districtCode}?depth=2`);
       setWards(response.data.wards || []);
     } catch {
       setErrors({ general: 'Không thể tải danh sách phường/xã' });
@@ -301,18 +297,20 @@ export function useAddressManager() {
 
     try {
       setLoading(true);
-      const provinceResponse = await axios.get(PROVINCES_API_URL);
+      const provinceResponse = await unAuthApi.province.get<Province[]>(`/p/`);
       setProvinces(provinceResponse.data);
       const province = provinceResponse.data.find((p: Province) => p.name === address.country);
       if (province) {
-        const districtResponse = await axios.get(`${PROVINCES_API_URL}${province.code}?depth=2`);
+        const districtResponse = await unAuthApi.province.get<Province>(
+          `/p/${province.code}?depth=2`,
+        );
         setDistricts(districtResponse.data.districts || []);
         const district = districtResponse.data.districts.find(
           (d: District) => d.name === address.district,
         );
         if (district) {
-          const wardResponse = await axios.get(
-            `https://provinces.open-api.vn/api/d/${district.code}?depth=2`,
+          const wardResponse = await unAuthApi.province.get<District>(
+            `/d/${district.code}?depth=2`,
           );
           setWards(wardResponse.data.wards || []);
           const ward = wardResponse.data.wards.find((w: Ward) => w.name === address.ward);
