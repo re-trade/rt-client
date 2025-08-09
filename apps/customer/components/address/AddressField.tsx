@@ -55,16 +55,17 @@ export function AddressField({
 
     return (
       <div className="form-control w-full items-start" key={key}>
-        <label className="text-sm font-semibold text-[#121212] mb-1">{label}</label>
+        <label className="text-sm font-semibold text-gray-800 mb-1">{label}</label>
         <div className="relative w-full">
           <select
             className={`select w-full px-4 py-2.5 border ${
-              hasError ? 'border-red-500' : 'border-[#525252]/20'
-            } text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all appearance-none`}
+              hasError ? 'border-red-500' : 'border-orange-200'
+            } text-gray-600 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all appearance-none`}
             value={value as string}
             onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
             onBlur={() => onFieldBlur(key as keyof AddressFormData)}
             disabled={isDisabled || loading || submitting}
+            style={{ color: 'rgb(75, 85, 99)' }}
           >
             <option value="">Chọn {label}</option>
             {options.map((option) => (
@@ -75,7 +76,7 @@ export function AddressField({
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <svg
-              className="w-4 h-4 text-[#525252]"
+              className="w-4 h-4 text-orange-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -98,12 +99,12 @@ export function AddressField({
 
   return (
     <div className="form-control w-full items-start" key={key}>
-      <label className="text-sm font-semibold text-[#121212] mb-1">{label}</label>
+      <label className="text-sm font-semibold text-gray-800 mb-1">{label}</label>
       <input
         type="text"
         className={`input w-full px-4 py-2.5 border ${
-          hasError ? 'border-red-500' : 'border-[#525252]/20'
-        } text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all`}
+          hasError ? 'border-red-500' : 'border-orange-200'
+        } text-gray-600 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all`}
         value={value as string}
         onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
         onBlur={() => onFieldBlur(key as keyof AddressFormData)}
