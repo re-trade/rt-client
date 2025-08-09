@@ -4,6 +4,7 @@ import { useCart } from '@/context/CartContext';
 import MobileMenu from '@components/header/MobileHeaderMenu';
 import SearchBar from '@components/header/SearchBar';
 import UserDropdown from '@components/header/UserHeaderDropdown';
+
 import {
   IconBuildingStore,
   IconMenu2,

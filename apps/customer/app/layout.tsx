@@ -1,5 +1,6 @@
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { NotificationProvider } from '@/context/NotificationContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { CookieConsent } from '@components/common/CookieConsent';
 import Footer from '@components/common/Footer';
@@ -22,7 +23,9 @@ const RootLayout = ({ children }: RootLayoutProps) => {
             </Suspense>
             <div className="min-h-screen bg-gray-100">
               <ToastProvider>
-                <Suspense>{children}</Suspense>
+                <NotificationProvider>
+                  <Suspense>{children}</Suspense>
+                </NotificationProvider>
               </ToastProvider>
             </div>
             <Footer />
