@@ -30,7 +30,7 @@ export const useNotificationSocket = () => {
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
   const [connected, setConnected] = useState(false);
   const stompClientRef = useRef<Client | null>(null);
-  const subscriptionRef = useRef<StompSubscription | null>(null);
+  const subscriptionRef = useRef<StompSubscription[]>([]);
 
   const mapNotificationType = useCallback(
     (type: string): 'success' | 'info' | 'warning' | 'error' => {
@@ -63,7 +63,7 @@ export const useNotificationSocket = () => {
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
-      debug: (msg) => console.log(`[STOMP DEBUG] ${msg}`),
+      debug: () => {},
     });
 
     stompClientRef.current = client;
@@ -71,12 +71,10 @@ export const useNotificationSocket = () => {
     client.onConnect = () => {
       setConnected(true);
 
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-      }
+      subscriptionRef.current.forEach((sub) => sub.unsubscribe());
+      subscriptionRef.current = [];
 
-      subscriptionRef.current = client.subscribe(
+      const userNotification = client.subscribe(
         `/user/${account.id}/queue/notifications`,
         (message) => {
           try {
@@ -88,6 +86,15 @@ export const useNotificationSocket = () => {
           }
         },
       );
+
+      const globalNotification = client.subscribe(`/topic/notifications`, (message) => {
+        try {
+          const notification = JSON.parse(message.body) as UserNotification;
+          setNotifications((prev) => [notification, ...prev]);
+        } catch (error) {}
+      });
+
+      subscriptionRef.current.push(userNotification, globalNotification);
     };
 
     client.onStompError = (frame) => {
@@ -104,10 +111,9 @@ export const useNotificationSocket = () => {
   }, [account, showToast, mapNotificationType]);
 
   const disconnect = useCallback(() => {
-    if (subscriptionRef.current) {
-      subscriptionRef.current.unsubscribe();
-      subscriptionRef.current = null;
-    }
+    subscriptionRef.current.forEach((sub) => sub.unsubscribe());
+    subscriptionRef.current = [];
+
     if (stompClientRef.current) {
       stompClientRef.current.deactivate();
       stompClientRef.current = null;
