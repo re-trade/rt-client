@@ -2,6 +2,7 @@
 
 import { ToastMessage, ToastType } from '@/hooks/use-toast';
 import clsx from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, Check, Info, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -11,27 +12,38 @@ type ToastProps = {
 };
 
 export default function Toast({ messages, closable = true }: ToastProps) {
-  const [visibleIds, setVisibleIds] = useState<string[]>([]);
+  const [visibleMessages, setVisibleMessages] = useState<ToastMessage[]>([]);
 
   useEffect(() => {
+    const newMessages = messages.filter(
+      (msg) => !visibleMessages.some((visMsg) => visMsg.id === msg.id),
+    );
+
+    if (newMessages.length > 0) {
+      newMessages.forEach((msg, index) => {
+        setTimeout(() => {
+          setVisibleMessages((prev) => [...prev, msg]);
+        }, index * 100);
+      });
+    }
     const timers: NodeJS.Timeout[] = [];
 
-    messages.forEach((msg) => {
-      if (!visibleIds.includes(msg.id)) {
-        setVisibleIds((prev) => [...prev, msg.id]);
+    newMessages.forEach((msg) => {
+      const timer = setTimeout(() => {
+        handleClose(msg.id);
+      }, 5000);
 
-        const timer = setTimeout(() => {
-          setVisibleIds((prev) => prev.filter((id) => id !== msg.id));
-        }, 5000);
-
-        timers.push(timer);
-      }
+      timers.push(timer);
     });
 
     return () => {
-      timers.forEach(clearTimeout);
+      timers.forEach((timer) => clearTimeout(timer));
     };
-  }, [messages, visibleIds]);
+  }, [messages]);
+
+  const handleClose = (id: string) => {
+    setVisibleMessages((prev) => prev.filter((msg) => msg.id !== id));
+  };
 
   const getStyles = (type: ToastType): { containerClass: string; iconBg: string } => {
     switch (type) {
@@ -66,73 +78,101 @@ export default function Toast({ messages, closable = true }: ToastProps) {
     switch (type) {
       case 'success':
         return (
-          <div
+          <motion.div
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
             className={`w-8 h-8 ${styles.iconBg} rounded-full flex items-center justify-center flex-shrink-0`}
           >
             <Check size={16} className="text-white" />
-          </div>
+          </motion.div>
         );
       case 'error':
         return (
-          <div
+          <motion.div
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
             className={`w-8 h-8 ${styles.iconBg} rounded-full flex items-center justify-center flex-shrink-0`}
           >
             <AlertCircle size={16} className="text-white" />
-          </div>
+          </motion.div>
         );
       case 'warning':
         return (
-          <div
+          <motion.div
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
             className={`w-8 h-8 ${styles.iconBg} rounded-full flex items-center justify-center flex-shrink-0`}
           >
             <AlertTriangle size={16} className="text-white" />
-          </div>
+          </motion.div>
         );
       case 'info':
       default:
         return (
-          <div
+          <motion.div
+            initial={{ scale: 0.5 }}
+            animate={{ scale: 1 }}
             className={`w-8 h-8 ${styles.iconBg} rounded-full flex items-center justify-center flex-shrink-0`}
           >
             <Info size={16} className="text-white" />
-          </div>
+          </motion.div>
         );
     }
   };
 
   return (
     <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-[9999]">
-      {messages.map((msg) => {
-        const styles = getStyles(msg.type);
-        return (
-          <div
-            key={msg.id}
-            className={clsx(
-              'px-5 py-4 rounded-lg shadow-lg transition-all duration-300 transform border',
-              styles.containerClass,
-              visibleIds.includes(msg.id) ? 'opacity-100 scale-100' : 'opacity-0 scale-95',
-            )}
-            style={{
-              minWidth: '300px',
-              maxWidth: '400px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            }}
-          >
-            <div className="flex items-center gap-3">
-              {getIcon(msg.type)}
-              <span className="text-sm">{msg.text}</span>
-              {closable && (
-                <button
-                  onClick={() => setVisibleIds((prev) => prev.filter((id) => id !== msg.id))}
-                  className="hover:text-orange-600 transition-colors duration-200 flex-shrink-0 ml-auto"
+      <AnimatePresence mode="popLayout">
+        {visibleMessages.map((msg) => {
+          const styles = getStyles(msg.type);
+
+          return (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, x: 100, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 100, rotateZ: 5, scale: 0.8 }}
+              layout
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 25,
+                duration: 0.4,
+                layout: { type: 'spring', damping: 30 },
+              }}
+              className={clsx('px-5 py-4 rounded-lg shadow-lg border', styles.containerClass)}
+              style={{
+                minWidth: '300px',
+                maxWidth: '400px',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                transformOrigin: 'center right',
+              }}
+            >
+              <div className="flex items-center gap-3">
+                {getIcon(msg.type)}
+                <motion.span
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-sm"
                 >
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-          </div>
-        );
-      })}
+                  {msg.text}
+                </motion.span>
+                {closable && (
+                  <motion.button
+                    whileHover={{ scale: 1.2, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleClose(msg.id)}
+                    className="hover:text-orange-600 transition-colors duration-200 flex-shrink-0 ml-auto"
+                  >
+                    <X size={16} />
+                  </motion.button>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </div>
   );
 }
