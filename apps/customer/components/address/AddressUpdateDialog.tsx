@@ -115,15 +115,15 @@ export default function AddressUpdateDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div
         ref={modalRef}
-        className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden"
+        className="bg-white text-gray-800 rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden"
       >
-        <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <MapPin className="w-5 h-5 mr-2 text-[#121212]" />
-            <h3 className="text-xl font-bold text-[#121212]">Cập nhật địa chỉ</h3>
+            <MapPin className="w-5 h-5 mr-2 text-white" />
+            <h3 className="text-xl font-bold text-white">Cập nhật địa chỉ</h3>
           </div>
           <button
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-[#121212] hover:bg-white/40 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
             onClick={onClose}
             disabled={submitting}
           >
@@ -150,18 +150,18 @@ export default function AddressUpdateDialog({
               />
             ))}
 
-            <div className="form-control col-span-1 md:col-span-2 flex flex-col gap-4 mt-2 border-t border-[#525252]/20 pt-4">
+            <div className="form-control col-span-1 md:col-span-2 flex flex-col gap-4 mt-2 border-t border-orange-200 pt-4">
               <div className="flex flex-col gap-2 w-full">
                 <div className="flex items-center">
                   <input
                     type="checkbox"
                     id="isDefaultUpdate"
-                    className="w-5 h-5 text-[#FFD2B2] rounded border-[#525252]/40 focus:ring-[#FFD2B2]"
+                    className="w-5 h-5 text-orange-500 rounded border-orange-200 focus:ring-orange-400"
                     checked={formData.isDefault}
                     onChange={(e) => onFieldChange('isDefault', e.target.checked)}
                     disabled={submitting}
                   />
-                  <label htmlFor="isDefaultUpdate" className="ml-2 text-[#121212] font-medium">
+                  <label htmlFor="isDefaultUpdate" className="ml-2 text-gray-600 font-medium">
                     Đặt làm địa chỉ mặc định
                   </label>
                 </div>
@@ -182,14 +182,14 @@ export default function AddressUpdateDialog({
               <div className="mt-4 flex justify-end space-x-3 w-full">
                 <button
                   onClick={onClose}
-                  className="px-5 py-2.5 bg-[#FDFEF9] border border-[#525252]/20 text-[#121212] rounded-lg hover:bg-gray-100 transition font-medium"
+                  className="px-5 py-2.5 bg-white border border-orange-200 text-gray-600 rounded-lg hover:bg-gray-100 transition font-medium"
                   disabled={submitting}
                 >
                   Hủy bỏ
                 </button>
                 <button
                   onClick={handleUpdate}
-                  className="px-5 py-2.5 bg-[#FFD2B2] text-[#121212] rounded-lg hover:bg-[#FFBB99] transition font-medium flex items-center"
+                  className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition font-medium flex items-center shadow-md hover:shadow-lg"
                   disabled={
                     loading ||
                     submitting ||

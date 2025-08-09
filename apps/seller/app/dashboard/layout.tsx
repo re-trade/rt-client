@@ -36,10 +36,10 @@ const menuItems = [
     ],
   },
   {
-    group: 'Thông tin cửa hàng',
+    group: 'Thông tin người bán',
     items: [
       {
-        title: 'Thông tin seller',
+        title: 'Thông tin người bán',
         icon: Store,
         href: '/dashboard/seller-info',
       },

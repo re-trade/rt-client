@@ -49,17 +49,17 @@ export default function AddressCard({ address, index, onEdit, onDelete }: Props)
           </div>
         </div>
 
-        <div className="flex space-x-2 pt-2 mt-2 border-t border-[#525252]/20">
+        <div className="flex space-x-2 pt-2 mt-2 border-t border-orange-200">
           <button
             onClick={() => onEdit(address)}
-            className="flex items-center bg-[#FFD2B2] text-[#121212] px-3 py-1.5 rounded-lg text-sm hover:bg-[#FFBB99] transition font-medium"
+            className="flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1.5 rounded-lg text-sm hover:from-orange-600 hover:to-orange-700 transition font-medium shadow-sm hover:shadow-md"
           >
             <Edit className="w-4 h-4 mr-1" />
             Cập nhật
           </button>
           <button
             onClick={() => onDelete(address.id)}
-            className="flex items-center bg-white border border-[#525252]/20 text-[#121212] px-3 py-1.5 rounded-lg text-sm hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition font-medium"
+            className="flex items-center bg-white border border-orange-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition font-medium"
           >
             <Trash2 className="w-4 h-4 mr-1" />
             Xóa

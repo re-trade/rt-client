@@ -28,7 +28,7 @@ export interface DeviceInfo {
   location: string;
 }
 
-const createBaseURL = (service: EApiService = EApiService.MAIN) => {
+export const createBaseURL = (service: EApiService = EApiService.MAIN) => {
   const path = NODE_ENV === 'development' ? '/api/v1' : `/api/${service}/v1`;
   return new URL(path, BASE_API_URL).toString();
 };
