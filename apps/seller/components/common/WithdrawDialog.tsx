@@ -130,7 +130,7 @@ export function WithdrawDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="space-y-3">
           <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
             Rút tiền từ ví
@@ -139,16 +139,16 @@ export function WithdrawDialog({
 
         <div className="space-y-6">
           {/* Thông tin số dư */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+          <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-600">Số dư khả dụng</p>
-                <p className="text-2xl font-bold text-blue-700">
+                <p className="text-sm font-medium text-green-600">Số dư khả dụng</p>
+                <p className="text-2xl font-bold text-gray-800">
                   {formatCurrency(availableBalance)}
                 </p>
               </div>
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <Wallet className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <Wallet className="w-8 h-8 text-green-600" />
               </div>
             </div>
           </div>
@@ -337,7 +337,7 @@ export function WithdrawDialog({
               Hủy bỏ
             </Button>
             <Button
-              className="flex-1 h-12 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
               onClick={handleConfirm}
               disabled={!isFormValid}
             >
