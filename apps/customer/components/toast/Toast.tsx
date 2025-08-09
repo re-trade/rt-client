@@ -22,7 +22,7 @@ export default function Toast({ messages, closable = true }: ToastProps) {
 
         const timer = setTimeout(() => {
           setVisibleIds((prev) => prev.filter((id) => id !== msg.id));
-        }, 3000);
+        }, 5000);
 
         timers.push(timer);
       }
@@ -101,18 +101,22 @@ export default function Toast({ messages, closable = true }: ToastProps) {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+    <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-[9999]">
       {messages.map((msg) => {
         const styles = getStyles(msg.type);
         return (
           <div
             key={msg.id}
             className={clsx(
-              'px-5 py-4 rounded-lg shadow-md transition-all duration-300 transform border',
+              'px-5 py-4 rounded-lg shadow-lg transition-all duration-300 transform border',
               styles.containerClass,
               visibleIds.includes(msg.id) ? 'opacity-100 scale-100' : 'opacity-0 scale-95',
             )}
-            style={{ minWidth: '300px', maxWidth: '400px' }}
+            style={{
+              minWidth: '300px',
+              maxWidth: '400px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            }}
           >
             <div className="flex items-center gap-3">
               {getIcon(msg.type)}

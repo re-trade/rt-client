@@ -1,12 +1,11 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/context/ToastContext';
 import { createBaseURL, EApiService } from '@retrade/util';
 import { Client, StompSubscription } from '@stomp/stompjs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-interface UserNotification {
+export interface UserNotification {
   id: string;
   title: string;
   content: string;
@@ -26,7 +25,6 @@ const webSocketUrl = (): string => {
 
 export const useNotificationSocket = () => {
   const { account } = useAuth();
-  const { showToast } = useToast();
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
   const [connected, setConnected] = useState(false);
   const stompClientRef = useRef<Client | null>(null);
@@ -80,7 +78,6 @@ export const useNotificationSocket = () => {
           try {
             const notification = JSON.parse(message.body) as UserNotification;
             setNotifications((prev) => [notification, ...prev]);
-            showToast(notification.content, mapNotificationType(notification.type));
           } catch (error) {
             console.error('Failed to process notification:', error);
           }
@@ -91,7 +88,9 @@ export const useNotificationSocket = () => {
         try {
           const notification = JSON.parse(message.body) as UserNotification;
           setNotifications((prev) => [notification, ...prev]);
-        } catch (error) {}
+        } catch (error) {
+          console.error('Failed to process global notification:', error);
+        }
       });
 
       subscriptionRef.current.push(userNotification, globalNotification);
@@ -100,15 +99,17 @@ export const useNotificationSocket = () => {
     client.onStompError = (frame) => {
       console.error('STOMP Error:', frame);
       setConnected(false);
+      console.error('Notification connection error. Reconnecting...');
     };
 
     client.onWebSocketError = (event) => {
       console.error('WebSocket Error:', event);
       setConnected(false);
+      console.error('Notification connection error. Reconnecting...');
     };
 
     client.activate();
-  }, [account, showToast, mapNotificationType]);
+  }, [account, mapNotificationType]);
 
   const disconnect = useCallback(() => {
     subscriptionRef.current.forEach((sub) => sub.unsubscribe());
@@ -144,6 +145,8 @@ export const useNotificationSocket = () => {
 
   useEffect(() => {
     if (account?.id) {
+      console.log('Connecting to notification service...');
+
       const intervalId = setInterval(() => {
         const client = stompClientRef.current;
         if (client && !client.connected && !client.active) {

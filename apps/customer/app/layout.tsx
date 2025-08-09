@@ -19,13 +19,13 @@ const RootLayout = ({ children }: RootLayoutProps) => {
         <AuthProvider>
           <CartProvider>
             <Suspense>
-              <Header />
+              <NotificationProvider>
+                <Header />
+              </NotificationProvider>
             </Suspense>
             <div className="min-h-screen bg-gray-100">
               <ToastProvider>
-                <NotificationProvider>
-                  <Suspense>{children}</Suspense>
-                </NotificationProvider>
+                <Suspense>{children}</Suspense>
               </ToastProvider>
             </div>
             <Footer />
