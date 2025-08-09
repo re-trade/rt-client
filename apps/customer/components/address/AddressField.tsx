@@ -58,18 +58,24 @@ export function AddressField({
         <label className="text-sm font-semibold text-gray-800 mb-1">{label}</label>
         <div className="relative w-full">
           <select
-            className={`select w-full px-4 py-2.5 border ${
+            className={`w-full px-4 py-2.5 border ${
               hasError ? 'border-red-500' : 'border-orange-200'
-            } text-gray-600 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all appearance-none`}
+            } bg-white text-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all appearance-none`}
             value={value as string}
             onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
             onBlur={() => onFieldBlur(key as keyof AddressFormData)}
             disabled={isDisabled || loading || submitting}
-            style={{ color: 'rgb(75, 85, 99)' }}
+            style={{ color: '#4B5563' }}
           >
-            <option value="">Chọn {label}</option>
+            <option value="" style={{ color: '#6B7280', backgroundColor: 'white' }}>
+              Chọn {label}
+            </option>
             {options.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option
+                key={option.value}
+                value={option.value}
+                style={{ color: '#4B5563', backgroundColor: 'white' }}
+              >
                 {option.label}
               </option>
             ))}
@@ -104,11 +110,13 @@ export function AddressField({
         type="text"
         className={`input w-full px-4 py-2.5 border ${
           hasError ? 'border-red-500' : 'border-orange-200'
-        } text-gray-600 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all`}
+        } text-gray-600 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all placeholder:text-gray-500`}
+        placeholder={`Nhập ${label.toLowerCase()}`}
         value={value as string}
         onChange={(e) => onFieldChange(key as keyof AddressFormData, e.target.value)}
         onBlur={() => onFieldBlur(key as keyof AddressFormData)}
         disabled={submitting}
+        style={{ color: '#4B5563' }}
       />
       <div className="min-h-[22px] mt-1">
         {hasError && <span className="text-red-500 text-xs font-medium">{errors[key]}</span>}
