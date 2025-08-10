@@ -48,6 +48,13 @@ type SellerProfileResponse = {
   updatedAt: string;
 };
 
+type SellerStatusResponse = {
+  canLogin: boolean;
+  registered: boolean;
+  banned: boolean;
+  registerFailed: boolean;
+};
+
 export const sellerApi = {
   registerSeller: async (
     req: SellerProfileRegisterRequest,
@@ -106,5 +113,19 @@ export const sellerApi = {
       return undefined;
     }
   },
+  checkSellerStatus: async (): Promise<SellerStatusResponse | undefined> => {
+    try {
+      const response =
+        await authApi.default.get<IResponseObject<SellerStatusResponse>>('/sellers/status');
+      return response.data.content;
+    } catch {
+      return undefined;
+    }
+  },
 };
-export type { SellerProfileRegisterRequest, SellerProfileResponse, SellerProfileUpdateRequest };
+export type {
+  SellerProfileRegisterRequest,
+  SellerProfileResponse,
+  SellerProfileUpdateRequest,
+  SellerStatusResponse,
+};

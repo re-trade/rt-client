@@ -6,6 +6,7 @@ import {
   TAccountMeResponse,
   TLocalLogin,
 } from '@/service/auth.api';
+import { sellerApi, SellerStatusResponse } from '@/service/seller.api';
 import { ETokenName } from '@retrade/util';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -13,6 +14,7 @@ function useAuth() {
   const [auth, setIsAuth] = useState<boolean | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [account, setAccount] = useState<TAccountMeResponse>();
+  const [sellerStatus, setSellerStatus] = useState<SellerStatusResponse>();
 
   const checkAuth = useCallback(async () => {
     try {
@@ -41,9 +43,17 @@ function useAuth() {
     }
   }, []);
 
+  const fetchCheckSellerStatus = useCallback(async () => {
+    const response = await sellerApi.checkSellerStatus();
+    if (response) {
+      setSellerStatus(response);
+    }
+  }, []);
+
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+    fetchCheckSellerStatus();
+  }, [checkAuth, fetchCheckSellerStatus]);
 
   const handleLogout = useCallback(async () => {
     localStorage.clear();
@@ -66,6 +76,7 @@ function useAuth() {
   return {
     handleLogout,
     login,
+    sellerStatus,
     roles,
     checkAuth,
     auth,
