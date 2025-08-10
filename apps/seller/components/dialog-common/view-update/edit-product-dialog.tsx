@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import TagInput from '@/components/ui/tag-input';
 import { productApi, TProduct, UpdateProductDto } from '@/service/product.api';
 import { storageApi } from '@/service/storage.api';
 import '@uiw/react-markdown-preview/markdown.css';
@@ -17,25 +18,30 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
-interface EditProductDialogProps {
+
+export interface EditProductDialogProps {
+  product: TProduct | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  product: TProduct | null;
-  isEdit: boolean; // New prop to control editability
-  onUpdateProduct: (
-    product: Omit<
-      TProduct,
-      'id' | 'createdAt' | 'updatedAt' | 'sellerId' | 'sellerShopName' | 'verified'
-    >,
-  ) => void;
+  onUpdateProduct?: (product: Partial<UpdateProductDto>) => void;
+  isEdit?: boolean;
+}
+
+export function formatDateFromArray(dateArr: any[] | undefined | string): string {
+  if (!dateArr) return '';
+  if (typeof dateArr === 'string') return dateArr;
+  if (dateArr.length < 3) return '';
+
+  const [year, month, day] = dateArr;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
 export function EditProductDialog({
+  product,
   open,
   onOpenChange,
-  product,
-  isEdit,
-  onUpdateProduct,
+  onUpdateProduct = () => {},
+  isEdit = false,
 }: EditProductDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
@@ -47,34 +53,23 @@ export function EditProductDialog({
     model: '',
     currentPrice: '',
     quantity: 0,
+    hasWarranty: false,
     warrantyExpiryDate: '',
-    condition: 'NEW' as const,
+    condition: 'NEW',
     categoryIds: [] as string[],
-    tags: '',
-    status: 'DRAFT' as const,
+    tags: [] as string[],
+    status: 'DRAFT',
   });
 
   const [initialFormData, setInitialFormData] = useState<typeof formData | null>(null);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [thumbnailFile, setThumbnailFile] = useState<File | undefined>();
+  const [selectedThumbnail, setSelectedThumbnail] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
-
-  const formatDateFromArray = (dateInput: number[] | string): string => {
-    if (Array.isArray(dateInput) && dateInput.length === 3) {
-      const [year, month, day] = dateInput;
-      const paddedMonth = String(month).padStart(2, '0');
-      const paddedDay = String(day).padStart(2, '0');
-      return `${year}-${paddedMonth}-${paddedDay}`;
-    }
-    if (typeof dateInput === 'string' && dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      return dateInput;
-    }
-    return '';
-  };
 
   useEffect(() => {
     if (product) {
@@ -88,13 +83,14 @@ export function EditProductDialog({
         model: product.model || '',
         currentPrice: product.currentPrice?.toString() || '',
         quantity: product.quantity || 0,
+        hasWarranty: Boolean(product.warrantyExpiryDate),
         warrantyExpiryDate: formatDateFromArray(product.warrantyExpiryDate),
         condition: product.condition || 'NEW',
         categoryIds: (product.categories || []).map((c) => c.id),
-        tags: (product.tags || []).join(','),
+        tags: product.tags || [],
         status: product.status || 'DRAFT',
       };
-      setFormData(updatedForm);
+      setFormData(updatedForm as typeof formData);
       setInitialFormData(updatedForm);
       setImagePreviews(product.productImages || []);
       setThumbnailPreview(product.thumbnail || '');
@@ -104,20 +100,20 @@ export function EditProductDialog({
   useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => {
-        if (url.startsWith('blob:')) {
+        if (url && url.startsWith('blob:')) {
           URL.revokeObjectURL(url);
         }
       });
+
       if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
         URL.revokeObjectURL(thumbnailPreview);
       }
     };
   }, [imagePreviews, thumbnailPreview]);
 
-  const handleFormChange = (field: keyof typeof formData, value: any) => {
-    if (isEdit) {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    }
+  const handleFormChange = (field: string, value: any) => {
+    if (!isEdit) return;
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleChooseFiles = () => {
@@ -128,11 +124,13 @@ export function EditProductDialog({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isEdit) return;
-    const files = Array.from(event.target.files || []);
-    if (files.length === 0) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
-    setSelectedFiles((prev) => [...prev, ...files]);
+    const newFiles = Array.from(files);
+    setSelectedFiles((prev) => [...prev, ...newFiles]);
+
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
     setImagePreviews((prev) => [...prev, ...newPreviews]);
     event.target.value = '';
   };
@@ -140,7 +138,7 @@ export function EditProductDialog({
   const handleRemoveImage = (index: number) => {
     if (!isEdit) return;
     const preview = imagePreviews[index];
-    if (preview.startsWith('blob:')) {
+    if (preview && preview.startsWith('blob:')) {
       URL.revokeObjectURL(preview);
     }
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
@@ -160,12 +158,10 @@ export function EditProductDialog({
       if (thumbnailPreview && thumbnailPreview.startsWith('blob:')) {
         URL.revokeObjectURL(thumbnailPreview);
       }
-      const imageUrl = URL.createObjectURL(file);
-      setThumbnailPreview(imageUrl);
-      setThumbnailFile(file);
-      setFormData((prev) => ({ ...prev, thumbnail: imageUrl }));
+      setSelectedThumbnail(file);
+      setThumbnailPreview(URL.createObjectURL(file));
+      e.target.value = '';
     }
-    e.target.value = '';
   };
 
   const handleRemoveThumbnail = () => {
@@ -174,59 +170,53 @@ export function EditProductDialog({
       URL.revokeObjectURL(thumbnailPreview);
     }
     setThumbnailPreview('');
-    setThumbnailFile(undefined);
+    setSelectedThumbnail(null);
     setFormData((prev) => ({ ...prev, thumbnail: '' }));
   };
 
-  const isFormChanged = (): boolean => {
-    if (!isEdit || !initialFormData) return false;
-    return (
-      JSON.stringify(formData) !== JSON.stringify(initialFormData) ||
-      selectedFiles.length > 0 ||
-      thumbnailFile !== undefined
-    );
+  const isFormChanged = () => {
+    if (!initialFormData) return false;
+
+    // Check if thumbnail or images have changed
+    if (selectedThumbnail || selectedFiles.length > 0) return true;
+
+    // Check for differences in other fields
+    for (const key in formData) {
+      if (key === 'productImages') continue; // Skip this as we handle images separately
+      if (
+        JSON.stringify(formData[key as keyof typeof formData]) !==
+        JSON.stringify(initialFormData[key as keyof typeof initialFormData])
+      ) {
+        return true;
+      }
+    }
+    return false;
   };
 
   const handleSubmit = async () => {
     if (!isEdit) return;
-
-    if (!formData.name.trim()) {
-      toast.error('Vui lòng nhập tên sản phẩm');
+    if (!isFormChanged()) {
+      toast.info('Không có thay đổi để cập nhật');
       return;
     }
-
-    if (!formData.brandId) {
-      toast.error('Vui lòng chọn thương hiệu');
-      return;
-    }
-
-    if (!formData.currentPrice || Number(formData.currentPrice) <= 0) {
-      toast.error('Vui lòng nhập giá sản phẩm hợp lệ');
-      return;
-    }
-
-    if (formData.categoryIds.length === 0) {
-      toast.error('Vui lòng chọn ít nhất một danh mục');
-      return;
-    }
-
-    setIsSubmitting(true);
-    toast.loading('Đang cập nhật sản phẩm...');
 
     try {
-      let thumbnailUrl = formData.thumbnail;
-      let productImageUrls = imagePreviews;
+      setIsSubmitting(true);
+      toast.info('Đang cập nhật sản phẩm...');
 
-      if (thumbnailFile) {
-        const res = await storageApi.fileUpload(thumbnailFile);
-        thumbnailUrl = res;
+      // Upload images if needed
+      let thumbnailUrl = formData.thumbnail;
+      if (selectedThumbnail) {
+        thumbnailUrl = await storageApi.fileUpload(selectedThumbnail);
       }
 
+      let productImages = [...imagePreviews];
       if (selectedFiles.length > 0) {
-        const res = await storageApi.fileBulkUpload(selectedFiles);
-        // Filter out blob URLs and add new uploaded URLs
-        const existingUrls = imagePreviews.filter((url) => !url.startsWith('blob:'));
-        productImageUrls = [...existingUrls, ...res.content];
+        // Filter out blob URLs and upload new files
+        const existingImages = imagePreviews.filter((url) => !url.startsWith('blob:'));
+        const result = await storageApi.fileBulkUpload(selectedFiles);
+        const uploadedUrls = result.content || [];
+        productImages = [...existingImages, ...uploadedUrls];
       }
 
       const productData: UpdateProductDto = {
@@ -234,18 +224,15 @@ export function EditProductDialog({
         shortDescription: formData.shortDescription,
         description: formData.description,
         thumbnail: thumbnailUrl,
-        productImages: productImageUrls,
+        productImages,
         brandId: formData.brandId,
         model: formData.model,
         currentPrice: Number(formData.currentPrice) || 0,
         categoryIds: formData.categoryIds,
         quantity: formData.quantity,
-        warrantyExpiryDate: formData.warrantyExpiryDate,
+        warrantyExpiryDate: formData.hasWarranty ? formData.warrantyExpiryDate : '',
         condition: formData.condition,
-        tags: formData.tags
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter(Boolean),
+        tags: formData.tags.filter(Boolean),
       };
 
       if (product?.id) {
@@ -303,8 +290,7 @@ export function EditProductDialog({
                 <SelectBrand
                   value={formData.brandId}
                   currentBrandId={formData.brandId}
-                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
-                  disabled={!isEdit}
+                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand)}
                 />
               </div>
 
@@ -386,37 +372,58 @@ export function EditProductDialog({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label
-                  htmlFor="warrantyExpiryDate"
-                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Ngày hết hạn bảo hành
-                </Label>
-                <Input
-                  id="warrantyExpiryDate"
-                  type="date"
-                  value={formData.warrantyExpiryDate}
-                  onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  disabled={!isEdit}
-                />
+                <div className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id="hasWarranty"
+                    checked={formData.hasWarranty}
+                    onChange={(e) => handleFormChange('hasWarranty', e.target.checked)}
+                    className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    disabled={!isEdit}
+                  />
+                  <Label
+                    htmlFor="hasWarranty"
+                    className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                  >
+                    <Shield className="w-4 h-4" />
+                    Sản phẩm còn bảo hành
+                  </Label>
+                </div>
+
+                {formData.hasWarranty && (
+                  <div className="mt-2">
+                    <Label
+                      htmlFor="warrantyExpiryDate"
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Ngày hết hạn bảo hành
+                    </Label>
+                    <Input
+                      id="warrantyExpiryDate"
+                      type="date"
+                      value={formData.warrantyExpiryDate}
+                      onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
+                      className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      disabled={!isEdit}
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label
                   htmlFor="tags"
-                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"
                 >
                   <Tag className="w-4 h-4" />
                   Tags
                 </Label>
-                <Input
-                  id="tags"
+                <TagInput
                   value={formData.tags}
-                  onChange={(e) => handleFormChange('tags', e.target.value)}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Ngăn cách bằng dấu phẩy"
+                  onChange={(tags) => handleFormChange('tags', tags)}
+                  placeholder="Nhập tag và nhấn Enter"
                   disabled={!isEdit}
                 />
               </div>
@@ -430,7 +437,6 @@ export function EditProductDialog({
                 value={formData.categoryIds}
                 currentCategoryId={product?.categories}
                 onChange={(selected) => handleFormChange('categoryIds', selected)}
-                disabled={!isEdit}
               />
             </div>
           </div>

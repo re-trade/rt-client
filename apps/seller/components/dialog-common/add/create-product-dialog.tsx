@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import TagInput from '@/components/ui/tag-input';
 import { CreateProductDto, productApi } from '@/service/product.api';
 import { storageApi } from '@/service/storage.api';
 import '@uiw/react-markdown-preview/markdown.css';
@@ -35,10 +36,11 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
     model: '',
     currentPrice: '',
     quantity: 0,
+    hasWarranty: false,
     warrantyExpiryDate: '',
     condition: 'NEW' as const,
     categoryIds: [] as string[],
-    tags: '',
+    tags: [] as string[],
     status: 'DRAFT' as const,
   });
 
@@ -155,13 +157,10 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
         currentPrice: Number(formData.currentPrice) || 0,
         categoryIds: formData.categoryIds,
         quantity: formData.quantity,
-        warrantyExpiryDate: formData.warrantyExpiryDate,
+        warrantyExpiryDate: formData.hasWarranty ? formData.warrantyExpiryDate : '',
         condition: formData.condition,
         status: formData.status,
-        tags: formData.tags
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter(Boolean),
+        tags: formData.tags.filter((tag) => tag !== ''),
       };
 
       await productApi.createProduct(productData);
@@ -191,9 +190,10 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
       currentPrice: '',
       categoryIds: [],
       quantity: 0,
+      hasWarranty: false,
       warrantyExpiryDate: '',
       condition: 'NEW',
-      tags: '',
+      tags: [],
       status: 'DRAFT',
     });
     setImagePreviews([]);
@@ -318,36 +318,56 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label
-                  htmlFor="warrantyExpiryDate"
-                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Ngày hết hạn bảo hành
-                </Label>
-                <Input
-                  id="warrantyExpiryDate"
-                  type="date"
-                  value={formData.warrantyExpiryDate}
-                  onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
+                <div className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id="hasWarranty"
+                    checked={formData.hasWarranty}
+                    onChange={(e) => handleFormChange('hasWarranty', e.target.checked)}
+                    className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <Label
+                    htmlFor="hasWarranty"
+                    className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                  >
+                    <Shield className="w-4 h-4" />
+                    Sản phẩm còn bảo hành
+                  </Label>
+                </div>
+
+                {formData.hasWarranty && (
+                  <div className="mt-2">
+                    <Label
+                      htmlFor="warrantyExpiryDate"
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Ngày hết hạn bảo hành
+                    </Label>
+                    <Input
+                      id="warrantyExpiryDate"
+                      type="date"
+                      value={formData.warrantyExpiryDate}
+                      onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
+                      className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label
                   htmlFor="tags"
-                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"
                 >
                   <Tag className="w-4 h-4" />
                   Tags
                 </Label>
-                <Input
-                  id="tags"
+                <TagInput
                   value={formData.tags}
-                  onChange={(e) => handleFormChange('tags', e.target.value)}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Ngăn cách bằng dấu phẩy"
+                  onChange={(tags) => handleFormChange('tags', tags)}
+                  placeholder="Nhập tag và nhấn Enter"
                 />
               </div>
             </div>
