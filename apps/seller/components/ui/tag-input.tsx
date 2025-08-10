@@ -10,7 +10,7 @@ interface TagInputProps {
   disabled?: boolean;
 }
 
-export default function TagInput({
+export function TagInput({
   value = [],
   onChange,
   placeholder = 'Enter tag and press Enter...',
@@ -65,3 +65,6 @@ export default function TagInput({
     </div>
   );
 }
+
+// Export as default as well for backward compatibility
+export default TagInput;

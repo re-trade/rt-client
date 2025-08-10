@@ -39,11 +39,11 @@ export default function useProduct() {
   const [sort, setSort] = useState<SortState>({ field: '', direction: null });
   const [filter, setFilter] = useState<FilterState>({
     search: '',
-    status: 'all',
-    verified: 'all',
-    category: 'all',
-    brand: 'all',
-    priceRange: 'all',
+    status: '',
+    verified: '',
+    category: '',
+    brand: '',
+    priceRange: '',
     minPrice: 0,
     maxPrice: 0,
   });
@@ -65,19 +65,19 @@ export default function useProduct() {
       if (filter.search) {
         queryBuilder.set('keyword', filter.search);
       }
-      if (filter.status && filter.status !== 'all') {
+      if (filter.status) {
         queryBuilder.set('status', filter.status);
       }
-      if (filter.verified && filter.verified !== 'all') {
+      if (filter.verified) {
         queryBuilder.set('verified', filter.verified);
       }
-      if (filter.category && filter.category !== 'all') {
+      if (filter.category) {
         queryBuilder.set('categoryId', filter.category);
       }
-      if (filter.brand && filter.brand !== 'all') {
+      if (filter.brand) {
         queryBuilder.set('brand', filter.brand);
       }
-      if (filter.priceRange && filter.priceRange !== 'all') {
+      if (filter.priceRange) {
         const [min, max] = filter.priceRange.split('-');
         queryBuilder.set('currentPrice', `${min}..${max}`);
       }
@@ -134,11 +134,11 @@ export default function useProduct() {
   const clearFilters = () => {
     setFilter({
       search: '',
-      status: 'all',
-      verified: 'all',
-      category: 'all',
-      brand: 'all',
-      priceRange: 'all',
+      status: '',
+      verified: '',
+      category: '',
+      brand: '',
+      priceRange: '',
       minPrice: 0,
       maxPrice: 0,
     });
@@ -204,13 +204,13 @@ export default function useProduct() {
       maxPrice,
       priceRanges,
     };
-  }, []);
+  }, [filterOptions]);
 
   const activeFiltersCount = useMemo(() => {
     return Object.entries(filter).filter(([key, value]) => {
       if (key === 'search') return value !== '';
       if (key === 'minPrice' || key === 'maxPrice') return value !== 0;
-      return value !== 'all';
+      return value !== '';
     }).length;
   }, [filter]);
 
