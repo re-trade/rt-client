@@ -3,7 +3,7 @@ import { createAuthApi, createUnAuthApi, EApiService } from './axios.config';
 
 const authApi: Record<string, AxiosInstance> & {
   default: AxiosInstance;
-  voucher: AxiosInstance;
+  achievement: AxiosInstance;
   imageSearch: AxiosInstance;
   storage: AxiosInstance;
   notification: AxiosInstance;
@@ -12,8 +12,8 @@ const authApi: Record<string, AxiosInstance> & {
   get default() {
     return createAuthApi();
   },
-  get voucher() {
-    return createAuthApi(EApiService.VOUCHER);
+  get achievement() {
+    return createAuthApi(EApiService.ACHIEVEMENT);
   },
   get imageSearch() {
     return createAuthApi(EApiService.IMAGE_SEARCH);
@@ -31,7 +31,7 @@ const authApi: Record<string, AxiosInstance> & {
 
 const unAuthApi: Record<string, AxiosInstance> & {
   default: AxiosInstance;
-  voucher: AxiosInstance;
+  achievement: AxiosInstance;
   imageSearch: AxiosInstance;
   storage: AxiosInstance;
   notification: AxiosInstance;
@@ -40,8 +40,8 @@ const unAuthApi: Record<string, AxiosInstance> & {
   get default() {
     return createUnAuthApi();
   },
-  get voucher() {
-    return createUnAuthApi(EApiService.VOUCHER);
+  get achievement() {
+    return createUnAuthApi(EApiService.ACHIEVEMENT);
   },
   get imageSearch() {
     return createUnAuthApi(EApiService.IMAGE_SEARCH);

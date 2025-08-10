@@ -10,12 +10,21 @@ export enum ETokenName {
 
 export enum EApiService {
   MAIN = 'main',
-  VOUCHER = 'user',
+  ACHIEVEMENT = 'achievement',
   IMAGE_SEARCH = 'image-search',
   STORAGE = 'storage',
   PROVINCE = 'province',
   NOTIFICATION = 'feedback-notification',
 }
+
+const DEV_PORT_MAP: Record<EApiService, number> = {
+  [EApiService.MAIN]: 8080,
+  [EApiService.ACHIEVEMENT]: 8084,
+  [EApiService.IMAGE_SEARCH]: 9090,
+  [EApiService.STORAGE]: 8083,
+  [EApiService.PROVINCE]: 8000,
+  [EApiService.NOTIFICATION]: 8086,
+};
 
 export type CustomAxiosRequestConfig = AxiosRequestConfig & {
   _retry?: boolean;
@@ -30,6 +39,9 @@ export interface DeviceInfo {
 
 export const createBaseURL = (service: EApiService = EApiService.MAIN) => {
   const path = NODE_ENV === 'development' ? '/api/v1' : `/api/${service}/v1`;
+  if (NODE_ENV === 'development') {
+    return new URL(path, `http://localhost:${DEV_PORT_MAP[service]}`).toString();
+  }
   return new URL(path, BASE_API_URL).toString();
 };
 
@@ -113,48 +125,4 @@ export const createAuthApi = (
   }
 
   return instance;
-};
-
-export const createApiInstances = (getDeviceInfo?: () => Promise<DeviceInfo>) => {
-  const authApi: Record<string, AxiosInstance> & {
-    default: AxiosInstance;
-    voucher: AxiosInstance;
-    imageSearch: AxiosInstance;
-    storage: AxiosInstance;
-  } = {
-    get default() {
-      return createAuthApi(EApiService.MAIN, getDeviceInfo);
-    },
-    get voucher() {
-      return createAuthApi(EApiService.VOUCHER, getDeviceInfo);
-    },
-    get imageSearch() {
-      return createAuthApi(EApiService.IMAGE_SEARCH, getDeviceInfo);
-    },
-    get storage() {
-      return createAuthApi(EApiService.STORAGE, getDeviceInfo);
-    },
-  };
-
-  const unAuthApi: Record<string, AxiosInstance> & {
-    default: AxiosInstance;
-    voucher: AxiosInstance;
-    imageSearch: AxiosInstance;
-    storage: AxiosInstance;
-  } = {
-    get default() {
-      return createUnAuthApi();
-    },
-    get voucher() {
-      return createUnAuthApi(EApiService.VOUCHER);
-    },
-    get imageSearch() {
-      return createUnAuthApi(EApiService.IMAGE_SEARCH);
-    },
-    get storage() {
-      return createUnAuthApi(EApiService.STORAGE);
-    },
-  };
-
-  return { authApi, unAuthApi };
 };

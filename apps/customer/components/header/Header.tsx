@@ -4,6 +4,7 @@ import { useCart } from '@/context/CartContext';
 import MobileMenu from '@components/header/MobileHeaderMenu';
 import SearchBar from '@components/header/SearchBar';
 import UserDropdown from '@components/header/UserHeaderDropdown';
+import BellNotification from '@components/notification/BellNotification';
 
 import {
   IconBuildingStore,
@@ -41,6 +42,9 @@ const Header = () => {
                   <IconBuildingStore size={16} />
                   Tới trang người bán
                 </Link>
+                <div className="hidden lg:block">
+                  <BellNotification />
+                </div>
               </>
             )}
           </div>
@@ -75,6 +79,9 @@ const Header = () => {
         <div className="flex items-center space-x-2">
           {auth && (
             <>
+              <div className="lg:hidden">
+                <BellNotification />
+              </div>
               <Link
                 href="/cart"
                 className="relative p-3 hover:bg-orange-50 rounded-xl group"
