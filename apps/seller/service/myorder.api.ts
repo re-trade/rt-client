@@ -110,12 +110,3 @@ export const myOrderApi = {
     }
   },
 };
-
-export interface PaymentMethod {
-  id: string;
-  name: string;
-  code: string;
-  type: string;
-  description: string;
-  imgUrl: string;
-}

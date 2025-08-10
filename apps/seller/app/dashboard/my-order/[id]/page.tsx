@@ -8,7 +8,8 @@ import { RetradeModal } from '@/components/order-detail/RetradeModal';
 import { SellerInfoCard } from '@/components/order-detail/SellerInfoCard';
 import { ShippingInfoCard } from '@/components/order-detail/ShippingInfoCard';
 import { useMyOrderDetail } from '@/hooks/use-my-order-detail';
-import { retradeApi } from '@/service/retrade.api';
+import { retradeApi, RetradeRequest } from '@/service/retrade.api';
+import { storageApi } from '@/service/storage.api';
 import { ArrowLeft, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -33,24 +34,41 @@ export default function OrderDetailPage() {
   const [isRetradeModalOpen, setIsRetradeModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<OrderItem>();
   const [retradeQuantity, setRetradeQuantity] = useState(1);
+  const [retradePrice, setRetradePrice] = useState(0);
+  const [shortDescription, setShortDescription] = useState('');
+  const [description, setDescription] = useState('');
+  const [thumbnail, setThumbnail] = useState('');
   const [isRetrading, setIsRetrading] = useState(false);
 
   const handleRetradeClick = (item: OrderItem) => {
     setSelectedItem(item);
     setRetradeQuantity(1);
+    setRetradePrice(item.basePrice);
+    setShortDescription(`Retrade for ${item.itemName}`);
+    setDescription(`Retrade request for ${item.itemName} purchased in order ${orderId}`);
+    setThumbnail(item.itemThumbnail || '');
     setIsRetradeModalOpen(true);
   };
 
-  const handleRetradeSubmit = async () => {
+  const handleRetradeSubmit = async (thumbnailFile?: File) => {
     if (!selectedItem) return;
 
     try {
       setIsRetrading(true);
-      await retradeApi.createRetrade({
-        orderId: orderId,
-        itemId: selectedItem.itemId,
+      let thumbnailUrl = thumbnail;
+      if (thumbnailFile) {
+        thumbnailUrl = await storageApi.fileUpload(thumbnailFile);
+      }
+
+      const request: RetradeRequest = {
+        orderItemId: selectedItem.itemId,
         quantity: retradeQuantity,
-      });
+        price: retradePrice,
+        shortDescription: shortDescription,
+        description: description,
+        thumbnail: thumbnailUrl,
+      };
+      await retradeApi.createRetrade(request);
       toast.success('Yêu cầu retrade đã được gửi thành công!');
       setIsRetradeModalOpen(false);
     } catch (error) {
@@ -154,9 +172,17 @@ export default function OrderDetailPage() {
         isSubmitting={isRetrading}
         onOpenChange={setIsRetradeModalOpen}
         onSubmit={handleRetradeSubmit}
-        retradeQuantity={selectedItem?.quantity || 0}
+        retradeQuantity={retradeQuantity}
         selectedItem={selectedItem}
         setRetradeQuantity={setRetradeQuantity}
+        retradePrice={retradePrice}
+        setRetradePrice={setRetradePrice}
+        shortDescription={shortDescription}
+        setShortDescription={setShortDescription}
+        description={description}
+        setDescription={setDescription}
+        thumbnail={thumbnail}
+        setThumbnail={setThumbnail}
       />
     </div>
   );

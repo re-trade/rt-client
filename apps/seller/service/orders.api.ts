@@ -72,7 +72,6 @@ export const ordersApi = {
     const url = `/orders/seller/combo?${searchParams.toString()}`;
     const response = await authApi.default.get<IResponseObject<OrderResponse[]>>(url);
 
-    // Default response in case of error
     const defaultResponse = {
       orders: [] as OrderResponse[],
       totalPages: 1,
