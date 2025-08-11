@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -9,69 +9,71 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useWithdrawManager } from "@/hooks/use-withdraw-manager"
-import type { TWithdrawProfile } from "@/services/withdraw.api"
-import { AlertTriangle, Check, PauseCircle, Search, Store } from "lucide-react"
-import { useState } from "react"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useWithdrawManager } from '@/hooks/use-withdraw-manager';
+import type { TWithdrawProfile } from '@/services/withdraw.api';
+import { AlertTriangle, Check, PauseCircle, Search, Store } from 'lucide-react';
+import { useState } from 'react';
 
-// Status mappings for display
 const statusLabels: Record<string, string> = {
-  "0": "Yêu cầu đã thực hiện",
-  PENDING: "Đang chờ",
-  APPROVED: "Đã duyệt",
-  REJECTED: "Từ chối",
-  COMPLETED: "Hoàn thành",
-}
+  '0': 'Yêu cầu đã thực hiện',
+  PENDING: 'Đang chờ',
+  APPROVED: 'Đã duyệt',
+  REJECTED: 'Từ chối',
+  COMPLETED: 'Hoàn thành',
+};
 
 const statusColors: Record<string, string> = {
-  "0": "bg-blue-100 text-blue-800 border border-blue-200",
-  PENDING: "bg-yellow-100 text-yellow-800 border border-yellow-200",
-  APPROVED: "bg-green-100 text-green-800 border border-green-200",
-  REJECTED: "bg-red-100 text-red-800 border border-red-200",
-  COMPLETED: "bg-blue-100 text-blue-800 border border-blue-200",
-}
+  '0': 'bg-blue-100 text-blue-800 border border-blue-200',
+  PENDING: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+  APPROVED: 'bg-green-100 text-green-800 border border-green-200',
+  REJECTED: 'bg-red-100 text-red-800 border border-red-200',
+  COMPLETED: 'bg-blue-100 text-blue-800 border border-blue-200',
+};
 
-// Helper function to format date consistently in Vietnamese format
 const formatVietnameseDate = (dateInput: any): string => {
   try {
-    let date: Date
+    let date: Date;
 
-    // Handle array format [year, month, day, hour, minute, second]
     if (Array.isArray(dateInput)) {
-      const [year, month, day, hour, minute, second] = dateInput
-      date = new Date(year, month - 1, day, hour, minute, second)
+      const [year, month, day, hour, minute, second] = dateInput;
+      date = new Date(year, month - 1, day, hour, minute, second);
     }
-    // Handle string or Date object
     else {
-      date = new Date(dateInput)
+      date = new Date(dateInput);
     }
 
-    // Check if date is valid
     if (isNaN(date.getTime())) {
-      return "N/A"
+      return 'N/A';
     }
 
-    return date.toLocaleString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
       hour12: false,
-    })
+    });
   } catch (error) {
-    return "N/A"
+    return 'N/A';
   }
-}
+};
 
 export default function WithdrawManagementPage() {
-  const [selectedWithdraw, setSelectedWithdraw] = useState<TWithdrawProfile | null>(null)
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
-  const [qrError, setQrError] = useState<string | null>(null)
+  const [selectedWithdraw, setSelectedWithdraw] = useState<TWithdrawProfile | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [qrError, setQrError] = useState<string | null>(null);
 
   const {
     withdraws,
@@ -85,55 +87,55 @@ export default function WithdrawManagementPage() {
     stats,
     approveWithdraw,
     fetchWithdrawQr,
-  } = useWithdrawManager()
+  } = useWithdrawManager();
 
-  const [isQrLoading, setIsQrLoading] = useState(false)
+  const [isQrLoading, setIsQrLoading] = useState(false);
 
   const fetchQr = async (withdrawId: string) => {
     try {
-      setIsQrLoading(true)
-      const qrBlob = await fetchWithdrawQr(withdrawId)
+      setIsQrLoading(true);
+      const qrBlob = await fetchWithdrawQr(withdrawId);
       if (!qrBlob) {
-        throw new Error("No QR code data returned")
+        throw new Error('No QR code data returned');
       }
-      const url = URL.createObjectURL(qrBlob)
-      setQrCodeUrl(url)
-      return qrBlob
+      const url = URL.createObjectURL(qrBlob);
+      setQrCodeUrl(url);
+      return qrBlob;
     } catch (err: any) {
-      const errorMessage = err.message || "Failed to fetch QR code"
-      setQrError(errorMessage)
-      return null
+      const errorMessage = err.message || 'Failed to fetch QR code';
+      setQrError(errorMessage);
+      return null;
     } finally {
-      setIsQrLoading(false)
+      setIsQrLoading(false);
     }
-  }
+  };
 
   const handleViewDetails = async (withdraw: TWithdrawProfile) => {
-    setSelectedWithdraw(withdraw)
-    setQrCodeUrl(null)
-    setQrError(null)
-    if (withdraw.status !== "0") {
-      await fetchQr(withdraw.id)
+    setSelectedWithdraw(withdraw);
+    setQrCodeUrl(null);
+    setQrError(null);
+    if (withdraw.status !== '0') {
+      await fetchQr(withdraw.id);
     }
-  }
+  };
 
   const handleApprove = async (productId: string) => {
-    const success = await approveWithdraw(productId)
+    const success = await approveWithdraw(productId);
     if (success) {
-      setSelectedWithdraw(null)
-      setQrCodeUrl(null)
-      setQrError(null)
+      setSelectedWithdraw(null);
+      setQrCodeUrl(null);
+      setQrError(null);
     }
-  }
+  };
 
   const handleDialogClose = () => {
-    setSelectedWithdraw(null)
+    setSelectedWithdraw(null);
     if (qrCodeUrl) {
-      URL.revokeObjectURL(qrCodeUrl)
-      setQrCodeUrl(null)
+      URL.revokeObjectURL(qrCodeUrl);
+      setQrCodeUrl(null);
     }
-    setQrError(null)
-  }
+    setQrError(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -211,7 +213,10 @@ export default function WithdrawManagementPage() {
             <TableBody>
               {withdraws?.map((withdraw) => (
                 <TableRow key={withdraw.id}>
-                  <TableCell className="font-medium w-[150px] max-w-[150px] truncate" title={withdraw.id}>
+                  <TableCell
+                    className="font-medium w-[150px] max-w-[150px] truncate"
+                    title={withdraw.id}
+                  >
                     {withdraw.id}
                   </TableCell>
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
@@ -232,8 +237,9 @@ export default function WithdrawManagementPage() {
 
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Hiển thị {currentPage * itemsPerPage + 1} đến {Math.min((currentPage + 1) * itemsPerPage, withdraws.length)}{" "}
-            trong tổng số {withdraws.length} yêu cầu
+            Hiển thị {currentPage * itemsPerPage + 1} đến{' '}
+            {Math.min((currentPage + 1) * itemsPerPage, withdraws.length)} trong tổng số{' '}
+            {withdraws.length} yêu cầu
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -261,7 +267,9 @@ export default function WithdrawManagementPage() {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="space-y-3">
               <DialogTitle className="text-2xl font-bold">Chi tiết yêu cầu rút tiền</DialogTitle>
-              <DialogDescription>Thông tin chi tiết và trạng thái của yêu cầu rút tiền</DialogDescription>
+              <DialogDescription>
+                Thông tin chi tiết và trạng thái của yêu cầu rút tiền
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 mt-6">
@@ -271,28 +279,30 @@ export default function WithdrawManagementPage() {
                   <Store className="h-8 w-8 text-green-600" />
                   <div>
                     <p className="text-sm text-muted-foreground">Số tiền yêu cầu</p>
-                    <p className="text-2xl font-bold text-green-600">{selectedWithdraw.amount.toLocaleString()} ₫</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {selectedWithdraw.amount.toLocaleString()} ₫
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground mb-2">Trạng thái</p>
                   <div
                     className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      selectedWithdraw.status === "PENDING"
-                        ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                        : selectedWithdraw.status === "APPROVED"
-                          ? "bg-green-100 text-green-800 border border-green-200"
-                          : selectedWithdraw.status === "REJECTED"
-                            ? "bg-red-100 text-red-800 border border-red-200"
-                            : selectedWithdraw.status === "COMPLETED"
-                              ? "bg-green-100 text-green-800 border border-green-200"
-                              : "bg-gray-100 text-gray-800 border border-gray-200"
+                      selectedWithdraw.status === 'PENDING'
+                        ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                        : selectedWithdraw.status === 'APPROVED'
+                          ? 'bg-green-100 text-green-800 border border-green-200'
+                          : selectedWithdraw.status === 'REJECTED'
+                            ? 'bg-red-100 text-red-800 border border-red-200'
+                            : selectedWithdraw.status === 'COMPLETED'
+                              ? 'bg-green-100 text-green-800 border border-green-200'
+                              : 'bg-gray-100 text-gray-800 border border-gray-200'
                     }`}
                   >
-                    {selectedWithdraw.status === "PENDING" && "⏳ Đang chờ"}
-                    {selectedWithdraw.status === "APPROVED" && "✅ Đã duyệt"}
-                    {selectedWithdraw.status === "REJECTED" && "❌ Từ chối"}
-                    {selectedWithdraw.status === "COMPLETED" && "✅ Đã thanh toán"}
+                    {selectedWithdraw.status === 'PENDING' && '⏳ Đang chờ'}
+                    {selectedWithdraw.status === 'APPROVED' && '✅ Đã duyệt'}
+                    {selectedWithdraw.status === 'REJECTED' && '❌ Từ chối'}
+                    {selectedWithdraw.status === 'COMPLETED' && '✅ Đã thanh toán'}
                   </div>
                 </div>
               </div>
@@ -311,14 +321,18 @@ export default function WithdrawManagementPage() {
                       <AlertTriangle className="h-4 w-4" />
                       Mã yêu cầu
                     </div>
-                    <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">{selectedWithdraw.id}</p>
+                    <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
+                      {selectedWithdraw.id}
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <PauseCircle className="h-4 w-4" />
                       Ngày tạo
                     </div>
-                    <p className="font-medium">{formatVietnameseDate(selectedWithdraw.createdDate)}</p>
+                    <p className="font-medium">
+                      {formatVietnameseDate(selectedWithdraw.createdDate)}
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -350,7 +364,7 @@ export default function WithdrawManagementPage() {
                       {selectedWithdraw.bankUrl ? (
                         <div className="flex items-center justify-center p-4 bg-white border-2 border-dashed border-gray-200 rounded-lg">
                           <img
-                            src={selectedWithdraw.bankUrl || "/placeholder.svg"}
+                            src={selectedWithdraw.bankUrl || '/placeholder.svg'}
                             alt={`${selectedWithdraw.bankName} Logo`}
                             className="max-w-[120px] max-h-[60px] object-contain"
                           />
@@ -377,7 +391,7 @@ export default function WithdrawManagementPage() {
                   </h3>
                 </div>
                 <div className="p-4">
-                  {selectedWithdraw.status === "COMPLETED" ? (
+                  {selectedWithdraw.status === 'COMPLETED' ? (
                     <div className="flex items-center justify-center p-8 bg-green-50 border-2 border-dashed border-green-200 rounded-lg">
                       <div className="text-center">
                         <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -390,9 +404,9 @@ export default function WithdrawManagementPage() {
                       <div>
                         <p className="font-medium text-red-800">Lỗi khi tải mã QR</p>
                         <p className="text-sm text-red-700 mt-1">
-                          {qrError === "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại."
+                          {qrError === 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
                             ? qrError
-                            : qrError || "Không thể tải mã QR"}
+                            : qrError || 'Không thể tải mã QR'}
                         </p>
                       </div>
                     </div>
@@ -400,7 +414,7 @@ export default function WithdrawManagementPage() {
                     <div className="flex justify-center">
                       <div className="p-4 bg-white border-2 border-gray-200 rounded-lg shadow-sm">
                         <img
-                          src={qrCodeUrl || "/placeholder.svg"}
+                          src={qrCodeUrl || '/placeholder.svg'}
                           alt="QR Code thanh toán"
                           className="max-w-[250px] rounded"
                         />
@@ -423,11 +437,11 @@ export default function WithdrawManagementPage() {
                 <Button variant="outline" onClick={handleDialogClose}>
                   Đóng
                 </Button>
-                {selectedWithdraw.status === "PENDING" && (
+                {selectedWithdraw.status === 'PENDING' && (
                   <Button
                     onClick={async () => {
                       if (selectedWithdraw) {
-                        await handleApprove(selectedWithdraw.id)
+                        await handleApprove(selectedWithdraw.id);
                       }
                     }}
                     className="bg-green-600 hover:bg-green-700"
@@ -442,5 +456,5 @@ export default function WithdrawManagementPage() {
         </Dialog>
       )}
     </div>
-  )
+  );
 }
