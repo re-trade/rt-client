@@ -93,7 +93,8 @@ export const reviewApi = {
   },
   createReview: async (review: CreateReview): Promise<ReviewResponse> => {
     const response = await authApi.default.post<IResponseObject<ReviewResponse>>(
-      '/product-review',review
+      '/product-review',
+      review,
     );
     return response.data.content;
   },

@@ -1,9 +1,9 @@
 'use client';
 
 import { ReviewResponse } from '@/services/product-review.api';
+import ImageGallery from '@components/gallery/ImageGallery';
 import { Star, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
-import ImageGallery from '@components/gallery/ImageGallery';
 
 interface MyReviewsTabProps {
   reviews: ReviewResponse[];
@@ -11,10 +11,9 @@ interface MyReviewsTabProps {
 }
 
 export function MyReviewsTab({ reviews, formatDate }: MyReviewsTabProps) {
-
-    const [showGallery, setShowGallery] = useState(false);
-    const [galleryImages, setGalleryImages] = useState<string[]>([]);
-    const [galleryIndex, setGalleryIndex] = useState(0);
+  const [showGallery, setShowGallery] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const openGallery = (images: string[], index: number) => {
     setGalleryImages(images);
     setGalleryIndex(index);
@@ -36,7 +35,7 @@ export function MyReviewsTab({ reviews, formatDate }: MyReviewsTabProps) {
   const handleGalleryIndexChange = (index: number) => {
     setGalleryIndex(index);
   };
-
+  
 
   if (reviews.length === 0) {
     return (
@@ -78,37 +77,37 @@ export function MyReviewsTab({ reviews, formatDate }: MyReviewsTabProps) {
 
               <p className="text-gray-700 mb-4">Nội dung: {review.content}</p>
 
-              {Array.isArray(review.images) && review.images.length > 0 &&  (
+              {Array.isArray(review.images) && review.images.length > 0 && (
                 <div className="flex space-x-2 mb-4">
-                 {review.images.map((url, index) => (
-                      <div
-                        key={index}
-                        className="relative group cursor-pointer"
-                        onClick={() => openGallery(review.images, index)}
-                      >
-                        <img
-                          src={url}
-                          alt={`Hình đánh giá ${index + 1}`}
-                          className="w-20 h-20 rounded-lg object-cover border border-orange-100 group-hover:border-orange-300 transition-all duration-200 group-hover:scale-105 shadow-sm"
-                        />
-                        {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all duration-200" /> */}
-                        <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white px-1 py-0.5 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                          {index + 1}/{review.images.length}
-                        </div>
+                  {review.images.map((url, index) => (
+                    <div
+                      key={index}
+                      className="relative group cursor-pointer"
+                      onClick={() => openGallery(review.images, index)}
+                    >
+                      <img
+                        src={url}
+                        alt={`Hình đánh giá ${index + 1}`}
+                        className="w-20 h-20 rounded-lg object-cover border border-orange-100 group-hover:border-orange-300 transition-all duration-200 group-hover:scale-105 shadow-sm"
+                      />
+                      {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all duration-200" /> */}
+                      <div className="absolute bottom-1 right-1 bg-black bg-opacity-50 text-white px-1 py-0.5 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                        {index + 1}/{review.images.length}
                       </div>
-                    ))}
+                    </div>
+                  ))}
                 </div>
               )}
-                    <ImageGallery
-                      images={galleryImages}
-                      currentIndex={galleryIndex}
-                      isOpen={showGallery}
-                      onClose={closeGallery}
-                      onNext={nextImage}
-                      onPrevious={prevImage}
-                      onIndexChange={handleGalleryIndexChange}
-                      productName="Hình ảnh đánh giá"
-                    />
+              <ImageGallery
+                images={galleryImages}
+                currentIndex={galleryIndex}
+                isOpen={showGallery}
+                onClose={closeGallery}
+                onNext={nextImage}
+                onPrevious={prevImage}
+                onIndexChange={handleGalleryIndexChange}
+                productName="Hình ảnh đánh giá"
+              />
 
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <ThumbsUp className="w-4 h-4" />

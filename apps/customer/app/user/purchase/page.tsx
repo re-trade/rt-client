@@ -58,13 +58,7 @@ export default function PurchasePage() {
     fecthOrderStats();
   }, []);
 
-  const { totalOrders, deliveredCount, totalSpent } = useMemo(() => {
-    const totalOrders = pagination?.totalElements || 0;
-    const deliveredCount = orders.filter((o) => o.orderStatus === 'Delivered').length;
-    const totalSpent = orders.reduce((sum, order) => sum + order.grandPrice, 0);
 
-    return { totalOrders, deliveredCount, totalSpent };
-  }, [orders, pagination?.totalElements]);
 
   if (isLoading) {
     return <PurchaseSkeleton />;
