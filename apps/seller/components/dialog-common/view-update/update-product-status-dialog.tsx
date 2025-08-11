@@ -56,10 +56,10 @@ const ProductStatusOptions = [
     label: 'Hoạt động',
     description: 'Sản phẩm đang được hiển thị và có thể mua',
     icon: <CheckCircle className="h-4 w-4 text-white" />,
-    iconClassName: 'bg-emerald-600',
-    textClassName: 'text-emerald-700',
-    color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    bgColor: 'bg-emerald-500',
+    iconClassName: 'bg-orange-600',
+    textClassName: 'text-orange-700',
+    color: 'bg-orange-50 text-orange-700 border-orange-200',
+    bgColor: 'bg-orange-500',
   },
   {
     value: ProductStatusEnum.INACTIVE,
@@ -99,6 +99,9 @@ export function UpdateProductStatusDialog({
   const [selectedStatus, setSelectedStatus] = useState<TProductStatus | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableStatuses, setAvailableStatuses] = useState<TProductStatus[]>([]);
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [buttonHoldProgress, setButtonHoldProgress] = useState(0);
+  const [isHolding, setIsHolding] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -124,6 +127,14 @@ export function UpdateProductStatusDialog({
     if (!product || !selectedStatus) return;
 
     try {
+      if (
+        selectedStatus === ProductStatusEnum.DRAFT &&
+        product.status !== ProductStatusEnum.INACTIVE
+      ) {
+        setShowWarning(true);
+        return;
+      }
+
       setIsSubmitting(true);
       if (selectedStatus !== product.status) {
         await productApi.updateProductStatus(product.id, selectedStatus);
@@ -140,6 +151,51 @@ export function UpdateProductStatusDialog({
     }
   };
 
+  const executeStatusUpdate = async () => {
+    if (!product || !selectedStatus) return;
+
+    try {
+      setIsSubmitting(true);
+      await productApi.updateProductStatus(product.id, ProductStatusEnum.DRAFT);
+      toast.success('Đã chuyển sản phẩm về trạng thái Bản nháp');
+      onSuccess();
+      onOpenChange(false);
+      setShowWarning(false);
+    } catch (error) {
+      toast.error('Không thể cập nhật trạng thái sản phẩm');
+      console.error('Error updating product status:', error);
+    } finally {
+      setIsSubmitting(false);
+      setButtonHoldProgress(0);
+      setIsHolding(false);
+    }
+  };
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isHolding && buttonHoldProgress < 100) {
+      timer = setTimeout(() => {
+        const newProgress = buttonHoldProgress + 4;
+        setButtonHoldProgress(newProgress);
+        if (newProgress >= 100) {
+          executeStatusUpdate();
+        }
+      }, 40);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isHolding, buttonHoldProgress]);
+
+  const handleMouseDown = () => {
+    setIsHolding(true);
+  };
+
+  const handleMouseUp = () => {
+    setIsHolding(false);
+    setButtonHoldProgress(0);
+  };
+
   const isFormValid = selectedStatus !== null && selectedStatus !== product?.status;
 
   if (!product) return null;
@@ -149,14 +205,14 @@ export function UpdateProductStatusDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-orange-100">
         <DialogHeader className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className={cn('p-2 rounded-full', currentStatusConfig.bgColor)}>
+            <div className={cn('p-2 rounded-full bg-orange-500')}>
               <Package className="h-5 w-5 text-white" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-semibold">
+              <DialogTitle className="text-xl font-semibold text-orange-500">
                 Cập nhật trạng thái sản phẩm
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
@@ -192,10 +248,10 @@ export function UpdateProductStatusDialog({
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-gray-900">
+                  <div className="text-lg font-bold text-orange-600">
                     {product.currentPrice.toLocaleString('vi-VN')}đ
                   </div>
-                  <div className="text-sm text-gray-600">Số lượng: {product.quantity}</div>
+                  <p className="text-sm text-gray-600">Số lượng: {product.quantity || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -203,7 +259,7 @@ export function UpdateProductStatusDialog({
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Chuyển trạng thái</h3>
+              <h3 className="text-lg font-semibold text-orange-500">Chuyển trạng thái</h3>
 
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Info className="h-4 w-4" />
@@ -212,32 +268,38 @@ export function UpdateProductStatusDialog({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <Card className="border-2 border-gray-200">
+              {/* Current Status */}
+              <Card className="border-2 border-orange-100">
                 <CardContent className="p-4 text-center">
                   <div className="mb-3">
                     <div
                       className={cn(
                         'inline-flex h-12 w-12 items-center justify-center rounded-full',
-                        currentStatusConfig.bgColor,
+                        currentStatusConfig?.bgColor || 'bg-gray-500',
                       )}
                     >
-                      {currentStatusConfig.icon}
+                      {currentStatusConfig?.icon || <AlertCircle className="h-4 w-4 text-white" />}
                     </div>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">Hiện tại</h4>
-                  <Badge className={cn('text-xs', currentStatusConfig.color)}>
-                    {currentStatusConfig.label}
+                  <h4 className="font-medium text-orange-700 mb-1">Hiện tại</h4>
+                  <Badge
+                    className={cn(
+                      'text-xs',
+                      currentStatusConfig?.color || 'bg-gray-100 text-gray-700 border-gray-300',
+                    )}
+                  >
+                    {currentStatusConfig?.label || 'Không xác định'}
                   </Badge>
                 </CardContent>
               </Card>
 
               {/* Arrow */}
               <div className="flex justify-center">
-                <ArrowRight className="h-8 w-8 text-gray-400" />
+                <ArrowRight className="h-8 w-8 text-orange-400" />
               </div>
 
               {selectedStatus ? (
-                <Card className="border-2 border-blue-200 bg-blue-50/30">
+                <Card className="border-2 border-orange-200 bg-orange-50/30">
                   <CardContent className="p-4 text-center">
                     <div className="mb-3">
                       <div
@@ -249,22 +311,22 @@ export function UpdateProductStatusDialog({
                         {newStatusConfig?.icon}
                       </div>
                     </div>
-                    <h4 className="font-medium text-gray-900 mb-1">Mới</h4>
+                    <h4 className="font-medium text-orange-700 mb-1">Mới</h4>
                     <Badge className={cn('text-xs', newStatusConfig?.color)}>
                       {newStatusConfig?.label}
                     </Badge>
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="border-2 border-dashed border-gray-300">
+                <Card className="border-2 border-dashed border-orange-200">
                   <CardContent className="p-4 text-center">
                     <div className="mb-3">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-200">
-                        <AlertCircle className="h-5 w-5 text-gray-500" />
+                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-orange-100">
+                        <AlertCircle className="h-5 w-5 text-orange-500" />
                       </div>
                     </div>
-                    <h4 className="font-medium text-gray-900 mb-1">Chọn trạng thái mới</h4>
-                    <Badge className="text-xs bg-gray-100 text-gray-700 border-gray-300">
+                    <h4 className="font-medium text-orange-700 mb-1">Chọn trạng thái mới</h4>
+                    <Badge className="text-xs bg-orange-50 text-orange-700 border-orange-200">
                       Chưa chọn
                     </Badge>
                   </CardContent>
@@ -277,8 +339,8 @@ export function UpdateProductStatusDialog({
 
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-medium">Chọn trạng thái mới</Label>
-              <p className="text-sm text-gray-500 mt-1">
+              <Label className="text-base font-medium text-orange-700">Chọn trạng thái mới</Label>
+              <p className="text-sm text-orange-500/70 mt-1">
                 Chỉ hiển thị các trạng thái được phép chuyển đổi từ trạng thái hiện tại
               </p>
             </div>
@@ -291,21 +353,21 @@ export function UpdateProductStatusDialog({
                     <Card
                       key={status}
                       className={cn(
-                        'border hover:border-blue-300 cursor-pointer transition-all',
+                        'border hover:border-orange-300 cursor-pointer transition-all shadow-sm hover:shadow',
                         selectedStatus === status
-                          ? 'border-blue-500 bg-blue-50'
+                          ? 'border-orange-500 bg-orange-50 shadow'
                           : 'border-gray-200',
                       )}
                       onClick={() => setSelectedStatus(status)}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className={cn('p-2 rounded-full', statusConfig.bgColor)}>
-                            {statusConfig.icon}
+                          <div className={cn('p-2 rounded-full', statusConfig?.bgColor)}>
+                            {statusConfig?.icon}
                           </div>
                           <div>
-                            <h4 className="font-medium text-gray-900">{statusConfig.label}</h4>
-                            <p className="text-sm text-gray-500">{statusConfig.description}</p>
+                            <h4 className="font-medium text-orange-700">{statusConfig?.label}</h4>
+                            <p className="text-sm text-gray-500">{statusConfig?.description}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -313,9 +375,12 @@ export function UpdateProductStatusDialog({
                   );
                 })
               ) : (
-                <div className="col-span-2 p-4 text-center border rounded-md border-gray-200 bg-gray-50">
-                  <p className="text-gray-500">
-                    Không có trạng thái nào được phép chuyển đổi từ {currentStatusConfig.label}
+                <div className="col-span-2 p-4 text-center border rounded-md border-orange-200 bg-orange-50/30">
+                  <p className="text-orange-600">
+                    Không có trạng thái nào được phép chuyển đổi từ{' '}
+                    <span className="font-semibold">
+                      {currentStatusConfig?.label || 'Không xác định'}
+                    </span>
                   </p>
                 </div>
               )}
@@ -327,7 +392,7 @@ export function UpdateProductStatusDialog({
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-slate-200 hover:bg-slate-50 flex-1 h-11"
+              className="border-orange-200 hover:bg-orange-50 flex-1 h-11 text-orange-600"
               disabled={isSubmitting}
             >
               Hủy bỏ
@@ -335,11 +400,11 @@ export function UpdateProductStatusDialog({
             <Button
               onClick={handleUpdateStatus}
               disabled={!isFormValid || isSubmitting}
-              className="bg-blue-600 hover:bg-blue-700 text-white flex-1 h-11"
+              className="bg-orange-500 hover:bg-orange-600 text-white flex-1 h-11 shadow-md hover:shadow-lg transition-all duration-300"
             >
               {isSubmitting ? (
                 <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                   Đang cập nhật...
                 </>
               ) : (
@@ -352,6 +417,66 @@ export function UpdateProductStatusDialog({
           </div>
         </div>
       </DialogContent>
+
+      <Dialog open={showWarning} onOpenChange={setShowWarning}>
+        <DialogContent className="max-w-md border-orange-100">
+          <DialogHeader>
+            <DialogTitle className="text-orange-600">Cảnh báo xác thực</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-orange-500 mt-0.5" />
+                <div className="space-y-2">
+                  <p className="text-gray-700">
+                    Chuyển sang trạng thái <strong>Bản nháp</strong> sẽ làm mất xác thực sản phẩm.
+                  </p>
+                  <p className="text-gray-700">Bạn sẽ cần gửi lại để xác thực sau khi chỉnh sửa.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative mt-4">
+              <Button
+                className="w-full h-12 bg-orange-500 hover:bg-orange-500 text-white relative overflow-hidden"
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onTouchStart={handleMouseDown}
+                onTouchEnd={handleMouseUp}
+                disabled={isSubmitting}
+              >
+                <span className="z-10 relative flex items-center justify-center">
+                  {isSubmitting ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      Đang cập nhật...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Giữ để xác nhận
+                    </>
+                  )}
+                </span>
+                <span
+                  className="absolute left-0 top-0 h-full bg-orange-600 transition-all"
+                  style={{ width: `${buttonHoldProgress}%` }}
+                />
+              </Button>
+            </div>
+
+            <Button
+              variant="outline"
+              onClick={() => setShowWarning(false)}
+              className="w-full border-orange-200 hover:bg-orange-50 text-orange-600 h-11"
+              disabled={isSubmitting}
+            >
+              Hủy bỏ
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

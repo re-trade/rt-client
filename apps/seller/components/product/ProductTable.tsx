@@ -1,4 +1,5 @@
 'use client';
+import { UpdateProductQuantityDialog } from '@/components/dialog-common/view-update/update-product-quantity-dialog';
 import { UpdateProductStatusDialog } from '@/components/dialog-common/view-update/update-product-status-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +15,7 @@ import {
   Eye,
   FileText,
   MoreHorizontal,
+  Package,
   RefreshCw,
   Star,
   Tags,
@@ -148,12 +150,19 @@ const ProductTable = ({
   handleSortChange,
 }: ProductTableProps) => {
   const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
+  const [isUpdateQuantityOpen, setIsUpdateQuantityOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
 
   const handleUpdateStatus = (product: TProduct) => {
     setSelectedProduct(product);
     setIsUpdateStatusOpen(true);
   };
+
+  const handleUpdateQuantity = (product: TProduct) => {
+    setSelectedProduct(product);
+    setIsUpdateQuantityOpen(true);
+  };
+
   if (loading) {
     return <ProductListSkeleton />;
   }
@@ -427,6 +436,15 @@ const ProductTable = ({
                             <RefreshCw className="mr-2 h-4 w-4" />
                             Cập nhật trạng thái
                           </DropdownMenuItem>
+                          {!product.retraded && (
+                            <DropdownMenuItem
+                              onClick={() => handleUpdateQuantity(product)}
+                              className="hover:bg-green-50 hover:text-green-700"
+                            >
+                              <Package className="mr-2 h-4 w-4" />
+                              Cập nhật số lượng
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => handleDeleteProduct(product)}
@@ -445,6 +463,18 @@ const ProductTable = ({
           </div>
         </CardContent>
       </Card>
+
+      <UpdateProductQuantityDialog
+        open={isUpdateQuantityOpen}
+        onOpenChange={setIsUpdateQuantityOpen}
+        product={selectedProduct}
+        onSuccess={() => {
+          if (handlePageChange) {
+            handlePageChange(currentPage);
+          }
+        }}
+      />
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

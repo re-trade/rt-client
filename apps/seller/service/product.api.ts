@@ -191,4 +191,15 @@ export const productApi = {
     }
     throw new Error('Failed to update product status');
   },
+  async updateProductQuantity(payload: { productId: string; quantity: number }) {
+    try {
+      const response = await authApi.default.patch<IResponseObject<void>>(
+        `/products/quantity`,
+        payload,
+      );
+      return response.data.success;
+    } catch {
+      return false;
+    }
+  },
 };
