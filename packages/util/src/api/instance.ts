@@ -8,6 +8,7 @@ const authApi: Record<string, AxiosInstance> & {
   storage: AxiosInstance;
   notification: AxiosInstance;
   province: AxiosInstance;
+  textModeration: AxiosInstance;
 } = {
   get default() {
     return createAuthApi();
@@ -27,6 +28,9 @@ const authApi: Record<string, AxiosInstance> & {
   get province() {
     return createUnAuthApi(EApiService.PROVINCE);
   },
+  get textModeration() {
+    return createUnAuthApi(EApiService.TEXT_MODERATION);
+  },
 };
 
 const unAuthApi: Record<string, AxiosInstance> & {
@@ -36,6 +40,7 @@ const unAuthApi: Record<string, AxiosInstance> & {
   storage: AxiosInstance;
   notification: AxiosInstance;
   province: AxiosInstance;
+  textModeration: AxiosInstance;
 } = {
   get default() {
     return createUnAuthApi();
@@ -54,6 +59,9 @@ const unAuthApi: Record<string, AxiosInstance> & {
   },
   get province() {
     return createUnAuthApi(EApiService.PROVINCE);
+  },
+  get textModeration() {
+    return createUnAuthApi(EApiService.TEXT_MODERATION);
   },
 };
 
