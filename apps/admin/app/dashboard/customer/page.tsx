@@ -26,23 +26,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useCustomerManager } from '@/hooks/use-customer-manager';
-import {
-  AlertCircle,
-  CheckCircle,
-  Eye,
-  Filter,
-  Package,
-  RefreshCw,
-  Search,
-  XCircle,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle, Eye, Filter, Package, RefreshCw, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 const CustomerStats = ({ customers }: { customers: any[] }) => {
   const totalCustomers = customers.length;
-  const verifiedCustomers = customers.filter((p) => p.verified).length;
-  const pendingCustomers = customers.filter((p) => !p.verified).length;
+  const verifiedCustomers = customers.filter((p) => p.enabled).length;
+  const pendingCustomers = customers.filter((p) => !p.enabled).length;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -119,7 +110,7 @@ const AdvancedFilters = ({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="relative">
+        {/* <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Tìm kiếm..."
@@ -127,7 +118,7 @@ const AdvancedFilters = ({
             onChange={(e) => onSearch(e.target.value)}
             className="pl-8"
           />
-        </div>
+        </div> */}
 
         <Select value={selectedStatus} onValueChange={setSelectedStatus}>
           <SelectTrigger>

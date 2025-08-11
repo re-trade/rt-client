@@ -1,7 +1,7 @@
 'use client';
 
 import { productApi, type TProduct, type TProductFilter } from '@/services/product.api';
-import { useRouter, useSearchParams } from 'next/navigation'; // Add useRouter
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -26,7 +26,7 @@ interface ApiResponse {
 
 const useProductManager = () => {
   const searchParams = useSearchParams();
-  const router = useRouter(); // Add router for URL manipulation
+  const router = useRouter();
   const [products, setProducts] = useState<TProduct[]>([]);
   const [page, setPage] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<number>(1);
@@ -103,14 +103,14 @@ const useProductManager = () => {
 
   const searchProducts = useCallback(
     (searchQuery: string) => {
-      setPage(1); // Reset to first page on new search
+      setPage(1);
       const params = new URLSearchParams(searchParams.toString());
       if (searchQuery) {
         params.set('keyword', searchQuery);
       } else {
-        params.delete('keyword'); // Remove keyword if empty
+        params.delete('keyword');
       }
-      router.push(`?${params.toString()}`); // Update URL
+      router.push(`?${params.toString()}`);
     },
     [router, searchParams],
   );
@@ -222,8 +222,8 @@ const useProductManager = () => {
     fetchProducts,
     fetchFilter,
     refetch,
-    searchProducts, // Expose searchProducts
-    goToPage, // Added missing goToPage export
+    searchProducts,
+    goToPage,
     verifyProduct,
     unverifyProduct,
     handleFilterChange,

@@ -396,23 +396,19 @@ const EvidenceDetailModal = ({
 
   const handlePostEvidence = async () => {
     try {
-      // Reset validation errors
       setValidationErrors({ urls: false, note: false });
 
       const errors = { urls: false, note: false };
 
-      // Validation: Check if at least one URL is provided
       const validUrls = newEvidence.evidenceUrls.filter((url) => url.trim());
       if (validUrls.length === 0) {
         errors.urls = true;
       }
 
-      // Validation: Check if note is provided
       if (!newEvidence.note.trim()) {
         errors.note = true;
       }
 
-      // If there are validation errors, set them and return
       if (errors.urls || errors.note) {
         setValidationErrors(errors);
         return;
@@ -614,7 +610,6 @@ const EvidenceDetailModal = ({
         </DialogContent>
       </Dialog>
 
-      {/* Add evidence modal */}
       <Dialog
         open={isAddEvidenceOpen}
         onOpenChange={(open) => {
@@ -645,7 +640,6 @@ const EvidenceDetailModal = ({
                       value={url}
                       onChange={(e) => {
                         handleUrlChange(index, e.target.value);
-                        // Clear validation error when user starts typing
                         if (validationErrors.urls && e.target.value.trim()) {
                           setValidationErrors((prev) => ({ ...prev, urls: false }));
                         }
@@ -685,7 +679,6 @@ const EvidenceDetailModal = ({
                   value={newEvidence.note}
                   onChange={(e) => {
                     handleNoteChange(e.target.value);
-                    // Clear validation error when user starts typing
                     if (validationErrors.note && e.target.value.trim()) {
                       setValidationErrors((prev) => ({ ...prev, note: false }));
                     }

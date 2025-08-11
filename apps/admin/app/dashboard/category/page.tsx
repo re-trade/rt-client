@@ -40,7 +40,6 @@ export default function CategoryPage() {
     handleToggleVisible,
   } = useCategoryManager();
 
-  // State cho dialog và form
   const [openDialog, setOpenDialog] = useState<null | 'create' | 'edit'>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState<{
@@ -51,12 +50,10 @@ export default function CategoryPage() {
   }>({ name: '', description: '', categoryParentId: null, visible: true });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load danh mục ban đầu
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Xử lý form input
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setForm((prev) => ({
@@ -72,7 +69,6 @@ export default function CategoryPage() {
     }));
   };
 
-  // Mở dialog thêm mới
   const openCreateDialog = (categoryParentId?: string | null) => {
     setForm({
       name: '',
@@ -84,7 +80,6 @@ export default function CategoryPage() {
     setOpenDialog('create');
   };
 
-  // Mở dialog sửa
   const openEditDialog = (cat: Category) => {
     setForm({
       name: cat.name,
@@ -96,14 +91,12 @@ export default function CategoryPage() {
     setOpenDialog('edit');
   };
 
-  // Đóng dialog
   const closeDialog = () => {
     setOpenDialog(null);
     setEditingCategory(null);
     setForm({ name: '', description: '', categoryParentId: null, visible: true });
   };
 
-  // Submit form thêm/sửa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -119,14 +112,12 @@ export default function CategoryPage() {
         await handleCreate(payload);
         toast.success('Thêm danh mục thành công!', { position: 'top-right' });
       } else if (openDialog === 'edit' && editingCategory) {
-        // Khi edit, chỉ gửi những field thay đổi
         const payload: any = {
           name: form.name,
           description: form.description ?? undefined,
           visible: form.visible,
         };
 
-        // Chỉ gửi categoryParentId nếu nó thực sự thay đổi
         if (form.categoryParentId !== editingCategory.parentId) {
           payload.categoryParentId = form.categoryParentId;
         }
@@ -137,11 +128,9 @@ export default function CategoryPage() {
     } catch (err: any) {
       console.error('Form submit error:', err);
       if (err?.response?.status === 401) {
-        // Redirect về login nếu token hết hạn
         window.location.href = '/login?error=unauthorized';
         return;
       } else if (err?.response?.status === 500) {
-        // Lỗi server
         toast.error('Lỗi server. Vui lòng thử lại sau!', { position: 'top-right' });
       } else {
         toast.error('Có lỗi xảy ra!', { position: 'top-right' });
@@ -423,7 +412,7 @@ export default function CategoryPage() {
                 >
                   <option value="">Không có danh mục cha</option>
                   {categories
-                    .filter((cat) => !cat.parentId) // Chỉ hiển thị categories level 0
+                    .filter((cat) => !cat.parentId)
                     .map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
