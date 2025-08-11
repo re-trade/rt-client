@@ -1,5 +1,6 @@
 'use client';
 
+import BuyAgainDialog from '@/components/common/BuyAgainDialog';
 import PaymentStatus from '@/components/payment/PaymentStatus';
 import { useOrderDetail } from '@/hooks/use-order-detail';
 import {
@@ -13,16 +14,15 @@ import {
   Package,
   Phone,
   Receipt,
+  ShoppingCart,
   Star,
   User,
   XCircle,
-  ShoppingCart
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import BuyAgainDialog from '@/components/common/BuyAgainDialog';
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -49,16 +49,19 @@ export default function OrderDetailPage() {
     });
   };
 
-
   const showButtonBuyAgain = () => {
     if (!currentOrder || !currentOrder.items || currentOrder.items.length === 0) {
       return false;
-    } else if (currentOrder.orderStatus === 'COMPLETED' || currentOrder.orderStatus === 'RETURNED' || currentOrder.orderStatus !== 'DELIVERED') {
+    } else if (
+      currentOrder.orderStatus === 'COMPLETED' ||
+      currentOrder.orderStatus === 'RETURNED' ||
+      currentOrder.orderStatus !== 'DELIVERED'
+    ) {
       return true;
     } else {
       return false;
     }
-  }
+  };
 
   const handleCopyOrderId = () => {
     navigator.clipboard.writeText(orderId);
@@ -368,8 +371,10 @@ export default function OrderDetailPage() {
               <div>
                 <h3 className="font-bold text-gray-800 text-lg mb-3">Địa chỉ giao hàng</h3>
                 <div className="text-gray-600 space-y-1">
-                  <p className="leading-relaxed">{currentOrder.destination.addressLine} {currentOrder.destination.ward}, {currentOrder.destination.district} {currentOrder.destination.state}</p>
-
+                  <p className="leading-relaxed">
+                    {currentOrder.destination.addressLine} {currentOrder.destination.ward},{' '}
+                    {currentOrder.destination.district} {currentOrder.destination.state}
+                  </p>
                 </div>
               </div>
             </div>
