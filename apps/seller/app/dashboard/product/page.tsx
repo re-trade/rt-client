@@ -51,6 +51,10 @@ export default function ProductManagement() {
     fetchProducts();
   };
 
+  const handleUpdateProductStatus = async () => {
+    fetchProducts();
+  };
+
   const handleEditProduct = (product: TProduct) => {
     setSelectedProduct(product);
     setIsEditOpen(true);

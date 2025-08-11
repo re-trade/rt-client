@@ -1,3 +1,5 @@
+'use client';
+import { UpdateProductStatusDialog } from '@/components/dialog-common/view-update/update-product-status-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +14,7 @@ import {
   Eye,
   FileText,
   MoreHorizontal,
+  RefreshCw,
   Star,
   Tags,
   Trash,
@@ -39,6 +42,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import Image from 'next/image';
+import { useState } from 'react';
 
 const getStatusBadge = (status: TProductStatus) => {
   switch (status) {
@@ -143,6 +147,13 @@ const ProductTable = ({
   sort = { field: '', direction: null },
   handleSortChange,
 }: ProductTableProps) => {
+  const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
+
+  const handleUpdateStatus = (product: TProduct) => {
+    setSelectedProduct(product);
+    setIsUpdateStatusOpen(true);
+  };
   if (loading) {
     return <ProductListSkeleton />;
   }
@@ -409,6 +420,13 @@ const ProductTable = ({
                             <Edit className="mr-2 h-4 w-4" />
                             Chỉnh sửa
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateStatus(product)}
+                            className="hover:bg-blue-50 hover:text-blue-700"
+                          >
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Cập nhật trạng thái
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => handleDeleteProduct(product)}
@@ -436,6 +454,17 @@ const ProductTable = ({
         onPageSizeChange={handlePageSizeChange}
         loading={loading || refreshing}
         pageSizeOptions={[10, 15, 20, 50]}
+      />
+
+      <UpdateProductStatusDialog
+        open={isUpdateStatusOpen}
+        onOpenChange={setIsUpdateStatusOpen}
+        product={selectedProduct}
+        onSuccess={() => {
+          if (handlePageChange) {
+            handlePageChange(currentPage);
+          }
+        }}
       />
     </div>
   );

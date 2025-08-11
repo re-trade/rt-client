@@ -252,7 +252,7 @@ export default function ReviewsPage() {
                   placeholder="Tìm kiếm theo tên khách hàng, sản phẩm, nội dung..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   className="pl-10 h-10"
                   disabled={isFiltering}
                 />
