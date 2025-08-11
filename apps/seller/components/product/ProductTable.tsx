@@ -351,7 +351,7 @@ const ProductTable = ({
                     className="hover:bg-slate-50/50 transition-colors border-slate-100"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <TableBody>
+                    <TableCell>
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-slate-100 shadow-sm">
                         <Image
                           src={product.thumbnail || '/placeholder.svg'}
@@ -360,7 +360,7 @@ const ProductTable = ({
                           className="object-cover transition-transform hover:scale-110"
                         />
                       </div>
-                    </TableBody>
+                    </TableCell>
                     <TableCell>
                       <div className="font-semibold text-slate-900 line-clamp-2 hover:text-blue-600 transition-colors">
                         {product.name}
