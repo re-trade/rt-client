@@ -570,7 +570,7 @@ const SellerDetailModal = ({
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Trạng thái cửa hàng</p>
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${
                       seller.verified
                         ? 'bg-green-100 text-green-800'
                         : 'bg-orange-100 text-orange-800'
@@ -582,7 +582,7 @@ const SellerDetailModal = ({
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Trạng thái CCCD</p>
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getIdentityStatusColor(
+                    className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${getIdentityStatusColor(
                       seller.identityVerifiedStatus,
                     )}`}
                   >
@@ -1032,7 +1032,7 @@ export default function SellerManagementPage() {
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(seller.verified)]}`}
+                        className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium whitespace-nowrap ${statusColors[String(seller.verified)]}`}
                       >
                         {statusLabels[String(seller.verified)]}
                       </span>

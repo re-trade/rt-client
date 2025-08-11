@@ -417,7 +417,6 @@ export default function CustomerManagementPage() {
 
   return (
     <div className="space-y-6">
-      {/* Success Display */}
       {deleteSuccess && (
         <Card className="p-4 border-green-200 bg-green-50">
           <div className="flex items-center gap-2 text-green-700">
@@ -531,7 +530,7 @@ export default function CustomerManagementPage() {
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(customer.enabled)]}`}
+                        className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium whitespace-nowrap ${statusColors[String(customer.enabled)]}`}
                       >
                         {statusLabels[String(customer.enabled)]}
                       </span>
