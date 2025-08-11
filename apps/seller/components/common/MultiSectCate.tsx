@@ -16,9 +16,15 @@ interface Props {
     id: string;
     name: string;
   }[];
+  disabled?: boolean;
 }
 
-export function FancyMultiSelect({ onChange, value: initialValue = [], currentCategoryId }: Props) {
+export function FancyMultiSelect({
+  onChange,
+  value: initialValue = [],
+  currentCategoryId,
+  disabled = false,
+}: Props) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<Framework[]>([]);
@@ -26,8 +32,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
   const [categories, setCategories] = React.useState<Framework[]>([]);
   const [loading, setLoading] = React.useState(false);
 
-  // Track if we've initialized to prevent multiple calls
-  const hasInitialized = useRef(false);
+  // Track the last notified values to prevent duplicate notifications
   const lastNotifiedValues = useRef<string[]>([]);
 
   // Fetch categories
@@ -41,6 +46,21 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
           label: category.name || category.label,
         }));
         setCategories(transformedCategories);
+
+        // Initialize selection after categories are loaded
+        if (currentCategoryId && currentCategoryId.length > 0) {
+          const initialSelectedItems = transformedCategories.filter((cat) =>
+            currentCategoryId.some((item) => item.id === cat.value),
+          );
+          setSelected(initialSelectedItems);
+          lastNotifiedValues.current = initialSelectedItems.map((item) => item.value);
+        } else if (initialValue && initialValue.length > 0) {
+          const initialSelectedItems = transformedCategories.filter((cat) =>
+            initialValue.includes(cat.value),
+          );
+          setSelected(initialSelectedItems);
+          lastNotifiedValues.current = initialSelectedItems.map((item) => item.value);
+        }
       } catch (error) {
         console.error('Failed to fetch categories:', error);
       } finally {
@@ -49,28 +69,11 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
     };
 
     fetchCategories();
-  }, []);
-
-  // Memoize the initial selected values to prevent unnecessary re-calculations
-  const initialSelectedValues = useMemo(() => {
-    if (currentCategoryId && currentCategoryId.length > 0) {
-      return currentCategoryId.map((item) => item.id);
-    }
-    return initialValue;
   }, [currentCategoryId, initialValue]);
 
-  // Initialize selected items only once when categories are loaded
-  useEffect(() => {
-    if (categories.length === 0 || hasInitialized.current) return;
+  // No longer needed as we handle this directly in the fetch categories effect
 
-    const initialSelected = categories.filter((cat) => initialSelectedValues.includes(cat.value));
-
-    setSelected(initialSelected);
-    hasInitialized.current = true;
-
-    // Set initial lastNotifiedValues to prevent immediate onChange call
-    lastNotifiedValues.current = initialSelected.map((item) => item.value);
-  }, [categories, initialSelectedValues]);
+  // This effect is no longer needed as we handle initialization in the fetchCategories function
 
   // Helper function to check if arrays are equal
   const arraysEqual = (a: string[], b: string[]) => {
@@ -93,6 +96,8 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
 
   const handleUnselect = useCallback(
     (framework: Framework) => {
+      if (disabled) return;
+
       setSelected((prev) => {
         const newSelected = prev.filter((s) => s.value !== framework.value);
         // Use setTimeout to avoid calling during render
@@ -100,7 +105,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
         return newSelected;
       });
     },
-    [notifyChange],
+    [notifyChange, disabled],
   );
 
   const handleKeyDown = useCallback(
@@ -184,7 +189,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
             onFocus={handleInputFocus}
             placeholder={loading ? 'Loading categories...' : 'Select categories...'}
             className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-            disabled={loading}
+            disabled={loading || disabled}
           />
         </div>
       </div>
@@ -202,8 +207,8 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
                           e.preventDefault();
                           e.stopPropagation();
                         }}
-                        onSelect={() => handleSelect(framework)}
-                        className={'cursor-pointer'}
+                        onSelect={() => !disabled && handleSelect(framework)}
+                        className={`${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
                       >
                         {framework.label}
                       </CommandItem>

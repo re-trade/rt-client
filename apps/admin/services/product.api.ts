@@ -21,6 +21,7 @@ export type TProduct = {
   tags: string[];
   keywords?: string[];
   verified: boolean;
+  retraded: boolean;
   createdAt: string;
   updatedAt: string;
 };

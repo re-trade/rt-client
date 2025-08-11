@@ -42,6 +42,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
     categoryIds: [] as string[],
     tags: [] as string[],
     status: 'DRAFT' as const,
+    categorySelected: true,
   });
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -60,7 +61,16 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
   }, [imagePreviews, thumbnailPreview]);
 
   const handleFormChange = (field: keyof typeof formData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === 'categoryIds') {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+        categorySelected: true, // Always keep brand field visible
+        brandId: '', // Reset brand when category changes
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleChooseFiles = () => {
@@ -235,16 +245,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
-                  Thương hiệu <span className="text-red-500">*</span>
-                </Label>
-                <SelectBrand
-                  value={formData.brandId}
-                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="currentPrice" className="text-sm font-medium text-gray-700">
                   Giá sản phẩm <span className="text-red-500">*</span>
                 </Label>
@@ -316,7 +316,27 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               Thông tin bổ sung
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Danh mục <span className="text-red-500">*</span>
+              </Label>
+              <FancyMultiSelect
+                value={formData.categoryIds}
+                onChange={(selected) => handleFormChange('categoryIds', selected)}
+              />
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
+                Thương hiệu <span className="text-red-500">*</span>
+              </Label>
+              <SelectBrand
+                value={formData.brandId}
+                onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="space-y-2">
                 <div className="flex items-center mb-2">
                   <input
@@ -370,16 +390,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   placeholder="Nhập tag và nhấn Enter"
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
-                Danh mục <span className="text-red-500">*</span>
-              </Label>
-              <FancyMultiSelect
-                value={formData.categoryIds}
-                onChange={(selected) => handleFormChange('categoryIds', selected)}
-              />
             </div>
           </div>
 

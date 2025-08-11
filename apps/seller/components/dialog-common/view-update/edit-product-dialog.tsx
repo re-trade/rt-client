@@ -11,7 +11,7 @@ import { productApi, TProduct, UpdateProductDto } from '@/service/product.api';
 import { storageApi } from '@/service/storage.api';
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
-import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
+import { Calendar, Image as ImageIcon, Lock, Package, Shield, Tag, Upload, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
@@ -59,6 +59,8 @@ export function EditProductDialog({
     categoryIds: [] as string[],
     tags: [] as string[],
     status: 'DRAFT',
+    categorySelected: false,
+    retraded: false,
   });
 
   const [initialFormData, setInitialFormData] = useState<typeof formData | null>(null);
@@ -73,6 +75,7 @@ export function EditProductDialog({
 
   useEffect(() => {
     if (product) {
+      const productCategories = product.categories || [];
       const updatedForm = {
         name: product.name || '',
         shortDescription: product.shortDescription || '',
@@ -86,9 +89,11 @@ export function EditProductDialog({
         hasWarranty: Boolean(product.warrantyExpiryDate),
         warrantyExpiryDate: formatDateFromArray(product.warrantyExpiryDate),
         condition: product.condition || 'NEW',
-        categoryIds: (product.categories || []).map((c) => c.id),
+        categoryIds: productCategories.map((c) => c.id),
         tags: product.tags || [],
         status: product.status || 'DRAFT',
+        categorySelected: true,
+        retraded: product.retraded || false,
       };
       setFormData(updatedForm as typeof formData);
       setInitialFormData(updatedForm);
@@ -113,7 +118,17 @@ export function EditProductDialog({
 
   const handleFormChange = (field: string, value: any) => {
     if (!isEdit) return;
-    setFormData((prev) => ({ ...prev, [field]: value }));
+
+    if (field === 'categoryIds') {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+        categorySelected: true,
+        brandId: prev.retraded ? prev.brandId : '',
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const handleChooseFiles = () => {
@@ -177,12 +192,10 @@ export function EditProductDialog({
   const isFormChanged = () => {
     if (!initialFormData) return false;
 
-    // Check if thumbnail or images have changed
     if (selectedThumbnail || selectedFiles.length > 0) return true;
 
-    // Check for differences in other fields
     for (const key in formData) {
-      if (key === 'productImages') continue; // Skip this as we handle images separately
+      if (key === 'productImages') continue;
       if (
         JSON.stringify(formData[key as keyof typeof formData]) !==
         JSON.stringify(initialFormData[key as keyof typeof initialFormData])
@@ -204,7 +217,6 @@ export function EditProductDialog({
       setIsSubmitting(true);
       toast.info('Đang cập nhật sản phẩm...');
 
-      // Upload images if needed
       let thumbnailUrl = formData.thumbnail;
       if (selectedThumbnail) {
         thumbnailUrl = await storageApi.fileUpload(selectedThumbnail);
@@ -212,7 +224,6 @@ export function EditProductDialog({
 
       let productImages = [...imagePreviews];
       if (selectedFiles.length > 0) {
-        // Filter out blob URLs and upload new files
         const existingImages = imagePreviews.filter((url) => !url.startsWith('blob:'));
         const result = await storageApi.fileBulkUpload(selectedFiles);
         const uploadedUrls = result.content || [];
@@ -234,6 +245,34 @@ export function EditProductDialog({
         condition: formData.condition,
         tags: formData.tags.filter(Boolean),
       };
+
+      if (product?.retraded) {
+        const validationErrors = [];
+
+        if (product.name !== formData.name) {
+          validationErrors.push('Không thể thay đổi tên sản phẩm bán lại');
+        }
+        if (product.brandId !== formData.brandId) {
+          validationErrors.push('Không thể thay đổi thương hiệu cho sản phẩm bán lại');
+        }
+        if (product.model !== formData.model) {
+          validationErrors.push('Không thể thay đổi model cho sản phẩm bán lại');
+        }
+        if (
+          JSON.stringify(product.categories.map((c) => c.id).sort()) !==
+          JSON.stringify(formData.categoryIds.sort())
+        ) {
+          validationErrors.push('Không thể thay đổi danh mục cho sản phẩm bán lại');
+        }
+        if (product.quantity !== formData.quantity) {
+          validationErrors.push('Không thể thay đổi số lượng cho sản phẩm bán lại');
+        }
+
+        if (validationErrors.length > 0) {
+          toast.error(validationErrors[0]);
+          return;
+        }
+      }
 
       if (product?.id) {
         const response = await productApi.updateProduct(product.id, productData);
@@ -261,7 +300,6 @@ export function EditProductDialog({
         </DialogHeader>
 
         <div className="space-y-8 pt-6">
-          {/* Basic Information Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
               <Package className="w-5 h-5 text-blue-600" />
@@ -273,25 +311,19 @@ export function EditProductDialog({
                 <Label htmlFor="name" className="text-sm font-medium text-gray-700">
                   Tên sản phẩm <span className="text-red-500">*</span>
                 </Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleFormChange('name', e.target.value)}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Nhập tên sản phẩm"
-                  disabled={!isEdit}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
-                  Thương hiệu <span className="text-red-500">*</span>
-                </Label>
-                <SelectBrand
-                  value={formData.brandId}
-                  currentBrandId={formData.brandId}
-                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand)}
-                />
+                <div className="relative">
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleFormChange('name', e.target.value)}
+                    className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Nhập tên sản phẩm"
+                    disabled={!isEdit || formData.retraded}
+                  />
+                  {formData.retraded && (
+                    <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-500" />
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -315,30 +347,40 @@ export function EditProductDialog({
                 <Label htmlFor="quantity" className="text-sm font-medium text-gray-700">
                   Số lượng
                 </Label>
-                <Input
-                  type="number"
-                  id="quantity"
-                  min="0"
-                  value={formData.quantity}
-                  onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="0"
-                  disabled={!isEdit}
-                />
+                <div className="relative">
+                  <Input
+                    type="number"
+                    id="quantity"
+                    min="0"
+                    value={formData.quantity}
+                    onChange={(e) => handleFormChange('quantity', Number(e.target.value))}
+                    className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="0"
+                    disabled={!isEdit || formData.retraded}
+                  />
+                  {formData.retraded && (
+                    <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-500" />
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="model" className="text-sm font-medium text-gray-700">
                   Model
                 </Label>
-                <Input
-                  id="model"
-                  value={formData.model}
-                  onChange={(e) => handleFormChange('model', e.target.value)}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  placeholder="Nhập model sản phẩm"
-                  disabled={!isEdit}
-                />
+                <div className="relative">
+                  <Input
+                    id="model"
+                    value={formData.model}
+                    onChange={(e) => handleFormChange('model', e.target.value)}
+                    className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Nhập model sản phẩm"
+                    disabled={!isEdit || formData.retraded}
+                  />
+                  {formData.retraded && (
+                    <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-500" />
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -363,14 +405,81 @@ export function EditProductDialog({
             </div>
           </div>
 
-          {/* Additional Information Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
               <Tag className="w-5 h-5 text-green-600" />
               Thông tin bổ sung
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {formData.retraded && (
+              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                <p className="text-sm font-medium text-amber-700 flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Đây là sản phẩm bán lại. Những trường sau không thể thay đổi: tên, thương hiệu,
+                  model, danh mục và số lượng.
+                </p>
+                <p className="text-xs text-amber-600 mt-1">
+                  Các trường này đã bị khóa để tránh vi phạm quy định hệ thống.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2 mt-4">
+              <Label className="text-sm font-medium text-gray-700">
+                Danh mục <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <FancyMultiSelect
+                  value={formData.categoryIds}
+                  currentCategoryId={product?.categories || []}
+                  onChange={(selected) => handleFormChange('categoryIds', selected)}
+                  disabled={formData.retraded}
+                />
+                {formData.retraded && (
+                  <Lock className="absolute right-3 top-3 h-4 w-4 text-amber-500" />
+                )}
+              </div>
+              {formData.retraded && (
+                <p className="text-sm text-amber-600 mt-1">
+                  Không thể thay đổi danh mục cho sản phẩm bán lại.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
+                Thương hiệu <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <SelectBrand
+                  value={formData.brandId}
+                  currentBrandId={formData.brandId}
+                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand || '')}
+                  disabled={formData.retraded}
+                />
+                {formData.retraded && (
+                  <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-500" />
+                )}
+              </div>
+              {formData.retraded && (
+                <p className="text-sm text-amber-600 mt-1">
+                  Không thể thay đổi thương hiệu cho sản phẩm bán lại.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="tags" className="text-sm font-medium text-gray-700">
+                Tags
+              </Label>
+              <TagInput
+                value={formData.tags}
+                onChange={(tags) => handleFormChange('tags', tags)}
+                placeholder="Nhập tag và nhấn Enter"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="space-y-2">
                 <div className="flex items-center mb-2">
                   <input
@@ -411,33 +520,6 @@ export function EditProductDialog({
                   </div>
                 )}
               </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="tags"
-                  className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"
-                >
-                  <Tag className="w-4 h-4" />
-                  Tags
-                </Label>
-                <TagInput
-                  value={formData.tags}
-                  onChange={(tags) => handleFormChange('tags', tags)}
-                  placeholder="Nhập tag và nhấn Enter"
-                  disabled={!isEdit}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
-                Danh mục <span className="text-red-500">*</span>
-              </Label>
-              <FancyMultiSelect
-                value={formData.categoryIds}
-                currentCategoryId={product?.categories}
-                onChange={(selected) => handleFormChange('categoryIds', selected)}
-              />
             </div>
           </div>
 
@@ -623,7 +705,6 @@ export function EditProductDialog({
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-4 pt-6 border-t bg-gray-50 -mx-6 -mb-6 px-6 py-4">
           {isEdit && (
             <Button

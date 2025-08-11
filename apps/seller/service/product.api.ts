@@ -26,6 +26,7 @@ export type TProduct = {
   condition: string;
   status: TProductStatus;
   avgVote: number;
+  retraded: boolean;
   createdAt: string;
   updatedAt: string;
 };
