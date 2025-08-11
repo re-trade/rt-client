@@ -15,6 +15,7 @@ export enum EApiService {
   STORAGE = 'storage',
   PROVINCE = 'province',
   NOTIFICATION = 'feedback-notification',
+  TEXT_MODERATION = 'text-moderation',
 }
 
 const DEV_PORT_MAP: Record<EApiService, number> = {
@@ -23,6 +24,7 @@ const DEV_PORT_MAP: Record<EApiService, number> = {
   [EApiService.IMAGE_SEARCH]: 9090,
   [EApiService.STORAGE]: 8083,
   [EApiService.PROVINCE]: 8000,
+  [EApiService.TEXT_MODERATION]: 8001,
   [EApiService.NOTIFICATION]: 8086,
 };
 

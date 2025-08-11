@@ -107,11 +107,11 @@ export default function ProductFilter({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700">Trạng thái</Label>
               <Select
-                value={filter.status}
+                value={filter.status === '' ? 'all' : filter.status}
                 onValueChange={(value) => handleFilterChange('status', value)}
               >
                 <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
-                  <SelectValue placeholder="Tất cả" />
+                  <SelectValue placeholder="Chọn trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
@@ -125,11 +125,11 @@ export default function ProductFilter({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700">Xác minh</Label>
               <Select
-                value={filter.verified}
+                value={filter.verified === '' ? 'all' : filter.verified}
                 onValueChange={(value) => handleFilterChange('verified', value)}
               >
                 <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
-                  <SelectValue placeholder="Tất cả" />
+                  <SelectValue placeholder="Chọn trạng thái xác minh" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
@@ -142,11 +142,11 @@ export default function ProductFilter({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700">Danh mục</Label>
               <Select
-                value={filter.category}
+                value={filter.category === '' ? 'all' : filter.category}
                 onValueChange={(value) => handleFilterChange('category', value)}
               >
                 <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
-                  <SelectValue placeholder="Tất cả" />
+                  <SelectValue placeholder="Chọn danh mục" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
@@ -166,11 +166,11 @@ export default function ProductFilter({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700">Thương hiệu</Label>
               <Select
-                value={filter.brand}
+                value={filter.brand === '' ? 'all' : filter.brand}
                 onValueChange={(value) => handleFilterChange('brand', value)}
               >
                 <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
-                  <SelectValue placeholder="Tất cả" />
+                  <SelectValue placeholder="Chọn thương hiệu" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
@@ -190,11 +190,11 @@ export default function ProductFilter({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700">Khoảng giá</Label>
               <Select
-                value={filter.priceRange}
+                value={filter.priceRange === '' ? 'all' : filter.priceRange}
                 onValueChange={(value) => handleFilterChange('priceRange', value)}
               >
                 <SelectTrigger className="border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 h-9">
-                  <SelectValue placeholder="Chọn khoảng giá" />
+                  <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function SellerAuthMiddleware() {
-  const { auth, roles, isLoading } = useAuth();
+  const { auth, isLoading, sellerStatus } = useAuth();
   const router = useRouter();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -15,15 +15,23 @@ export default function SellerAuthMiddleware() {
     if (auth === false) {
       router.push('/login');
     } else if (auth === true) {
-      const hasSellerRole = roles.includes('ROLE_SELLER');
-
-      if (hasSellerRole) {
-        router.push('/dashboard');
+      if (sellerStatus) {
+        if (sellerStatus.banned) {
+          router.push('/ban');
+        } else if (sellerStatus.registerFailed) {
+          router.push('/register');
+        } else if (sellerStatus.canLogin) {
+          router.push('/dashboard');
+        } else if (sellerStatus.registered) {
+          router.push('/pending');
+        } else {
+          router.push('/register');
+        }
       } else {
-        router.push('/register');
+        return;
       }
     }
-  }, [auth, roles, isLoading, router]);
+  }, [auth, isLoading, router, sellerStatus]);
 
   if (isLoading || isRedirecting) {
     return (

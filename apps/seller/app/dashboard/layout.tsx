@@ -15,7 +15,7 @@ import {
   Store,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -108,6 +108,18 @@ const menuItems = [
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { sellerStatus } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  if (
+    (sellerStatus?.banned || sellerStatus?.registerFailed) &&
+    pathname !== '/dashboard/seller-info'
+  ) {
+    router.push('/dashboard/seller-info');
+    return null;
+  }
+
   return (
     <SidebarProvider>
       <DashboardContent>{children}</DashboardContent>
@@ -118,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { state } = useSidebar();
-  const { handleLogout } = useAuth();
+  const { handleLogout, sellerStatus } = useAuth();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
   const toggleGroup = (index: number) => {
@@ -129,7 +141,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Automatically open the dropdown for the active route
     const activeGroup = menuItems.findIndex((group) =>
       group.items.some((item) => item.href === pathname),
     );
@@ -151,46 +162,65 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 Dashboard Người Bán
               </h2>
               <div className="space-y-4 mt-6">
-                {menuItems.map((group, groupIndex) => (
-                  <div key={groupIndex} className="space-y-1">
-                    <button
-                      onClick={() => toggleGroup(groupIndex)}
-                      className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-orange-50 rounded-lg"
-                    >
-                      <span>{group.group}</span>
-                      <ChevronDown
-                        className={cn(
-                          'h-4 w-4 transition-transform duration-200',
-                          openGroups[groupIndex] ? 'transform rotate-180' : '',
-                        )}
-                      />
-                    </button>
-                    <div
-                      className={cn(
-                        'space-y-1 overflow-hidden transition-all duration-200',
-                        openGroups[groupIndex] ? 'max-h-96' : 'max-h-0',
-                      )}
-                    >
-                      {group.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
+                {menuItems.map((group, groupIndex) => {
+                  if (
+                    (sellerStatus?.banned || sellerStatus?.registerFailed) &&
+                    group.group !== 'Thông tin người bán'
+                  ) {
+                    return null;
+                  }
+
+                  const filteredItems =
+                    (sellerStatus?.banned || sellerStatus?.registerFailed) &&
+                    group.group === 'Thông tin người bán'
+                      ? group.items.filter((item) => item.href === '/dashboard/seller-info')
+                      : group.items;
+
+                  if (filteredItems.length === 0) {
+                    return null;
+                  }
+
+                  return (
+                    <div key={groupIndex} className="space-y-1">
+                      <button
+                        onClick={() => toggleGroup(groupIndex)}
+                        className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-orange-50 rounded-lg"
+                      >
+                        <span>{group.group}</span>
+                        <ChevronDown
                           className={cn(
-                            'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                            pathname === item.href
-                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600',
+                            'h-4 w-4 transition-transform duration-200',
+                            openGroups[groupIndex] ? 'transform rotate-180' : '',
                           )}
-                        >
-                          <item.icon
-                            className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
-                          />
-                          <span className="font-medium">{item.title}</span>
-                        </Link>
-                      ))}
+                        />
+                      </button>
+                      <div
+                        className={cn(
+                          'space-y-1 overflow-hidden transition-all duration-200',
+                          openGroups[groupIndex] ? 'max-h-96' : 'max-h-0',
+                        )}
+                      >
+                        {filteredItems.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                              'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                              pathname === item.href
+                                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600',
+                            )}
+                          >
+                            <item.icon
+                              className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
+                            />
+                            <span className="font-medium">{item.title}</span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50 hover:shadow-sm w-full text-left mt-6 border border-red-100"
@@ -220,7 +250,16 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-200 shadow-lg">
           <nav className="flex justify-around items-center h-16 px-2">
             {menuItems
-              .flatMap((group) => group.items)
+              .flatMap((group) => {
+                // Filter out non-seller-info items if banned or registration failed
+                if (sellerStatus?.banned || sellerStatus?.registerFailed) {
+                  if (group.group === 'Thông tin người bán') {
+                    return group.items.filter((item) => item.href === '/dashboard/seller-info');
+                  }
+                  return [];
+                }
+                return group.items;
+              })
               .slice(0, 5)
               .map((item) => (
                 <Link
@@ -299,52 +338,71 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="space-y-4">
-            {menuItems.map((group, groupIndex) => (
-              <div key={groupIndex} className="space-y-1">
-                <button
-                  onClick={() => toggleGroup(groupIndex)}
-                  className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-orange-50 rounded-lg"
-                >
-                  <span>{group.group}</span>
-                  <ChevronDown
-                    className={cn(
-                      'h-4 w-4 transition-transform duration-200',
-                      openGroups[groupIndex] ? 'transform rotate-180' : '',
-                    )}
-                  />
-                </button>
-                <div
-                  className={cn(
-                    'space-y-1 overflow-hidden transition-all duration-200',
-                    openGroups[groupIndex] ? 'max-h-96' : 'max-h-0',
-                  )}
-                >
-                  {group.items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
+            {menuItems.map((group, groupIndex) => {
+              if (
+                (sellerStatus?.banned || sellerStatus?.registerFailed) &&
+                group.group !== 'Thông tin người bán'
+              ) {
+                return null;
+              }
+
+              const filteredItems =
+                (sellerStatus?.banned || sellerStatus?.registerFailed) &&
+                group.group === 'Thông tin người bán'
+                  ? group.items.filter((item) => item.href === '/dashboard/seller-info')
+                  : group.items;
+
+              if (filteredItems.length === 0) {
+                return null;
+              }
+
+              return (
+                <div key={groupIndex} className="space-y-1">
+                  <button
+                    onClick={() => toggleGroup(groupIndex)}
+                    className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:bg-orange-50 rounded-lg"
+                  >
+                    <span>{group.group}</span>
+                    <ChevronDown
                       className={cn(
-                        'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
-                        pathname === item.href
-                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                          : 'text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600',
+                        'h-4 w-4 transition-transform duration-200',
+                        openGroups[groupIndex] ? 'transform rotate-180' : '',
                       )}
-                      onClick={() => {
-                        document.body.classList.remove('overflow-hidden');
-                        document
-                          .getElementById('mobile-menu-drawer')
-                          ?.classList.add('translate-x-full');
-                      }}
-                    >
-                      <item.icon
-                        className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
-                      />
-                      <span>{item.title}</span>
-                    </Link>
-                  ))}
+                    />
+                  </button>
+                  <div
+                    className={cn(
+                      'space-y-1 overflow-hidden transition-all duration-200',
+                      openGroups[groupIndex] ? 'max-h-96' : 'max-h-0',
+                    )}
+                  >
+                    {filteredItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                          'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                          pathname === item.href
+                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                            : 'text-gray-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600',
+                        )}
+                        onClick={() => {
+                          document.body.classList.remove('overflow-hidden');
+                          document
+                            .getElementById('mobile-menu-drawer')
+                            ?.classList.add('translate-x-full');
+                        }}
+                      >
+                        <item.icon
+                          className={cn('h-5 w-5', pathname === item.href ? 'text-white' : '')}
+                        />
+                        <span>{item.title}</span>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <button
               onClick={() => {

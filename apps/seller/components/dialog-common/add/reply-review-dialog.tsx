@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ReviewResponse } from '@/service/review.api';
+import { textModApi } from '@/service/textmod.api';
 import { CheckCircle, MessageSquare, Sparkles, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -19,6 +20,8 @@ interface ReplyDialogProps {
 
 export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: ReplyDialogProps) {
   const [replyContent, setReplyContent] = useState('');
+  const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
   useEffect(() => {
     if (review?.reply) {
@@ -26,6 +29,26 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
     } else {
       setReplyContent('');
     }
+
+    const fetchSuggestions = async () => {
+      if (review) {
+        setIsLoadingSuggestions(true);
+        try {
+          const response = await textModApi.suggestReply({
+            review: review.content,
+            rating: review.vote,
+          });
+          setSuggestedReplies(response.data.suggestions);
+        } catch (error) {
+          console.error('Error fetching reply suggestions:', error);
+          setSuggestedReplies(getDefaultSuggestedReplies(review.vote));
+        } finally {
+          setIsLoadingSuggestions(false);
+        }
+      }
+    };
+
+    fetchSuggestions();
   }, [review]);
 
   if (!review) return null;
@@ -52,7 +75,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
     }
   };
 
-  const getSuggestedReplies = (rating: number) => {
+  const getDefaultSuggestedReplies = (rating: number) => {
     if (rating >= 4) {
       return [
         'Cảm ơn bạn đã đánh giá tích cực! Shop rất vui khi bạn hài lòng với sản phẩm.',
@@ -73,8 +96,6 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
       ];
     }
   };
-
-  const suggestedReplies = getSuggestedReplies(review.vote);
 
   const getRatingColor = (rating: number) => {
     if (rating >= 4) return 'text-green-600';
@@ -180,22 +201,33 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
               </Label>
             </div>
             <div className="grid gap-3">
-              {suggestedReplies.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => setReplyContent(suggestion)}
-                  className="group w-full text-left p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl border border-blue-200 transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
-                      <span className="text-white text-xs font-bold">{index + 1}</span>
+              {isLoadingSuggestions ? (
+                <div className="text-center py-4">
+                  <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-blue-500 border-r-transparent"></div>
+                  <p className="mt-2 text-sm text-gray-600">Đang tạo gợi ý phản hồi...</p>
+                </div>
+              ) : suggestedReplies.length > 0 ? (
+                suggestedReplies.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setReplyContent(suggestion)}
+                    className="group w-full text-left p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl border border-blue-200 transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
+                        <span className="text-white text-xs font-bold">{index + 1}</span>
+                      </div>
+                      <p className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+                        {suggestion}
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
-                      {suggestion}
-                    </p>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))
+              ) : (
+                <p className="text-center py-4 text-sm text-gray-600">
+                  Không có gợi ý phản hồi nào. Vui lòng thử lại sau.
+                </p>
+              )}
             </div>
           </div>
 
