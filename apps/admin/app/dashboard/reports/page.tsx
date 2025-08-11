@@ -17,9 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useReportSeller } from '@/hooks/use-report-seller-manager';
 import { AlertCircle, Eye, RefreshCw, XCircle } from 'lucide-react';
 import { useState } from 'react';
-import { useReportSeller } from '@/hooks/use-report-seller-manager';
 
 function ReportDetailModal({
   report,
