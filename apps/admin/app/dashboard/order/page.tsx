@@ -1,71 +1,109 @@
-"use client"
+'use client';
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useDashboardStats } from "@/hooks/use-dashboard-stats"
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { useOrderManager } from "@/hooks/use-order-manager"
-import type { TOrder } from "@/services/order.api"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useOrderManager } from '@/hooks/use-order-manager';
+import type { TOrder } from '@/services/order.api';
 import {
   AlertCircle,
   Ban,
+  Calendar,
   CheckCircle,
   ChevronDown,
   ChevronRight,
   Clock,
   DollarSign,
+  Eye,
   Filter,
   Hash,
   Package,
+  Phone,
   RefreshCw,
-  Search,
   ShoppingCart,
   Truck,
   User,
   XCircle,
-  Eye,
-  Calendar,
-  Phone,
-} from "lucide-react"
-import { useState } from "react"
+} from 'lucide-react';
+import { useState } from 'react';
 
 const OrderStats = ({ orders }: { orders: TOrder[] }) => {
-  const { stats, loading, error } = useDashboardStats()
+  const { stats, loading, error } = useDashboardStats();
 
-  const completedOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "COMPLETED")).length
-  const pendingOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "PENDING")).length
+  const completedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'COMPLETED'),
+  ).length;
+  const pendingOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'PENDING'),
+  ).length;
   const paymentConfirmationOrders = orders.filter((o) =>
-    o.orderCombos.some((combo) => combo.status === "PAYMENT_CONFIRMATION"),
-  ).length
+    o.orderCombos.some((combo) => combo.status === 'PAYMENT_CONFIRMATION'),
+  ).length;
   const paymentFailedOrders = orders.filter((o) =>
-    o.orderCombos.some((combo) => combo.status === "PAYMENT_FAILED"),
-  ).length
+    o.orderCombos.some((combo) => combo.status === 'PAYMENT_FAILED'),
+  ).length;
   const paymentCancelledOrders = orders.filter((o) =>
-    o.orderCombos.some((combo) => combo.status === "PAYMENT_CANCELLED"),
-  ).length
-  const unpaidOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "UNPAID")).length
-  const preparingOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "PREPARING")).length
-  const deliveringOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "DELIVERING")).length
-  const deliveredOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "DELIVERED")).length
-  const cancelledOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "CANCELLED")).length
+    o.orderCombos.some((combo) => combo.status === 'PAYMENT_CANCELLED'),
+  ).length;
+  const unpaidOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'UNPAID'),
+  ).length;
+  const preparingOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'PREPARING'),
+  ).length;
+  const deliveringOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'DELIVERING'),
+  ).length;
+  const deliveredOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'DELIVERED'),
+  ).length;
+  const cancelledOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'CANCELLED'),
+  ).length;
   const returnRequestedOrders = orders.filter((o) =>
-    o.orderCombos.some((combo) => combo.status === "RETURN_REQUESTED"),
-  ).length
+    o.orderCombos.some((combo) => combo.status === 'RETURN_REQUESTED'),
+  ).length;
   const returnApprovedOrders = orders.filter((o) =>
-    o.orderCombos.some((combo) => combo.status === "RETURN_APPROVED"),
-  ).length
+    o.orderCombos.some((combo) => combo.status === 'RETURN_APPROVED'),
+  ).length;
   const returnRejectedOrders = orders.filter((o) =>
-    o.orderCombos.some((combo) => combo.status === "RETURN_REJECTED"),
-  ).length
-  const returningOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "RETURNING")).length
-  const returnedOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "RETURNED")).length
-  const refundedOrders = orders.filter((o) => o.orderCombos.some((combo) => combo.status === "REFUNDED")).length
+    o.orderCombos.some((combo) => combo.status === 'RETURN_REJECTED'),
+  ).length;
+  const returningOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETURNING'),
+  ).length;
+  const returnedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETURNED'),
+  ).length;
+  const refundedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'REFUNDED'),
+  ).length;
 
   if (loading) {
     return (
@@ -79,7 +117,7 @@ const OrderStats = ({ orders }: { orders: TOrder[] }) => {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (error) {
@@ -97,7 +135,7 @@ const OrderStats = ({ orders }: { orders: TOrder[] }) => {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (!stats) {
@@ -110,7 +148,7 @@ const OrderStats = ({ orders }: { orders: TOrder[] }) => {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -120,7 +158,9 @@ const OrderStats = ({ orders }: { orders: TOrder[] }) => {
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm font-medium text-blue-700">Tổng số đơn hàng</p>
-              <p className="text-3xl font-bold text-blue-900">{stats.totalOrders.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-blue-900">
+                {stats.totalOrders.toLocaleString()}
+              </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-xl">
               <Package className="h-6 w-6 text-blue-600" />
@@ -129,8 +169,8 @@ const OrderStats = ({ orders }: { orders: TOrder[] }) => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
 const AdvancedFilters = ({
   searchQuery,
@@ -144,24 +184,24 @@ const AdvancedFilters = ({
   updatedAfter,
   setUpdatedAfter,
 }: {
-  searchQuery: string
-  onSearch: (query: string) => void
-  selectedCategory: string
-  setSelectedCategory: (category: string) => void
-  sortField: string
-  setSortField: (field: string) => void
-  sortOrder: "asc" | "desc"
-  setSortOrder: (order: "asc" | "desc") => void
-  updatedAfter: string
-  setUpdatedAfter: (date: string) => void
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+  sortField: string;
+  setSortField: (field: string) => void;
+  sortOrder: 'asc' | 'desc';
+  setSortOrder: (order: 'asc' | 'desc') => void;
+  updatedAfter: string;
+  setUpdatedAfter: (date: string) => void;
 }) => {
   const handleClearFilters = () => {
-    onSearch("")
-    setSelectedCategory("all")
-    setSortField("orderId")
-    setSortOrder("asc")
-    setUpdatedAfter("")
-  }
+    onSearch('');
+    setSelectedCategory('all');
+    setSortField('orderId');
+    setSortOrder('asc');
+    setUpdatedAfter('');
+  };
 
   return (
     <Card className="border-0 shadow-sm bg-white">
@@ -233,8 +273,8 @@ const AdvancedFilters = ({
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 const OrderDetailModal = ({
   order,
@@ -242,12 +282,12 @@ const OrderDetailModal = ({
   onClose,
   onVerify,
 }: {
-  order: TOrder | null
-  isOpen: boolean
-  onClose: () => void
-  onVerify?: (id: string) => void
+  order: TOrder | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onVerify?: (id: string) => void;
 }) => {
-  if (!order) return null
+  if (!order) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -303,7 +343,7 @@ const OrderDetailModal = ({
                     <div>
                       <p className="text-sm font-medium text-slate-500">Ngày tạo</p>
                       <p className="font-medium text-slate-900">
-                        {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                        {new Date(order.createdAt).toLocaleDateString('vi-VN')}
                       </p>
                     </div>
                   </div>
@@ -313,7 +353,7 @@ const OrderDetailModal = ({
                     <div>
                       <p className="text-sm font-medium text-slate-500">Cập nhật lần cuối</p>
                       <p className="font-medium text-slate-900">
-                        {new Date(order.updatedAt).toLocaleDateString("vi-VN")}
+                        {new Date(order.updatedAt).toLocaleDateString('vi-VN')}
                       </p>
                     </div>
                   </div>
@@ -323,7 +363,7 @@ const OrderDetailModal = ({
           </Card>
         </div>
 
-        {order.status === "PENDING" && (
+        {order.status === 'PENDING' && (
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={onClose}>
               Đóng
@@ -340,25 +380,25 @@ const OrderDetailModal = ({
         )}
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 export default function OrderManagementPage() {
-  const { stats, loading: statsLoading, error: statsError } = useDashboardStats()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [sortField, setSortField] = useState<string>("orderId")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [updatedAfter, setUpdatedAfter] = useState<string>("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
-  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null)
-  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set())
+  const { stats, loading: statsLoading, error: statsError } = useDashboardStats();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [sortField, setSortField] = useState<string>('orderId');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [updatedAfter, setUpdatedAfter] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   const [expandedSections, setExpandedSections] = useState<{
-    [orderId: string]: { combos: boolean; items: boolean }
-  }>({})
+    [orderId: string]: { combos: boolean; items: boolean };
+  }>({});
 
   const {
     orders = [],
@@ -371,180 +411,182 @@ export default function OrderManagementPage() {
     goToPage,
     searchOrders,
     cancelOrder,
-  } = useOrderManager()
+  } = useOrderManager();
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setCurrentPage(1)
-    searchOrders(query)
-    goToPage(1, query)
-  }
+    setSearchQuery(query);
+    setCurrentPage(1);
+    searchOrders(query);
+    goToPage(1, query);
+  };
 
   const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category)
-    setCurrentPage(1)
-    goToPage(1, searchQuery)
-  }
+    setSelectedCategory(category);
+    setCurrentPage(1);
+    goToPage(1, searchQuery);
+  };
 
   const handleSortFieldChange = (field: string) => {
-    setSortField(field)
-    setCurrentPage(1)
-    goToPage(1, searchQuery)
-  }
+    setSortField(field);
+    setCurrentPage(1);
+    goToPage(1, searchQuery);
+  };
 
-  const handleSortOrderChange = (order: "asc" | "desc") => {
-    setSortOrder(order)
-    setCurrentPage(1)
-    goToPage(1, searchQuery)
-  }
+  const handleSortOrderChange = (order: 'asc' | 'desc') => {
+    setSortOrder(order);
+    setCurrentPage(1);
+    goToPage(1, searchQuery);
+  };
 
   const handleUpdatedAfterChange = (date: string) => {
-    setUpdatedAfter(date)
-    setCurrentPage(1)
-    goToPage(1, searchQuery)
-  }
+    setUpdatedAfter(date);
+    setCurrentPage(1);
+    goToPage(1, searchQuery);
+  };
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage)
-    goToPage(newPage, searchQuery)
-  }
+    setCurrentPage(newPage);
+    goToPage(newPage, searchQuery);
+  };
 
   const handleCancel = async (orderId: string) => {
-    const result = await cancelOrder(orderId)
+    const result = await cancelOrder(orderId);
     if (result.success) {
-      setDeleteSuccess("Hủy đơn hàng thành công!")
+      setDeleteSuccess('Hủy đơn hàng thành công!');
     } else {
-      setDeleteError(result.message || "Lỗi hủy đơn hàng")
+      setDeleteError(result.message || 'Lỗi hủy đơn hàng');
     }
-  }
+  };
 
   const handleView = (order: TOrder) => {
-    setSelectedOrder(order)
-    setIsDetailModalOpen(true)
-  }
+    setSelectedOrder(order);
+    setIsDetailModalOpen(true);
+  };
 
   const toggleExpandOrder = (orderId: string) => {
     setExpandedOrders((prev) => {
-      const newSet = new Set(prev)
+      const newSet = new Set(prev);
       if (newSet.has(orderId)) {
-        newSet.delete(orderId)
+        newSet.delete(orderId);
         setExpandedSections((prevSections) => {
-          const newSections = { ...prevSections }
-          delete newSections[orderId]
-          return newSections
-        })
+          const newSections = { ...prevSections };
+          delete newSections[orderId];
+          return newSections;
+        });
       } else {
-        newSet.add(orderId)
+        newSet.add(orderId);
         setExpandedSections((prevSections) => ({
           ...prevSections,
           [orderId]: { combos: false, items: false },
-        }))
+        }));
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
-  const toggleSection = (orderId: string, section: "combos" | "items") => {
+  const toggleSection = (orderId: string, section: 'combos' | 'items') => {
     setExpandedSections((prev) => ({
       ...prev,
       [orderId]: {
         ...prev[orderId],
         [section]: !prev[orderId]?.[section],
       },
-    }))
-  }
+    }));
+  };
 
   const sortedOrders = [...orders].sort((a: TOrder, b: TOrder) => {
-    let valueA: any
-    let valueB: any
+    let valueA: any;
+    let valueB: any;
     switch (sortField) {
-      case "orderId":
-        valueA = a.orderId.toLowerCase()
-        valueB = b.orderId.toLowerCase()
-        break
-      case "customerId":
-        valueA = a.customerId.toLowerCase()
-        valueB = b.customerId.toLowerCase()
-        break
-      case "customerName":
-        valueA = a.customerName.toLowerCase()
-        valueB = b.customerName.toLowerCase()
-        break
-      case "phone":
-        valueA = a.destination.phone.toLowerCase()
-        valueB = b.destination.phone.toLowerCase()
-        break
-      case "grandTotal":
-        valueA = a.grandTotal
-        valueB = b.grandTotal
-        break
-      case "status":
-        valueA = a.orderCombos[0]?.status?.toLowerCase() || ""
-        valueB = b.orderCombos[0]?.status?.toLowerCase() || ""
-        break
-      case "createdAt":
-        valueA = new Date(a.createdAt).getTime()
-        valueB = new Date(b.createdAt).getTime()
-        break
-      case "updatedAt":
-        valueA = new Date(a.updatedAt).getTime()
-        valueB = new Date(b.updatedAt).getTime()
-        break
+      case 'orderId':
+        valueA = a.orderId.toLowerCase();
+        valueB = b.orderId.toLowerCase();
+        break;
+      case 'customerId':
+        valueA = a.customerId.toLowerCase();
+        valueB = b.customerId.toLowerCase();
+        break;
+      case 'customerName':
+        valueA = a.customerName.toLowerCase();
+        valueB = b.customerName.toLowerCase();
+        break;
+      case 'phone':
+        valueA = a.destination.phone.toLowerCase();
+        valueB = b.destination.phone.toLowerCase();
+        break;
+      case 'grandTotal':
+        valueA = a.grandTotal;
+        valueB = b.grandTotal;
+        break;
+      case 'status':
+        valueA = a.orderCombos[0]?.status?.toLowerCase() || '';
+        valueB = b.orderCombos[0]?.status?.toLowerCase() || '';
+        break;
+      case 'createdAt':
+        valueA = new Date(a.createdAt).getTime();
+        valueB = new Date(b.createdAt).getTime();
+        break;
+      case 'updatedAt':
+        valueA = new Date(a.updatedAt).getTime();
+        valueB = new Date(b.updatedAt).getTime();
+        break;
       default:
-        return 0
+        return 0;
     }
-    if (valueA === valueB) return 0
-    if (!valueA) return 1
-    if (!valueB) return -1
-    return sortOrder === "asc" ? (valueA < valueB ? -1 : 1) : valueA > valueB ? -1 : 1
-  })
+    if (valueA === valueB) return 0;
+    if (!valueA) return 1;
+    if (!valueB) return -1;
+    return sortOrder === 'asc' ? (valueA < valueB ? -1 : 1) : valueA > valueB ? -1 : 1;
+  });
 
   const filteredOrders = sortedOrders.filter((order: TOrder) => {
     const matchesCategory =
-      selectedCategory === "all" ||
-      order.orderCombos.some((combo) => combo.status.toLowerCase().includes(selectedCategory.toLowerCase()))
-    const orderLastUpdate = new Date(order.updatedAt)
-    const matchesLastUpdate = !updatedAfter || orderLastUpdate >= new Date(updatedAfter)
-    return matchesCategory && matchesLastUpdate
-  })
+      selectedCategory === 'all' ||
+      order.orderCombos.some((combo) =>
+        combo.status.toLowerCase().includes(selectedCategory.toLowerCase()),
+      );
+    const orderLastUpdate = new Date(order.updatedAt);
+    const matchesLastUpdate = !updatedAfter || orderLastUpdate >= new Date(updatedAfter);
+    return matchesCategory && matchesLastUpdate;
+  });
 
   const getStatusColor = (status?: string): string => {
-    switch (status ?? "PENDING") {
-      case "PENDING":
-        return "bg-amber-100 text-amber-800 border-amber-200"
-      case "PAYMENT_CONFIRMATION":
-      case "PREPARING":
-      case "DELIVERING":
-        return "bg-blue-100 text-blue-800 border-blue-200"
-      case "COMPLETED":
-      case "RETURNED":
-      case "REFUNDED":
-        return "bg-emerald-100 text-emerald-800 border-emerald-200"
-      case "PAYMENT_FAILED":
-      case "CANCELLED":
-      case "RETURN_REJECTED":
-        return "bg-red-100 text-red-800 border-red-200"
-      case "DELIVERED":
-        return "bg-purple-100 text-purple-800 border-purple-200"
+    switch (status ?? 'PENDING') {
+      case 'PENDING':
+        return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'PAYMENT_CONFIRMATION':
+      case 'PREPARING':
+      case 'DELIVERING':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'COMPLETED':
+      case 'RETURNED':
+      case 'REFUNDED':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'PAYMENT_FAILED':
+      case 'CANCELLED':
+      case 'RETURN_REJECTED':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'DELIVERED':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
       default:
-        return "bg-slate-100 text-slate-800 border-slate-200"
+        return 'bg-slate-100 text-slate-800 border-slate-200';
     }
-  }
+  };
 
   const getStatusIcon = (status?: string) => {
-    switch (status ?? "PENDING") {
-      case "PENDING":
-        return <Clock className="h-3 w-3" />
-      case "COMPLETED":
-        return <CheckCircle className="h-3 w-3" />
-      case "CANCELLED":
-        return <Ban className="h-3 w-3" />
-      case "DELIVERING":
-        return <Truck className="h-3 w-3" />
+    switch (status ?? 'PENDING') {
+      case 'PENDING':
+        return <Clock className="h-3 w-3" />;
+      case 'COMPLETED':
+        return <CheckCircle className="h-3 w-3" />;
+      case 'CANCELLED':
+        return <Ban className="h-3 w-3" />;
+      case 'DELIVERING':
+        return <Truck className="h-3 w-3" />;
       default:
-        return <Package className="h-3 w-3" />
+        return <Package className="h-3 w-3" />;
     }
-  }
+  };
 
   return (
     <div className="space-y-8 p-6 bg-slate-50 min-h-screen">
@@ -582,13 +624,15 @@ export default function OrderManagementPage() {
               <div className="flex-1">
                 <p className="font-semibold">Có lỗi xảy ra</p>
                 <p className="text-sm text-red-600 mb-2">{error || deleteError}</p>
-                {(error || deleteError)?.includes("đăng nhập") && (
+                {(error || deleteError)?.includes('đăng nhập') && (
                   <div className="text-sm space-y-1">
                     <p className="text-red-600">
-                      Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao tác này.
+                      Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện
+                      thao tác này.
                     </p>
                     <p className="text-xs text-red-500 bg-red-50 p-2 rounded">
-                      <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3 giây.
+                      <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3
+                      giây.
                     </p>
                   </div>
                 )}
@@ -644,7 +688,9 @@ export default function OrderManagementPage() {
                 <Package className="h-12 w-12" />
               </div>
               <h3 className="font-semibold text-lg mb-2">Không tìm thấy đơn hàng</h3>
-              <p className="text-sm text-center max-w-md">Thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác</p>
+              <p className="text-sm text-center max-w-md">
+                Thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác
+              </p>
             </div>
           ) : (
             <div className="rounded-lg border border-slate-200 overflow-hidden">
@@ -680,9 +726,15 @@ export default function OrderManagementPage() {
                             )}
                           </Button>
                         </TableCell>
-                        <TableCell className="font-mono text-sm max-w-[150px] truncate">{order.orderId}</TableCell>
-                        <TableCell className="font-medium text-slate-900">{order.customerId}</TableCell>
-                        <TableCell className="font-medium text-slate-900">{order.customerName}</TableCell>
+                        <TableCell className="font-mono text-sm max-w-[150px] truncate">
+                          {order.orderId}
+                        </TableCell>
+                        <TableCell className="font-medium text-slate-900">
+                          {order.customerId}
+                        </TableCell>
+                        <TableCell className="font-medium text-slate-900">
+                          {order.customerName}
+                        </TableCell>
                         <TableCell className="font-medium text-slate-700 max-w-[150px] truncate">
                           {order.destination.phone}
                         </TableCell>
@@ -693,12 +745,12 @@ export default function OrderManagementPage() {
                           </Badge>
                         </TableCell> */}
                         <TableCell className="text-slate-600">
-                          {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                          {new Date(order.createdAt).toLocaleDateString('vi-VN')}
                         </TableCell>
                         <TableCell className="text-slate-600">
-                          {new Date(order.updatedAt).toLocaleDateString("vi-VN")}
+                          {new Date(order.updatedAt).toLocaleDateString('vi-VN')}
                         </TableCell>
-                        <TableCell >
+                        <TableCell>
                           <Button
                             variant="outline"
                             size="sm"
@@ -720,7 +772,7 @@ export default function OrderManagementPage() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => toggleSection(order.orderId, "combos")}
+                                      onClick={() => toggleSection(order.orderId, 'combos')}
                                       className="mr-3 p-0 hover:bg-slate-100"
                                     >
                                       {expandedSections[order.orderId]?.combos ? (
@@ -733,8 +785,12 @@ export default function OrderManagementPage() {
                                       <Package className="h-5 w-5 text-blue-600" />
                                     </div>
                                     <div>
-                                      <h4 className="font-semibold text-lg text-slate-900">Danh sách Order Combos</h4>
-                                      <p className="text-sm text-slate-500">Chi tiết các combo trong đơn hàng</p>
+                                      <h4 className="font-semibold text-lg text-slate-900">
+                                        Danh sách Order Combos
+                                      </h4>
+                                      <p className="text-sm text-slate-500">
+                                        Chi tiết các combo trong đơn hàng
+                                      </p>
                                     </div>
                                     <Badge
                                       variant="secondary"
@@ -793,12 +849,15 @@ export default function OrderManagementPage() {
                                                   Số tiền
                                                 </p>
                                                 <p className="font-bold text-lg text-emerald-600">
-                                                  {combo.grandPrice?.toLocaleString("vi-VN")} ₫
+                                                  {combo.grandPrice?.toLocaleString('vi-VN')} ₫
                                                 </p>
                                               </div>
                                               <div className="text-right">
                                                 <p className="text-slate-500 text-sm mb-1">Items</p>
-                                                <Badge variant="outline" className="border-slate-300">
+                                                <Badge
+                                                  variant="outline"
+                                                  className="border-slate-300"
+                                                >
                                                   {combo.itemIds.length} sản phẩm
                                                 </Badge>
                                               </div>
@@ -806,17 +865,21 @@ export default function OrderManagementPage() {
 
                                             {combo.itemIds.length > 0 && (
                                               <div className="space-y-2">
-                                                <p className="text-slate-500 text-xs font-medium">Item IDs:</p>
+                                                <p className="text-slate-500 text-xs font-medium">
+                                                  Item IDs:
+                                                </p>
                                                 <div className="flex flex-wrap gap-1">
-                                                  {combo.itemIds.slice(0, 3).map((itemId, index) => (
-                                                    <Badge
-                                                      key={index}
-                                                      variant="secondary"
-                                                      className="text-xs font-mono bg-slate-100 text-slate-700"
-                                                    >
-                                                      {itemId}
-                                                    </Badge>
-                                                  ))}
+                                                  {combo.itemIds
+                                                    .slice(0, 3)
+                                                    .map((itemId, index) => (
+                                                      <Badge
+                                                        key={index}
+                                                        variant="secondary"
+                                                        className="text-xs font-mono bg-slate-100 text-slate-700"
+                                                      >
+                                                        {itemId}
+                                                      </Badge>
+                                                    ))}
                                                   {combo.itemIds.length > 3 && (
                                                     <Badge
                                                       variant="secondary"
@@ -840,7 +903,7 @@ export default function OrderManagementPage() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => toggleSection(order.orderId, "items")}
+                                      onClick={() => toggleSection(order.orderId, 'items')}
                                       className="mr-3 p-0 hover:bg-slate-100"
                                     >
                                       {expandedSections[order.orderId]?.items ? (
@@ -853,8 +916,12 @@ export default function OrderManagementPage() {
                                       <ShoppingCart className="h-5 w-5 text-emerald-600" />
                                     </div>
                                     <div>
-                                      <h4 className="font-semibold text-lg text-slate-900">Danh sách Items</h4>
-                                      <p className="text-sm text-slate-500">Chi tiết sản phẩm trong đơn hàng</p>
+                                      <h4 className="font-semibold text-lg text-slate-900">
+                                        Danh sách Items
+                                      </h4>
+                                      <p className="text-sm text-slate-500">
+                                        Chi tiết sản phẩm trong đơn hàng
+                                      </p>
                                     </div>
                                     <Badge
                                       variant="secondary"
@@ -876,11 +943,14 @@ export default function OrderManagementPage() {
                                               <div className="flex-shrink-0 mr-4">
                                                 <div className="relative">
                                                   <img
-                                                    src={item.productThumbnail || "/placeholder.svg"}
+                                                    src={
+                                                      item.productThumbnail || '/placeholder.svg'
+                                                    }
                                                     alt={item.productName}
                                                     className="w-16 h-16 object-cover rounded-xl border-2 border-slate-200 shadow-sm"
                                                     onError={(e) => {
-                                                      e.currentTarget.src = "/placeholder.svg?height=64&width=64"
+                                                      e.currentTarget.src =
+                                                        '/placeholder.svg?height=64&width=64';
                                                     }}
                                                   />
                                                 </div>
@@ -908,7 +978,9 @@ export default function OrderManagementPage() {
                                             <div className="p-6 pt-4">
                                               <div className="grid grid-cols-3 gap-4">
                                                 <div className="text-center">
-                                                  <p className="text-xs text-slate-500 mb-2 font-medium">Số lượng</p>
+                                                  <p className="text-xs text-slate-500 mb-2 font-medium">
+                                                    Số lượng
+                                                  </p>
                                                   <Badge
                                                     variant="outline"
                                                     className="text-blue-700 border-blue-300 bg-blue-50 font-semibold"
@@ -917,15 +989,19 @@ export default function OrderManagementPage() {
                                                   </Badge>
                                                 </div>
                                                 <div className="text-center">
-                                                  <p className="text-xs text-slate-500 mb-2 font-medium">Đơn giá</p>
+                                                  <p className="text-xs text-slate-500 mb-2 font-medium">
+                                                    Đơn giá
+                                                  </p>
                                                   <p className="font-semibold text-sm text-slate-900">
-                                                    {item.unitPrice?.toLocaleString("vi-VN")} ₫
+                                                    {item.unitPrice?.toLocaleString('vi-VN')} ₫
                                                   </p>
                                                 </div>
                                                 <div className="text-center">
-                                                  <p className="text-xs text-slate-500 mb-2 font-medium">Tổng tiền</p>
+                                                  <p className="text-xs text-slate-500 mb-2 font-medium">
+                                                    Tổng tiền
+                                                  </p>
                                                   <p className="font-bold text-sm text-emerald-600">
-                                                    {item.totalPrice?.toLocaleString("vi-VN")} ₫
+                                                    {item.totalPrice?.toLocaleString('vi-VN')} ₫
                                                   </p>
                                                 </div>
                                               </div>
@@ -953,9 +1029,10 @@ export default function OrderManagementPage() {
           <div className="px-6 py-4 border-t border-slate-200 bg-slate-50">
             <div className="flex items-center justify-between">
               <div className="text-sm text-slate-600">
-                Hiển thị <span className="font-semibold">{filteredOrders.length}</span> đơn hàng trên trang{" "}
-                <span className="font-semibold">{page}</span> / <span className="font-semibold">{maxPage}</span> (Tổng
-                cộng <span className="font-semibold">{totalOrders}</span> đơn hàng)
+                Hiển thị <span className="font-semibold">{filteredOrders.length}</span> đơn hàng
+                trên trang <span className="font-semibold">{page}</span> /{' '}
+                <span className="font-semibold">{maxPage}</span> (Tổng cộng{' '}
+                <span className="font-semibold">{totalOrders}</span> đơn hàng)
               </div>
               <div className="flex items-center space-x-3">
                 <Button
@@ -989,18 +1066,18 @@ export default function OrderManagementPage() {
         order={selectedOrder}
         isOpen={isDetailModalOpen}
         onClose={() => {
-          setIsDetailModalOpen(false)
-          setSelectedOrder(null)
+          setIsDetailModalOpen(false);
+          setSelectedOrder(null);
         }}
         onVerify={async (id: string) => {
-          const result = await cancelOrder(id)
-          if (result.success) setDeleteSuccess("Hủy đơn hàng thành công!")
-          else setDeleteError(result.message || "Lỗi hủy đơn hàng")
-          setIsDetailModalOpen(false)
-          setSelectedOrder(null)
-          refetch()
+          const result = await cancelOrder(id);
+          if (result.success) setDeleteSuccess('Hủy đơn hàng thành công!');
+          else setDeleteError(result.message || 'Lỗi hủy đơn hàng');
+          setIsDetailModalOpen(false);
+          setSelectedOrder(null);
+          refetch();
         }}
       />
     </div>
-  )
+  );
 }
