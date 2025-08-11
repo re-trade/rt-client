@@ -84,23 +84,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
     }
   };
 
-  const buyNow = () => {
-    if (!productDetail) return;
-    try {
-      const query = new URLSearchParams({
-        buyNow: 'true',
-        productId: productDetail.id,
-        quantity: quantity.toString(),
-      }).toString();
-      router.push(`/checkout?${query}`);
-    } catch (error) {
-      showToast('Không thể thêm vào giỏ hàng.', 'error');
-      showToast('Có lỗi xảy ra khi chuyển đến trang thanh toán.', 'error');
-    } finally {
-      setIsAddingToCart(false);
-    }
-  };
-
   const openGallery = (index: number) => {
     setGalleryIndex(index);
     setShowGallery(true);

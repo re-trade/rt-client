@@ -81,7 +81,10 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
         productId: product.product.id,
       };
       console.log('data send create review', request);
-      await reviewApi.createReview(request);
+      const response = await reviewApi.createReview(request);
+      if (response === null) {
+        console.log('lỗi');
+      }
       await onSubmit({
         rating,
         comment: comment.trim(),
