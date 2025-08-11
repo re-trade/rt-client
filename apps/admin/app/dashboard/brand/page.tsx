@@ -2,7 +2,6 @@
 
 import type React from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -26,16 +25,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import useBrandManager from '@/hooks/use-brand-manager';
-import {
-  AlertCircle,
-  Building2,
-  Eye,
-  ImageIcon,
-  Package,
-  Plus,
-  RefreshCw,
-  Tag,
-} from 'lucide-react';
+import { AlertCircle, Building2, Eye, ImageIcon, Package, Plus, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -59,69 +49,7 @@ const AdvancedFilters = ({
     onSearch(localSearchQuery);
   };
 
-  return (
-    <Card>
-      {/* <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Advanced Filters</CardTitle>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleClearFilters}>
-            <XCircle className="h-4 w-4 mr-2" />
-            Clear Filters
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="search">Search Brands</Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="search"
-                  value={localSearchQuery}
-                  onChange={(e) => setLocalSearchQuery(e.target.value)}
-                  placeholder="Search by name or ID..."
-                  className="pl-10"
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                />
-              </div>
-              <Button onClick={handleSearch} size="sm">
-                Search
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="filter-type">Filter Type</Label>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger id="filter-type">
-                <SelectValue placeholder="Select filter type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Brand Name</SelectItem>
-                <SelectItem value="id">Brand ID</SelectItem>
-                <SelectItem value="category">Category</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Quick Actions</Label>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => onSearch("")}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CardContent> */}
-    </Card>
-  );
+  return <Card></Card>;
 };
 
 const BrandDetailModal = ({
@@ -141,60 +69,45 @@ const BrandDetailModal = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            Brand Details
+            Chi tiết nhãn hàng
           </DialogTitle>
-          <DialogDescription>Complete information about this brand</DialogDescription>
+          <DialogDescription>Thông tin đầy đủ về nhãn hàng này</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="flex items-center justify-center">
             {brand.imgUrl ? (
-              <div className="relative">
+              <div className="relative w-80 h-60">
+                {' '}
                 <img
                   src={brand.imgUrl || '/placeholder.svg?height=96&width=96'}
                   alt={`${brand.name} logo`}
-                  className="h-24 w-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
+                  className="max-w-full max-h-full rounded-lg object-contain border-4 border-primary/20 shadow-lg"
                 />
                 <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full p-1">
                   <ImageIcon className="h-4 w-4" />
                 </div>
               </div>
             ) : (
-              <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center border-4 border-primary/20">
+              <div className="h-24 w-24 rounded-lg bg-muted flex items-center justify-center border-4 border-primary/20">
                 <ImageIcon className="h-8 w-8 text-muted-foreground" />
               </div>
             )}
           </div>
-
           <Separator />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">Brand ID</Label>
+                <Label className="text-sm font-medium text-muted-foreground">Mã nhãn hàng</Label>
                 <p className="text-lg font-mono bg-muted px-3 py-2 rounded-md">{brand.id}</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">Tên nhãn hàng</Label>
-                <p className="text-xl font-semibold">{brand.name}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">Logo URL</Label>
-                <p className="text-sm break-all bg-muted px-3 py-2 rounded-md">
-                  {brand.imgUrl || 'No logo URL provided'}
-                </p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">Categories</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <Badge variant="secondary">
-                    <Tag className="h-3 w-3 mr-1" />
-                    Sample Category
-                  </Badge>
-                </div>
+                <Label className="text-sm font-medium text-muted-foreground">Tên nhãn hàng</Label>
+                <p className="text-xl font-semibold">{brand.name}</p>
               </div>
             </div>
           </div>
@@ -280,25 +193,25 @@ export default function BrandManagementPage() {
     const newErrors: Record<string, string> = {};
 
     if (!newBrandName.trim()) {
-      newErrors.name = 'Brand name is required';
+      newErrors.name = 'Tên nhãn hàng là bắt buộc';
     } else if (newBrandName.trim().length < 2) {
-      newErrors.name = 'Brand name must be at least 2 characters';
+      newErrors.name = 'Tên nhãn hàng phải có ít nhất 2 ký tự';
     }
 
     if (!newBrandImgUrl.trim()) {
-      newErrors.imgUrl = 'Logo URL is required';
+      newErrors.imgUrl = 'URL logo là bắt buộc';
     } else if (!isValidUrl(newBrandImgUrl)) {
-      newErrors.imgUrl = 'Please enter a valid URL';
+      newErrors.imgUrl = 'Vui lòng nhập URL hợp lệ';
     }
 
     if (!newBrandDescription.trim()) {
-      newErrors.description = 'Brand description is required';
+      newErrors.description = 'Mô tả nhãn hàng là bắt buộc';
     } else if (newBrandDescription.trim().length < 10) {
-      newErrors.description = 'Description must be at least 10 characters';
+      newErrors.description = 'Mô tả phải có ít nhất 10 ký tự';
     }
 
     if (newSelectedCategoryIds.length === 0) {
-      newErrors.categories = 'Please select at least one category';
+      newErrors.categories = 'Vui lòng chọn ít nhất một danh mục';
     }
 
     setErrors(newErrors);
@@ -333,7 +246,7 @@ export default function BrandManagementPage() {
 
   const handleAddBrand = async () => {
     if (!validateForm()) {
-      toast.error('Please fix the form errors before submitting');
+      toast.error('Vui lòng sửa các lỗi trong biểu mẫu trước khi gửi');
       return;
     }
 
@@ -347,14 +260,14 @@ export default function BrandManagementPage() {
       });
 
       if (result.success) {
-        toast.success('Brand added successfully!');
+        toast.success('Thêm nhãn hàng thành công!');
         setIsAddModalOpen(false);
         resetNewBrandForm();
       } else {
         toast.error(result.message);
       }
     } catch (err: any) {
-      toast.error(err.message || 'An error occurred while adding the brand');
+      toast.error(err.message || 'Đã xảy ra lỗi khi thêm nhãn hàng');
     } finally {
       setIsSubmitting(false);
     }
@@ -364,12 +277,12 @@ export default function BrandManagementPage() {
     <div className="container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight">Brand Management</h1>
-          <p className="text-muted-foreground mt-2">Manage your brand portfolio with ease</p>
+          <h1 className="text-4xl font-bold tracking-tight">Quản lý nhãn hàng</h1>
+          <p className="text-muted-foreground mt-2">Quản lý danh mục nhãn hàng của bạn một cách dễ dàng</p>
         </div>
         <Button onClick={() => setIsAddModalOpen(true)} size="lg" className="shadow-lg">
           <Plus className="h-5 w-5 mr-2" />
-          Add New Brand
+          Thêm nhãn hàng mới
         </Button>
       </div>
 
@@ -379,12 +292,12 @@ export default function BrandManagementPage() {
             <div className="flex items-center gap-3 text-destructive">
               <AlertCircle className="h-5 w-5" />
               <div className="flex-1">
-                <p className="font-medium">Error occurred</p>
+                <p className="font-medium">Đã xảy ra lỗi</p>
                 <p className="text-sm">{error}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Retry
+                Thử lại
               </Button>
             </div>
           </CardContent>
@@ -397,7 +310,7 @@ export default function BrandManagementPage() {
             <div className="flex items-center gap-3 text-destructive">
               <AlertCircle className="h-5 w-5" />
               <div className="flex-1">
-                <p className="font-medium">Category Error</p>
+                <p className="font-medium">Lỗi danh mục</p>
                 <p className="text-sm">{categoriesError}</p>
               </div>
             </div>
@@ -411,12 +324,12 @@ export default function BrandManagementPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Brand List
+            Danh sách nhãn hàng
           </CardTitle>
           <CardDescription>
             {totalBrands > 0
-              ? `Showing ${brands.length} of ${totalBrands} brands`
-              : 'No brands found'}
+              ? `Hiển thị ${brands.length} trong tổng số ${totalBrands} nhãn hàng`
+              : 'Không tìm thấy nhãn hàng'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -424,7 +337,7 @@ export default function BrandManagementPage() {
             <div className="flex items-center justify-center py-12">
               <div className="text-center space-y-4">
                 <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
-                <p className="text-muted-foreground">Loading brands...</p>
+                <p className="text-muted-foreground">Đang tải nhãn hàng...</p>
               </div>
             </div>
           ) : brands.length === 0 ? (
@@ -433,14 +346,14 @@ export default function BrandManagementPage() {
                 <Package className="h-12 w-12 text-muted-foreground" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">No brands found</h3>
+                <h3 className="text-lg font-semibold">Không tìm thấy nhãn hàng</h3>
                 <p className="text-muted-foreground">
-                  Try adjusting your search or add a new brand to get started
+                  Thử điều chỉnh tìm kiếm hoặc thêm nhãn hàng mới để bắt đầu
                 </p>
               </div>
               <Button onClick={() => setIsAddModalOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Your First Brand
+                Thêm nhãn hàng đầu tiên
               </Button>
             </div>
           ) : (
@@ -448,22 +361,23 @@ export default function BrandManagementPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-20">Logo</TableHead>
-                    <TableHead>Brand Name</TableHead>
+                    <TableHead className="w-80">Logo</TableHead>
+                    <TableHead>Tên nhãn hàng</TableHead>
                     <TableHead>ID</TableHead>
-                    <TableHead>Categories</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-center">Hành động</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {brands.map((brand) => (
                     <TableRow key={brand.id} className="hover:bg-muted/50">
-                      <TableCell>
+                      <TableCell className="w-40 h-24">
+                        {' '}
                         {brand.imgUrl ? (
                           <img
-                            src={brand.imgUrl || '/placeholder.svg?height=40&width=40'}
+                            src={brand.imgUrl}
                             alt={`${brand.name} logo`}
-                            className="h-10 w-10 rounded-lg object-cover border shadow-sm"
+                            className="max-w-full max-h-full rounded-lg object-contain border shadow-sm"
+                            style={{ maxWidth: '160px', maxHeight: '96px' }} 
                           />
                         ) : (
                           <div className="h-10 w-10 bg-muted rounded-lg flex items-center justify-center border">
@@ -474,27 +388,21 @@ export default function BrandManagementPage() {
                       <TableCell>
                         <div>
                           <p className="font-medium">{brand.name}</p>
-                          <p className="text-sm text-muted-foreground">Brand</p>
+                          <p className="text-sm text-muted-foreground">Nhãn hàng</p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <code className="bg-muted px-2 py-1 rounded text-sm">{brand.id}</code>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">
-                          <Tag className="h-3 w-3 mr-1" />
-                          Sample
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
+
+                      <TableCell className="flex items-center justify-center">
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleView(brand)}
-                          className="shadow-sm"
+                          className="p-0"
                         >
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
+                          <Eye className="h-5 w-5" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -505,7 +413,7 @@ export default function BrandManagementPage() {
               {maxPage > 1 && (
                 <div className="mt-6 flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
-                    Page {page} of {maxPage} • {totalBrands} total brands
+                    Trang {page} trên {maxPage} • Tổng {totalBrands} nhãn hàng
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
@@ -514,7 +422,7 @@ export default function BrandManagementPage() {
                       onClick={() => handlePageChange(page - 1)}
                       disabled={page === 1}
                     >
-                      Previous
+                      Trước
                     </Button>
                     <div className="flex items-center space-x-1">
                       {Array.from({ length: Math.min(5, maxPage) }, (_, i) => {
@@ -538,7 +446,7 @@ export default function BrandManagementPage() {
                       onClick={() => handlePageChange(page + 1)}
                       disabled={page === maxPage}
                     >
-                      Next
+                      Tiếp
                     </Button>
                   </div>
                 </div>
@@ -568,28 +476,28 @@ export default function BrandManagementPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5 text-primary" />
-              Add New Brand
+              Thêm nhãn hàng mới
             </DialogTitle>
             <DialogDescription>
-              Fill in the information below to create a new brand
+              Điền thông tin bên dưới để tạo nhãn hàng mới
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Brand Name" required error={errors.name}>
+              <FormField label="Tên nhãn hàng" required error={errors.name}>
                 <Input
                   value={newBrandName}
                   onChange={(e) => {
                     setNewBrandName(e.target.value);
                     if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
                   }}
-                  placeholder="Enter brand name"
+                  placeholder="Nhập tên nhãn hàng"
                   disabled={isSubmitting}
                 />
               </FormField>
 
-              <FormField label="Logo URL" required error={errors.imgUrl}>
+              <FormField label="URL Logo" required error={errors.imgUrl}>
                 <Input
                   value={newBrandImgUrl}
                   onChange={(e) => {
@@ -602,28 +510,28 @@ export default function BrandManagementPage() {
               </FormField>
             </div>
 
-            <FormField label="Brand Description" required error={errors.description}>
+            <FormField label="Mô tả nhãn hàng" required error={errors.description}>
               <Textarea
                 value={newBrandDescription}
                 onChange={(e) => {
                   setNewBrandDescription(e.target.value);
                   if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
                 }}
-                placeholder="Describe the brand, its values, and what makes it unique..."
+                placeholder="Mô tả về nhãn hàng, giá trị và điểm đặc biệt..."
                 rows={4}
                 disabled={isSubmitting}
               />
             </FormField>
 
-            <FormField label="Categories" required error={errors.categories}>
+            <FormField label="Danh mục" required error={errors.categories}>
               {categoriesLoading ? (
                 <div className="flex items-center justify-center py-8 border rounded-md">
                   <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                  <span className="text-sm text-muted-foreground">Loading categories...</span>
+                  <span className="text-sm text-muted-foreground">Đang tải danh mục...</span>
                 </div>
               ) : categoriesError ? (
                 <div className="text-destructive text-sm bg-destructive/5 p-3 rounded-md">
-                  Error loading categories: {categoriesError}
+                  Lỗi khi tải danh mục: {categoriesError}
                 </div>
               ) : (
                 <MultiSelect
@@ -636,26 +544,26 @@ export default function BrandManagementPage() {
                     setNewSelectedCategoryIds(selected);
                     if (errors.categories) setErrors((prev) => ({ ...prev, categories: '' }));
                   }}
-                  placeholder="Select categories for this brand..."
+                  placeholder="Chọn danh mục cho nhãn hàng..."
                 />
               )}
             </FormField>
 
             {newBrandImgUrl && isValidUrl(newBrandImgUrl) && (
               <div className="space-y-2">
-                <Label>Logo Preview</Label>
+                <Label>Xem trước logo</Label>
                 <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/20">
                   <img
                     src={newBrandImgUrl || '/placeholder.svg?height=48&width=48'}
-                    alt="Logo preview"
+                    alt="Xem trước logo"
                     className="h-12 w-12 rounded-lg object-cover border"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
                   />
                   <div>
-                    <p className="font-medium">{newBrandName || 'Brand Name'}</p>
-                    <p className="text-sm text-muted-foreground">Logo preview</p>
+                    <p className="font-medium">{newBrandName || 'Tên nhãn hàng'}</p>
+                    <p className="text-sm text-muted-foreground">Xem trước logo</p>
                   </div>
                 </div>
               </div>
@@ -670,18 +578,18 @@ export default function BrandManagementPage() {
               onClick={() => setIsAddModalOpen(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              Hủy
             </Button>
             <Button onClick={handleAddBrand} disabled={isSubmitting} className="min-w-24">
               {isSubmitting ? (
                 <>
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Adding...
+                  Đang thêm...
                 </>
               ) : (
                 <>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Brand
+                  Thêm nhãn hàng
                 </>
               )}
             </Button>
