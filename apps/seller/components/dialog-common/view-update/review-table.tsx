@@ -101,7 +101,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                       <div className="flex items-center gap-3">
                         <Avatar className="h-12 w-12 border-2 border-gray-100">
                           <AvatarImage src={review.author.avatarUrl || '/placeholder.svg'} />
-                          <AvatarFallback className="font-semibold bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                          <AvatarFallback className="font-semibold bg-orange-500 text-white">
                             {review.author.name.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
@@ -112,14 +112,14 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             {review.isVerifiedPurchase && (
                               <>
-                                <CheckCircle className="h-3 w-3 text-green-600" />
-                                <span className="text-green-600 font-medium">Đã mua hàng</span>
+                                <CheckCircle className="h-3 w-3 text-orange-600" />
+                                <span className="text-orange-600 font-medium">Đã mua hàng</span>
                               </>
                             )}
                             {review.helpful > 0 && (
                               <>
-                                <ThumbsUp className="h-3 w-3 text-blue-600" />
-                                <span className="text-blue-600">{review.helpful}</span>
+                                <ThumbsUp className="h-3 w-3 text-orange-600" />
+                                <span className="text-orange-600">{review.helpful}</span>
                               </>
                             )}
                           </div>
@@ -163,7 +163,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                           {truncateText(review.content, 80)}
                         </div>
                         {review.imageUrls && review.imageUrls.length > 0 && (
-                          <div className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full w-fit">
+                          <div className="flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full w-fit">
                             <ImageIcon className="h-3 w-3" />
                             <span>+{review.imageUrls.length} hình ảnh</span>
                           </div>
@@ -213,7 +213,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                           variant="outline"
                           size="sm"
                           onClick={() => onViewDetail(review)}
-                          className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-colors"
+                          className="hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300 transition-colors"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -222,7 +222,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                             variant="outline"
                             size="sm"
                             onClick={() => onReply(review)}
-                            className="hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-colors"
+                            className="hover:bg-orange-50 hover:text-orange-600 hover:border-orange-300 transition-colors"
                           >
                             <MessageSquare className="h-4 w-4" />
                           </Button>

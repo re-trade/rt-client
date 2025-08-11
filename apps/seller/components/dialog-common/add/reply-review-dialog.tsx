@@ -114,8 +114,8 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="border-b border-gray-100 pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MessageSquare className="h-5 w-5 text-blue-600" />
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <MessageSquare className="h-5 w-5 text-orange-600" />
             </div>
             <DialogTitle className="text-xl font-semibold">
               {review.reply ? 'Chỉnh sửa phản hồi' : 'Phản hồi đánh giá'}
@@ -125,11 +125,11 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
 
         <div className="space-y-6 py-2">
           {/* Review Summary */}
-          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 rounded-2xl border border-blue-200/50 shadow-sm">
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
             <div className="flex items-start gap-4">
-              <Avatar className="h-12 w-12 ring-3 ring-blue-100 shadow-lg">
+              <Avatar className="h-12 w-12 ring-3 ring-orange-100 shadow-lg">
                 <AvatarImage src={review.author.avatarUrl || '/placeholder.svg'} />
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
+                <AvatarFallback className="bg-orange-500 text-white font-semibold">
                   {review.author.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
@@ -160,9 +160,9 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
                   </span>
                 </div>
 
-                <div className="mb-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-white/50 shadow-sm">
+                <div className="mb-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                    <div className="h-2 w-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                    <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
                     Sản Phẩm
                   </h4>
                   <div className="flex items-center gap-4">
@@ -171,7 +171,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
                       alt={review.product.productName}
                       width={48}
                       height={48}
-                      className="rounded-xl object-cover shadow-md ring-2 ring-white/50"
+                      className="rounded-xl object-cover shadow-md ring-2 ring-orange-100"
                     />
                     <span className="text-sm font-medium text-gray-900 line-clamp-2">
                       {review.product.productName}
@@ -179,9 +179,9 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
                   </div>
                 </div>
 
-                <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-white/50 shadow-sm">
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                   <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                    <div className="h-2 w-2 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full"></div>
+                    <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
                     Nội dung đánh giá
                   </h4>
                   <p className="text-sm text-gray-700 leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-gray-100">
@@ -195,7 +195,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
           {/* Suggested Replies */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-purple-500" />
+              <Sparkles className="h-5 w-5 text-orange-500" />
               <Label className="text-base font-semibold text-gray-900">
                 Gợi ý phản hồi thông minh
               </Label>
@@ -203,7 +203,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
             <div className="grid gap-3">
               {isLoadingSuggestions ? (
                 <div className="text-center py-4">
-                  <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-blue-500 border-r-transparent"></div>
+                  <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-orange-500 border-r-transparent"></div>
                   <p className="mt-2 text-sm text-gray-600">Đang tạo gợi ý phản hồi...</p>
                 </div>
               ) : suggestedReplies.length > 0 ? (
@@ -211,10 +211,10 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
                   <button
                     key={index}
                     onClick={() => setReplyContent(suggestion)}
-                    className="group w-full text-left p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl border border-blue-200 transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+                    className="group w-full text-left p-4 bg-white hover:bg-orange-50 rounded-xl border border-gray-200 transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
+                      <div className="flex-shrink-0 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center mt-0.5">
                         <span className="text-white text-xs font-bold">{index + 1}</span>
                       </div>
                       <p className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
@@ -242,7 +242,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 placeholder="Nhập phản hồi của bạn để tương tác với khách hàng..."
-                className="min-h-[140px] resize-none border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm"
+                className="min-h-[140px] resize-none border-gray-300 focus:border-orange-500 focus:ring-orange-500 rounded-xl shadow-sm"
                 maxLength={500}
               />
               <div className="absolute bottom-3 right-3 flex items-center gap-2">
@@ -262,7 +262,7 @@ export function ReplyDialog({ open, onOpenChange, review, onSubmitReply }: Reply
             <Button
               onClick={handleSubmit}
               disabled={!replyContent.trim()}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 rounded-xl transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-xl transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {review.reply ? 'Cập nhật phản hồi' : 'Gửi phản hồi'}
             </Button>

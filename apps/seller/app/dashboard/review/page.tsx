@@ -206,12 +206,14 @@ export default function ReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       <div className="space-y-8 p-6 max-w-7xl mx-auto">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <MessageSquare className="h-6 w-6 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Quản lý đánh giá</h1>
+            <MessageSquare className="h-6 w-6 text-orange-600" />
+            <h1 className="text-3xl font-bold text-orange-500 border-b-2 border-orange-400 pb-2 inline-block">
+              Danh sách đánh giá
+            </h1>
           </div>
           <p className="text-muted-foreground">
             Xem và phản hồi đánh giá từ khách hàng để cải thiện dịch vụ
@@ -222,20 +224,20 @@ export default function ReviewsPage() {
         <ReviewStats reviews={productReviews} />
 
         {/* Filters Card */}
-        <Card className="shadow-sm">
+        <Card className="shadow-sm border bg-white">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Filter className="h-5 w-5" />
+              <Filter className="h-5 w-5 text-orange-500" />
               Bộ lọc tìm kiếm
               {activeFiltersCount > 0 && (
-                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
                   {activeFiltersCount} bộ lọc
                 </span>
               )}
               {/* Hiển thị loading indicator nhỏ khi đang filter */}
               {isFiltering && (
-                <div className="flex items-center gap-2 text-sm text-blue-600">
-                  <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                <div className="flex items-center gap-2 text-sm text-orange-600">
+                  <div className="animate-spin h-4 w-4 border-2 border-orange-600 border-t-transparent rounded-full"></div>
                   <span>Đang tải...</span>
                 </div>
               )}
@@ -318,7 +320,7 @@ export default function ReviewsPage() {
                 <Button
                   onClick={handleSearch}
                   disabled={isSearching || isFiltering}
-                  className="h-10 bg-blue-600 hover:bg-blue-700"
+                  className="h-10 bg-orange-500 hover:bg-orange-600"
                 >
                   {isSearching ? (
                     <>
@@ -369,7 +371,7 @@ export default function ReviewsPage() {
           {isFiltering && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
               <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-lg">
-                <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-5 w-5 border-2 border-orange-600 border-t-transparent rounded-full"></div>
                 <span className="text-sm font-medium text-gray-700">Đang tải kết quả...</span>
               </div>
             </div>
