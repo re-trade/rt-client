@@ -35,7 +35,6 @@ export function MyReviewsTab({ reviews, formatDate }: MyReviewsTabProps) {
   const handleGalleryIndexChange = (index: number) => {
     setGalleryIndex(index);
   };
-  
 
   if (reviews.length === 0) {
     return (

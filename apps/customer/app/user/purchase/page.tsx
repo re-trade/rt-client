@@ -58,8 +58,6 @@ export default function PurchasePage() {
     fecthOrderStats();
   }, []);
 
-
-
   if (isLoading) {
     return <PurchaseSkeleton />;
   }
