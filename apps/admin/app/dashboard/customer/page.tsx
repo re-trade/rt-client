@@ -26,16 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useCustomerManager } from '@/hooks/use-customer-manager';
-import {
-  AlertCircle,
-  CheckCircle,
-  Eye,
-  Filter,
-  Package,
-  RefreshCw,
-  Search,
-  XCircle,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle, Eye, Filter, Package, RefreshCw, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 

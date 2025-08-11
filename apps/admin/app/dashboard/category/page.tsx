@@ -412,7 +412,7 @@ export default function CategoryPage() {
                 >
                   <option value="">Không có danh mục cha</option>
                   {categories
-                    .filter((cat) => !cat.parentId) 
+                    .filter((cat) => !cat.parentId)
                     .map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}

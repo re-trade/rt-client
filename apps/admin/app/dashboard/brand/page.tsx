@@ -1,54 +1,63 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState, useEffect } from "react"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Package,
-  RefreshCw,
-  Filter,
-  XCircle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { Separator } from '@/components/ui/separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
+import useBrandManager from '@/hooks/use-brand-manager';
+import {
   AlertCircle,
-  Plus,
-  Search,
+  Building2,
   Eye,
   ImageIcon,
+  Package,
+  Plus,
+  RefreshCw,
   Tag,
-  Building2,
-} from "lucide-react"
-import useBrandManager from "@/hooks/use-brand-manager"
-import { MultiSelect } from "@/components/ui/multi-select"
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const AdvancedFilters = ({
   searchQuery,
   onSearch,
 }: {
-  searchQuery: string
-  onSearch: (query: string) => void
+  searchQuery: string;
+  onSearch: (query: string) => void;
 }) => {
-  const [filterType, setFilterType] = useState("")
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
+  const [filterType, setFilterType] = useState('');
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
 
   const handleClearFilters = () => {
-    setFilterType("")
-    setLocalSearchQuery("")
-    onSearch("")
-  }
+    setFilterType('');
+    setLocalSearchQuery('');
+    onSearch('');
+  };
 
   const handleSearch = () => {
-    onSearch(localSearchQuery)
-  }
+    onSearch(localSearchQuery);
+  };
 
   return (
     <Card>
@@ -112,19 +121,19 @@ const AdvancedFilters = ({
         </div>
       </CardContent> */}
     </Card>
-  )
-}
+  );
+};
 
 const BrandDetailModal = ({
   brand,
   isOpen,
   onClose,
 }: {
-  brand: any | null
-  isOpen: boolean
-  onClose: () => void
+  brand: any | null;
+  isOpen: boolean;
+  onClose: () => void;
 }) => {
-  if (!brand) return null
+  if (!brand) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -142,7 +151,7 @@ const BrandDetailModal = ({
             {brand.imgUrl ? (
               <div className="relative">
                 <img
-                  src={brand.imgUrl || "/placeholder.svg?height=96&width=96"}
+                  src={brand.imgUrl || '/placeholder.svg?height=96&width=96'}
                   alt={`${brand.name} logo`}
                   className="h-24 w-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
                 />
@@ -175,7 +184,7 @@ const BrandDetailModal = ({
               <div>
                 <Label className="text-sm font-medium text-muted-foreground">Logo URL</Label>
                 <p className="text-sm break-all bg-muted px-3 py-2 rounded-md">
-                  {brand.imgUrl || "No logo URL provided"}
+                  {brand.imgUrl || 'No logo URL provided'}
                 </p>
               </div>
               <div>
@@ -192,8 +201,8 @@ const BrandDetailModal = ({
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 const FormField = ({
   label,
@@ -201,10 +210,10 @@ const FormField = ({
   error,
   children,
 }: {
-  label: string
-  required?: boolean
-  error?: string
-  children: React.ReactNode
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
 }) => (
   <div className="space-y-2">
     <Label className="text-sm font-medium">
@@ -219,22 +228,22 @@ const FormField = ({
       </p>
     )}
   </div>
-)
+);
 
 export default function BrandManagementPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedBrand, setSelectedBrand] = useState<any | null>(null)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedBrand, setSelectedBrand] = useState<any | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [newBrandName, setNewBrandName] = useState("")
-  const [newBrandImgUrl, setNewBrandImgUrl] = useState("")
-  const [newBrandDescription, setNewBrandDescription] = useState("")
-  const [newSelectedCategoryIds, setNewSelectedCategoryIds] = useState<string[]>([])
+  const [newBrandName, setNewBrandName] = useState('');
+  const [newBrandImgUrl, setNewBrandImgUrl] = useState('');
+  const [newBrandDescription, setNewBrandDescription] = useState('');
+  const [newSelectedCategoryIds, setNewSelectedCategoryIds] = useState<string[]>([]);
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const {
     brands,
@@ -251,105 +260,105 @@ export default function BrandManagementPage() {
     categoriesLoading,
     categoriesError,
     addBrand,
-  } = useBrandManager()
+  } = useBrandManager();
 
   useEffect(() => {
     if (isAddModalOpen) {
-      fetchCategories()
+      fetchCategories();
     }
-  }, [isAddModalOpen, fetchCategories])
+  }, [isAddModalOpen, fetchCategories]);
 
   const resetNewBrandForm = () => {
-    setNewBrandName("")
-    setNewBrandImgUrl("")
-    setNewBrandDescription("")
-    setNewSelectedCategoryIds([])
-    setErrors({})
-  }
+    setNewBrandName('');
+    setNewBrandImgUrl('');
+    setNewBrandDescription('');
+    setNewSelectedCategoryIds([]);
+    setErrors({});
+  };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     if (!newBrandName.trim()) {
-      newErrors.name = "Brand name is required"
+      newErrors.name = 'Brand name is required';
     } else if (newBrandName.trim().length < 2) {
-      newErrors.name = "Brand name must be at least 2 characters"
+      newErrors.name = 'Brand name must be at least 2 characters';
     }
 
     if (!newBrandImgUrl.trim()) {
-      newErrors.imgUrl = "Logo URL is required"
+      newErrors.imgUrl = 'Logo URL is required';
     } else if (!isValidUrl(newBrandImgUrl)) {
-      newErrors.imgUrl = "Please enter a valid URL"
+      newErrors.imgUrl = 'Please enter a valid URL';
     }
 
     if (!newBrandDescription.trim()) {
-      newErrors.description = "Brand description is required"
+      newErrors.description = 'Brand description is required';
     } else if (newBrandDescription.trim().length < 10) {
-      newErrors.description = "Description must be at least 10 characters"
+      newErrors.description = 'Description must be at least 10 characters';
     }
 
     if (newSelectedCategoryIds.length === 0) {
-      newErrors.categories = "Please select at least one category"
+      newErrors.categories = 'Please select at least one category';
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const isValidUrl = (url: string): boolean => {
     try {
-      new URL(url)
-      return true
+      new URL(url);
+      return true;
     } catch {
-      return false
+      return false;
     }
-  }
+  };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    fetchBrands(query, 1)
-    setCurrentPage(1)
-  }
+    setSearchQuery(query);
+    fetchBrands(query, 1);
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > maxPage) return
-    setCurrentPage(newPage)
-    goToPage(newPage, searchQuery)
-  }
+    if (newPage < 1 || newPage > maxPage) return;
+    setCurrentPage(newPage);
+    goToPage(newPage, searchQuery);
+  };
 
   const handleView = (brand: any) => {
-    setSelectedBrand(brand)
-    setIsDetailModalOpen(true)
-  }
+    setSelectedBrand(brand);
+    setIsDetailModalOpen(true);
+  };
 
   const handleAddBrand = async () => {
     if (!validateForm()) {
-      toast.error("Please fix the form errors before submitting")
-      return
+      toast.error('Please fix the form errors before submitting');
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const result = await addBrand({
         name: newBrandName.trim(),
         imgUrl: newBrandImgUrl.trim(),
         description: newBrandDescription.trim(),
         categoryIds: newSelectedCategoryIds,
-      })
+      });
 
       if (result.success) {
-        toast.success("Brand added successfully!")
-        setIsAddModalOpen(false)
-        resetNewBrandForm()
+        toast.success('Brand added successfully!');
+        setIsAddModalOpen(false);
+        resetNewBrandForm();
       } else {
-        toast.error(result.message)
+        toast.error(result.message);
       }
     } catch (err: any) {
-      toast.error(err.message || "An error occurred while adding the brand")
+      toast.error(err.message || 'An error occurred while adding the brand');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -405,7 +414,9 @@ export default function BrandManagementPage() {
             Brand List
           </CardTitle>
           <CardDescription>
-            {totalBrands > 0 ? `Showing ${brands.length} of ${totalBrands} brands` : "No brands found"}
+            {totalBrands > 0
+              ? `Showing ${brands.length} of ${totalBrands} brands`
+              : 'No brands found'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -423,7 +434,9 @@ export default function BrandManagementPage() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold">No brands found</h3>
-                <p className="text-muted-foreground">Try adjusting your search or add a new brand to get started</p>
+                <p className="text-muted-foreground">
+                  Try adjusting your search or add a new brand to get started
+                </p>
               </div>
               <Button onClick={() => setIsAddModalOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -448,7 +461,7 @@ export default function BrandManagementPage() {
                       <TableCell>
                         {brand.imgUrl ? (
                           <img
-                            src={brand.imgUrl || "/placeholder.svg?height=40&width=40"}
+                            src={brand.imgUrl || '/placeholder.svg?height=40&width=40'}
                             alt={`${brand.name} logo`}
                             className="h-10 w-10 rounded-lg object-cover border shadow-sm"
                           />
@@ -474,7 +487,12 @@ export default function BrandManagementPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="outline" size="sm" onClick={() => handleView(brand)} className="shadow-sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleView(brand)}
+                          className="shadow-sm"
+                        >
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </Button>
@@ -500,18 +518,18 @@ export default function BrandManagementPage() {
                     </Button>
                     <div className="flex items-center space-x-1">
                       {Array.from({ length: Math.min(5, maxPage) }, (_, i) => {
-                        const pageNum = i + 1
+                        const pageNum = i + 1;
                         return (
                           <Button
                             key={pageNum}
-                            variant={page === pageNum ? "default" : "outline"}
+                            variant={page === pageNum ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => handlePageChange(pageNum)}
                             className="w-8 h-8 p-0"
                           >
                             {pageNum}
                           </Button>
-                        )
+                        );
                       })}
                     </div>
                     <Button
@@ -534,16 +552,16 @@ export default function BrandManagementPage() {
         brand={selectedBrand}
         isOpen={isDetailModalOpen}
         onClose={() => {
-          setIsDetailModalOpen(false)
-          setSelectedBrand(null)
+          setIsDetailModalOpen(false);
+          setSelectedBrand(null);
         }}
       />
 
       <Dialog
         open={isAddModalOpen}
         onOpenChange={(open) => {
-          setIsAddModalOpen(open)
-          if (!open) resetNewBrandForm()
+          setIsAddModalOpen(open);
+          if (!open) resetNewBrandForm();
         }}
       >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -552,7 +570,9 @@ export default function BrandManagementPage() {
               <Plus className="h-5 w-5 text-primary" />
               Add New Brand
             </DialogTitle>
-            <DialogDescription>Fill in the information below to create a new brand</DialogDescription>
+            <DialogDescription>
+              Fill in the information below to create a new brand
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6 py-4">
@@ -561,8 +581,8 @@ export default function BrandManagementPage() {
                 <Input
                   value={newBrandName}
                   onChange={(e) => {
-                    setNewBrandName(e.target.value)
-                    if (errors.name) setErrors((prev) => ({ ...prev, name: "" }))
+                    setNewBrandName(e.target.value);
+                    if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
                   }}
                   placeholder="Enter brand name"
                   disabled={isSubmitting}
@@ -573,8 +593,8 @@ export default function BrandManagementPage() {
                 <Input
                   value={newBrandImgUrl}
                   onChange={(e) => {
-                    setNewBrandImgUrl(e.target.value)
-                    if (errors.imgUrl) setErrors((prev) => ({ ...prev, imgUrl: "" }))
+                    setNewBrandImgUrl(e.target.value);
+                    if (errors.imgUrl) setErrors((prev) => ({ ...prev, imgUrl: '' }));
                   }}
                   placeholder="https://example.com/logo.png"
                   disabled={isSubmitting}
@@ -586,8 +606,8 @@ export default function BrandManagementPage() {
               <Textarea
                 value={newBrandDescription}
                 onChange={(e) => {
-                  setNewBrandDescription(e.target.value)
-                  if (errors.description) setErrors((prev) => ({ ...prev, description: "" }))
+                  setNewBrandDescription(e.target.value);
+                  if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
                 }}
                 placeholder="Describe the brand, its values, and what makes it unique..."
                 rows={4}
@@ -613,8 +633,8 @@ export default function BrandManagementPage() {
                   }))}
                   selected={newSelectedCategoryIds}
                   onChange={(selected) => {
-                    setNewSelectedCategoryIds(selected)
-                    if (errors.categories) setErrors((prev) => ({ ...prev, categories: "" }))
+                    setNewSelectedCategoryIds(selected);
+                    if (errors.categories) setErrors((prev) => ({ ...prev, categories: '' }));
                   }}
                   placeholder="Select categories for this brand..."
                 />
@@ -626,15 +646,15 @@ export default function BrandManagementPage() {
                 <Label>Logo Preview</Label>
                 <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/20">
                   <img
-                    src={newBrandImgUrl || "/placeholder.svg?height=48&width=48"}
+                    src={newBrandImgUrl || '/placeholder.svg?height=48&width=48'}
                     alt="Logo preview"
                     className="h-12 w-12 rounded-lg object-cover border"
                     onError={(e) => {
-                      e.currentTarget.style.display = "none"
+                      e.currentTarget.style.display = 'none';
                     }}
                   />
                   <div>
-                    <p className="font-medium">{newBrandName || "Brand Name"}</p>
+                    <p className="font-medium">{newBrandName || 'Brand Name'}</p>
                     <p className="text-sm text-muted-foreground">Logo preview</p>
                   </div>
                 </div>
@@ -645,7 +665,11 @@ export default function BrandManagementPage() {
           <Separator />
 
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setIsAddModalOpen(false)} disabled={isSubmitting}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddModalOpen(false)}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
             <Button onClick={handleAddBrand} disabled={isSubmitting} className="min-w-24">
@@ -665,5 +689,5 @@ export default function BrandManagementPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

@@ -26,7 +26,7 @@ interface ApiResponse {
 
 const useProductManager = () => {
   const searchParams = useSearchParams();
-  const router = useRouter(); 
+  const router = useRouter();
   const [products, setProducts] = useState<TProduct[]>([]);
   const [page, setPage] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<number>(1);
@@ -103,14 +103,14 @@ const useProductManager = () => {
 
   const searchProducts = useCallback(
     (searchQuery: string) => {
-      setPage(1); 
+      setPage(1);
       const params = new URLSearchParams(searchParams.toString());
       if (searchQuery) {
         params.set('keyword', searchQuery);
       } else {
-        params.delete('keyword'); 
+        params.delete('keyword');
       }
-      router.push(`?${params.toString()}`); 
+      router.push(`?${params.toString()}`);
     },
     [router, searchParams],
   );
@@ -222,7 +222,7 @@ const useProductManager = () => {
     fetchProducts,
     fetchFilter,
     refetch,
-    searchProducts, 
+    searchProducts,
     goToPage,
     verifyProduct,
     unverifyProduct,

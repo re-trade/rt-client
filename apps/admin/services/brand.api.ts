@@ -38,24 +38,19 @@ interface IResponseObject<T> {
   };
 }
 
-
-
 const getBrands = async (
   page: number = 0,
   size: number = 10,
   query?: string,
 ): Promise<IResponseObject<TBrand[]> | undefined> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TBrand[]>>(
-      `/brands`,
-      {
-        params: {
-          page,
-          size,
-          ...(query ? { q: query } : {}),
-        },
+    const result = await authApi.default.get<IResponseObject<TBrand[]>>(`/brands`, {
+      params: {
+        page,
+        size,
+        ...(query ? { q: query } : {}),
       },
-    );
+    });
     if (result.data.success && result.status === 200) {
       return result.data;
     }
@@ -72,7 +67,6 @@ const postBrand = async (data: BrandInput): Promise<IResponseObject<TBrand>> => 
     if (!data.imgUrl.trim()) {
       throw new Error('Image URL is required');
     }
-   
 
     const cleanData = {
       name: data.name.trim(),
@@ -83,14 +77,10 @@ const postBrand = async (data: BrandInput): Promise<IResponseObject<TBrand>> => 
 
     console.log('Posting brand with:', JSON.stringify(cleanData, null, 2));
 
-    const response = await authApi.default.post<IResponseObject<TBrand>>(
-      `/brands`,
-      cleanData,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        withCredentials: true,
-      }
-    );
+    const response = await authApi.default.post<IResponseObject<TBrand>>(`/brands`, cleanData, {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+    });
 
     if (!response?.data || !response.data.success) {
       throw new Error(response?.data?.messages?.[0] || 'Failed to post brand');
@@ -110,10 +100,9 @@ const postBrand = async (data: BrandInput): Promise<IResponseObject<TBrand>> => 
 
 const getCategories = async (): Promise<IResponseObject<TCategory[]> | undefined> => {
   try {
-    const response = await authApi.default.get<IResponseObject<TCategory[]>>(
-      '/categories/all',
-      { withCredentials: true },
-    );
+    const response = await authApi.default.get<IResponseObject<TCategory[]>>('/categories/all', {
+      withCredentials: true,
+    });
     if (response.status === 200 && response.data.success) {
       return response.data;
     }
@@ -124,8 +113,8 @@ const getCategories = async (): Promise<IResponseObject<TCategory[]> | undefined
   }
 };
 
-export {getBrands, postBrand, type IResponseObject , getCategories};
+export { getBrands, getCategories, postBrand, type IResponseObject };
 
 function isValidUrl(arg0: string) {
-    throw new Error('Function not implemented.');
+  throw new Error('Function not implemented.');
 }

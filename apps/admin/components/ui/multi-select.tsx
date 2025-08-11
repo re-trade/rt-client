@@ -1,10 +1,17 @@
-import * as React from "react";
-import { X } from "lucide-react";
+import { X } from 'lucide-react';
+import * as React from 'react';
 
-import { Badge } from "@/components/ui/badge";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export interface Option {
   label: string;
@@ -23,7 +30,7 @@ export function MultiSelect({
   options,
   selected,
   onChange,
-  placeholder = "Select items...",
+  placeholder = 'Select items...',
   className,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
@@ -54,16 +61,12 @@ export function MultiSelect({
               selected.map((item) => {
                 const option = options.find((opt) => opt.value === item);
                 return (
-                  <Badge
-                    variant="secondary"
-                    key={item}
-                    className="mr-1 mb-1"
-                  >
+                  <Badge variant="secondary" key={item} className="mr-1 mb-1">
                     {option?.label}
                     <span
                       className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") {
+                        if (e.key === 'Enter') {
                           handleUnselect(item);
                         }
                       }}
@@ -102,8 +105,8 @@ export function MultiSelect({
                   <div
                     className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary ${
                       selected.includes(option.value)
-                        ? "bg-primary text-primary-foreground"
-                        : "opacity-50 [&_svg]:invisible"
+                        ? 'bg-primary text-primary-foreground'
+                        : 'opacity-50 [&_svg]:invisible'
                     }`}
                   >
                     <X className="h-4 w-4" />

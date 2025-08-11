@@ -119,7 +119,7 @@ const AdvancedFilters = ({
   setEndDate: (date: string) => void;
   selectedState: string;
   setSelectedState: (state: string) => void;
-  sortField: keyof TSellerProfile; 
+  sortField: keyof TSellerProfile;
   setSortField: (field: keyof TSellerProfile) => void;
   sortOrder: 'asc' | 'desc';
   setSortOrder: (order: 'asc' | 'desc') => void;
@@ -803,7 +803,7 @@ export default function SellerManagementPage() {
     searchSellers,
     handleBanSeller,
     handleUnbanSeller,
-  } = useSellerManager(); 
+  } = useSellerManager();
 
   const handleClearFilters = () => {
     setSearchQuery('');

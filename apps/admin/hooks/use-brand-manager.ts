@@ -1,5 +1,12 @@
-import { useState, useCallback, useEffect } from 'react';
-import { getBrands, postBrand, TBrand, BrandInput, IResponseObject, getCategories, TCategory } from '@/services/brand.api';
+import {
+  BrandInput,
+  getBrands,
+  getCategories,
+  postBrand,
+  TBrand,
+  TCategory,
+} from '@/services/brand.api';
+import { useCallback, useEffect, useState } from 'react';
 
 const useBrandManager = (initialPage = 1, pageSize = 10) => {
   const [brands, setBrands] = useState<TBrand[]>([]);
