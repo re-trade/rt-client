@@ -2,9 +2,9 @@
 
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
 import { Package, ShoppingCart, Store, Tag, Users } from 'lucide-react';
-import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import React from 'react';
 
 const StatCard = ({
   title,
@@ -55,11 +55,7 @@ function QuickActions() {
                   : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <Icon
-                className={`h-6 w-6 ${
-                  isActive ? 'text-blue-600' : 'text-gray-600'
-                }`}
-              />
+              <Icon className={`h-6 w-6 ${isActive ? 'text-blue-600' : 'text-gray-600'}`} />
               <span className="text-sm font-medium">{label}</span>
             </Link>
           );
@@ -81,10 +77,7 @@ export default function AdminPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse"
-            >
+            <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
               <div className="h-4 bg-gray-200 rounded mb-2"></div>
               <div className="h-8 bg-gray-200 rounded mb-2"></div>
               <div className="h-3 bg-gray-200 rounded"></div>
@@ -128,9 +121,7 @@ export default function AdminPage() {
     <div className="p-6 space-y-6">
       <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
         <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
-        <p className="text-lg opacity-90">
-          Xem tổng quan về hoạt động của hệ thống admin
-        </p>
+        <p className="text-lg opacity-90">Xem tổng quan về hoạt động của hệ thống admin</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
