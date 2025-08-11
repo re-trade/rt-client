@@ -109,7 +109,7 @@ export default function WithdrawManagementPage() {
     }
   };
 
-   const handleViewDetails = async (withdraw: TWithdrawProfile) => {
+  const handleViewDetails = async (withdraw: TWithdrawProfile) => {
     setSelectedWithdraw(withdraw);
     setQrCodeUrl(null);
     setQrError(null);
@@ -390,43 +390,43 @@ export default function WithdrawManagementPage() {
                   </h3>
                 </div>
                 <div className="p-4">
-                 {selectedWithdraw.status === 'COMPLETED' ? (
-  <div className="flex items-center justify-center p-8 bg-green-50 border-2 border-dashed border-green-200 rounded-lg">
-    <div className="text-center">
-      <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
-      <p className="text-sm font-medium text-green-700">Đã thanh toán</p>
-    </div>
-  </div>
-) : qrError ? (
-  <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-    <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-    <div>
-      <p className="font-medium text-red-800">Lỗi khi tải mã QR</p>
-      <p className="text-sm text-red-700 mt-1">
-        {qrError === 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
-          ? qrError
-          : qrError || 'Không thể tải mã QR'}
-      </p>
-    </div>
-  </div>
-) : qrCodeUrl ? (
-  <div className="flex justify-center">
-    <div className="p-4 bg-white border-2 border-gray-200 rounded-lg shadow-sm">
-      <img
-        src={qrCodeUrl || '/placeholder.svg'}
-        alt="QR Code thanh toán"
-        className="max-w-[250px] rounded"
-      />
-    </div>
-  </div>
-) : (
-  <div className="flex items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-2"></div>
-      <p className="text-sm text-muted-foreground">Đang tải mã QR...</p>
-    </div>
-  </div>
-)}
+                  {selectedWithdraw.status === 'COMPLETED' ? (
+                    <div className="flex items-center justify-center p-8 bg-green-50 border-2 border-dashed border-green-200 rounded-lg">
+                      <div className="text-center">
+                        <Check className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                        <p className="text-sm font-medium text-green-700">Đã thanh toán</p>
+                      </div>
+                    </div>
+                  ) : qrError ? (
+                    <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-red-800">Lỗi khi tải mã QR</p>
+                        <p className="text-sm text-red-700 mt-1">
+                          {qrError === 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+                            ? qrError
+                            : qrError || 'Không thể tải mã QR'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : qrCodeUrl ? (
+                    <div className="flex justify-center">
+                      <div className="p-4 bg-white border-2 border-gray-200 rounded-lg shadow-sm">
+                        <img
+                          src={qrCodeUrl || '/placeholder.svg'}
+                          alt="QR Code thanh toán"
+                          className="max-w-[250px] rounded"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-2"></div>
+                        <p className="text-sm text-muted-foreground">Đang tải mã QR...</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </Card>
             </div>

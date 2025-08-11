@@ -18,67 +18,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { AlertCircle, Eye, RefreshCw, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
-
-// Custom hook để fetch report
-function useReportManager() {
-  const [reports, setReports] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalReports, setTotalReports] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchReports = async (pageNum = page) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(
-        `https://dev.retrades.trade/api/main/v1/report-seller?page=${pageNum - 1}&size=${size}`,
-        {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            // Authorization nếu cần
-          },
-        },
-      );
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Lỗi khi lấy danh sách report');
-      }
-      const data = await res.json();
-      setReports(data.content || []);
-      setTotalPages(data.totalPages || 1);
-      setTotalReports(data.totalElements || 0);
-    } catch (e: any) {
-      setError(e.message || 'Lỗi không xác định');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchReports(page);
-  }, [page, size]);
-
-  const goToPage = (p: number) => {
-    if (p >= 1 && p <= totalPages) setPage(p);
-  };
-
-  return {
-    reports,
-    page,
-    size,
-    totalPages,
-    totalReports,
-    loading,
-    error,
-    goToPage,
-    refetch: () => fetchReports(page),
-  };
-}
+import { useState } from 'react';
+import { useReportSeller } from '@/hooks/use-report-seller-manager';
 
 function ReportDetailModal({
   report,
@@ -99,13 +40,13 @@ function ReportDetailModal({
         </DialogHeader>
         <div className="space-y-2">
           <div>
-            <b>Người báo cáo:</b> {report.reporterName || report.reporter?.username || '-'}
+            <b>Người báo cáo:</b> {report.customerId || '-'}
           </div>
           <div>
-            <b>Người bị báo cáo:</b> {report.sellerName || report.seller?.username || '-'}
+            <b>Người bị báo cáo:</b> {report.sellerId || '-'}
           </div>
           <div>
-            <b>Lý do:</b> {report.reason || '-'}
+            <b>Lý do:</b> {report.typeReport || '-'}
           </div>
           <div>
             <b>Nội dung:</b> {report.content || '-'}
@@ -115,19 +56,19 @@ function ReportDetailModal({
             {report.createdAt ? new Date(report.createdAt).toLocaleString('vi-VN') : '-'}
           </div>
           <div>
-            <b>Trạng thái:</b> {report.status || '-'}
+            <b>Trạng thái:</b> {report.resolutionStatus || '-'}
           </div>
-          {report.imageUrl && (
+          {report.image && (
             <div>
               <b>Bằng chứng:</b>
               <div className="mt-2">
                 <img
-                  src={report.imageUrl}
+                  src={report.image}
                   alt="Bằng chứng báo cáo"
                   className="max-w-full h-auto rounded-md"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
-                    console.error('Error loading image:', report.imageUrl);
+                    console.error('Error loading image:', report.image);
                   }}
                 />
               </div>
@@ -140,8 +81,16 @@ function ReportDetailModal({
 }
 
 export default function ReportManagementPage() {
-  const { reports, page, totalPages, totalReports, loading, error, goToPage, refetch } =
-    useReportManager();
+  const {
+    reports,
+    page,
+    maxPage: totalPages,
+    totalReports,
+    loading,
+    error,
+    goToPage,
+    refetch,
+  } = useReportSeller();
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
@@ -209,14 +158,14 @@ export default function ReportManagementPage() {
             <TableBody>
               {reports.map((report) => (
                 <TableRow key={report.id}>
-                  <TableCell>{report.reporterName || report.reporter?.username || '-'}</TableCell>
-                  <TableCell>{report.sellerName || report.seller?.username || '-'}</TableCell>
-                  <TableCell>{report.reason || '-'}</TableCell>
+                  <TableCell>{report.customerId || '-'}</TableCell>
+                  <TableCell>{report.sellerId || '-'}</TableCell>
+                  <TableCell>{report.typeReport || '-'}</TableCell>
                   <TableCell className="truncate max-w-[240px]">{report.content || '-'}</TableCell>
                   <TableCell>
                     {report.createdAt ? new Date(report.createdAt).toLocaleString('vi-VN') : '-'}
                   </TableCell>
-                  <TableCell>{report.status || '-'}</TableCell>
+                  <TableCell>{report.resolutionStatus || '-'}</TableCell>
                   <TableCell className="text-center">
                     <Button variant="ghost" size="icon" onClick={() => handleView(report)}>
                       <Eye className="h-4 w-4" />
@@ -260,7 +209,6 @@ export default function ReportManagementPage() {
         )}
       </Card>
 
-      {/* Modal xem chi tiết report */}
       <ReportDetailModal
         report={selectedReport}
         isOpen={isDetailModalOpen}
