@@ -50,7 +50,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// SellerStats component (unchanged)
 const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   const totalSellers = sellers.length;
   const verifiedSellers = sellers.filter((p) => p.verified).length;
@@ -91,7 +90,6 @@ const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   );
 };
 
-// AdvancedFilters component (updated to use TSellerProfile)
 const AdvancedFilters = ({
   sellers,
   searchQuery,
@@ -121,7 +119,7 @@ const AdvancedFilters = ({
   setEndDate: (date: string) => void;
   selectedState: string;
   setSelectedState: (state: string) => void;
-  sortField: keyof TSellerProfile; // Use keyof TSellerProfile for type safety
+  sortField: keyof TSellerProfile;
   setSortField: (field: keyof TSellerProfile) => void;
   sortOrder: 'asc' | 'desc';
   setSortOrder: (order: 'asc' | 'desc') => void;
@@ -223,7 +221,6 @@ const AdvancedFilters = ({
   );
 };
 
-// ID Card Image Modal
 const IdCardImageModal = ({
   isOpen,
   onClose,
@@ -293,7 +290,6 @@ const IdCardImageModal = ({
   );
 };
 
-// Confirmation Dialog
 const ConfirmationDialog = ({
   isOpen,
   onClose,
@@ -340,7 +336,6 @@ const ConfirmationDialog = ({
   );
 };
 
-// SellerDetailModal (updated to show all information)
 const SellerDetailModal = ({
   seller,
   isOpen,
@@ -439,7 +434,6 @@ const SellerDetailModal = ({
         setShowConfirmDialog(false);
         onClose();
       } else {
-        // Handle error
         console.error('Failed to update seller status');
       }
     } catch (error) {
@@ -570,7 +564,7 @@ const SellerDetailModal = ({
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Trạng thái cửa hàng</p>
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${
                       seller.verified
                         ? 'bg-green-100 text-green-800'
                         : 'bg-orange-100 text-orange-800'
@@ -582,7 +576,7 @@ const SellerDetailModal = ({
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Trạng thái CCCD</p>
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getIdentityStatusColor(
+                    className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${getIdentityStatusColor(
                       seller.identityVerifiedStatus,
                     )}`}
                   >
@@ -743,7 +737,6 @@ const SellerDetailModal = ({
   );
 };
 
-// SellerActions (updated to use TSellerProfile)
 const SellerActions = ({
   seller,
   onVerify,
@@ -810,7 +803,7 @@ export default function SellerManagementPage() {
     searchSellers,
     handleBanSeller,
     handleUnbanSeller,
-  } = useSellerManager(); // Assume useSellerManager returns TSellerProfile[]
+  } = useSellerManager();
 
   const handleClearFilters = () => {
     setSearchQuery('');
@@ -866,7 +859,6 @@ export default function SellerManagementPage() {
     setIsDetailModalOpen(true);
   };
 
-  // Apply filters
   const filteredSellers = sellers
     .filter((seller) => {
       const matchesStatus =
@@ -1032,7 +1024,7 @@ export default function SellerManagementPage() {
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(seller.verified)]}`}
+                        className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium whitespace-nowrap ${statusColors[String(seller.verified)]}`}
                       >
                         {statusLabels[String(seller.verified)]}
                       </span>

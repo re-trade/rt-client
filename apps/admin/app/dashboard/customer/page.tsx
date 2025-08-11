@@ -26,23 +26,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useCustomerManager } from '@/hooks/use-customer-manager';
-import {
-  AlertCircle,
-  CheckCircle,
-  Eye,
-  Filter,
-  Package,
-  RefreshCw,
-  Search,
-  XCircle,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle, Eye, Filter, Package, RefreshCw, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 const CustomerStats = ({ customers }: { customers: any[] }) => {
   const totalCustomers = customers.length;
-  const verifiedCustomers = customers.filter((p) => p.verified).length;
-  const pendingCustomers = customers.filter((p) => !p.verified).length;
+  const verifiedCustomers = customers.filter((p) => p.enabled).length;
+  const pendingCustomers = customers.filter((p) => !p.enabled).length;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -119,7 +110,7 @@ const AdvancedFilters = ({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="relative">
+        {/* <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Tìm kiếm..."
@@ -127,7 +118,7 @@ const AdvancedFilters = ({
             onChange={(e) => onSearch(e.target.value)}
             className="pl-8"
           />
-        </div>
+        </div> */}
 
         <Select value={selectedStatus} onValueChange={setSelectedStatus}>
           <SelectTrigger>
@@ -417,7 +408,6 @@ export default function CustomerManagementPage() {
 
   return (
     <div className="space-y-6">
-      {/* Success Display */}
       {deleteSuccess && (
         <Card className="p-4 border-green-200 bg-green-50">
           <div className="flex items-center gap-2 text-green-700">
@@ -531,7 +521,7 @@ export default function CustomerManagementPage() {
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(customer.enabled)]}`}
+                        className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium whitespace-nowrap ${statusColors[String(customer.enabled)]}`}
                       >
                         {statusLabels[String(customer.enabled)]}
                       </span>

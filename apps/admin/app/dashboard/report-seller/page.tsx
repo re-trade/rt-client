@@ -1,7 +1,8 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -30,17 +32,21 @@ import type { TEvidence } from '@/services/report.seller.api';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   AlertCircle,
+  AlertTriangle,
   CheckCircle,
+  Clock,
   Eye,
   Filter,
   Package,
   Plus,
   RefreshCw,
-  Search,
+  Shield,
+  TrendingUp,
   X,
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const ReportStats = ({ reports }: { reports: any[] }) => {
   const totalReports = reports.length;
@@ -48,77 +54,98 @@ const ReportStats = ({ reports }: { reports: any[] }) => {
   const rejectedReports = reports.filter((p) => p.resolutionStatus === 'REJECTED').length;
   const pendingReports = reports.filter((p) => p.resolutionStatus === 'PENDING').length;
 
+  const stats = [
+    {
+      title: 'Tổng số tố cáo',
+      value: totalReports,
+      icon: TrendingUp,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      iconBg: 'bg-blue-100',
+    },
+    {
+      title: 'Đã duyệt',
+      value: verifiedReports,
+      icon: CheckCircle,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      iconBg: 'bg-green-100',
+    },
+    {
+      title: 'Đã từ chối',
+      value: rejectedReports,
+      icon: XCircle,
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      iconBg: 'bg-red-100',
+    },
+    {
+      title: 'Đang chờ',
+      value: pendingReports,
+      icon: Clock,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50',
+      iconBg: 'bg-orange-100',
+    },
+  ];
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Tổng số tố cáo</p>
-            <p className="text-2xl font-bold">{totalReports}</p>
-          </div>
-          <Package className="h-8 w-8 text-blue-500" />
-        </div>
-      </Card>
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Đã duyệt</p>
-            <p className="text-2xl font-bold text-green-600">{verifiedReports}</p>
-          </div>
-          <CheckCircle className="h-8 w-8 text-green-500" />
-        </div>
-      </Card>
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Đã từ chối</p>
-            <p className="text-2xl font-bold text-red-600">{rejectedReports}</p>
-          </div>
-          <XCircle className="h-8 w-8 text-red-500" />
-        </div>
-      </Card>
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Đang chờ</p>
-            <p className="text-2xl font-bold text-orange-600">{pendingReports}</p>
-          </div>
-          <AlertCircle className="h-8 w-8 text-orange-500" />
-        </div>
-      </Card>
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {stats.map((stat, index) => (
+        <Card
+          key={index}
+          className={`${stat.bgColor} border-0 shadow-sm hover:shadow-md transition-shadow`}
+        >
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
+              </div>
+              <div className={`${stat.iconBg} p-3 rounded-full`}>
+                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
 
 const AdvancedFilters = ({ searchQuery, onSearch, selectedCategory, setSelectedCategory }: any) => {
   return (
-    <Card className="p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-4 w-4" />
-        <h3 className="font-medium">Bộ lọc nâng cao</h3>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Tìm kiếm tố cáo..."
-            value={searchQuery}
-            onChange={(e) => onSearch(e.target.value)}
-            className="pl-8"
-          />
+    <Card className="shadow-sm">
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-5 w-5 text-blue-600" />
+          <CardTitle className="text-lg">Bộ lọc nâng cao</CardTitle>
         </div>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger>
-            <SelectValue placeholder="Trạng thái" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả trạng thái</SelectItem>
-            <SelectItem value="accepted">Đã xác minh</SelectItem>
-            <SelectItem value="pending">Chờ duyệt</SelectItem>
-            <SelectItem value="rejected">Từ chối</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Tìm kiếm tố cáo..."
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
+              className="pl-10 h-11"
+            />
+          </div> */}
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="h-11">
+              <SelectValue placeholder="Trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
+              <SelectItem value="accepted">Đã xác minh</SelectItem>
+              <SelectItem value="pending">Chờ duyệt</SelectItem>
+              <SelectItem value="rejected">Từ chối</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
     </Card>
   );
 };
@@ -141,88 +168,130 @@ const ReportDetailModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Shield className="h-6 w-6 text-blue-600" />
             Thông tin tố cáo
           </DialogTitle>
           <DialogDescription>Thông tin chi tiết về tố cáo</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-6">
-          <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">ID</p>
-                <p className="break-all">{report.id}</p>
+
+        <div className="space-y-6">
+          <div className="grid gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  ID Tố cáo
+                </p>
+                <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
+                  {report.id}
+                </p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">ID khách hàng</p>
-                <p>{report.customerId}</p>
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  ID Khách hàng
+                </p>
+                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
+                  {report.customerId}
+                </p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">ID sản phẩm</p>
-                <p>{report.productId}</p>
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  ID Sản phẩm
+                </p>
+                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
+                  {report.productId}
+                </p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">ID đơn hàng</p>
-                <p>{report.orderId}</p>
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  ID Đơn hàng
+                </p>
+                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">{report.orderId}</p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">ID người bán</p>
-                <p>{report.sellerId}</p>
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  ID Người bán
+                </p>
+                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">{report.sellerId}</p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Loại tố cáo</p>
-                <p>{report.typeReport}</p>
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  Loại tố cáo
+                </p>
+                <Badge variant="secondary" className="text-sm">
+                  {report.typeReport}
+                </Badge>
               </div>
-              <div className="col-span-2">
-                <p className="text-sm font-medium text-muted-foreground">Nội dung</p>
-                <p className="whitespace-pre-wrap">{report.content}</p>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                Nội dung
+              </p>
+              <div className="bg-gray-50 p-4 rounded-lg border">
+                <p className="whitespace-pre-wrap text-sm leading-relaxed">{report.content}</p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Ngày tạo</p>
-                <p>{new Date(report.createdAt).toLocaleDateString('vi-VN')}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  Ngày tạo
+                </p>
+                <p className="text-sm bg-gray-50 p-2 rounded border">
+                  {new Date(report.createdAt).toLocaleDateString('vi-VN')}
+                </p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Trạng thái</p>
-                <p
-                  className={
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  Trạng thái
+                </p>
+                <Badge
+                  variant={
                     report.resolutionStatus === 'ACCEPTED'
-                      ? 'text-green-600'
+                      ? 'default'
                       : report.resolutionStatus === 'REJECTED'
-                        ? 'text-red-600'
-                        : 'text-orange-600'
+                        ? 'destructive'
+                        : 'secondary'
                   }
+                  className="text-sm"
                 >
                   {report.resolutionStatus === 'ACCEPTED'
                     ? 'Đã xác minh'
                     : report.resolutionStatus === 'REJECTED'
                       ? 'Đã từ chối'
                       : 'Chờ duyệt'}
-                </p>
+                </Badge>
               </div>
             </div>
           </div>
         </div>
+
         {report.resolutionStatus === 'PENDING' && (
-          <div className="flex justify-end gap-2 mt-4">
-            <Button
-              variant="outline"
-              className="text-green-600 border-green-600 hover:bg-green-50 bg-transparent"
-              onClick={() => onVerify && onVerify(report.id)}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Đồng ý tố cáo
-            </Button>
-            <Button
-              variant="outline"
-              className="text-red-600 border-red-600 hover:bg-red-50 bg-transparent"
-              onClick={() => onReject && onReject(report.id)}
-            >
-              <XCircle className="h-4 w-4 mr-2" />
-              Từ chối tố cáo
-            </Button>
-          </div>
+          <>
+            <Separator />
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                className="text-green-600 border-green-600 hover:bg-green-50 bg-transparent"
+                onClick={() => onVerify && onVerify(report.id)}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Đồng ý tố cáo
+              </Button>
+              <Button
+                variant="outline"
+                className="text-red-600 border-red-600 hover:bg-red-50 bg-transparent"
+                onClick={() => onReject && onReject(report.id)}
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Từ chối tố cáo
+              </Button>
+            </div>
+          </>
         )}
       </DialogContent>
     </Dialog>
@@ -231,27 +300,25 @@ const ReportDetailModal = ({
 
 const ReportActions = ({ report, onVerify, onReject, onView }: any) => {
   return (
-    <div className="flex items-center space-x-2">
-      <Button variant="ghost" size="icon" onClick={() => onView(report)} title="Xem chi tiết">
+    <div className="flex items-center gap-1">
+      <Button variant="ghost" size="sm" onClick={() => onView(report)} className="h-8 w-8 p-0">
         <Eye className="h-4 w-4" />
       </Button>
       {report.resolutionStatus === 'PENDING' && (
         <>
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={() => onVerify(report.id)}
-            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-            title="Chấp nhận"
+            className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
           >
             <CheckCircle className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={() => onReject(report.id)}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            title="Từ chối"
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <XCircle className="h-4 w-4" />
           </Button>
@@ -280,8 +347,14 @@ const EvidenceDetailModal = ({
     evidenceUrls: [''],
     note: '',
   });
-  const [postError, setPostError] = useState<string | null>(null);
-  const [postSuccess, setPostSuccess] = useState<string | null>(null);
+
+  const [validationErrors, setValidationErrors] = useState<{
+    urls: boolean;
+    note: boolean;
+  }>({
+    urls: false,
+    note: false,
+  });
 
   const { fetchEvidence, postEvidence, evidenceLoading } = useReportSeller();
 
@@ -323,40 +396,58 @@ const EvidenceDetailModal = ({
 
   const handlePostEvidence = async () => {
     try {
-      setPostError(null);
-      setPostSuccess(null);
+      setValidationErrors({ urls: false, note: false });
+
+      const errors = { urls: false, note: false };
+
+      const validUrls = newEvidence.evidenceUrls.filter((url) => url.trim());
+      if (validUrls.length === 0) {
+        errors.urls = true;
+      }
+
+      if (!newEvidence.note.trim()) {
+        errors.note = true;
+      }
+
+      if (errors.urls || errors.note) {
+        setValidationErrors(errors);
+        return;
+      }
 
       const result = await postEvidence(reportId, {
-        evidenceUrls: newEvidence.evidenceUrls.filter((url) => url.trim()),
-        note: newEvidence.note,
+        evidenceUrls: validUrls,
+        note: newEvidence.note.trim(),
       });
 
       if (result.success) {
-        setPostSuccess('Thêm bằng chứng thành công!');
+        toast.success('Thêm bằng chứng thành công!', {
+          description: 'Bằng chứng đã được thêm vào báo cáo',
+        });
         setNewEvidence({ evidenceUrls: [''], note: '' });
+        setValidationErrors({ urls: false, note: false });
         setIsAddEvidenceOpen(false);
 
-        // Fetch updated evidence list
         const updatedEvidence = await fetchEvidence(reportId);
         onEvidenceUpdate(updatedEvidence);
-
-        // Clear success message after 3 seconds
-        setTimeout(() => setPostSuccess(null), 3000);
       } else {
-        setPostError(result.message || 'Không thể thêm bằng chứng');
+        toast.error('Không thể thêm bằng chứng', {
+          description: result.message || 'Có lỗi xảy ra khi thêm bằng chứng',
+        });
       }
     } catch (error: any) {
-      setPostError(error.message || 'Có lỗi xảy ra khi thêm bằng chứng');
+      toast.error('Có lỗi xảy ra', {
+        description: error.message || 'Không thể thêm bằng chứng vào lúc này',
+      });
     }
   };
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Package className="h-6 w-6 text-blue-600" />
               Chi tiết bằng chứng
             </DialogTitle>
             <DialogDescription>
@@ -364,119 +455,123 @@ const EvidenceDetailModal = ({
             </DialogDescription>
           </DialogHeader>
 
-          <Button onClick={() => setIsAddEvidenceOpen(true)} className="mb-4" disabled={!reportId}>
-            <Plus className="h-4 w-4 mr-2" />
-            Thêm bằng chứng
-          </Button>
-
-          {postSuccess && (
-            <div className="p-4 border-green-200 bg-green-50 flex items-center gap-2 text-green-700 rounded-md">
-              <CheckCircle className="h-4 w-4" />
-              <span className="font-medium">Thành công:</span> {postSuccess}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPostSuccess(null)}
-                className="text-green-600 hover:text-green-700 ml-auto"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-
-          {postError && (
-            <div className="p-4 border-red-200 bg-red-50 flex items-center gap-2 text-red-700 rounded-md">
-              <AlertCircle className="h-4 w-4" />
-              <span className="font-medium">Lỗi:</span> {postError}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPostError(null)}
-                className="text-red-600 hover:text-red-700 ml-auto"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+          <div className="flex justify-between items-center">
+            <Button
+              onClick={() => setIsAddEvidenceOpen(true)}
+              disabled={!reportId}
+              className="mb-4"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Thêm bằng chứng
+            </Button>
+          </div>
 
           {evidence && Array.isArray(evidence) && evidence.length > 0 ? (
-            <div className="grid gap-6">
+            <div className="space-y-6">
               {evidence.map((item, index) => (
-                <div key={item.id || index} className="grid gap-4 border-b pb-4 last:border-b-0">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">ID</p>
-                      <p className="break-all text-sm">{item.id || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Vai trò người gửi</p>
-                      <p className="text-sm">{item.senderRole || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Tên người gửi</p>
-                      <p className="text-sm">{item.senderName || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">ID người gửi</p>
-                      <p className="break-all text-sm">{item.senderId || 'N/A'}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm font-medium text-muted-foreground">Ghi chú</p>
-                      <p className="whitespace-pre-wrap text-sm">
-                        {item.notes || 'Không có ghi chú'}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm font-medium text-muted-foreground">Hình ảnh/Video</p>
-                      {Array.isArray(item.evidenceUrls) && item.evidenceUrls.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                          {item.evidenceUrls.map((url, urlIndex) => {
-                            const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?$/i.test(url);
-                            return isImage ? (
-                              <div key={urlIndex} className="relative">
-                                <img
-                                  src={url || '/placeholder.svg'}
-                                  alt={`Bằng chứng ${urlIndex + 1}`}
-                                  className="max-w-full h-auto object-contain rounded-md cursor-pointer border hover:shadow-md transition-shadow"
-                                  style={{ maxHeight: '200px' }}
-                                  onClick={() => handleImageClick(url)}
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                    const nextSibling = e.currentTarget.nextElementSibling;
-                                    if (nextSibling instanceof HTMLElement) {
-                                      nextSibling.style.display = 'block';
-                                    }
-                                  }}
-                                />
-                                <p className="text-red-600 text-sm mt-1 hidden">
-                                  Không thể tải hình ảnh
-                                </p>
-                              </div>
-                            ) : (
-                              <a
-                                key={urlIndex}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline truncate block p-2 border rounded hover:bg-blue-50 transition-colors"
-                              >
-                                {url}
-                              </a>
-                            );
-                          })}
+                <Card key={item.id || index} className="shadow-sm">
+                  <CardContent className="p-6">
+                    <div className="grid gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                            ID
+                          </p>
+                          <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
+                            {item.id || 'N/A'}
+                          </p>
                         </div>
-                      ) : (
-                        <p className="text-muted-foreground text-sm">Không có bằng chứng</p>
-                      )}
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                            Vai trò người gửi
+                          </p>
+                          <Badge variant="outline">{item.senderRole || 'N/A'}</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                            Tên người gửi
+                          </p>
+                          <p className="text-sm bg-gray-50 p-2 rounded border">
+                            {item.senderName || 'N/A'}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                            ID người gửi
+                          </p>
+                          <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
+                            {item.senderId || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                          Ghi chú
+                        </p>
+                        <div className="bg-gray-50 p-3 rounded-lg border">
+                          <p className="whitespace-pre-wrap text-sm">
+                            {item.notes || 'Không có ghi chú'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                          Hình ảnh/Video
+                        </p>
+                        {Array.isArray(item.evidenceUrls) && item.evidenceUrls.length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {item.evidenceUrls.map((url, urlIndex) => {
+                              const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?$/i.test(url);
+                              return isImage ? (
+                                <div key={urlIndex} className="relative group">
+                                  <img
+                                    src={url || '/placeholder.svg'}
+                                    alt={`Bằng chứng ${urlIndex + 1}`}
+                                    className="w-full h-32 object-cover rounded-lg cursor-pointer border hover:shadow-lg transition-all duration-200 group-hover:scale-105"
+                                    onClick={() => handleImageClick(url)}
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      const nextSibling = e.currentTarget.nextElementSibling;
+                                      if (nextSibling instanceof HTMLElement) {
+                                        nextSibling.style.display = 'block';
+                                      }
+                                    }}
+                                  />
+                                  <p className="text-red-600 text-sm mt-1 hidden text-center">
+                                    Không thể tải hình ảnh
+                                  </p>
+                                </div>
+                              ) : (
+                                <a
+                                  key={urlIndex}
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline truncate block p-3 border rounded-lg hover:bg-blue-50 transition-colors"
+                                >
+                                  {url}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed">
+                            <Package className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                            <p>Không có bằng chứng</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-              <p className="text-muted-foreground">Không có dữ liệu bằng chứng</p>
+            <div className="text-center py-12">
+              <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500 text-lg">Không có dữ liệu bằng chứng</p>
             </div>
           )}
         </DialogContent>
@@ -484,7 +579,7 @@ const EvidenceDetailModal = ({
 
       {/* Full size image modal */}
       <Dialog open={!!fullSizeImage} onOpenChange={handleCloseFullSize}>
-        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0">
           <VisuallyHidden>
             <DialogTitle>Hình ảnh toàn màn hình</DialogTitle>
           </VisuallyHidden>
@@ -493,7 +588,7 @@ const EvidenceDetailModal = ({
               <img
                 src={fullSizeImage || '/placeholder.svg'}
                 alt="Hình ảnh toàn màn hình"
-                className="w-full h-auto max-h-[90vh] object-contain"
+                className="w-full h-auto max-h-[95vh] object-contain"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const nextSibling = e.currentTarget.nextElementSibling;
@@ -506,24 +601,22 @@ const EvidenceDetailModal = ({
             <p className="text-red-600 text-sm mt-1 hidden text-center">Không thể tải hình ảnh</p>
             <button
               onClick={handleCloseFullSize}
-              className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors"
+              className="absolute top-4 right-4 bg-black/70 text-white rounded-full p-2 hover:bg-black/90 transition-colors"
               aria-label="Đóng hình ảnh toàn màn hình"
             >
-              ✕
+              <X className="h-5 w-5" />
             </button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Add evidence modal */}
       <Dialog
         open={isAddEvidenceOpen}
         onOpenChange={(open) => {
           setIsAddEvidenceOpen(open);
           if (!open) {
             setNewEvidence({ evidenceUrls: [''], note: '' });
-            setPostError(null);
-            setPostSuccess(null);
+            setValidationErrors({ urls: false, note: false });
           }
         }}
       >
@@ -534,23 +627,37 @@ const EvidenceDetailModal = ({
               Nhập các URL bằng chứng và ghi chú cho báo cáo ID: {reportId}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">URLs bằng chứng:</label>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                URLs bằng chứng: <span className="text-red-500">*</span>
+              </label>
               {newEvidence.evidenceUrls.map((url, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <Input
-                    placeholder="Nhập URL bằng chứng (ví dụ: https://example.com/image.jpg)"
-                    value={url}
-                    onChange={(e) => handleUrlChange(index, e.target.value)}
-                    className="flex-1"
-                  />
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Nhập URL bằng chứng (ví dụ: https://example.com/image.jpg)"
+                      value={url}
+                      onChange={(e) => {
+                        handleUrlChange(index, e.target.value);
+                        if (validationErrors.urls && e.target.value.trim()) {
+                          setValidationErrors((prev) => ({ ...prev, urls: false }));
+                        }
+                      }}
+                      className={`${validationErrors.urls ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    />
+                    {validationErrors.urls && index === 0 && (
+                      <p className="text-red-500 text-sm mt-1">
+                        Vui lòng nhập ít nhất một URL bằng chứng
+                      </p>
+                    )}
+                  </div>
                   {newEvidence.evidenceUrls.length > 1 && (
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => handleRemoveUrl(index)}
-                      aria-label="Xóa URL"
+                      className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -562,15 +669,29 @@ const EvidenceDetailModal = ({
                 Thêm URL
               </Button>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Ghi chú:</label>
-              <Input
-                placeholder="Nhập ghi chú về bằng chứng"
-                value={newEvidence.note}
-                onChange={(e) => handleNoteChange(e.target.value)}
-              />
+            <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                Ghi chú: <span className="text-red-500">*</span>
+              </label>
+              <div>
+                <Input
+                  placeholder="Nhập ghi chú về bằng chứng"
+                  value={newEvidence.note}
+                  onChange={(e) => {
+                    handleNoteChange(e.target.value);
+                    if (validationErrors.note && e.target.value.trim()) {
+                      setValidationErrors((prev) => ({ ...prev, note: false }));
+                    }
+                  }}
+                  className={`${validationErrors.note ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                />
+                {validationErrors.note && (
+                  <p className="text-red-500 text-sm mt-1">Vui lòng nhập ghi chú về bằng chứng</p>
+                )}
+              </div>
             </div>
-            <div className="flex gap-2 pt-4">
+            <Separator />
+            <div className="flex gap-3">
               <Button
                 onClick={handlePostEvidence}
                 disabled={evidenceLoading || !reportId}
@@ -605,8 +726,6 @@ export default function ReportManagementPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<TEvidence[] | null>(null);
   const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
 
@@ -645,22 +764,26 @@ export default function ReportManagementPage() {
   const handleVerify = async (reportId: string) => {
     const result = await acceptReport(reportId);
     if (result) {
-      setDeleteSuccess('Xác minh tố cáo thành công!');
-      setTimeout(() => setDeleteSuccess(null), 5000);
+      toast.success('Xác minh tố cáo thành công!', {
+        description: 'Tố cáo đã được xác minh và cập nhật trạng thái',
+      });
     } else {
-      setDeleteError('Lỗi xác minh tố cáo');
-      setTimeout(() => setDeleteError(null), 5000);
+      toast.error('Lỗi xác minh tố cáo', {
+        description: 'Không thể xác minh tố cáo vào lúc này',
+      });
     }
   };
 
   const handleReject = async (reportId: string) => {
     const result = await rejectReport(reportId);
     if (result) {
-      setDeleteSuccess('Từ chối tố cáo thành công!');
-      setTimeout(() => setDeleteSuccess(null), 5000);
+      toast.success('Từ chối tố cáo thành công!', {
+        description: 'Tố cáo đã được từ chối và cập nhật trạng thái',
+      });
     } else {
-      setDeleteError('Lỗi từ chối tố cáo');
-      setTimeout(() => setDeleteError(null), 5000);
+      toast.error('Lỗi từ chối tố cáo', {
+        description: 'Không thể từ chối tố cáo vào lúc này',
+      });
     }
   };
 
@@ -677,8 +800,9 @@ export default function ReportManagementPage() {
       setIsEvidenceModalOpen(true);
     } catch (error) {
       console.error('Error fetching evidence:', error);
-      setDeleteError('Lỗi khi tải bằng chứng');
-      setTimeout(() => setDeleteError(null), 5000);
+      toast.error('Lỗi khi tải bằng chứng', {
+        description: 'Không thể tải dữ liệu bằng chứng vào lúc này',
+      });
       setSelectedEvidence([]);
     }
   };
@@ -690,63 +814,57 @@ export default function ReportManagementPage() {
     return matchesCategory;
   });
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'ACCEPTED':
+        return (
+          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Đã xác minh</Badge>
+        );
+      case 'REJECTED':
+        return <Badge variant="destructive">Đã từ chối</Badge>;
+      default:
+        return <Badge variant="secondary">Chờ duyệt</Badge>;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Quản lý tố cáo người bán</h1>
-            <p className="text-gray-600 mt-1">Xem và xử lý các tố cáo từ khách hàng</p>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-gray-900">Quản lý tố cáo người bán</h1>
+            <p className="text-gray-600 text-lg">Xem và xử lý các tố cáo từ khách hàng</p>
           </div>
-          <Button onClick={handleRefresh} variant="outline">
-            <RefreshCw className="h-4 w-4 mr-2" />
+          <Button
+            onClick={handleRefresh}
+            variant="outline"
+            size="lg"
+            className="shadow-sm bg-transparent"
+          >
+            <RefreshCw className="h-5 w-5 mr-2" />
             Làm mới
           </Button>
         </div>
 
-        {deleteSuccess && (
-          <Card className="p-4 border-green-200 bg-green-50">
-            <div className="flex items-center gap-2 text-green-700">
-              <CheckCircle className="h-4 w-4" />
-              <div className="flex-1">
-                <span className="font-medium">Thành công:</span> {deleteSuccess}
+        {/* Error Message */}
+        {error && (
+          <Card className="border-red-200 bg-red-50 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 text-red-700">
+                <AlertTriangle className="h-5 w-5" />
+                <div className="flex-1">
+                  <span className="font-semibold">Lỗi:</span> {error}
+                </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDeleteSuccess(null)}
-                className="text-green-600 hover:text-green-700"
-              >
-                <XCircle className="h-4 w-4" />
-              </Button>
-            </div>
+            </CardContent>
           </Card>
         )}
 
-        {(error || deleteError) && (
-          <Card className="p-4 border-red-200 bg-red-50">
-            <div className="flex items-center gap-2 text-red-700">
-              <AlertCircle className="h-4 w-4" />
-              <div className="flex-1">
-                <span className="font-medium">Lỗi:</span> {error || deleteError}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setDeleteError(null);
-                  setDeleteError(null);
-                }}
-                className="text-red-600 hover:text-red-700"
-              >
-                <XCircle className="h-4 w-4" />
-              </Button>
-            </div>
-          </Card>
-        )}
-
+        {/* Stats */}
         <ReportStats reports={reports} />
 
+        {/* Filters */}
         <AdvancedFilters
           searchQuery={searchQuery}
           onSearch={handleSearch}
@@ -754,127 +872,128 @@ export default function ReportManagementPage() {
           setSelectedCategory={setSelectedCategory}
         />
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Danh sách tố cáo</h2>
-            <div className="text-sm text-muted-foreground">Tổng cộng: {totalReports} tố cáo</div>
-          </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
-              <span className="ml-2 text-gray-600">Đang tải...</span>
+        {/* Reports Table */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl">Danh sách tố cáo</CardTitle>
+              <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                Tổng cộng: {totalReports} tố cáo
+              </div>
             </div>
-          ) : (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nội dung tố cáo</TableHead>
-                    <TableHead>Loại tố cáo</TableHead>
-                    <TableHead>Trạng thái</TableHead>
-                    <TableHead>Ngày tạo</TableHead>
-                    <TableHead>Hành động</TableHead>
-                    <TableHead>Bằng chứng</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredReports.length > 0 ? (
-                    filteredReports.map((report) => (
-                      <TableRow key={report.id} className="hover:bg-gray-50">
-                        <TableCell className="font-medium max-w-xs">
-                          <div className="truncate" title={report.content}>
-                            {report.content || 'N/A'}
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="text-center space-y-4">
+                  <RefreshCw className="h-12 w-12 animate-spin text-blue-500 mx-auto" />
+                  <p className="text-gray-600 text-lg">Đang tải dữ liệu...</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-50">
+                      <TableHead className="font-semibold">Nội dung tố cáo</TableHead>
+                      <TableHead className="font-semibold">Loại tố cáo</TableHead>
+                      <TableHead className="font-semibold">Trạng thái</TableHead>
+                      <TableHead className="font-semibold">Ngày tạo</TableHead>
+                      <TableHead className="font-semibold text-center">Hành động</TableHead>
+                      <TableHead className="font-semibold text-center">Bằng chứng</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredReports.length > 0 ? (
+                      filteredReports.map((report) => (
+                        <TableRow key={report.id} className="hover:bg-gray-50 transition-colors">
+                          <TableCell className="font-medium max-w-xs">
+                            <div className="truncate" title={report.content}>
+                              {report.content || 'N/A'}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-50 text-blue-700 border-blue-200"
+                            >
+                              {report.typeReport || 'N/A'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(report.resolutionStatus)}</TableCell>
+                          <TableCell className="text-sm text-gray-600">
+                            {new Date(report.createdAt).toLocaleDateString('vi-VN')}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <ReportActions
+                              report={report}
+                              onVerify={handleVerify}
+                              onReject={handleReject}
+                              onView={handleView}
+                            />
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewEvidence(report.id)}
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            >
+                              <Package className="h-4 w-4 mr-1" />
+                              Xem
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-12">
+                          <div className="space-y-3">
+                            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto" />
+                            <p className="text-gray-500 text-lg">Không có tố cáo nào</p>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                            {report.typeReport || 'N/A'}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              report.resolutionStatus === 'ACCEPTED'
-                                ? 'bg-green-100 text-green-800'
-                                : report.resolutionStatus === 'REJECTED'
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-orange-100 text-orange-800'
-                            }`}
-                          >
-                            {report.resolutionStatus === 'ACCEPTED'
-                              ? 'Đã xác minh'
-                              : report.resolutionStatus === 'REJECTED'
-                                ? 'Đã từ chối'
-                                : 'Chờ duyệt'}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-sm text-gray-600">
-                          {new Date(report.createdAt).toLocaleDateString('vi-VN')}
-                        </TableCell>
-                        <TableCell>
-                          <ReportActions
-                            report={report}
-                            onVerify={handleVerify}
-                            onReject={handleReject}
-                            onView={handleView}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewEvidence(report.id)}
-                          >
-                            <Package className="h-4 w-4 mr-1" />
-                            Xem
-                          </Button>
-                        </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                        Không có tố cáo nào
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                    )}
+                  </TableBody>
+                </Table>
 
-              {filteredReports.length > 0 && (
-                <div className="mt-6 flex justify-between items-center">
-                  <div className="text-sm text-muted-foreground">
-                    Hiển thị {(page - 1) * 10 + 1} - {Math.min(page * 10, totalReports)} trong số{' '}
-                    {totalReports} tố cáo
+                {/* Pagination */}
+                {filteredReports.length > 0 && (
+                  <div className="mt-6 flex justify-between items-center pt-4 border-t">
+                    <div className="text-sm text-gray-600">
+                      Hiển thị {(page - 1) * 10 + 1} - {Math.min(page * 10, totalReports)} trong số{' '}
+                      {totalReports} tố cáo
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page === 1}
+                        onClick={() => handlePageChange(page - 1)}
+                      >
+                        Trước
+                      </Button>
+                      <div className="px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded-md font-medium">
+                        {page} / {maxPage}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={page === maxPage}
+                        onClick={() => handlePageChange(page + 1)}
+                      >
+                        Sau
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page === 1}
-                      onClick={() => handlePageChange(page - 1)}
-                    >
-                      Trước
-                    </Button>
-                    <span className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded">
-                      {page} / {maxPage}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page === maxPage}
-                      onClick={() => handlePageChange(page + 1)}
-                    >
-                      Sau
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+                )}
+              </>
+            )}
+          </CardContent>
         </Card>
 
+        {/* Modals */}
         <ReportDetailModal
           report={selectedReport}
           isOpen={isDetailModalOpen}

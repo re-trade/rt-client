@@ -1,5 +1,6 @@
 'use client';
 
+import BuyAgainDialog from '@/components/common/BuyAgainDialog';
 import PaymentStatus from '@/components/payment/PaymentStatus';
 import { useOrderDetail } from '@/hooks/use-order-detail';
 import {
@@ -13,6 +14,7 @@ import {
   Package,
   Phone,
   Receipt,
+  ShoppingCart,
   Star,
   User,
   XCircle,
@@ -27,6 +29,7 @@ export default function OrderDetailPage() {
   const orderId = params.id as string;
   const { currentOrder, isLoading, error, getStatusDisplay } = useOrderDetail(orderId);
   const [copiedOrderId, setCopiedOrderId] = useState(false);
+  const [showBuyAgainDialog, setShowBuyAgainDialog] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -44,6 +47,20 @@ export default function OrderDetailPage() {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const showButtonBuyAgain = () => {
+    if (!currentOrder || !currentOrder.items || currentOrder.items.length === 0) {
+      return false;
+    } else if (
+      currentOrder.orderStatus === 'COMPLETED' ||
+      currentOrder.orderStatus === 'RETURNED' ||
+      currentOrder.orderStatus !== 'DELIVERED'
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const handleCopyOrderId = () => {
@@ -144,7 +161,7 @@ export default function OrderDetailPage() {
                   </div>
                   {currentOrder.createDate && (
                     <div className="text-sm text-orange-100 mt-1">
-                      <span>Mua lúc: {formatDate(currentOrder.createDate)}</span>
+                      <span>Mua {formatDate(currentOrder.createDate)}</span>
                     </div>
                   )}
                 </div>
@@ -174,7 +191,11 @@ export default function OrderDetailPage() {
         </div>
 
         <PaymentStatus orderId={orderId} />
-
+        <BuyAgainDialog
+          isOpen={showBuyAgainDialog}
+          onClose={() => setShowBuyAgainDialog(false)}
+          items={currentOrder.items}
+        />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
             <div className="flex items-center space-x-3">
@@ -313,6 +334,17 @@ export default function OrderDetailPage() {
               </span>
             </div>
           </div>
+          {showButtonBuyAgain() && (
+            <div className="mt-6 pt-4 border-t border-orange-200">
+              <button
+                onClick={() => setShowBuyAgainDialog(true)}
+                className="flex items-center justify-center w-full gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>Mua lại</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
@@ -339,11 +371,10 @@ export default function OrderDetailPage() {
               <div>
                 <h3 className="font-bold text-gray-800 text-lg mb-3">Địa chỉ giao hàng</h3>
                 <div className="text-gray-600 space-y-1">
-                  <p className="leading-relaxed">{currentOrder.destination.addressLine}</p>
-                  <p>
-                    {currentOrder.destination.ward}, {currentOrder.destination.district}
+                  <p className="leading-relaxed">
+                    {currentOrder.destination.addressLine} {currentOrder.destination.ward},{' '}
+                    {currentOrder.destination.district} {currentOrder.destination.state}
                   </p>
-                  <p>{currentOrder.destination.state}</p>
                 </div>
               </div>
             </div>

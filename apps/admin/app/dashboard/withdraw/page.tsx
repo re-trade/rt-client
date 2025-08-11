@@ -20,11 +20,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useWithdrawManager } from '@/hooks/use-withdraw-manager';
-import { TWithdrawProfile } from '@/services/withdraw.api';
+import type { TWithdrawProfile } from '@/services/withdraw.api';
 import { AlertTriangle, Check, PauseCircle, Search, Store } from 'lucide-react';
 import { useState } from 'react';
 
-// Status mappings for display
 const statusLabels: Record<string, string> = {
   '0': 'Yêu cầu đã thực hiện',
   PENDING: 'Đang chờ',
@@ -41,10 +40,40 @@ const statusColors: Record<string, string> = {
   COMPLETED: 'bg-blue-100 text-blue-800 border border-blue-200',
 };
 
+const formatVietnameseDate = (dateInput: any): string => {
+  try {
+    let date: Date;
+
+    if (Array.isArray(dateInput)) {
+      const [year, month, day, hour, minute, second] = dateInput;
+      date = new Date(year, month - 1, day, hour, minute, second);
+    } else {
+      date = new Date(dateInput);
+    }
+
+    if (isNaN(date.getTime())) {
+      return 'N/A';
+    }
+
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+  } catch (error) {
+    return 'N/A';
+  }
+};
+
 export default function WithdrawManagementPage() {
   const [selectedWithdraw, setSelectedWithdraw] = useState<TWithdrawProfile | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [qrError, setQrError] = useState<string | null>(null);
+
   const {
     withdraws,
     loading,
@@ -84,7 +113,7 @@ export default function WithdrawManagementPage() {
     setSelectedWithdraw(withdraw);
     setQrCodeUrl(null);
     setQrError(null);
-    if (withdraw.status !== '0') {
+    if (withdraw.status !== '0' && withdraw.status !== 'COMPLETED') {
       await fetchQr(withdraw.id);
     }
   };
@@ -191,16 +220,7 @@ export default function WithdrawManagementPage() {
                   </TableCell>
                   <TableCell className="font-medium">{withdraw.amount}</TableCell>
                   <TableCell>{statusLabels[withdraw.status] || withdraw.status}</TableCell>
-                  <TableCell>
-                    {new Date(withdraw.createdDate).toLocaleString('vi-VN', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: false,
-                    })}
-                  </TableCell>
+                  <TableCell>{formatVietnameseDate(withdraw.createdDate)}</TableCell>
                   <TableCell>{withdraw.bankName}</TableCell>
                   <TableCell>{withdraw.bankBin}</TableCell>
                   <TableCell className="text-right">
@@ -310,13 +330,7 @@ export default function WithdrawManagementPage() {
                       Ngày tạo
                     </div>
                     <p className="font-medium">
-                      {selectedWithdraw.createdDate
-                        ? (() => {
-                            const [year, month, day, hour, minute, second] =
-                              selectedWithdraw.createdDate;
-                            return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
-                          })()
-                        : 'N/A'}
+                      {formatVietnameseDate(selectedWithdraw.createdDate)}
                     </p>
                   </div>
                 </div>

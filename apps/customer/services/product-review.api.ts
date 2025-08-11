@@ -32,7 +32,7 @@ export type ProductNoReview = {
   product: TProduct;
   orderDate: string;
   orderId: string;
-  orderComboId?: string;
+  orderComboId: string;
   orderAmount: number;
 };
 
@@ -91,12 +91,10 @@ export const reviewApi = {
     );
     return response.data.content;
   },
-  createReview: async (createReview: CreateReview): Promise<ReviewResponse> => {
+  createReview: async (review: CreateReview): Promise<ReviewResponse> => {
     const response = await authApi.default.post<IResponseObject<ReviewResponse>>(
       '/product-review',
-      {
-        createRequest: createReview,
-      },
+      review,
     );
     return response.data.content;
   },

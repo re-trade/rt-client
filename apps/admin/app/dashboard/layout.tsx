@@ -25,6 +25,7 @@ import {
   Settings,
   ShoppingCart,
   Store,
+  Tag,
   User,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -47,6 +48,7 @@ const menuItems = [
       { title: 'Quản lý đơn hàng', icon: ShoppingCart, href: '/dashboard/order' },
 
       { title: 'Quản lý Danh Mục', icon: FileText, href: '/dashboard/category' },
+      { title: 'Quản lý nhãn hàng', icon: Tag, href: '/dashboard/brand' },
     ],
   },
   {
