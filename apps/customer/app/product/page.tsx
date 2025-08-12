@@ -84,19 +84,31 @@ export default function ProductListPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
-                <div className="btn-group">
+              <div className="flex items-center">
+                <div className="inline-flex shadow-sm rounded-md">
                   <button
-                    className={`btn btn-sm ${viewMode === 'grid' ? 'btn-active bg-orange-500 border-orange-500' : 'btn-outline border-orange-200'}`}
+                    className={`flex items-center justify-center px-3 py-2 rounded-l-md transition-all duration-200 ${
+                      viewMode === 'grid'
+                        ? 'bg-orange-500 text-white shadow-md'
+                        : 'bg-white text-gray-700 border border-orange-200 hover:bg-orange-50'
+                    }`}
                     onClick={() => setViewMode('grid')}
+                    aria-label="Grid view"
+                    title="Grid view"
                   >
-                    <IconGridDots size={16} />
+                    <IconGridDots size={18} stroke={1.5} />
                   </button>
                   <button
-                    className={`btn btn-sm ${viewMode === 'list' ? 'btn-active bg-orange-500 border-orange-500' : 'btn-outline border-orange-200'}`}
+                    className={`flex items-center justify-center px-3 py-2 rounded-r-md transition-all duration-200 ${
+                      viewMode === 'list'
+                        ? 'bg-orange-500 text-white shadow-md'
+                        : 'bg-white text-gray-700 border border-orange-200 hover:bg-orange-50'
+                    }`}
                     onClick={() => setViewMode('list')}
+                    aria-label="List view"
+                    title="List view"
                   >
-                    <IconList size={16} />
+                    <IconList size={18} stroke={1.5} />
                   </button>
                 </div>
               </div>
