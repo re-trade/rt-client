@@ -62,7 +62,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     try {
       await addToCart(productDetail.id, quantity);
       showToast('Đã thêm vào giỏ hàng thành công!', 'success');
-    } catch (error) {
+    } catch (_) {
       showToast('Không thể thêm vào giỏ hàng.', 'error');
     } finally {
       setIsAddingToCart(false);
@@ -403,43 +403,47 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex items-center">
-                    {showButtonBuy() ? (
-                      <div>
-                        <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
-                          Số lượng:
-                        </span>
-                        <div className="flex items-center border border-orange-200 rounded-lg">
-                          <button
-                            onClick={() => handleQuantityChange(false)}
-                            className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={quantity <= 1}
-                          >
-                            <MdRemove size={16} className="text-gray-600" />
-                          </button>
-                          <input
-                            type="number"
-                            value={quantity}
-                            onChange={handleQuantityInput}
-                            className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
-                            min="1"
-                            max={productDetail.quantity}
-                          />
-                          <button
-                            onClick={() => handleQuantityChange(true)}
-                            className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={quantity >= productDetail.quantity}
-                          >
-                            <MdAdd size={16} className="text-gray-600" />
-                          </button>
+                  {auth ? (
+                    <div className="flex items-center">
+                      {showButtonBuy() ? (
+                        <div>
+                          <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                            Số lượng:
+                          </span>
+                          <div className="flex items-center border border-orange-200 rounded-lg">
+                            <button
+                              onClick={() => handleQuantityChange(false)}
+                              className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={quantity <= 1}
+                            >
+                              <MdRemove size={16} className="text-gray-600" />
+                            </button>
+                            <input
+                              type="number"
+                              value={quantity}
+                              onChange={handleQuantityInput}
+                              className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
+                              min="1"
+                              max={productDetail.quantity}
+                            />
+                            <button
+                              onClick={() => handleQuantityChange(true)}
+                              className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={quantity >= productDetail.quantity}
+                            >
+                              <MdAdd size={16} className="text-gray-600" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
-                        Số lượng: {productDetail.quantity}
-                      </span>
-                    )}
-                  </div>
+                      ) : (
+                        <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                          Số lượng: {productDetail.quantity}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
 
                   {auth ? (
                     <div className="flex gap-3 flex-1">
@@ -505,42 +509,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
               product={productDetail}
               initialQuantity={2}
             />
-            {/* Features */}
-            {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
-                <MdLocalShipping className="text-orange-500 flex-shrink-0" size={24} />
-                <div>
-                  <p className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>
-                    Miễn phí vận chuyển
-                  </p>
-                  <p className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
-                    Toàn quốc
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
-                <MdSecurity className="text-orange-500 flex-shrink-0" size={24} />
-                <div>
-                  <p className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>
-                    Bảo hành chính hãng
-                  </p>
-                  <p className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
-                    12 tháng
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
-                <MdAssignment className="text-orange-500 flex-shrink-0" size={24} />
-                <div>
-                  <p className="font-semibold text-gray-800" style={{ color: '#1f2937' }}>
-                    Đổi trả 7 ngày
-                  </p>
-                  <p className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
-                    Miễn phí
-                  </p>
-                </div>
-              </div>
-            </div> */}
           </div>
         </div>
 
@@ -795,28 +763,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 <h3 className="text-xl font-bold text-gray-800">Đánh giá từ khách hàng</h3>
                 <div className="text-center py-12 text-gray-500">
                   <ReviewsList productId={productDetail.id} />
-                  {/* {reviews.length === 0 ? (
-                    <>
-                      <MdStar size={48} className="mx-auto mb-4 text-gray-300" />
-                      <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-                    </>
-                  ) : (
-                    // <ReviewList reviews={reviews} />
-                    <div className="space-y-4">
-                      {reviews.map((review) => (
-                        <div key={review.id} className="p-4 bg-white rounded-lg shadow-sm">
-                          <div className="flex items-center gap-2 mb-2">
-                            <MdStar className="text-yellow-500" size={20} />
-                            <span className="font-semibold text-gray-800">{review.vote}</span>
-                          </div>
-                          <p className="text-gray-700">{review.content}</p>
-                          <div className="text-sm text-gray-500 mt-2">
-                            {new Date(review.createdAt).toLocaleDateString('vi-VN')}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )} */}
                 </div>
               </div>
             )}
@@ -826,22 +772,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
         <div className="mb-12">
           <ProductHistoryList history={productHistories} />
         </div>
-
-        {/* <div className="bg-white rounded-2xl shadow-lg border border-orange-100 mb-12">
-          <div className="p-6 border-b border-orange-100">
-            <h2 className="text-2xl font-bold text-gray-800" style={{ color: '#1f2937' }}>
-              Lịch sử giá
-            </h2>
-            <p className="text-gray-600 mt-1" style={{ color: '#6b7280' }}>
-              Theo dõi xu hướng giá của sản phẩm
-            </p>
-          </div>
-          <div className="p-6">
-            <div className="h-[300px]">
-              <Chart />
-            </div>
-          </div>
-        </div> */}
 
         <div className="bg-white rounded-2xl shadow-lg border border-orange-100">
           <div className="p-6 border-b border-orange-100">
