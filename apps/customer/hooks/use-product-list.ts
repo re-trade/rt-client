@@ -42,7 +42,7 @@ export function useProductList() {
   const [totalElements, setTotalElements] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
 
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 9;
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
