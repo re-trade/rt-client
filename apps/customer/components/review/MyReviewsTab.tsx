@@ -1,7 +1,7 @@
 'use client';
 
-import { ReviewResponse } from '@/services/product-review.api';
 import ImageGallery from '@components/gallery/ImageGallery';
+import { ReviewResponse } from '@services/product-review.api';
 import { Star, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
 

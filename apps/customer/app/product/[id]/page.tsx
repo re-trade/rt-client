@@ -7,13 +7,13 @@ import { useToast } from '@/context/ToastContext';
 import { useProductDetail } from '@/hooks/use-product-detail';
 import { reviewApi } from '@/services/product-review.api';
 import BuyNowDialog from '@components/common/BuyNowDialog';
-import ReviewsList from '@components/common/review/ListReview';
 import ImageGallery from '@components/gallery/ImageGallery';
 import ContentSkeleton from '@components/product/ProductContentSkeleton';
 import { ProductHistoryList } from '@components/product/ProductHistoryList';
 import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
 import ProductInfoSkeleton from '@components/product/ProductInfoSkeleton';
 import RelatedProducts from '@components/related-product/RelatedProduct';
+import ReviewsList from '@components/review/ListReview';
 import ShareButton from '@components/share/ShareButton';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -23,7 +23,6 @@ import { useEffect, useState } from 'react';
 import {
   MdAdd,
   MdAddShoppingCart,
-  MdFavoriteBorder,
   MdRemove,
   MdSecurity,
   MdStar,
@@ -62,7 +61,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     try {
       await addToCart(productDetail.id, quantity);
       showToast('Đã thêm vào giỏ hàng thành công!', 'success');
-    } catch (_) {
+    } catch (_error) {
       showToast('Không thể thêm vào giỏ hàng.', 'error');
     } finally {
       setIsAddingToCart(false);
@@ -117,8 +116,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
         try {
           const response = await reviewApi.getTotalReviews(productDetail.id);
           setTotalReviews(response);
-        } catch (error) {
-          console.error('Error fetching reviews:', error);
+        } catch (_error) {
+          // Error handled silently
         }
       }
     };
@@ -306,9 +305,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   {productDetail.name}
                 </h1>
                 <div className="flex gap-2 flex-shrink-0">
-                  <button className="p-3 rounded-full border border-orange-200 hover:bg-orange-50 transition-colors hover:scale-105">
-                    <MdFavoriteBorder size={20} className="text-orange-600" />
-                  </button>
                   <ShareButton
                     productName={productDetail.name}
                     productDescription={productDetail.shortDescription}
@@ -405,7 +401,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  {auth ? (
+                  {auth && (
                     <div className="flex items-center">
                       {showButtonBuy() ? (
                         <div>
@@ -438,13 +434,13 @@ function ProductDetail({ params }: { params: { id: string } }) {
                           </div>
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
-                          Số lượng: {productDetail.quantity}
-                        </span>
+                        auth && (
+                          <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                            Số lượng: {productDetail.quantity}
+                          </span>
+                        )
                       )}
                     </div>
-                  ) : (
-                    <div></div>
                   )}
 
                   {auth ? (
@@ -468,8 +464,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
                               </>
                             )}
                           </button>
-
-                          {/* Nút mua ngay */}
                           <button
                             className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors"
                             onClick={() => setShowBuyNow(true)}
@@ -508,7 +502,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
               isOpen={showBuyNow}
               onClose={() => setShowBuyNow(false)}
               product={productDetail}
-              initialQuantity={2}
+              initialQuantity={quantity}
             />
           </div>
         </div>

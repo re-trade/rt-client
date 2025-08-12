@@ -1,9 +1,9 @@
 'use client';
 
-import { fileApi } from '@/services/file.api';
-import { CreateReview, ProductNoReview, reviewApi } from '@/services/product-review.api';
+import { fileApi } from '@services/file.api';
+import { CreateReview, ProductNoReview, reviewApi } from '@services/product-review.api';
 import { Send, Star, Upload, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ReviewFormProps {
   product: ProductNoReview;
@@ -19,7 +19,6 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [createReview, setCreateReview] = useState<CreateReview>({
     orderId: product.orderId,
     content: '',
@@ -28,7 +27,6 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
     imageReview: [],
   });
 
-  // Đồng bộ createReview với rating, comment, images
   useEffect(() => {
     setCreateReview((prev) => ({
       ...prev,
@@ -47,8 +45,7 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
 
     const previewUrls = fileList.map((file) => URL.createObjectURL(file));
     setImages((prev) => [...prev, ...previewUrls]);
-
-    e.target.value = ''; // Cho phép chọn lại cùng file
+    e.target.value = '';
   };
 
   const removeImage = (index: number) => {
@@ -80,7 +77,6 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
         imageReview: reviewImageUrls,
         productId: product.product.id,
       };
-      console.log('data send create review', request);
       const response = await reviewApi.createReview(request);
       if (response === null) {
         console.log('lỗi');
@@ -120,7 +116,6 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
       <h4 className="text-lg font-semibold text-gray-800 mb-4">Viết đánh giá</h4>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Rating */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn *</label>
           <div className="flex items-center space-x-2">
@@ -150,7 +145,6 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
           </div>
         </div>
 
-        {/* Comment */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Nhận xét của bạn *</label>
           <textarea
@@ -165,13 +159,11 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
           <div className="text-right text-xs text-gray-500 mt-1">{comment.length}/500</div>
         </div>
 
-        {/* Image Upload */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Hình ảnh (Tùy chọn)
           </label>
           <div className="space-y-3">
-            {/* Upload Button */}
             <div className="flex items-center">
               <label
                 className={`cursor-pointer bg-white border-2 border-dashed border-gray-300 rounded-lg px-4 py-2 hover:border-orange-300 transition-colors flex items-center space-x-2 ${
@@ -194,7 +186,6 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
               <span className="text-xs text-gray-500 ml-3">Tối đa 5 hình ảnh</span>
             </div>
 
-            {/* Image Preview */}
             {images.length > 0 && (
               <div className="grid grid-cols-5 gap-2">
                 {images.map((image, index) => (
@@ -218,7 +209,6 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex space-x-3 pt-4">
           <button
             type="submit"
