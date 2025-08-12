@@ -51,12 +51,11 @@ const getSellerMetric = async (id: string): Promise<TSellerMetricResponse | unde
 };
 const getSellerInformation = async (): Promise<TSellerProfile | undefined> => {
   try {
-    const response =
-      await authApi.default.get<IResponseObject<TSellerProfile>>('/sellers/profile');
+    const response = await authApi.default.get<IResponseObject<TSellerProfile>>('/sellers/profile');
     return response.data.content;
   } catch {
     return undefined;
   }
 };
 
-export { getSellerMetric, getSellerProfile, getSellerInformation };
+export { getSellerInformation, getSellerMetric, getSellerProfile };

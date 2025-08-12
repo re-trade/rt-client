@@ -97,8 +97,9 @@ export default function Home() {
               Xoá bộ lọc
             </button>
           )}
-          <button className="text-[#121212] hover:text-[#525252] text-sm font-medium flex items-center gap-2 px-4 py-2 bg-[#FFD2B2] hover:bg-[#FFBB99] rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
-          onClick={() => router.push(`/product`)}
+          <button
+            className="text-[#121212] hover:text-[#525252] text-sm font-medium flex items-center gap-2 px-4 py-2 bg-[#FFD2B2] hover:bg-[#FFBB99] rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+            onClick={() => router.push(`/product`)}
           >
             Xem tất cả
             <ChevronRight className="w-4 h-4" />
