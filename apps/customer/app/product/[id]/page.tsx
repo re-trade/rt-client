@@ -36,7 +36,7 @@ import remarkGfm from 'remark-gfm';
 
 function ProductDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { auth } = useAuth();
+  const { auth, sellerProfile } = useAuth();
   const { addToCart } = useCart();
   const { showToast, messages } = useToast();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -69,7 +69,14 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setIsAddingToCart(false);
     }
   };
-
+  const showButtonBuy = () => {
+    if (sellerProfile && sellerProfile.verified) {
+      if (productDetail && productDetail.sellerId === sellerProfile.id) {
+        return false;
+      }
+    }
+    return true;
+  };
   const handleQuantityChange = (increment: boolean) => {
     if (increment) {
       if (productDetail && quantity < productDetail.quantity) {
@@ -88,7 +95,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     setGalleryIndex(index);
     setShowGallery(true);
   };
-  const { sellerProfile } = useSellerProfile(productDetail?.sellerId || '');
+
   const closeGallery = () => {
     setShowGallery(false);
   };
@@ -275,10 +282,9 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     openGallery(index);
                   }}
                   className={`relative min-w-[100px] h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 hover:shadow-md
-                    ${
-                      selectedImage === index
-                        ? 'border-orange-500 ring-2 ring-orange-200 shadow-md'
-                        : 'border-orange-200 hover:border-orange-300'
+                    ${selectedImage === index
+                      ? 'border-orange-500 ring-2 ring-orange-200 shadow-md'
+                      : 'border-orange-200 hover:border-orange-300'
                     }`}
                 >
                   <Image src={img} alt={`Ảnh ${index + 1}`} fill className="object-cover" />
@@ -371,11 +377,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     Tình trạng:
                   </span>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      productDetail.quantity > 0
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${productDetail.quantity > 0
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                      }`}
                     style={{
                       color: productDetail.quantity > 0 ? '#166534' : '#991b1b',
                       backgroundColor: productDetail.quantity > 0 ? '#dcfce7' : '#fee2e2',
@@ -398,63 +403,82 @@ function ProductDetail({ params }: { params: { id: string } }) {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex items-center">
-                    <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
-                      Số lượng:
-                    </span>
-                    <div className="flex items-center border border-orange-200 rounded-lg">
-                      <button
-                        onClick={() => handleQuantityChange(false)}
-                        className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={quantity <= 1}
-                      >
-                        <MdRemove size={16} className="text-gray-600" />
-                      </button>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={handleQuantityInput}
-                        className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
-                        min="1"
-                        max={productDetail.quantity}
-                      />
-                      <button
-                        onClick={() => handleQuantityChange(true)}
-                        className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={quantity >= productDetail.quantity}
-                      >
-                        <MdAdd size={16} className="text-gray-600" />
-                      </button>
-                    </div>
+                    {showButtonBuy() ? (
+                      <div>
+                        <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                          Số lượng:
+                        </span>
+                        <div className="flex items-center border border-orange-200 rounded-lg">
+                          <button
+                            onClick={() => handleQuantityChange(false)}
+                            className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity <= 1}
+                          >
+                            <MdRemove size={16} className="text-gray-600" />
+                          </button>
+                          <input
+                            type="number"
+                            value={quantity}
+                            onChange={handleQuantityInput}
+                            className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
+                            min="1"
+                            max={productDetail.quantity}
+                          />
+                          <button
+                            onClick={() => handleQuantityChange(true)}
+                            className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity >= productDetail.quantity}
+                          >
+                            <MdAdd size={16} className="text-gray-600" />
+                          </button>
+                        </div>
+                      </div>
+                    ):(
+                          <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                          Số lượng: {productDetail.quantity}
+                        </span>
+                    )}
                   </div>
 
                   {auth ? (
                     <div className="flex gap-3 flex-1">
-                      <button
-                        onClick={handleAddToCart}
-                        disabled={isAddingToCart || productDetail.quantity === 0}
-                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {isAddingToCart ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                            Đang thêm...
-                          </>
-                        ) : (
-                          <>
-                            <MdAddShoppingCart size={20} />
-                            Thêm vào giỏ
-                          </>
-                        )}
-                      </button>
-                      <button
-                        className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors"
-                        onClick={() => setShowBuyNow(true)}
-                        disabled={productDetail.quantity === 0}
-                        style={{ color: '#ffffff' }}
-                      >
-                        Mua ngay
-                      </button>
+                      {showButtonBuy() ? (
+                        <div className="flex gap-3 flex-1">
+                          {/* Nút thêm vào giỏ */}
+                          <button
+                            onClick={handleAddToCart}
+                            disabled={isAddingToCart || productDetail.quantity === 0}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          >
+                            {isAddingToCart ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                Đang thêm...
+                              </>
+                            ) : (
+                              <>
+                                <MdAddShoppingCart size={20} />
+                                Thêm vào giỏ
+                              </>
+                            )}
+                          </button>
+
+                          {/* Nút mua ngay */}
+                          <button
+                            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors"
+                            onClick={() => setShowBuyNow(true)}
+                            disabled={productDetail.quantity === 0}
+                          >
+                            Mua ngay
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center flex-1 bg-gray-50 rounded-lg border border-gray-200 p-4">
+                          <p className="text-gray-700 font-medium">🌟 Đây là sản phẩm của bạn</p>
+                        </div>
+                      )}
                     </div>
+
                   ) : (
                     <div className="flex-1 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                       <div className="text-gray-600 mb-4">
@@ -533,11 +557,10 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   onClick={() =>
                     setActiveTab(tab.key as 'description' | 'specifications' | 'reviews')
                   }
-                  className={`px-6 py-4 font-semibold transition-colors relative ${
-                    activeTab === tab.key
-                      ? 'text-orange-600 border-b-2 border-orange-600'
-                      : 'text-gray-600 hover:text-orange-600'
-                  }`}
+                  className={`px-6 py-4 font-semibold transition-colors relative ${activeTab === tab.key
+                    ? 'text-orange-600 border-b-2 border-orange-600'
+                    : 'text-gray-600 hover:text-orange-600'
+                    }`}
                   style={{
                     color: activeTab === tab.key ? '#ea580c' : '#6b7280',
                   }}
@@ -698,23 +721,23 @@ function ProductDetail({ params }: { params: { id: string } }) {
                       <span className="text-gray-800">
                         {productDetail.categories?.length > 0
                           ? productDetail.categories.map((cat, index) => {
-                              const colorClasses = [
-                                'text-orange-500 border-orange-500',
-                                'text-blue-500 border-blue-500',
-                                'text-yellow-500 border-yellow-500',
-                                'text-teal-500 border-teal-500',
-                                'text-red-500 border-red-500',
-                              ];
-                              const colorClass = colorClasses[index % colorClasses.length];
-                              return (
-                                <span
-                                  key={cat.name}
-                                  className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
-                                >
-                                  {cat.name}
-                                </span>
-                              );
-                            })
+                            const colorClasses = [
+                              'text-orange-500 border-orange-500',
+                              'text-blue-500 border-blue-500',
+                              'text-yellow-500 border-yellow-500',
+                              'text-teal-500 border-teal-500',
+                              'text-red-500 border-red-500',
+                            ];
+                            const colorClass = colorClasses[index % colorClasses.length];
+                            return (
+                              <span
+                                key={cat.name}
+                                className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
+                              >
+                                {cat.name}
+                              </span>
+                            );
+                          })
                           : 'Không có'}
                       </span>
                     </div>
@@ -725,23 +748,23 @@ function ProductDetail({ params }: { params: { id: string } }) {
                       <span className="text-gray-800">
                         {productDetail.tags?.length > 0
                           ? productDetail.tags.map((tag, index) => {
-                              const colorClasses = [
-                                'text-orange-500 border-orange-500',
-                                'text-blue-500 border-blue-500',
-                                'text-yellow-500 border-yellow-500',
-                                'text-teal-500 border-teal-500',
-                                'text-red-500 border-red-500',
-                              ];
-                              const colorClass = colorClasses[index % colorClasses.length];
-                              return (
-                                <span
-                                  key={tag}
-                                  className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
-                                >
-                                  {tag}
-                                </span>
-                              );
-                            })
+                            const colorClasses = [
+                              'text-orange-500 border-orange-500',
+                              'text-blue-500 border-blue-500',
+                              'text-yellow-500 border-yellow-500',
+                              'text-teal-500 border-teal-500',
+                              'text-red-500 border-red-500',
+                            ];
+                            const colorClass = colorClasses[index % colorClasses.length];
+                            return (
+                              <span
+                                key={tag}
+                                className={`border ${colorClass} px-2 py-1 rounded-md mr-2 text-sm font-medium`}
+                              >
+                                {tag}
+                              </span>
+                            );
+                          })
                           : 'Không có'}
                       </span>
                     </div>
