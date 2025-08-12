@@ -50,6 +50,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+// SellerStats component (unchanged)
 const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   const totalSellers = sellers.length;
   const verifiedSellers = sellers.filter((p) => p.verified).length;
@@ -90,6 +91,7 @@ const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   );
 };
 
+// AdvancedFilters component (updated to use TSellerProfile)
 const AdvancedFilters = ({
   sellers,
   searchQuery,
@@ -119,7 +121,7 @@ const AdvancedFilters = ({
   setEndDate: (date: string) => void;
   selectedState: string;
   setSelectedState: (state: string) => void;
-  sortField: keyof TSellerProfile;
+  sortField: keyof TSellerProfile; // Use keyof TSellerProfile for type safety
   setSortField: (field: keyof TSellerProfile) => void;
   sortOrder: 'asc' | 'desc';
   setSortOrder: (order: 'asc' | 'desc') => void;
@@ -221,6 +223,69 @@ const AdvancedFilters = ({
   );
 };
 
+// Warning Dialog for ID Card
+const IdCardWarningDialog = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  cardType,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  cardType: 'FRONT' | 'BACK';
+}) => {
+  const getCardTypeText = (type: 'FRONT' | 'BACK') => {
+    return type === 'FRONT' ? 'Mặt trước' : 'Mặt sau';
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-yellow-600">
+            <AlertTriangle className="h-5 w-5" />
+            Cảnh báo bảo mật
+          </DialogTitle>
+          <DialogDescription>
+            Bạn sắp xem hình ảnh CCCD {getCardTypeText(cardType)} của người bán. Đây là thông tin nhạy cảm và được bảo vệ theo quy định pháp luật.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-yellow-800">
+                <p className="font-medium mb-2">Lưu ý quan trọng:</p>
+                <ul className="space-y-1 text-xs">
+                  <li>• Không được phép tải xuống, sao chép hoặc chia sẻ hình ảnh CCCD</li>
+                  <li>• Chỉ xem để mục đích xác minh danh tính người bán</li>
+                  <li>• Tuân thủ quy định bảo mật thông tin cá nhân</li>
+                  <li>• Hành vi vi phạm sẽ bị xử lý theo quy định pháp luật</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose}>
+              Hủy
+            </Button>
+            <Button 
+              onClick={onConfirm}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              Tôi hiểu và muốn xem
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ID Card Image Modal (Updated without download)
 const IdCardImageModal = ({
   isOpen,
   onClose,
@@ -238,41 +303,59 @@ const IdCardImageModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent 
+        className="max-w-2xl"
+        onContextMenu={(e) => e.preventDefault()}
+        style={{ userSelect: 'none' }}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
             CCCD - {getCardTypeText(cardType)}
           </DialogTitle>
-          <DialogDescription>Hình ảnh CCCD của người bán</DialogDescription>
+          <DialogDescription>
+            Hình ảnh CCCD của người bán - Chỉ xem để xác minh danh tính
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4">
           {imageUrl ? (
             <>
-              <div className="relative w-full max-h-[500px] overflow-hidden rounded-lg border">
+              <div 
+                className="relative w-full max-h-[500px] overflow-hidden rounded-lg border"
+                onContextMenu={(e) => e.preventDefault()}
+                style={{ userSelect: 'none' }}
+              >
                 <img
                   src={imageUrl}
                   alt={`CCCD ${getCardTypeText(cardType)}`}
                   className="w-full h-auto object-contain"
+                  style={{ 
+                    userSelect: 'none', 
+                    pointerEvents: 'none',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none'
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
                 />
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = imageUrl;
-                    link.download = `cccd-${cardType.toLowerCase()}.jpg`;
-                    link.click();
-                  }}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Tải xuống
-                </Button>
-                <Button variant="outline" onClick={onClose}>
-                  Đóng
-                </Button>
+              <div className="flex flex-col gap-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <Shield className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-xs text-blue-800">
+                      <p className="font-medium mb-1">Thông tin bảo mật:</p>
+                      <p>Hình ảnh CCCD được hiển thị chỉ để xác minh danh tính. Vui lòng tuân thủ quy định bảo mật thông tin cá nhân.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={onClose}>
+                    Đóng
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
@@ -290,6 +373,7 @@ const IdCardImageModal = ({
   );
 };
 
+// Confirmation Dialog
 const ConfirmationDialog = ({
   isOpen,
   onClose,
@@ -336,6 +420,7 @@ const ConfirmationDialog = ({
   );
 };
 
+// SellerDetailModal (updated to show all information)
 const SellerDetailModal = ({
   seller,
   isOpen,
@@ -351,6 +436,7 @@ const SellerDetailModal = ({
 }) => {
   const [idCardImageUrl, setIdCardImageUrl] = useState<string | null>(null);
   const [isIdCardModalOpen, setIsIdCardModalOpen] = useState(false);
+  const [isWarningDialogOpen, setIsWarningDialogOpen] = useState(false);
   const [selectedCardType, setSelectedCardType] = useState<'FRONT' | 'BACK'>('FRONT');
   const [isLoadingIdCard, setIsLoadingIdCard] = useState(false);
   const [isLoadingAction, setIsLoadingAction] = useState(false);
@@ -394,11 +480,16 @@ const SellerDetailModal = ({
   };
 
   const handleViewIdCard = async (cardType: 'FRONT' | 'BACK') => {
-    setIsLoadingIdCard(true);
     setSelectedCardType(cardType);
+    setIsWarningDialogOpen(true);
+  };
+
+  const handleConfirmViewIdCard = async () => {
+    setIsLoadingIdCard(true);
+    setIsWarningDialogOpen(false);
 
     try {
-      const imageUrl = await getIdCardImage(seller.id, cardType);
+      const imageUrl = await getIdCardImage(seller.id, selectedCardType);
       setIdCardImageUrl(imageUrl);
       setIsIdCardModalOpen(true);
     } catch (error) {
@@ -434,6 +525,7 @@ const SellerDetailModal = ({
         setShowConfirmDialog(false);
         onClose();
       } else {
+        // Handle error
         console.error('Failed to update seller status');
       }
     } catch (error) {
@@ -564,7 +656,7 @@ const SellerDetailModal = ({
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Trạng thái cửa hàng</p>
                   <span
-                    className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       seller.verified
                         ? 'bg-green-100 text-green-800'
                         : 'bg-orange-100 text-orange-800'
@@ -576,7 +668,7 @@ const SellerDetailModal = ({
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Trạng thái CCCD</p>
                   <span
-                    className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${getIdentityStatusColor(
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getIdentityStatusColor(
                       seller.identityVerifiedStatus,
                     )}`}
                   >
@@ -713,6 +805,14 @@ const SellerDetailModal = ({
         </DialogContent>
       </Dialog>
 
+      {/* ID Card Warning Dialog */}
+      <IdCardWarningDialog
+        isOpen={isWarningDialogOpen}
+        onClose={() => setIsWarningDialogOpen(false)}
+        onConfirm={handleConfirmViewIdCard}
+        cardType={selectedCardType}
+      />
+
       {/* ID Card Image Modal */}
       <IdCardImageModal
         isOpen={isIdCardModalOpen}
@@ -737,6 +837,7 @@ const SellerDetailModal = ({
   );
 };
 
+// SellerActions (updated to use TSellerProfile)
 const SellerActions = ({
   seller,
   onVerify,
@@ -803,7 +904,7 @@ export default function SellerManagementPage() {
     searchSellers,
     handleBanSeller,
     handleUnbanSeller,
-  } = useSellerManager();
+  } = useSellerManager(); // Assume useSellerManager returns TSellerProfile[]
 
   const handleClearFilters = () => {
     setSearchQuery('');
@@ -859,6 +960,7 @@ export default function SellerManagementPage() {
     setIsDetailModalOpen(true);
   };
 
+  // Apply filters
   const filteredSellers = sellers
     .filter((seller) => {
       const matchesStatus =
@@ -1024,7 +1126,7 @@ export default function SellerManagementPage() {
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium whitespace-nowrap ${statusColors[String(seller.verified)]}`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[String(seller.verified)]}`}
                       >
                         {statusLabels[String(seller.verified)]}
                       </span>
