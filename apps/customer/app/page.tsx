@@ -40,8 +40,10 @@ export default function Home() {
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
       handleSelectedFilterChange('categories', [categoryId]);
+      router.push(`/category/${categoryId}`);
+    } else {
+      router.push('/product');
     }
-    router.push(`/category/${categoryId || ''}`);
   };
 
   const ProductSection = ({

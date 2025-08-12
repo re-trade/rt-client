@@ -323,7 +323,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   style={{ color: '#6b7280' }}
                 >
                   <MdStar className="text-yellow-400" size={16} />
-                  {productDetail.avgVote} ({totalReviews} đánh giá)
+                  {productDetail.avgVote ? Number(productDetail.avgVote).toFixed(1) : '0'} (
+                  {totalReviews} đánh giá)
                 </span>
                 <span className="text-gray-400" style={{ color: '#9ca3af' }}>
                   |
@@ -346,7 +347,8 @@ function ProductDetail({ params }: { params: { id: string } }) {
                   <div className="flex items-center gap-1">
                     <MdStar className="text-yellow-500" size={16} />
                     <span className="text-sm text-gray-600" style={{ color: '#6b7280' }}>
-                      {sellerProfile?.avgVote || 0} (256 đánh giá)
+                      {sellerProfile?.avgVote ? Number(sellerProfile.avgVote).toFixed(1) : '0'} (
+                      {totalReviews} đánh giá)
                     </span>
                   </div>
                 </div>
@@ -449,7 +451,6 @@ function ProductDetail({ params }: { params: { id: string } }) {
                     <div className="flex gap-3 flex-1">
                       {showButtonBuy() ? (
                         <div className="flex gap-3 flex-1">
-                          {/* Nút thêm vào giỏ */}
                           <button
                             onClick={handleAddToCart}
                             disabled={isAddingToCart || productDetail.quantity === 0}

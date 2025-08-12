@@ -44,7 +44,7 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
   };
 
   const formatRating = (rating: number) => {
-    return rating.toFixed(1) + '/5';
+    return Number(rating).toFixed(1) + '/5';
   };
 
   if (loading) {
@@ -177,7 +177,7 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
                   },
                   {
                     label: 'Đánh giá',
-                    value: sellerMetrics ? formatRating(sellerMetrics.avgVote) : '0/5',
+                    value: sellerMetrics ? formatRating(sellerMetrics.avgVote) : '0.0/5',
                     icon: IconStar,
                   },
                   {
