@@ -754,11 +754,9 @@ function ProductDetail({ params }: { params: { id: string } }) {
             )}
 
             {activeTab === 'reviews' && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-800">Đánh giá từ khách hàng</h3>
-                <div className="text-center py-12 text-gray-500">
-                  <ReviewsList productId={productDetail.id} />
-                </div>
+                <ReviewsList productId={productDetail.id} />
               </div>
             )}
           </div>

@@ -6,7 +6,6 @@ import { Calendar, ChevronDown, ChevronUp, MessageCircle, Star, ThumbsUp } from 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-// Constants for placeholder images
 const AVATAR_PLACEHOLDER = '/placeholder-avatar.png';
 const REVIEW_IMAGE_PLACEHOLDER = '/placeholder-review-image.png';
 
@@ -15,7 +14,6 @@ interface ReviewProps {
   totalReviews?: number;
 }
 
-// Define a safe image URL type
 type SafeImageUrl = string;
 
 const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
@@ -25,6 +23,9 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMoreReviews, setHasMoreReviews] = useState(true);
   const [ratingStats, setRatingStats] = useState<Record<number, number>>({
     5: 0,
     4: 0,
@@ -34,25 +35,34 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
   });
   const [averageRating, setAverageRating] = useState(0);
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
+  const fetchReviews = async (page: number = 0, append: boolean = false) => {
+    try {
+      if (!append) {
         setLoading(true);
-        const data = await reviewApi.getReviews(productId);
-        // Ensure all reviews have valid data structure
-        const validatedData = data.map((review) => ({
-          ...review,
-          author: {
-            ...review.author,
-            name: review.author?.name || 'Khách hàng',
-            avatarUrl: AVATAR_PLACEHOLDER,
-          },
-          images: Array.isArray(review.images)
-            ? review.images.map(() => REVIEW_IMAGE_PLACEHOLDER)
-            : [],
-        }));
+      } else {
+        setLoadingMore(true);
+      }
 
-        // Calculate rating statistics
+      const pageSize = 4;
+      const data = await reviewApi.getReviews(productId, page, pageSize);
+
+      const validatedData = data.map((review) => ({
+        ...review,
+        author: {
+          ...review.author,
+          name: review.author?.name || 'Khách hàng',
+          avatarUrl: AVATAR_PLACEHOLDER,
+        },
+        images: Array.isArray(review.images)
+          ? review.images.map(() => REVIEW_IMAGE_PLACEHOLDER)
+          : [],
+      }));
+
+      if (append) {
+        setReviews((prev) => [...prev, ...validatedData]);
+      } else {
+        setReviews(validatedData);
+
         const stats: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
         let sum = 0;
 
@@ -68,17 +78,32 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
         setAverageRating(
           validatedData.length > 0 ? Number((sum / validatedData.length).toFixed(1)) : 0,
         );
-        setReviews(validatedData);
-      } catch {
-        // Handle error quietly
-        setReviews([]);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchReviews();
+      setHasMoreReviews(validatedData.length === pageSize);
+    } catch {
+      if (!append) {
+        setReviews([]);
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    setCurrentPage(0);
+    setHasMoreReviews(true);
+    fetchReviews(0, false);
   }, [productId]);
+
+  const loadMoreReviews = () => {
+    if (!loadingMore && hasMoreReviews) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchReviews(nextPage, true);
+    }
+  };
 
   const toggleExpand = (reviewId: string) => {
     setExpandedReviews((prev) => {
@@ -90,7 +115,6 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
 
   const renderStars = (vote: number, size = 16) =>
     Array.from({ length: 5 }, (_, index) => {
-      // Handle partial stars (e.g. 4.5 stars)
       const isFilled = index < Math.floor(vote);
       const isHalf = !isFilled && index < Math.ceil(vote) && vote % 1 >= 0.4;
 
@@ -150,7 +174,6 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
     text.length <= maxLength ? text : `${text.substring(0, maxLength)}...`;
 
   const openGallery = (images: SafeImageUrl[], index: number) => {
-    // Always use placeholder images for gallery
     const placeholders = Array(images.length).fill(REVIEW_IMAGE_PLACEHOLDER);
     setGalleryImages(placeholders);
     setGalleryIndex(Math.min(index, Math.max(0, placeholders.length - 1)));
@@ -176,10 +199,8 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
   if (loading) {
     return (
       <div className="space-y-6">
-        {/* Review Summary */}
         <div className="bg-white rounded-xl shadow-md border border-orange-100 p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Overall Rating */}
             <div className="w-full md:w-1/3 flex flex-col items-center justify-center p-4 border-b md:border-b-0 md:border-r border-orange-100">
               <h3 className="font-semibold text-gray-700 mb-2">Đánh giá trung bình</h3>
               <div className="text-4xl font-bold text-orange-600 mb-2">{averageRating}</div>
@@ -189,7 +210,6 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
               </p>
             </div>
 
-            {/* Rating Distribution */}
             <div className="w-full md:w-2/3 p-4">
               <h3 className="font-semibold text-gray-700 mb-4">Phân bố đánh giá</h3>
               <div className="space-y-3">
@@ -280,7 +300,7 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 max-h-[600px] overflow-y-auto scroll-smooth">
       {reviews.map((review) => {
         const isExpanded = expandedReviews.has(review.id);
         const shouldTruncate = review.content.length > 150;
@@ -290,10 +310,9 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
             key={review.id}
             className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden hover:shadow-md hover:border-orange-200 transition-all duration-300 transform hover:-translate-y-1"
           >
-            <div className="p-6">
-              {/* Author Info */}
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-md">
+            <div className="p-4">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-md">
                   {review.author.avatarUrl ? (
                     <div className="relative w-full h-full">
                       <Image
@@ -320,7 +339,7 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
                 </div>
 
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-1">
                     <h4 className="font-semibold text-gray-900" style={{ color: '#111827' }}>
                       {review.author.name}
                     </h4>
@@ -328,7 +347,7 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
                       Đã mua hàng
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <div className="flex items-center gap-1">{renderStars(review.vote)}</div>
                     <span className="text-sm text-gray-400" style={{ color: '#9ca3af' }}>
                       •
@@ -344,8 +363,7 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
                 </div>
               </div>
 
-              {/* Content */}
-              <div className="mb-4">
+              <div className="mb-3">
                 <p
                   className={`text-gray-700 leading-relaxed text-start ${isExpanded ? 'animate-fadeIn' : ''}`}
                   style={{ color: '#374151' }}
@@ -355,7 +373,7 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
                 {shouldTruncate && (
                   <button
                     onClick={() => toggleExpand(review.id)}
-                    className="text-orange-600 hover:text-orange-700 text-sm mt-2 flex items-center gap-1 font-medium transition-colors hover:bg-orange-50 rounded-full px-3 py-1"
+                    className="text-orange-600 hover:text-orange-700 text-sm mt-1 flex items-center gap-1 font-medium transition-colors hover:bg-orange-50 rounded-full px-3 py-1"
                     style={{ color: '#ea580c' }}
                   >
                     {isExpanded ? (
@@ -375,8 +393,8 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
 
               {/* Images */}
               {Array.isArray(review.images) && review.images.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-sm text-gray-500 mb-2 flex items-center gap-1">
+                <div className="mb-3">
+                  <p className="text-sm text-gray-500 mb-1 flex items-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -394,14 +412,14 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
                     </svg>
                     Hình ảnh từ khách hàng
                   </p>
-                  <div className="flex gap-3 flex-wrap">
+                  <div className="flex gap-2 flex-wrap">
                     {review.images.map((url, index) => (
                       <div
                         key={index}
                         className="relative group cursor-pointer overflow-hidden"
                         onClick={() => openGallery(review.images, index)}
                       >
-                        <div className="relative w-24 h-24 rounded-lg border border-orange-100 group-hover:border-orange-300 transition-all duration-300 shadow-sm overflow-hidden">
+                        <div className="relative w-16 h-16 rounded-lg border border-orange-100 group-hover:border-orange-300 transition-all duration-300 shadow-sm overflow-hidden">
                           <Image
                             src="/placeholder-review-image.png"
                             alt={`Hình đánh giá sản phẩm ${index + 1}`}
@@ -464,7 +482,7 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-orange-100">
+              <div className="flex items-center justify-between pt-3 border-t border-orange-100">
                 <button className="flex items-center gap-2 text-gray-500 hover:text-orange-600 text-sm font-medium transition-colors group px-3 py-1 rounded-full hover:bg-orange-50">
                   <ThumbsUp size={16} className="group-hover:scale-110 transition-transform" />
                   Hữu ích ({review.helpful || 0})
@@ -492,28 +510,47 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
       />
 
       {/* Load more button */}
-      {reviews.length > 0 && (
-        <div className="text-center pt-6">
-          <button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-2 mx-auto">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="m16 12-4 4-4-4m4 4V8" />
-            </svg>
-            Xem thêm {Math.max(0, totalReviews - reviews.length)} đánh giá
+      {reviews.length > 0 && hasMoreReviews && (
+        <div className="text-center pt-4">
+          <button
+            onClick={loadMoreReviews}
+            disabled={loadingMore}
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            {loadingMore ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Đang tải...
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m16 12-4 4-4-4m4 4V8" />
+                </svg>
+                Xem thêm {Math.max(0, totalReviews - reviews.length)} đánh giá
+              </>
+            )}
           </button>
-          <p className="text-gray-500 text-sm mt-3">
+          <p className="text-gray-500 text-sm mt-2">
             Hiển thị {reviews.length} trong tổng số {totalReviews} đánh giá
           </p>
+        </div>
+      )}
+
+      {reviews.length > 0 && !hasMoreReviews && (
+        <div className="text-center pt-4">
+          <p className="text-gray-500 text-sm">Đã hiển thị tất cả {reviews.length} đánh giá</p>
         </div>
       )}
     </div>
