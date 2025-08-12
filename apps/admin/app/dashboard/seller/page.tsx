@@ -35,7 +35,6 @@ import {
   CheckCircle,
   Clock,
   CreditCard,
-  Download,
   Eye,
   Filter,
   Mail,
@@ -248,7 +247,8 @@ const IdCardWarningDialog = ({
             Cảnh báo bảo mật
           </DialogTitle>
           <DialogDescription>
-            Bạn sắp xem hình ảnh CCCD {getCardTypeText(cardType)} của người bán. Đây là thông tin nhạy cảm và được bảo vệ theo quy định pháp luật.
+            Bạn sắp xem hình ảnh CCCD {getCardTypeText(cardType)} của người bán. Đây là thông tin
+            nhạy cảm và được bảo vệ theo quy định pháp luật.
           </DialogDescription>
         </DialogHeader>
 
@@ -272,10 +272,7 @@ const IdCardWarningDialog = ({
             <Button variant="outline" onClick={onClose}>
               Hủy
             </Button>
-            <Button 
-              onClick={onConfirm}
-              className="bg-yellow-600 hover:bg-yellow-700"
-            >
+            <Button onClick={onConfirm} className="bg-yellow-600 hover:bg-yellow-700">
               Tôi hiểu và muốn xem
             </Button>
           </div>
@@ -303,7 +300,7 @@ const IdCardImageModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
+      <DialogContent
         className="max-w-2xl"
         onContextMenu={(e) => e.preventDefault()}
         style={{ userSelect: 'none' }}
@@ -321,7 +318,7 @@ const IdCardImageModal = ({
         <div className="flex flex-col items-center gap-4">
           {imageUrl ? (
             <>
-              <div 
+              <div
                 className="relative w-full max-h-[500px] overflow-hidden rounded-lg border"
                 onContextMenu={(e) => e.preventDefault()}
                 style={{ userSelect: 'none' }}
@@ -330,12 +327,12 @@ const IdCardImageModal = ({
                   src={imageUrl}
                   alt={`CCCD ${getCardTypeText(cardType)}`}
                   className="w-full h-auto object-contain"
-                  style={{ 
-                    userSelect: 'none', 
+                  style={{
+                    userSelect: 'none',
                     pointerEvents: 'none',
                     WebkitUserSelect: 'none',
                     MozUserSelect: 'none',
-                    msUserSelect: 'none'
+                    msUserSelect: 'none',
                   }}
                   onContextMenu={(e) => e.preventDefault()}
                   onDragStart={(e) => e.preventDefault()}
@@ -347,7 +344,10 @@ const IdCardImageModal = ({
                     <Shield className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-xs text-blue-800">
                       <p className="font-medium mb-1">Thông tin bảo mật:</p>
-                      <p>Hình ảnh CCCD được hiển thị chỉ để xác minh danh tính. Vui lòng tuân thủ quy định bảo mật thông tin cá nhân.</p>
+                      <p>
+                        Hình ảnh CCCD được hiển thị chỉ để xác minh danh tính. Vui lòng tuân thủ quy
+                        định bảo mật thông tin cá nhân.
+                      </p>
                     </div>
                   </div>
                 </div>
