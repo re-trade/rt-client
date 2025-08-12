@@ -31,7 +31,7 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
 
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-
+  const checkMyproduct = () => {};
   const {
     paymentMethods,
     selectedPaymentMethodId,

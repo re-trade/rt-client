@@ -5,7 +5,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useToast } from '@/context/ToastContext';
 import { useProductDetail } from '@/hooks/use-product-detail';
-import { useSellerProfile } from '@/hooks/use-seller-profile';
 import { reviewApi } from '@/services/product-review.api';
 import BuyNowDialog from '@components/common/BuyNowDialog';
 import ReviewsList from '@components/common/review/ListReview';
@@ -36,7 +35,7 @@ import remarkGfm from 'remark-gfm';
 
 function ProductDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { auth } = useAuth();
+  const { auth, sellerProfile } = useAuth();
   const { addToCart } = useCart();
   const { showToast, messages } = useToast();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -69,7 +68,14 @@ function ProductDetail({ params }: { params: { id: string } }) {
       setIsAddingToCart(false);
     }
   };
-
+  const showButtonBuy = () => {
+    if (sellerProfile && sellerProfile.verified) {
+      if (productDetail && productDetail.sellerId === sellerProfile.id) {
+        return false;
+      }
+    }
+    return true;
+  };
   const handleQuantityChange = (increment: boolean) => {
     if (increment) {
       if (productDetail && quantity < productDetail.quantity) {
@@ -88,7 +94,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
     setGalleryIndex(index);
     setShowGallery(true);
   };
-  const { sellerProfile } = useSellerProfile(productDetail?.sellerId || '');
+
   const closeGallery = () => {
     setShowGallery(false);
   };
@@ -398,62 +404,80 @@ function ProductDetail({ params }: { params: { id: string } }) {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex items-center">
-                    <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
-                      Số lượng:
-                    </span>
-                    <div className="flex items-center border border-orange-200 rounded-lg">
-                      <button
-                        onClick={() => handleQuantityChange(false)}
-                        className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={quantity <= 1}
-                      >
-                        <MdRemove size={16} className="text-gray-600" />
-                      </button>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={handleQuantityInput}
-                        className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
-                        min="1"
-                        max={productDetail.quantity}
-                      />
-                      <button
-                        onClick={() => handleQuantityChange(true)}
-                        className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={quantity >= productDetail.quantity}
-                      >
-                        <MdAdd size={16} className="text-gray-600" />
-                      </button>
-                    </div>
+                    {showButtonBuy() ? (
+                      <div>
+                        <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                          Số lượng:
+                        </span>
+                        <div className="flex items-center border border-orange-200 rounded-lg">
+                          <button
+                            onClick={() => handleQuantityChange(false)}
+                            className="p-2 hover:bg-orange-50 transition-colors rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity <= 1}
+                          >
+                            <MdRemove size={16} className="text-gray-600" />
+                          </button>
+                          <input
+                            type="number"
+                            value={quantity}
+                            onChange={handleQuantityInput}
+                            className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
+                            min="1"
+                            max={productDetail.quantity}
+                          />
+                          <button
+                            onClick={() => handleQuantityChange(true)}
+                            className="p-2 hover:bg-orange-50 transition-colors rounded-r-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity >= productDetail.quantity}
+                          >
+                            <MdAdd size={16} className="text-gray-600" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-600 mr-3" style={{ color: '#6b7280' }}>
+                        Số lượng: {productDetail.quantity}
+                      </span>
+                    )}
                   </div>
 
                   {auth ? (
                     <div className="flex gap-3 flex-1">
-                      <button
-                        onClick={handleAddToCart}
-                        disabled={isAddingToCart || productDetail.quantity === 0}
-                        className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {isAddingToCart ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                            Đang thêm...
-                          </>
-                        ) : (
-                          <>
-                            <MdAddShoppingCart size={20} />
-                            Thêm vào giỏ
-                          </>
-                        )}
-                      </button>
-                      <button
-                        className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors"
-                        onClick={() => setShowBuyNow(true)}
-                        disabled={productDetail.quantity === 0}
-                        style={{ color: '#ffffff' }}
-                      >
-                        Mua ngay
-                      </button>
+                      {showButtonBuy() ? (
+                        <div className="flex gap-3 flex-1">
+                          {/* Nút thêm vào giỏ */}
+                          <button
+                            onClick={handleAddToCart}
+                            disabled={isAddingToCart || productDetail.quantity === 0}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          >
+                            {isAddingToCart ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                Đang thêm...
+                              </>
+                            ) : (
+                              <>
+                                <MdAddShoppingCart size={20} />
+                                Thêm vào giỏ
+                              </>
+                            )}
+                          </button>
+
+                          {/* Nút mua ngay */}
+                          <button
+                            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors"
+                            onClick={() => setShowBuyNow(true)}
+                            disabled={productDetail.quantity === 0}
+                          >
+                            Mua ngay
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center flex-1 bg-gray-50 rounded-lg border border-gray-200 p-4">
+                          <p className="text-gray-700 font-medium">🌟 Đây là sản phẩm của bạn</p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="flex-1 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
