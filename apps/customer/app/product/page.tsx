@@ -20,7 +20,8 @@ export default function ProductListPage() {
     handleSelectedFilterChange,
     selectedFilter,
     page,
-    maxPage,
+    totalPages,
+    totalElements,
   } = useProductList();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
@@ -67,12 +68,14 @@ export default function ProductListPage() {
               transition={{ duration: 0.4 }}
             >
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                   Sản phẩm
-                  <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                    ({filteredProducts.length})
+                  <span className="text-lg font-medium text-gray-700">
+                    (<span className="text-orange-500 font-bold">{filteredProducts.length}</span>/
+                    <span className="text-orange-500 font-bold">{totalElements}</span>)
                   </span>
                 </h2>
+
                 {searchTerm && (
                   <p className="text-gray-600">
                     Kết quả tìm kiếm cho: &#34;
@@ -167,7 +170,7 @@ export default function ProductListPage() {
 
                 <Pagination
                   currentPage={page}
-                  totalPages={maxPage}
+                  totalPages={totalPages}
                   onPageChange={handlePageChange}
                   loading={isPaginating}
                 />
@@ -178,7 +181,7 @@ export default function ProductListPage() {
                   transition={{ duration: 0.4, delay: 0.2 }}
                 >
                   Hiển thị {page + 1}-{Math.min(page + productsPerPage, filteredProducts.length)}{' '}
-                  trong tổng số {filteredProducts.length} sản phẩm
+                  trong tổng số {totalElements} sản phẩm
                 </motion.div>
               </>
             )}
