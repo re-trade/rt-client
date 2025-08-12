@@ -6,9 +6,9 @@ import {
   TAccountMeResponse,
   TLocalLogin,
 } from '@/services/auth.api';
+import { getSellerInformation, TSellerProfile } from '@/services/seller.api';
 import { ETokenName } from '@retrade/util';
 import { useCallback, useEffect, useState } from 'react';
-import { TSellerProfile, getSellerInformation } from '@/services/seller.api';
 
 function useAuth() {
   const [auth, setIsAuth] = useState(false);
@@ -48,7 +48,7 @@ function useAuth() {
       try {
         await loginInternal(data);
         await isAuth();
-      } catch { }
+      } catch {}
     },
     [isAuth],
   );
