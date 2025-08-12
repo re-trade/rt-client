@@ -1,13 +1,17 @@
 'use client';
 
 import BuyAgainDialog from '@/components/common/BuyAgainDialog';
+import OrderStatusChangeDialog from '@/components/order/OrderStatusChangeDialog';
 import PaymentStatus from '@/components/payment/PaymentStatus';
+import { useToast } from '@/context/ToastContext';
 import { useOrderDetail } from '@/hooks/use-order-detail';
+import { orderApi } from '@/services/order.api';
 import {
   ArrowLeft,
   Calendar,
   Clock,
   Copy,
+  Edit3,
   Heart,
   MapPin,
   MessageCircle,
@@ -27,9 +31,12 @@ import { useState } from 'react';
 export default function OrderDetailPage() {
   const params = useParams();
   const orderId = params.id as string;
-  const { currentOrder, isLoading, error, getStatusDisplay } = useOrderDetail(orderId);
+  const { currentOrder, isLoading, error, getStatusDisplay, getOrderById } =
+    useOrderDetail(orderId);
+  const { showToast } = useToast();
   const [copiedOrderId, setCopiedOrderId] = useState(false);
   const [showBuyAgainDialog, setShowBuyAgainDialog] = useState(false);
+  const [showStatusChangeDialog, setShowStatusChangeDialog] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -67,6 +74,38 @@ export default function OrderDetailPage() {
     navigator.clipboard.writeText(orderId);
     setCopiedOrderId(true);
     setTimeout(() => setCopiedOrderId(false), 2000);
+  };
+
+  const handleStatusChange = async (action: 'cancel' | 'complete' | 'return', reason?: string) => {
+    try {
+      let updatedOrder;
+
+      switch (action) {
+        case 'cancel':
+          updatedOrder = await orderApi.cancelOrder(orderId, reason!);
+          showToast('Đơn hàng đã được hủy thành công', 'success');
+          break;
+        case 'complete':
+          updatedOrder = await orderApi.completeOrder(orderId);
+          showToast('Đơn hàng đã được hoàn thành', 'success');
+          break;
+        case 'return':
+          updatedOrder = await orderApi.requestReturn(orderId, reason!);
+          showToast('Yêu cầu trả hàng đã được gửi', 'success');
+          break;
+      }
+
+      await getOrderById();
+    } catch (error: any) {
+      showToast(error.message || 'Có lỗi xảy ra khi cập nhật trạng thái đơn hàng', 'error');
+      throw error;
+    }
+  };
+
+  const canChangeStatus = () => {
+    if (!currentOrder) return false;
+    const status = currentOrder.orderStatus;
+    return status === 'PENDING' || status === 'PAYMENT_CONFIRMATION' || status === 'DELIVERED';
   };
 
   const getStatusDisplayWithDescription = (statusId: string) => {
@@ -195,6 +234,12 @@ export default function OrderDetailPage() {
           isOpen={showBuyAgainDialog}
           onClose={() => setShowBuyAgainDialog(false)}
           items={currentOrder.items}
+        />
+        <OrderStatusChangeDialog
+          isOpen={showStatusChangeDialog}
+          onClose={() => setShowStatusChangeDialog(false)}
+          order={currentOrder}
+          onStatusChange={handleStatusChange}
         />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
@@ -383,6 +428,16 @@ export default function OrderDetailPage() {
 
         <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
           <div className="flex flex-wrap gap-3">
+            {canChangeStatus() && (
+              <button
+                onClick={() => setShowStatusChangeDialog(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Thay đổi trạng thái</span>
+              </button>
+            )}
+
             {currentOrder.orderStatus === 'DELIVERED' && (
               <>
                 <button className="flex items-center gap-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors duration-200">
@@ -402,7 +457,7 @@ export default function OrderDetailPage() {
             </button>
 
             <Link href="/user/purchase">
-              <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+              <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200">
                 <ArrowLeft className="w-4 h-4" />
                 <span>Quay lại danh sách</span>
               </button>
