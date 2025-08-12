@@ -98,4 +98,10 @@ export const ordersApi = {
       pageSize: pagination ? pagination.size || size : size,
     };
   },
+  async getOrderComboById(id: string) {
+    const response = await authApi.default.get<IResponseObject<OrderResponse>>(
+      `/orders/seller/combo/${id}`,
+    );
+    return response.data.success ? response.data.content : undefined;
+  },
 };

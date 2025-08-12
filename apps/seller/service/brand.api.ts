@@ -1,4 +1,4 @@
-import { authApi } from '@retrade/util';
+import { authApi, IResponseObject } from '@retrade/util';
 
 type TBrand = {
   id: string;
@@ -28,6 +28,25 @@ export const brandApi = {
       `/brands/all`,
     );
     return response.data.success ? response.data.content : [];
+  },
+  async getBrandByNameAndCategoryIds(categoryIds: string[], name?: string): Promise<TBrand[]> {
+    if (!categoryIds) {
+      return [];
+    }
+    const queryBuilder = new URLSearchParams();
+    categoryIds.forEach((categoryId) => {
+      queryBuilder.append('categoryId', categoryId);
+    });
+    if (name) {
+      queryBuilder.set('name', name);
+    }
+    const response = await authApi.default.get<IResponseObject<TBrand[]>>(
+      `/brands/categories?q=${queryBuilder.toString()}`,
+    );
+    if (response.data.success) {
+      return response.data.content;
+    }
+    return [];
   },
 };
 export type { TBrand };

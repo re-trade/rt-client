@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sid
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import {
+  AlertCircle,
   ChevronDown,
   DollarSign,
   LayoutDashboard,
@@ -77,6 +78,11 @@ const menuItems = [
         title: 'Chat với khách hàng',
         icon: MessageCircle,
         href: '/dashboard/chat',
+      },
+      {
+        title: 'Báo cáo',
+        icon: AlertCircle,
+        href: '/dashboard/report',
       },
     ],
   },

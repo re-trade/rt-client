@@ -6,6 +6,23 @@ import Joi from 'joi';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+export interface Province {
+  code: number;
+  name: string;
+  districts: District[];
+}
+
+export interface District {
+  code: number;
+  name: string;
+  wards: Ward[];
+}
+
+export interface Ward {
+  code: number;
+  name: string;
+}
+
 export type ValidationState = {
   isValid: boolean | null;
   isValidating: boolean;
@@ -33,6 +50,7 @@ export type CustomerRegisterHookReturn = {
   emailValidation: ValidationState;
 
   errors: Record<string, string>;
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 
   avatarFile: File | null;
   avatarPreview: string;
@@ -81,8 +99,11 @@ const registerSchema = Joi.object({
       'string.empty': 'Số điện thoại không được để trống',
       'string.pattern.base': 'Số điện thoại phải có 10 chữ số',
     }),
-  address: Joi.string().optional().allow('').max(200).messages({
+  address: Joi.string().required().min(1).max(200).messages({
+    'string.empty': 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã',
+    'string.min': 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã',
     'string.max': 'Địa chỉ không được vượt quá 200 ký tự',
+    'any.required': 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã',
   }),
   gender: Joi.string().optional().allow(''),
   password: Joi.string().required().min(6).max(128).messages({
@@ -99,20 +120,29 @@ const registerSchema = Joi.object({
 
 const useDebounce = (callback: () => void, delay: number, dependencies: React.DependencyList) => {
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const savedCallback = useRef(callback);
+
+  // Remember the latest callback
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(callback, delay);
+    timeoutRef.current = setTimeout(() => {
+      savedCallback.current();
+    }, delay);
 
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, dependencies);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...dependencies, delay]);
 
   const cancel = useCallback(() => {
     if (timeoutRef.current) {
@@ -197,7 +227,7 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
         isValidating: false,
         message: isAvailable ? 'Tên đăng nhập có thể sử dụng' : 'Tên đăng nhập đã được sử dụng',
       });
-    } catch (error) {
+    } catch {
       setUsernameValidation({
         isValid: false,
         isValidating: false,
@@ -239,7 +269,7 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
         isValidating: false,
         message: isAvailable ? 'Email có thể sử dụng' : 'Email đã được sử dụng',
       });
-    } catch (error) {
+    } catch {
       setEmailValidation({
         isValid: false,
         isValidating: false,
@@ -304,6 +334,10 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
             message: '',
           });
         }
+      } else if (name === 'address') {
+        // Always clear address errors when address is being set
+        // regardless of value to avoid validation conflicts
+        setErrors((prev) => ({ ...prev, address: '' }));
       }
     },
     [],
@@ -398,6 +432,18 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
           return;
         }
 
+        // Special handling for address field - check for province, district, and ward
+        // We need all three components in the address string
+        const addressParts = formData.address.split(',').map((part) => part.trim());
+        if (!formData.address || addressParts.length < 3) {
+          setErrors((prev) => ({
+            ...prev,
+            address: 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã',
+          }));
+          setIsLoading(false);
+          return;
+        }
+
         const validation = registerSchema.validate(formData, { abortEarly: false });
         if (validation.error) {
           const newErrors: Record<string, string> = {};
@@ -442,6 +488,7 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
     emailValidation,
 
     errors,
+    setErrors,
 
     avatarFile,
     avatarPreview,

@@ -321,7 +321,7 @@ export function useSellerRegistration() {
     }
     try {
       setLoading(true);
-      const response = await unAuthApi.province.get<District>(`/d/${districtCode}?depth=3`);
+      const response = await unAuthApi.province.get<District>(`/d/${districtCode}?depth=2`);
       setWards(response.data.wards || []);
     } catch (error) {
       console.error('Failed to fetch wards:', error);

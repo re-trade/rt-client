@@ -18,9 +18,15 @@ interface SelectBrandProps {
   value: string;
   currentBrandId?: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
-export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProps) {
+export function SelectBrand({
+  value,
+  currentBrandId,
+  onChange,
+  disabled = false,
+}: SelectBrandProps) {
   const [brands, setBrands] = useState<TBrand[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -36,6 +42,8 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
         const data = await brandApi.getAllBrandNoPagination();
         setBrands(data);
         setFilteredBrands(data);
+
+        // If we have a currentBrandId, try to find and select it in the fetched brands
         if (currentBrandId) {
           const current = data.find((b) => b.id === currentBrandId);
           if (current) {
@@ -90,6 +98,8 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
   }, [open, selectedBrand]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
+
     const newValue = e.target.value;
     setInputValue(newValue);
 
@@ -103,10 +113,12 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
   };
 
   const handleInputFocus = () => {
-    setOpen(true);
+    if (!disabled) setOpen(true);
   };
 
   const handleInputClick = () => {
+    if (disabled) return;
+
     setOpen(true);
     if (selectedBrand && inputValue === selectedBrand.name) {
       setInputValue('');
@@ -114,6 +126,9 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
   };
 
   const handleSelectBrand = (brand: TBrand) => {
+    if (disabled) return;
+
+    // Update the selected brand ID and display name
     onChange(brand.id);
     setInputValue(brand.name);
     setOpen(false);
@@ -137,8 +152,8 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
           onClick={handleInputClick}
           onKeyDown={handleKeyDown}
           placeholder={loading ? 'Đang tải...' : 'Chọn hoặc tìm thương hiệu...'}
-          disabled={loading}
-          className="pr-8"
+          disabled={loading || disabled}
+          className={`pr-8 ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           autoComplete="off"
         />
         <ChevronsUpDown className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 shrink-0 opacity-50 pointer-events-none" />
@@ -156,7 +171,7 @@ export function SelectBrand({ value, currentBrandId, onChange }: SelectBrandProp
                       key={brand.id}
                       value={brand.name}
                       onSelect={() => handleSelectBrand(brand)}
-                      className="cursor-pointer"
+                      className={disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
                     >
                       <Check
                         className={cn(

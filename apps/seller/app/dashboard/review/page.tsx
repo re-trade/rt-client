@@ -215,9 +215,9 @@ export default function ReviewsPage() {
               Danh sách đánh giá
             </h1>
           </div>
-          <p className="text-muted-foreground">
+          <span className="text-muted-foreground">
             Xem và phản hồi đánh giá từ khách hàng để cải thiện dịch vụ
-          </p>
+          </span>
         </div>
 
         {/* Stats */}
@@ -252,7 +252,7 @@ export default function ReviewsPage() {
                   placeholder="Tìm kiếm theo tên khách hàng, sản phẩm, nội dung..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   className="pl-10 h-10"
                   disabled={isFiltering}
                 />
@@ -266,29 +266,29 @@ export default function ReviewsPage() {
                 <SelectContent>
                   <SelectItem value="all">Tất cả đánh giá</SelectItem>
                   <SelectItem value="5">
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />5 sao
-                    </div>
+                    </span>
                   </SelectItem>
                   <SelectItem value="4">
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />4 sao
-                    </div>
+                    </span>
                   </SelectItem>
                   <SelectItem value="3">
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />3 sao
-                    </div>
+                    </span>
                   </SelectItem>
                   <SelectItem value="2">
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />2 sao
-                    </div>
+                    </span>
                   </SelectItem>
                   <SelectItem value="1">
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />1 sao
-                    </div>
+                    </span>
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -301,16 +301,16 @@ export default function ReviewsPage() {
                 <SelectContent>
                   <SelectItem value="all">Tất cả phản hồi</SelectItem>
                   <SelectItem value="REPLY">
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-green-600" />
                       Đã phản hồi
-                    </div>
+                    </span>
                   </SelectItem>
                   <SelectItem value="NO_REPLY">
-                    <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-yellow-600" />
                       Chưa phản hồi
-                    </div>
+                    </span>
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -354,14 +354,14 @@ export default function ReviewsPage() {
         {/* Results Summary */}
         {productReviews && productReviews.length > 0 && (
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               Hiển thị {productReviews.length} kết quả
               {activeFiltersCount > 0 && (
                 <span className="ml-1 font-medium">
                   với {activeFiltersCount} bộ lọc được áp dụng
                 </span>
               )}
-            </p>
+            </span>
           </div>
         )}
 

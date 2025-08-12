@@ -34,7 +34,7 @@ interface ReviewTableProps {
 export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps) {
   const renderStars = (rating: number) => {
     return (
-      <div className="flex items-center gap-1">
+      <span className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
@@ -43,7 +43,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
             }`}
           />
         ))}
-      </div>
+      </span>
     );
   };
 
@@ -65,8 +65,10 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
           <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
             <MessageSquare className="h-8 w-8 text-gray-400" />
           </div>
-          <p className="text-lg font-medium text-gray-900 mb-2">Chưa có đánh giá nào</p>
-          <p className="text-muted-foreground">Các đánh giá từ khách hàng sẽ xuất hiện tại đây</p>
+          <div className="text-lg font-medium text-gray-900 mb-2">Chưa có đánh giá nào</div>
+          <div className="text-muted-foreground">
+            Các đánh giá từ khách hàng sẽ xuất hiện tại đây
+          </div>
         </CardContent>
       </Card>
     );
@@ -98,18 +100,18 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                     }`}
                   >
                     <TableCell className="py-4">
-                      <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-3">
                         <Avatar className="h-12 w-12 border-2 border-gray-100">
                           <AvatarImage src={review.author.avatarUrl || '/placeholder.svg'} />
                           <AvatarFallback className="font-semibold bg-orange-500 text-white">
                             {review.author.name.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <div className="font-semibold text-gray-900 mb-1">
+                        <span>
+                          <span className="font-semibold text-gray-900 mb-1 block">
                             {review.author.name}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          </span>
+                          <span className="flex items-center gap-2 text-sm text-muted-foreground">
                             {review.isVerifiedPurchase && (
                               <>
                                 <CheckCircle className="h-3 w-3 text-orange-600" />
@@ -122,14 +124,14 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                                 <span className="text-orange-600">{review.helpful}</span>
                               </>
                             )}
-                          </div>
-                        </div>
-                      </div>
+                          </span>
+                        </span>
+                      </span>
                     </TableCell>
 
                     <TableCell className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
+                      <span className="flex items-center gap-3">
+                        <span className="relative">
                           <Image
                             src={review.product.thumbnailUrl || '/placeholder.svg'}
                             alt={review.product.productName}
@@ -137,57 +139,59 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                             height={50}
                             className="rounded-lg object-cover border-2 border-gray-100"
                           />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900 mb-1">
+                        </span>
+                        <span className="flex-1">
+                          <span className="font-medium text-gray-900 mb-1 block">
                             {truncateText(review.product.productName, 30)}
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          </span>
+                          <span className="flex items-center gap-2 text-xs text-muted-foreground">
                             <Package className="h-3 w-3" />
                             <span>#{review.orderId}</span>
-                          </div>
-                        </div>
-                      </div>
+                          </span>
+                        </span>
+                      </span>
                     </TableCell>
 
                     <TableCell className="py-4">
-                      <div className="space-y-2">
+                      <span className="space-y-2 inline-block">
                         {renderStars(review.vote)}
-                        <Badge className={getRatingColor(review.vote)}>{review.vote}/5 sao</Badge>
-                      </div>
+                        <Badge className={`${getRatingColor(review.vote)} block mt-2`}>
+                          {review.vote}/5 sao
+                        </Badge>
+                      </span>
                     </TableCell>
 
                     <TableCell className="py-4 max-w-xs">
-                      <div className="space-y-2">
-                        <div className="text-sm text-gray-700 leading-relaxed">
+                      <span className="space-y-2 inline-block">
+                        <span className="text-sm text-gray-700 leading-relaxed block">
                           {truncateText(review.content, 80)}
-                        </div>
+                        </span>
                         {review.imageUrls && review.imageUrls.length > 0 && (
-                          <div className="flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full w-fit">
+                          <span className="flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full mt-2 inline-flex">
                             <ImageIcon className="h-3 w-3" />
                             <span>+{review.imageUrls.length} hình ảnh</span>
-                          </div>
+                          </span>
                         )}
-                      </div>
+                      </span>
                     </TableCell>
 
                     <TableCell className="py-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                      <span className="space-y-1 inline-block">
+                        <span className="flex items-center gap-2 text-sm font-medium text-gray-900 block">
                           <Calendar className="h-3 w-3" />
                           {new Date(review.createdAt).toLocaleDateString('vi-VN')}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
+                        </span>
+                        <span className="text-xs text-muted-foreground block">
                           {new Date(review.createdAt).toLocaleTimeString('vi-VN', {
                             hour: '2-digit',
                             minute: '2-digit',
                           })}
-                        </div>
-                      </div>
+                        </span>
+                      </span>
                     </TableCell>
 
                     <TableCell className="py-4">
-                      <div className="space-y-1">
+                      <span className="space-y-1 inline-block">
                         {review.reply ? (
                           <Badge className="bg-green-100 text-green-800 border-green-200">
                             <MessageSquare className="h-3 w-3 mr-1" />
@@ -200,15 +204,15 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                           </Badge>
                         )}
                         {review.reply && (
-                          <div className="text-xs text-muted-foreground">
+                          <span className="text-xs text-muted-foreground block mt-1">
                             {new Date(review.reply.createdAt).toLocaleDateString('vi-VN')}
-                          </div>
+                          </span>
                         )}
-                      </div>
+                      </span>
                     </TableCell>
 
                     <TableCell className="py-4">
-                      <div className="flex items-center justify-center gap-2">
+                      <span className="flex items-center justify-center gap-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -227,7 +231,7 @@ export function ReviewTable({ reviews, onViewDetail, onReply }: ReviewTableProps
                             <MessageSquare className="h-4 w-4" />
                           </Button>
                         )}
-                      </div>
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

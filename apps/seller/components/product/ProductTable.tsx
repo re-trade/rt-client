@@ -1,3 +1,6 @@
+'use client';
+import { UpdateProductQuantityDialog } from '@/components/dialog-common/view-update/update-product-quantity-dialog';
+import { UpdateProductStatusDialog } from '@/components/dialog-common/view-update/update-product-status-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +15,8 @@ import {
   Eye,
   FileText,
   MoreHorizontal,
+  Package,
+  RefreshCw,
   Star,
   Tags,
   Trash,
@@ -39,6 +44,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import Image from 'next/image';
+import { useState } from 'react';
 
 const getStatusBadge = (status: TProductStatus) => {
   switch (status) {
@@ -143,6 +149,20 @@ const ProductTable = ({
   sort = { field: '', direction: null },
   handleSortChange,
 }: ProductTableProps) => {
+  const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
+  const [isUpdateQuantityOpen, setIsUpdateQuantityOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
+
+  const handleUpdateStatus = (product: TProduct) => {
+    setSelectedProduct(product);
+    setIsUpdateStatusOpen(true);
+  };
+
+  const handleUpdateQuantity = (product: TProduct) => {
+    setSelectedProduct(product);
+    setIsUpdateQuantityOpen(true);
+  };
+
   if (loading) {
     return <ProductListSkeleton />;
   }
@@ -331,7 +351,7 @@ const ProductTable = ({
                     className="hover:bg-slate-50/50 transition-colors border-slate-100"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <TableBody>
+                    <TableCell>
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-slate-100 shadow-sm">
                         <Image
                           src={product.thumbnail || '/placeholder.svg'}
@@ -340,7 +360,7 @@ const ProductTable = ({
                           className="object-cover transition-transform hover:scale-110"
                         />
                       </div>
-                    </TableBody>
+                    </TableCell>
                     <TableCell>
                       <div className="font-semibold text-slate-900 line-clamp-2 hover:text-blue-600 transition-colors">
                         {product.name}
@@ -409,6 +429,22 @@ const ProductTable = ({
                             <Edit className="mr-2 h-4 w-4" />
                             Chỉnh sửa
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleUpdateStatus(product)}
+                            className="hover:bg-blue-50 hover:text-blue-700"
+                          >
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Cập nhật trạng thái
+                          </DropdownMenuItem>
+                          {!product.retraded && (
+                            <DropdownMenuItem
+                              onClick={() => handleUpdateQuantity(product)}
+                              className="hover:bg-green-50 hover:text-green-700"
+                            >
+                              <Package className="mr-2 h-4 w-4" />
+                              Cập nhật số lượng
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => handleDeleteProduct(product)}
@@ -427,6 +463,18 @@ const ProductTable = ({
           </div>
         </CardContent>
       </Card>
+
+      <UpdateProductQuantityDialog
+        open={isUpdateQuantityOpen}
+        onOpenChange={setIsUpdateQuantityOpen}
+        product={selectedProduct}
+        onSuccess={() => {
+          if (handlePageChange) {
+            handlePageChange(currentPage);
+          }
+        }}
+      />
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -436,6 +484,17 @@ const ProductTable = ({
         onPageSizeChange={handlePageSizeChange}
         loading={loading || refreshing}
         pageSizeOptions={[10, 15, 20, 50]}
+      />
+
+      <UpdateProductStatusDialog
+        open={isUpdateStatusOpen}
+        onOpenChange={setIsUpdateStatusOpen}
+        product={selectedProduct}
+        onSuccess={() => {
+          if (handlePageChange) {
+            handlePageChange(currentPage);
+          }
+        }}
       />
     </div>
   );
