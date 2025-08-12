@@ -230,9 +230,7 @@ const Pagination = ({
         </div>
       )}
 
-      {/* Pagination Controls */}
       <div className={`flex flex-wrap justify-center items-center ${currentSizeConfig.gap}`}>
-        {/* Previous Button */}
         <button
           onClick={handlePrevious}
           disabled={currentPage === 1 || loading}
@@ -244,7 +242,6 @@ const Pagination = ({
           <span className="hidden sm:inline">{defaultLabels.previous}</span>
         </button>
 
-        {/* Page Numbers */}
         <div className={`flex items-center ${currentSizeConfig.gap}`}>
           {getVisiblePages().map((page, index) => (
             <button
@@ -264,7 +261,6 @@ const Pagination = ({
           ))}
         </div>
 
-        {/* Next Button */}
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages || loading}
@@ -277,7 +273,6 @@ const Pagination = ({
         </button>
       </div>
 
-      {/* Quick Jump (for larger datasets) */}
       {showQuickJump && totalPages > quickJumpThreshold && (
         <div
           className={`flex justify-center items-center gap-2 mt-4 pt-4 ${
