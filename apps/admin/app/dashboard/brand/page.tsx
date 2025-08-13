@@ -293,7 +293,7 @@ const BrandManagementPage = () => {
                                 ? brand.description.length > 50
                                   ? brand.description.slice(0, 50) + '...'
                                   : brand.description
-                                : 'Chưa có mô tả'}
+                                : 'Không có mô tả'}
                             </span>
                           </TableCell>
                           {/* Created Date */}
