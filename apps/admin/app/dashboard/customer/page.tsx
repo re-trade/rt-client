@@ -1,9 +1,9 @@
 'use client';
 
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Dialog,
   DialogContent,
@@ -31,7 +31,6 @@ import {
 import { useCustomerManager } from '@/hooks/use-customer-manager';
 import {
   AlertCircle,
-  Calendar,
   CheckCircle,
   Eye,
   Filter,
@@ -280,7 +279,7 @@ const CustomerDetailModal = ({
             <div className="relative">
               {customer.avatarUrl ? (
                 <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-                  <AvatarFallback className='text-5xl font-medium bg-orange-500 text-white'>
+                  <AvatarFallback className="text-5xl font-medium bg-orange-500 text-white">
                     {getCustomerInitials(customer.firstName + ' ' + customer.lastName)}
                   </AvatarFallback>
                 </Avatar>
@@ -290,8 +289,9 @@ const CustomerDetailModal = ({
                 </div>
               )}
               <Badge
-                className={`absolute -bottom-2 -right-2 px-3 py-1 ${isEnabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'
-                  }`}
+                className={`absolute -bottom-2 -right-2 px-3 py-1 ${
+                  isEnabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'
+                }`}
               >
                 {isEnabled ? 'Hoạt động' : 'Bị khóa'}
               </Badge>
@@ -318,23 +318,31 @@ const CustomerDetailModal = ({
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <p className="text-sm font-medium text-gray-600 mb-1">Họ</p>
-                    <p className="text-gray-900 font-semibold text-lg">{customer.firstName}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-medium text-gray-600">Họ: </p>
+                      <p className="text-gray-900 font-semibold text-lg">{customer.firstName}</p>
+                    </div>
                   </div>
                   <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <p className="text-sm font-medium text-gray-600 mb-1">Tên</p>
-                    <p className="text-gray-900 font-semibold text-lg">{customer.lastName}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-medium text-gray-600">Tên: </p>
+                      <p className="text-gray-900 font-semibold text-lg">{customer.lastName}</p>
+                    </div>
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-sm font-medium text-gray-600 mb-2">Giới tính</p>
-                  <Badge variant="outline" className="text-base px-3 py-1">
-                    {customer.gender === '0' ? '👨 Nam' : '👩 Nữ'}
-                  </Badge>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm font-medium text-gray-600">Giới tính: </p>
+                    <Badge variant="outline" className="text-base px-3 py-1">
+                      {customer.gender === '0' ? '👨 Nam' : '👩 Nữ'}
+                    </Badge>
+                  </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <p className="text-sm font-medium text-gray-600 mb-1">Ngày sinh</p>
-                  <p className="text-gray-900 font-semibold">{customer.dob}</p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm font-medium text-gray-600">Ngày sinh: </p>
+                    <p className="text-gray-900 font-semibold">{customer.dob}</p>
+                  </div>
                 </div>
               </div>
             </Card>
@@ -358,26 +366,22 @@ const CustomerDetailModal = ({
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3">
                     <div className="p-2 bg-green-100 rounded-full">
                       <Phone className="h-4 w-4 text-green-600" />
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Số điện thoại</p>
+                    <p className="text-sm font-medium text-gray-600">Số điện thoại: </p>
+                    <p className="text-gray-900 font-medium">{customer.phoneNumber || customer.phone}</p>
                   </div>
-                  <p className="text-gray-900 font-medium ml-11">
-                    {customer.phoneNumber || customer.phone}
-                  </p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-full">
                       <MapPin className="h-4 w-4 text-purple-600" />
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Địa chỉ</p>
+                    <p className="text-sm font-medium text-gray-600">Địa chỉ: </p>
+                    <p className="text-gray-900 font-medium">{customer.address || 'Không có thông tin'}</p>
                   </div>
-                  <p className="text-gray-900 font-medium ml-11">
-                    {customer.address || 'Không có thông tin'}
-                  </p>
                 </div>
               </div>
             </Card>
@@ -425,6 +429,7 @@ const CustomerDetailModal = ({
     </Dialog>
   );
 };
+
 export default function CustomerManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -474,7 +479,7 @@ export default function CustomerManagementPage() {
     goToPage(newPage, searchQuery);
   };
 
-    const getCustomerInitials = (name: string) => {
+  const getCustomerInitials = (name: string) => {
     return name
       .split(' ')
       .map((word) => word.charAt(0))
@@ -672,8 +677,9 @@ export default function CustomerManagementPage() {
                       {filteredCustomers.map((customer, index) => (
                         <TableRow
                           key={customer.id}
-                          className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                          className={`hover:bg-gray-50 transition-colors ${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                         >
                           <TableCell className="font-mono text-sm text-gray-600">
                             #{customer.id}
@@ -684,7 +690,9 @@ export default function CustomerManagementPage() {
                               {customer.avatarUrl ? (
                                 <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
                                   <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
-                                    {getCustomerInitials(customer.firstName + ' ' + customer.lastName)}
+                                    {getCustomerInitials(
+                                      customer.firstName + ' ' + customer.lastName,
+                                    )}
                                   </AvatarFallback>
                                 </Avatar>
                               ) : (
@@ -721,10 +729,11 @@ export default function CustomerManagementPage() {
 
                           <TableCell>
                             <Badge
-                              className={`${customer.enabled
+                              className={`${
+                                customer.enabled
                                   ? 'bg-green-100 text-green-800 border-green-200'
                                   : 'bg-red-100 text-red-800 border-red-200'
-                                } font-medium`}
+                              } font-medium`}
                               variant="outline"
                             >
                               {customer.enabled ? (
@@ -789,10 +798,11 @@ export default function CustomerManagementPage() {
                                 variant={page === pageNum ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handlePageChange(pageNum)}
-                                className={`w-10 h-8 ${page === pageNum
+                                className={`w-10 h-8 ${
+                                  page === pageNum
                                     ? 'bg-blue-600 text-white'
                                     : 'text-gray-700 hover:bg-gray-100'
-                                  }`}
+                                }`}
                               >
                                 {pageNum}
                               </Button>
