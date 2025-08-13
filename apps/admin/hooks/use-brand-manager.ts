@@ -92,6 +92,56 @@ const useBrandManager = (initialPage = 1, pageSize = 10) => {
     [fetchBrands, page],
   );
 
+  const updateBrand = useCallback(
+    async (id: string, data: BrandInput): Promise<{ success: boolean; message: string }> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await postBrand(data);
+        if (response.success) {
+          await fetchBrands(undefined, page);
+          return { success: true, message: 'Brand updated successfully' };
+        } else {
+          const msg = response.messages?.[0] || 'Failed to update brand';
+          setError(msg);
+          return { success: false, message: msg };
+        }
+      } catch (err: any) {
+        const msg = err.message || 'Failed to update brand';
+        setError(msg);
+        return { success: false, message: msg };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBrands, page],
+  );
+
+  const deleteBrand = useCallback(
+    async (id: string): Promise<{ success: boolean; message: string }> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await deleteBrand(id);
+        if (response.success) {
+          await fetchBrands(undefined, page);
+          return { success: true, message: 'Brand deleted successfully' };
+        } else {
+          const msg = response.message?.[0] || 'Failed to delete brand';
+          setError(msg);
+          return { success: false, message: msg };
+        }
+      } catch (err: any) {
+        const msg = err.message || 'Failed to delete brand';
+        setError(msg);
+        return { success: false, message: msg };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBrands, page],
+  );
+
   useEffect(() => {
     fetchBrands();
   }, [fetchBrands]);
@@ -115,6 +165,8 @@ const useBrandManager = (initialPage = 1, pageSize = 10) => {
     error,
     fetchBrands,
     addBrand,
+    deleteBrand,
+    updateBrand,
     setPage,
     refetch,
     goToPage,

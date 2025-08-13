@@ -25,7 +25,7 @@ export default function ProductListPage() {
   } = useProductList();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
-  const productsPerPage = 9;
+  const productsPerPage = 12;
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
