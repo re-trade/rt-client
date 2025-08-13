@@ -1,0 +1,551 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Ban,
+  Calendar,
+  Mail,
+  MapPin,
+  Phone,
+  Shield,
+  Star,
+  Store,
+  User,
+  UserCheck,
+  UserX,
+} from 'lucide-react';
+
+// Import the actual types from the API service
+import type { DetailedAccountResponse } from '@/services/account.api';
+
+interface DetailedUserDialogProps {
+  user: DetailedAccountResponse;
+  onToggleBan: (userId: string, currentStatus: string) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function DetailedUserDialog({
+  user,
+  onToggleBan,
+  open,
+  onOpenChange,
+}: DetailedUserDialogProps) {
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getGenderText = (gender: number) => {
+    switch (gender) {
+      case 0:
+        return 'Nam';
+      case 1:
+        return 'Nữ';
+      case 2:
+        return 'Khác';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const getVerificationStatus = (status: string) => {
+    switch (status) {
+      case 'VERIFIED':
+        return { text: 'Đã xác minh', color: 'bg-green-100 text-green-800' };
+      case 'PENDING':
+        return { text: 'Đang chờ', color: 'bg-yellow-100 text-yellow-800' };
+      case 'REJECTED':
+        return { text: 'Bị từ chối', color: 'bg-red-100 text-red-800' };
+      default:
+        return { text: 'Chưa xác minh', color: 'bg-gray-100 text-gray-800' };
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="max-w-[98vw] w-[98vw] max-h-[96vh] overflow-hidden p-0 bg-gradient-to-br from-slate-50 to-white border-0 shadow-2xl"
+        style={{ minWidth: '1200px' }}
+      >
+        <DialogHeader className="px-8 pt-8 pb-6 bg-gradient-to-r from-orange-500 to-orange-600 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/5"></div>
+          <div className="relative z-10">
+            <DialogTitle className="flex items-center gap-3 text-2xl font-bold">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <User className="h-7 w-7" />
+              </div>
+              Chi tiết người dùng
+            </DialogTitle>
+            <DialogDescription className="text-orange-100 mt-2 text-base">
+              Thông tin chi tiết về tài khoản và hồ sơ người dùng trong hệ thống
+            </DialogDescription>
+          </div>
+          <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full"></div>
+          <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/5 rounded-full"></div>
+        </DialogHeader>
+
+        <div className="overflow-y-auto max-h-[calc(96vh-180px)] px-16 py-6">
+          <div className="space-y-6">
+            {/* Account Information Section */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200/50 overflow-hidden">
+              <div className="px-8 py-6 bg-gradient-to-r from-slate-100 to-slate-50 border-b border-slate-200/50">
+                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-3">
+                  <div className="p-2 bg-orange-100 rounded-xl">
+                    <User className="h-6 w-6 text-orange-600" />
+                  </div>
+                  Thông tin tài khoản
+                </h3>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {/* Username Column */}
+                  <div className="group">
+                    <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors h-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
+                          <User className="h-4 w-4 text-orange-600" />
+                        </div>
+                        <p className="text-xs font-medium text-slate-600">Tên đăng nhập</p>
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">{user.username}</p>
+                    </div>
+                  </div>
+
+                  {/* Email Column */}
+                  <div className="group">
+                    <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors h-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                          <Mail className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <p className="text-xs font-medium text-slate-600">Email</p>
+                      </div>
+                      <p className="text-base font-semibold text-slate-900 break-all">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Join Date Column */}
+                  <div className="group">
+                    <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors h-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                          <Calendar className="h-4 w-4 text-green-600" />
+                        </div>
+                        <p className="text-xs font-medium text-slate-600">Ngày tham gia</p>
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">
+                        {formatDate(user.joinInDate)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Last Login Column */}
+                  <div className="group">
+                    <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors h-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                          <Calendar className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <p className="text-xs font-medium text-slate-600">Đăng nhập cuối</p>
+                      </div>
+                      <p className="text-base font-semibold text-slate-900">
+                        {user.lastLogin ? formatDate(user.lastLogin) : 'Chưa đăng nhập'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status Column */}
+                  <div className="group">
+                    <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors h-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-slate-100 rounded-lg group-hover:bg-slate-200 transition-colors">
+                          {user.enabled ? (
+                            <UserCheck className="h-4 w-4 text-emerald-600" />
+                          ) : (
+                            <UserX className="h-4 w-4 text-red-600" />
+                          )}
+                        </div>
+                        <p className="text-xs font-medium text-slate-600">Trạng thái</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {user.enabled ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-semibold">
+                            Hoạt động
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded-lg text-sm font-semibold">
+                            Bị cấm
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Second Row - Security & Roles */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                  {/* Security Info */}
+                  <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
+                    <p className="text-sm font-medium text-slate-600 mb-3">Bảo mật tài khoản</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="text-center">
+                        <p className="text-xs text-slate-500">Khóa TK</p>
+                        <span
+                          className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                            user.locked ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                          }`}
+                        >
+                          {user.locked ? 'Có' : 'Không'}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-slate-500">2FA</p>
+                        <span
+                          className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                            user.using2FA
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {user.using2FA ? 'Bật' : 'Tắt'}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-slate-500">Đổi tên</p>
+                        <span
+                          className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                            user.changedUsername
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {user.changedUsername ? 'Có' : 'Không'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Roles */}
+                  <div className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+                    <p className="text-sm font-medium text-orange-800 mb-3">Vai trò hệ thống</p>
+                    <div className="flex flex-wrap gap-2">
+                      {user.roles.map((role) => (
+                        <div
+                          key={role}
+                          className="flex items-center gap-1 px-3 py-1 bg-white/80 text-orange-800 rounded-lg text-sm font-semibold shadow-sm border border-orange-200"
+                        >
+                          {role.includes('ADMIN') && <Shield className="h-3 w-3" />}
+                          <span>{role.replace('ROLE_', '')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Account ID */}
+                  <div className="p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl border border-indigo-200">
+                    <p className="text-sm font-medium text-indigo-800 mb-2">ID Tài khoản</p>
+                    <p className="text-xs font-mono text-indigo-700 bg-white/60 px-2 py-1 rounded break-all">
+                      {user.id}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Customer Profile Section */}
+            {user.customerProfile && (
+              <div className="bg-white rounded-2xl shadow-lg border border-blue-200/50 overflow-hidden">
+                <div className="px-8 py-6 bg-gradient-to-r from-blue-100 to-blue-50 border-b border-blue-200/50">
+                  <h3 className="text-xl font-bold text-blue-800 flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-xl">
+                      <User className="h-6 w-6 text-blue-600" />
+                    </div>
+                    Hồ sơ khách hàng
+                  </h3>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {/* Name Column */}
+                    <div className="group">
+                      <div className="flex flex-col gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                            <User className="h-4 w-4 text-blue-600" />
+                          </div>
+                          <p className="text-xs font-medium text-blue-700">Họ và tên</p>
+                        </div>
+                        <p className="text-base font-semibold text-blue-900">
+                          {user.customerProfile.firstName} {user.customerProfile.lastName}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Phone Column */}
+                    <div className="group">
+                      <div className="flex flex-col gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                            <Phone className="h-4 w-4 text-green-600" />
+                          </div>
+                          <p className="text-xs font-medium text-blue-700">Số điện thoại</p>
+                        </div>
+                        <p className="text-base font-semibold text-blue-900">
+                          {user.customerProfile.phone || 'Chưa cập nhật'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Address Column */}
+                    <div className="group lg:col-span-2">
+                      <div className="flex flex-col gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                            <MapPin className="h-4 w-4 text-purple-600" />
+                          </div>
+                          <p className="text-xs font-medium text-blue-700">Địa chỉ</p>
+                        </div>
+                        <p className="text-base font-semibold text-blue-900">
+                          {user.customerProfile.address || 'Chưa cập nhật'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Gender Column */}
+                    <div className="group">
+                      <div className="flex flex-col gap-2 p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 h-full">
+                        <p className="text-xs font-medium text-blue-700 mb-2">Giới tính</p>
+                        <p className="text-base font-semibold text-blue-900">
+                          {getGenderText(user.customerProfile.gender)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Last Update Column */}
+                    <div className="group">
+                      <div className="flex flex-col gap-2 p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200 h-full">
+                        <p className="text-xs font-medium text-orange-700 mb-2">Cập nhật cuối</p>
+                        <p className="text-sm font-semibold text-orange-800">
+                          {formatDate(user.customerProfile.lastUpdate)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Seller Profile Section */}
+            {user.sellerProfile && (
+              <div className="bg-white rounded-2xl shadow-lg border border-emerald-200/50 overflow-hidden">
+                <div className="px-8 py-6 bg-gradient-to-r from-emerald-100 to-emerald-50 border-b border-emerald-200/50">
+                  <h3 className="text-xl font-bold text-emerald-800 flex items-center gap-3">
+                    <div className="p-2 bg-emerald-100 rounded-xl">
+                      <Store className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    Hồ sơ người bán
+                  </h3>
+                </div>
+                <div className="p-6">
+                  {/* First Row - Main Information */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-4">
+                    {/* Shop Name */}
+                    <div className="group lg:col-span-2">
+                      <div className="flex flex-col gap-2 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                            <Store className="h-4 w-4 text-emerald-600" />
+                          </div>
+                          <p className="text-xs font-medium text-emerald-700">Tên cửa hàng</p>
+                        </div>
+                        <p className="text-base font-semibold text-emerald-900">
+                          {user.sellerProfile.shopName}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="group">
+                      <div className="flex flex-col gap-2 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                            <Phone className="h-4 w-4 text-blue-600" />
+                          </div>
+                          <p className="text-xs font-medium text-emerald-700">Điện thoại</p>
+                        </div>
+                        <p className="text-base font-semibold text-emerald-900">
+                          {user.sellerProfile.phoneNumber}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Address */}
+                    <div className="group lg:col-span-2">
+                      <div className="flex flex-col gap-2 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                            <MapPin className="h-4 w-4 text-purple-600" />
+                          </div>
+                          <p className="text-xs font-medium text-emerald-700">Địa chỉ</p>
+                        </div>
+                        <p className="text-base font-semibold text-emerald-900">
+                          {user.sellerProfile.addressLine}
+                        </p>
+                        <p className="text-xs text-emerald-600">
+                          {user.sellerProfile.ward}, {user.sellerProfile.district},{' '}
+                          {user.sellerProfile.state}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Created Date */}
+                    <div className="group">
+                      <div className="flex flex-col gap-2 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                            <Calendar className="h-4 w-4 text-green-600" />
+                          </div>
+                          <p className="text-xs font-medium text-emerald-700">Ngày tạo</p>
+                        </div>
+                        <p className="text-base font-semibold text-emerald-900">
+                          {formatDate(user.sellerProfile.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Updated Date */}
+                    <div className="group">
+                      <div className="flex flex-col gap-2 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors h-full">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-1.5 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
+                            <Calendar className="h-4 w-4 text-orange-600" />
+                          </div>
+                          <p className="text-xs font-medium text-emerald-700">Cập nhật</p>
+                        </div>
+                        <p className="text-base font-semibold text-emerald-900">
+                          {formatDate(user.sellerProfile.updatedAt)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Second Row - Status & Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Verification Status */}
+                    <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200">
+                      <p className="text-sm font-medium text-emerald-700 mb-3">
+                        Trạng thái xác minh
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg font-semibold shadow-sm text-sm ${getVerificationStatus(user.sellerProfile.identityVerifiedStatus).color}`}
+                        >
+                          {getVerificationStatus(user.sellerProfile.identityVerifiedStatus).text}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
+                      <p className="text-sm font-medium text-yellow-800 mb-3">Đánh giá cửa hàng</p>
+                      <div className="flex items-center gap-2">
+                        <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                        <span className="text-xl font-bold text-yellow-800">
+                          {user.sellerProfile.avgVote?.toFixed(1) || 'N/A'}
+                        </span>
+                        <span className="text-sm text-yellow-700">/5.0</span>
+                      </div>
+                    </div>
+
+                    {/* Business Type */}
+                    <div className="p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl border border-indigo-200">
+                      <p className="text-sm font-medium text-indigo-800 mb-2">Loại kinh doanh</p>
+                      <p className="text-base font-semibold text-indigo-900">
+                        {user.sellerProfile.businessType === 0 ? 'Cá nhân' : 'Doanh nghiệp'}
+                      </p>
+                    </div>
+
+                    {/* Verification Status */}
+                    <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
+                      <p className="text-sm font-medium text-slate-700 mb-2">Xác minh tổng thể</p>
+                      <p className="text-sm font-semibold text-slate-600">
+                        {user.sellerProfile.verified ? '✅ Đã xác minh' : '⏳ Chưa xác minh'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <DialogFooter className="px-16 py-6 bg-gradient-to-r from-slate-50 to-white border-t border-slate-200/50">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <User className="h-4 w-4" />
+                <span>ID: {user.id.slice(0, 8)}...</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Calendar className="h-4 w-4" />
+                <span>Tham gia: {formatDate(user.joinInDate)}</span>
+              </div>
+              {user.customerProfile && (
+                <div className="flex items-center gap-2 text-sm text-blue-600">
+                  <User className="h-4 w-4" />
+                  <span>Khách hàng</span>
+                </div>
+              )}
+              {user.sellerProfile && (
+                <div className="flex items-center gap-2 text-sm text-emerald-600">
+                  <Store className="h-4 w-4" />
+                  <span>Người bán</span>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200"
+              >
+                Đóng
+              </Button>
+              <Button
+                variant={user.enabled ? 'destructive' : 'default'}
+                onClick={() => {
+                  onToggleBan(user.id, user.enabled ? 'active' : 'banned');
+                  onOpenChange(false);
+                }}
+                className={`flex items-center gap-2 px-8 py-2 font-semibold transition-all duration-200 ${
+                  user.enabled
+                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl'
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl'
+                }`}
+              >
+                <Ban className="h-4 w-4" />
+                {user.enabled ? 'Cấm người dùng' : 'Bỏ cấm người dùng'}
+              </Button>
+            </div>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

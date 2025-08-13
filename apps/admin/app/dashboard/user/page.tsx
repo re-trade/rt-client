@@ -1,7 +1,15 @@
 'use client';
 
+import { DetailedUserDialog } from '@/components/dialog/DetailedUserDialog';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -19,7 +27,24 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAccountManager } from '@/hooks/use-account-manager';
-import { Loader2, Search, Shield, User } from 'lucide-react';
+import { getAccountById } from '@/services/account.api';
+import {
+  AlertCircle,
+  Ban,
+  Calendar,
+  Edit,
+  Eye,
+  Loader2,
+  MoreHorizontal,
+  RefreshCw,
+  Search,
+  Shield,
+  User,
+  UserCheck,
+  Users,
+  UserX,
+} from 'lucide-react';
+import { useState } from 'react';
 
 const roleDisplayMap: Record<string, string> = {
   ROLE_ADMIN: 'Admin',
@@ -45,147 +70,342 @@ export default function UserManagementPage() {
     total,
     pageSize,
     toggleStatus,
-    updateRoles,
+    refresh,
   } = useAccountManager();
 
-  if (loading) {
-    return (
-      <div className="flex h-[200px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [loadingUserDetails, setLoadingUserDetails] = useState(false);
 
-  if (error) {
-    return <div className="flex h-[200px] items-center justify-center text-red-500">{error}</div>;
-  }
-
-  const handleToggleBan = async (userId: string, enabled: boolean) => {
+  const handleToggleBan = async (userId: string, currentStatus: string) => {
+    const enabled = currentStatus !== 'banned';
     await toggleStatus(userId, !enabled);
   };
 
+  const handleViewUserDetails = async (userId: string) => {
+    setLoadingUserDetails(true);
+    try {
+      const response = await getAccountById(userId);
+      if (response?.success && response.content) {
+        setSelectedUser(response.content);
+        setUserDialogOpen(true);
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    } finally {
+      setLoadingUserDetails(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('vi-VN');
+  };
+
+  const getStatusBadge = (enabled: boolean) => {
+    return enabled ? (
+      <span
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border"
+        style={{
+          backgroundColor: '#ecfdf5',
+          color: '#047857',
+          borderColor: '#a7f3d0',
+        }}
+      >
+        <UserCheck className="h-3 w-3" />
+        Hoạt động
+      </span>
+    ) : (
+      <span
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border"
+        style={{
+          backgroundColor: '#fef2f2',
+          color: '#dc2626',
+          borderColor: '#fecaca',
+        }}
+      >
+        <UserX className="h-3 w-3" />
+        Bị cấm
+      </span>
+    );
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">User Management</h1>
-      </div>
-
-      <Card className="p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-1 items-center space-x-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8"
-              />
+    <div className="min-h-screen bg-slate-50/50">
+      <div className="container mx-auto p-6 max-w-7xl">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl border border-orange-200/50 shadow-sm">
+                <Users className="h-8 w-8 text-orange-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
+                  Quản lý người dùng
+                </h1>
+                <p className="text-slate-600">
+                  Hiện tại {accounts.length} trong tổng số {total} người dùng
+                </p>
+              </div>
             </div>
-            <Select value={selectedRole} onValueChange={setSelectedRole}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Role" />
-              </SelectTrigger>
-              <SelectContent>
-                {roles.map((role) => (
-                  <SelectItem key={role} value={role}>
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {statuses.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
-        <div className="mt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Username</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Created At</TableHead>
-                {/* <TableHead>Actions</TableHead> */}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {accounts.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.id}</TableCell>
-                  <TableCell className="font-medium">{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {user.roles.includes('ROLE_ADMIN') ? (
-                        <Shield className="h-4 w-4 text-red-500" />
-                      ) : (
-                        <User className="h-4 w-4 text-blue-500" />
-                      )}
-                      <span className="capitalize">
-                        {user.roles.map((role) => roleDisplayMap[role]).join(', ')}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        user.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {user.enabled ? 'active' : 'banned'}
-                    </span>
-                  </TableCell>
-                  <TableCell>{new Date(user.joinInDate).toLocaleDateString('vi-VN')}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      {/*<ViewUserDialog user={user} onToggleBan={handleToggleBan} />*/}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        {error && (
+          <Card className="mb-6 border-red-200/50 bg-red-50/50 shadow-sm">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-3 text-red-700">
+                <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Có lỗi xảy ra</p>
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refresh()}
+                  className="border-red-200 text-red-700 hover:bg-red-100 shadow-sm"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Thử lại
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            Showing {page * pageSize + 1} to {Math.min((page + 1) * pageSize, accounts.length)} of{' '}
-            {accounts.length} users
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(page - 1)}
-              disabled={page === 0}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(page + 1)}
-              disabled={(page + 1) * pageSize >= total}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      </Card>
+        {/* Search and Filters */}
+        <Card className="mb-6 shadow-sm border-slate-200/50 bg-white/80 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Tìm kiếm theo tên người dùng hoặc email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 border-slate-200 focus:border-orange-400 focus:ring-orange-400/20 bg-white/50"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Select value={selectedRole} onValueChange={setSelectedRole}>
+                  <SelectTrigger className="w-[180px] border-slate-200 bg-white/50">
+                    <SelectValue placeholder="Vai trò" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role === 'All' ? 'Tất cả vai trò' : roleDisplayMap[role] || role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                  <SelectTrigger className="w-[180px] border-slate-200 bg-white/50">
+                    <SelectValue placeholder="Trạng thái" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statuses.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status === 'All'
+                          ? 'Tất cả trạng thái'
+                          : status === 'active'
+                            ? 'Hoạt động'
+                            : 'Bị cấm'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-lg shadow-slate-200/50 border-slate-200/50 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="border-b border-slate-200/50 bg-slate-50/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-slate-900">
+                  <Users className="h-5 w-5 text-orange-600" />
+                  Danh sách người dùng
+                </CardTitle>
+                <CardDescription className="text-slate-600">
+                  {total > 0
+                    ? `Quản lý và theo dõi ${total} người dùng trong hệ thống`
+                    : 'Không tìm thấy người dùng nào'}
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="text-center space-y-3">
+                  <RefreshCw className="h-8 w-8 animate-spin mx-auto text-orange-600" />
+                  <p className="text-slate-600">Đang tải dữ liệu...</p>
+                </div>
+              </div>
+            ) : accounts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-full p-6 mb-4 border border-orange-200/50">
+                  <Users className="h-12 w-12 text-orange-400" />
+                </div>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">
+                  Không tìm thấy người dùng
+                </h3>
+                <p className="text-slate-600 max-w-md">
+                  Không có người dùng nào phù hợp với tiêu chí tìm kiếm của bạn.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-slate-200 bg-slate-50/50 select-none">
+                      <TableHead className="font-semibold text-slate-700">Tên người dùng</TableHead>
+                      <TableHead className="font-semibold text-slate-700">Email</TableHead>
+                      <TableHead className="font-semibold text-slate-700">Vai trò</TableHead>
+                      <TableHead className="font-semibold text-slate-700">Trạng thái</TableHead>
+                      <TableHead className="font-semibold text-slate-700">Ngày tham gia</TableHead>
+                      <TableHead className="font-semibold text-slate-700 text-right w-24">
+                        Thao tác
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {accounts.map((user, index) => (
+                      <TableRow
+                        key={user.id}
+                        className="hover:bg-slate-50/50 transition-colors duration-200 border-slate-200"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <TableCell className="font-medium">{user.username}</TableCell>
+                        <TableCell className="text-slate-600">{user.email}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {user.roles.includes('ROLE_ADMIN') ? (
+                              <Shield className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <User className="h-4 w-4 text-orange-500" />
+                            )}
+                            <span className="text-sm font-medium">
+                              {user.roles.map((role) => roleDisplayMap[role]).join(', ')}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(user.enabled)}</TableCell>
+                        <TableCell className="text-slate-600">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4 text-slate-400" />
+                            <span className="text-sm">{formatDate(user.joinInDate)}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-slate-600 hover:text-orange-600 hover:bg-orange-50"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem
+                                onClick={() => handleViewUserDetails(user.id)}
+                                className="cursor-pointer"
+                                disabled={loadingUserDetails}
+                              >
+                                {loadingUserDetails ? (
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                ) : (
+                                  <Eye className="h-4 w-4 mr-2" />
+                                )}
+                                Xem chi tiết
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  // Handle edit roles
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Chỉnh sửa vai trò
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleToggleBan(user.id, user.enabled ? 'active' : 'banned')
+                                }
+                                className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                              >
+                                <Ban className="h-4 w-4 mr-2" />
+                                {user.enabled ? 'Cấm người dùng' : 'Bỏ cấm người dùng'}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Pagination */}
+        {accounts.length > 0 && (
+          <Card className="mt-6 shadow-sm border-slate-200/50 bg-white/80 backdrop-blur-sm">
+            <CardContent className="py-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-sm text-slate-600">
+                  Hiển thị {page * pageSize + 1} đến {Math.min((page + 1) * pageSize, total)} trong
+                  tổng số {total} người dùng
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 0}
+                    className="border-slate-200 text-slate-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 disabled:opacity-50"
+                  >
+                    Trước
+                  </Button>
+                  <div className="flex items-center gap-1 px-3 py-1 bg-orange-50 rounded-md border border-orange-200">
+                    <span className="text-sm text-slate-600">Trang</span>
+                    <span className="text-sm font-medium text-orange-700">{page + 1}</span>
+                    <span className="text-sm text-slate-600">/ {Math.ceil(total / pageSize)}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage(page + 1)}
+                    disabled={(page + 1) * pageSize >= total}
+                    className="border-slate-200 text-slate-700 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 disabled:opacity-50"
+                  >
+                    Sau
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Detailed User Dialog */}
+        {selectedUser && (
+          <DetailedUserDialog
+            user={selectedUser}
+            onToggleBan={handleToggleBan}
+            open={userDialogOpen}
+            onOpenChange={setUserDialogOpen}
+          />
+        )}
+      </div>
     </div>
   );
 }

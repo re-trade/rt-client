@@ -375,7 +375,9 @@ const CustomerDetailModal = ({
                       <Phone className="h-4 w-4 text-green-600" />
                     </div>
                     <p className="text-sm font-medium text-gray-600">Số điện thoại: </p>
-                    <p className="text-gray-900 font-medium">{customer.phoneNumber || customer.phone}</p>
+                    <p className="text-gray-900 font-medium">
+                      {customer.phoneNumber || customer.phone}
+                    </p>
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -384,7 +386,9 @@ const CustomerDetailModal = ({
                       <MapPin className="h-4 w-4 text-purple-600" />
                     </div>
                     <p className="text-sm font-medium text-gray-600">Địa chỉ: </p>
-                    <p className="text-gray-900 font-medium">{customer.address || 'Không có thông tin'}</p>
+                    <p className="text-gray-900 font-medium">
+                      {customer.address || 'Không có thông tin'}
+                    </p>
                   </div>
                 </div>
               </div>
