@@ -14,9 +14,15 @@ interface Props {
     id: string;
     name: string;
   }[];
+  disabled?: boolean;
 }
 
-export function FancyMultiSelect({ onChange, value: initialValue = [], currentCategoryId }: Props) {
+export function FancyMultiSelect({
+  onChange,
+  value: initialValue = [],
+  currentCategoryId,
+  disabled = false,
+}: Props) {
   const inputRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<Framework[]>([]);
@@ -91,19 +97,23 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
 
   const handleUnselect = useCallback(
     (framework: Framework) => {
+      if (disabled) return;
+
       setSelected((prev) => {
         const newSelected = prev.filter((s) => s.value !== framework.value);
         setTimeout(() => notifyChange(newSelected), 0);
         return newSelected;
       });
     },
-    [notifyChange],
+    [notifyChange, disabled],
   );
 
   const handleClearAll = useCallback(() => {
+    if (disabled) return;
+
     setSelected([]);
     setTimeout(() => notifyChange([]), 0);
-  }, [notifyChange]);
+  }, [notifyChange, disabled]);
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -115,7 +125,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
       if (e.key === 'Escape') {
         setOpen(false);
       }
-      if (e.key === 'Delete' || e.key === 'Backspace') {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !disabled) {
         if (selected.length > 0) {
           setSelected((prev) => {
             const newSelected = [...prev];
@@ -126,11 +136,13 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
         }
       }
     },
-    [notifyChange, selected.length],
+    [notifyChange, selected.length, disabled],
   );
 
   const handleSelect = useCallback(
     (framework: Framework) => {
+      if (disabled) return;
+
       setSelected((prev) => {
         const isSelected = prev.some((s) => s.value === framework.value);
         let newSelected;
@@ -145,12 +157,12 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
         return newSelected;
       });
     },
-    [notifyChange],
+    [notifyChange, disabled],
   );
 
   const handleInputFocus = useCallback(() => {
-    setOpen(true);
-  }, []);
+    if (!disabled) setOpen(true);
+  }, [disabled]);
 
   const handleInputBlur = useCallback(() => {
     setTimeout(() => setOpen(false), 200);
@@ -191,8 +203,12 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
         <div>
           {/* Main selector box */}
           <div
-            className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 cursor-pointer min-h-[40px]"
-            onClick={() => setOpen(!open)}
+            className={`group rounded-md border border-input px-3 py-2 text-sm ring-offset-background min-h-[40px] ${
+              disabled
+                ? 'bg-gray-100 cursor-not-allowed opacity-60'
+                : 'focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 cursor-pointer'
+            }`}
+            onClick={() => !disabled && setOpen(!open)}
           >
             <div className="flex items-center justify-between">
               <div className="flex flex-wrap gap-1 flex-1">
@@ -200,22 +216,24 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
                   selected.map((framework) => (
                     <Badge key={framework.value} variant="secondary" className="text-xs">
                       {framework.label}
-                      <button
-                        className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
+                      {!disabled && (
+                        <button
+                          className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.stopPropagation();
+                              handleUnselect(framework);
+                            }
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
                             handleUnselect(framework);
-                          }
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleUnselect(framework);
-                        }}
-                      >
-                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                      </button>
+                          }}
+                        >
+                          <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                        </button>
+                      )}
                     </Badge>
                   ))
                 ) : (
@@ -229,7 +247,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
           </div>
 
           {/* Dropdown list */}
-          {open && (
+          {open && !disabled && (
             <div className="absolute top-full mt-1 z-50 w-full rounded-md border bg-white shadow-lg">
               {/* Search header */}
               <div className="p-3 border-b border-gray-200">
@@ -238,14 +256,17 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
                   <input
                     type="text"
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={(e) => !disabled && setInputValue(e.target.value)}
                     placeholder="Tìm kiếm danh mục..."
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    disabled={disabled}
+                    className={`w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      disabled ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   />
                 </div>
 
-                {/* Clear All button - only show when there are selected items */}
-                {selected.length > 0 && (
+                {/* Clear All button - only show when there are selected items and not disabled */}
+                {selected.length > 0 && !disabled && (
                   <button
                     className="mt-2 w-full text-sm text-red-600 hover:text-red-700 flex items-center justify-center py-1 border border-red-200 rounded-md hover:bg-red-50 transition-colors"
                     onClick={(e) => {
@@ -268,8 +289,12 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
                       return (
                         <div
                           key={framework.value}
-                          onClick={() => handleSelect(framework)}
-                          className="flex items-center px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 rounded-md"
+                          onClick={() => !disabled && handleSelect(framework)}
+                          className={`flex items-center px-3 py-2 text-sm rounded-md ${
+                            disabled
+                              ? 'cursor-not-allowed opacity-60'
+                              : 'cursor-pointer hover:bg-gray-100'
+                          }`}
                         >
                           <div
                             className={`mr-3 h-4 w-4 border border-gray-300 rounded-sm flex items-center justify-center ${

@@ -69,6 +69,7 @@ export function EditProductDialog({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedThumbnail, setSelectedThumbnail] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [warrantyDateError, setWarrantyDateError] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
@@ -103,6 +104,14 @@ export function EditProductDialog({
   }, [product]);
 
   useEffect(() => {
+    if (formData.hasWarranty && formData.warrantyExpiryDate) {
+      validateWarrantyDate(formData.warrantyExpiryDate);
+    } else {
+      setWarrantyDateError('');
+    }
+  }, [formData.hasWarranty, formData.warrantyExpiryDate]);
+
+  useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => {
         if (url && url.startsWith('blob:')) {
@@ -129,6 +138,35 @@ export function EditProductDialog({
     } else {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
+
+    if (field === 'hasWarranty' && !value) {
+      setWarrantyDateError('');
+    }
+  };
+
+  const validateWarrantyDate = (dateValue: string) => {
+    if (!dateValue) {
+      setWarrantyDateError('');
+      return;
+    }
+
+    const today = new Date();
+    const warrantyDate = new Date(dateValue);
+
+    today.setHours(0, 0, 0, 0);
+    warrantyDate.setHours(0, 0, 0, 0);
+
+    if (warrantyDate <= today) {
+      setWarrantyDateError('Ngày hết hạn bảo hành phải là ngày trong tương lai');
+    } else {
+      setWarrantyDateError('');
+    }
+  };
+
+  const handleWarrantyDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    handleFormChange('warrantyExpiryDate', value);
+    validateWarrantyDate(value);
   };
 
   const handleChooseFiles = () => {
@@ -210,6 +248,29 @@ export function EditProductDialog({
     if (!isEdit) return;
     if (!isFormChanged()) {
       toast.info('Không có thay đổi để cập nhật');
+      return;
+    }
+
+    if (formData.hasWarranty) {
+      if (!formData.warrantyExpiryDate) {
+        toast.error('Vui lòng chọn ngày hết hạn bảo hành');
+        return;
+      }
+
+      const today = new Date();
+      const warrantyDate = new Date(formData.warrantyExpiryDate);
+
+      today.setHours(0, 0, 0, 0);
+      warrantyDate.setHours(0, 0, 0, 0);
+
+      if (warrantyDate <= today) {
+        toast.error('Ngày hết hạn bảo hành phải là ngày trong tương lai');
+        return;
+      }
+    }
+
+    if (warrantyDateError) {
+      toast.error(warrantyDateError);
       return;
     }
 
@@ -468,58 +529,75 @@ export function EditProductDialog({
               )}
             </div>
 
+            {/* Warranty Section - Horizontal Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  Tình trạng bảo hành
+                </Label>
+                <select
+                  value={formData.hasWarranty ? 'yes' : 'no'}
+                  onChange={(e) => handleFormChange('hasWarranty', e.target.value === 'yes')}
+                  className="w-full h-11 px-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                  disabled={!isEdit}
+                >
+                  <option value="no">Không có bảo hành</option>
+                  <option value="yes">Còn bảo hành</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="warrantyExpiryDate"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4 text-gray-500" />
+                  Ngày hết hạn bảo hành
+                </Label>
+                <Input
+                  id="warrantyExpiryDate"
+                  type="date"
+                  value={formData.warrantyExpiryDate}
+                  onChange={handleWarrantyDateChange}
+                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
+                    warrantyDateError
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                      : ''
+                  }`}
+                  disabled={!isEdit || !formData.hasWarranty}
+                  min={(() => {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    return tomorrow.toISOString().split('T')[0];
+                  })()}
+                />
+                {formData.hasWarranty && isEdit && !warrantyDateError && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Chọn ngày trong tương lai (sau ngày hôm nay)
+                  </p>
+                )}
+                {warrantyDateError && (
+                  <p className="text-xs text-red-500 mt-1">{warrantyDateError}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Tags Section */}
             <div className="space-y-2 mt-4">
-              <Label htmlFor="tags" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="tags"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
+                <Tag className="w-4 h-4 text-green-600" />
                 Tags
               </Label>
               <TagInput
                 value={formData.tags}
                 onChange={(tags) => handleFormChange('tags', tags)}
                 placeholder="Nhập tag và nhấn Enter"
+                disabled={!isEdit}
               />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <div className="space-y-2">
-                <div className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id="hasWarranty"
-                    checked={formData.hasWarranty}
-                    onChange={(e) => handleFormChange('hasWarranty', e.target.checked)}
-                    className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    disabled={!isEdit}
-                  />
-                  <Label
-                    htmlFor="hasWarranty"
-                    className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                  >
-                    <Shield className="w-4 h-4" />
-                    Sản phẩm còn bảo hành
-                  </Label>
-                </div>
-
-                {formData.hasWarranty && (
-                  <div className="mt-2">
-                    <Label
-                      htmlFor="warrantyExpiryDate"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Ngày hết hạn bảo hành
-                    </Label>
-                    <Input
-                      id="warrantyExpiryDate"
-                      type="date"
-                      value={formData.warrantyExpiryDate}
-                      onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
-                      className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      disabled={!isEdit}
-                      min={new Date().toISOString().split('T')[0]}
-                    />
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
