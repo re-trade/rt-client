@@ -336,8 +336,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               />
             </div>
 
-
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="space-y-2">
                 <div className="flex items-center mb-2">
@@ -375,7 +373,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                       min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
-
                 )}
               </div>
 

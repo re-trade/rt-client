@@ -1,27 +1,18 @@
 'use client';
 
+import { AlertCircle, Building2, FileText, Image as ImageIcon, Package, Trash2, Upload, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MultiSelect } from '@/components/ui/multi-select';
 import { Textarea } from '@/components/ui/textarea';
-import useBrandManager from '@/hooks/use-brand-manager';
-import { storageApi } from '@/services/storage.api';
-import { AlertCircle, Package, Plus, RefreshCw, Upload, X } from 'lucide-react';
-import dynamic from 'next/dynamic';
+import { FancyMultiSelect } from '@/components/common/MultiSectCate';
+import  useBrandManager  from '@/hooks/use-brand-manager';
 import Image from 'next/image';
-import type React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
-const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
-
+import { storageApi } from '@/services/storage.api';
+import { BrandInput } from '@/services/brand.api';
 interface FormFieldProps {
   label: string;
   required?: boolean;
@@ -56,13 +47,14 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
     name: '',
     description: '',
     categoryIds: [] as string[],
+    logo: ''
   });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { fetchCategories, categories, categoriesLoading, categoriesError, addBrand } =
-    useBrandManager();
+  
+  const { fetchCategories, categories, categoriesLoading, categoriesError, addBrand } = useBrandManager();
 
   // Fetch categories when dialog opens
   useEffect(() => {
@@ -80,6 +72,14 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
     };
   }, [logoPreview]);
 
+  const handleFormChange = (field: keyof typeof formData, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user makes changes
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
   const handleChooseLogo = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -88,16 +88,33 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          setErrors(prev => ({ ...prev, logo: 'Vui lòng chọn file hình ảnh' }));
+          return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          setErrors(prev => ({ ...prev, logo: 'Kích thước file không được vượt quá 5MB' }));
+          return;
+        }
+
         if (logoPreview) {
           URL.revokeObjectURL(logoPreview);
         }
         const imageUrl = URL.createObjectURL(file);
         setLogoPreview(imageUrl);
         setLogoFile(file);
+        
+        // Clear logo error
+        if (errors.logo) {
+          setErrors(prev => ({ ...prev, logo: '' }));
+        }
       }
       e.target.value = ''; // Reset input
     },
-    [logoPreview],
+    [logoPreview, errors.logo],
   );
 
   const handleRemoveLogo = useCallback(() => {
@@ -113,6 +130,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
       name: '',
       description: '',
       categoryIds: [],
+      logo: ''
     });
     setErrors({});
     handleRemoveLogo();
@@ -121,22 +139,30 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
   const validateForm = useCallback(() => {
     const newErrors: Partial<Record<keyof typeof formData, string>> = {};
 
+    // Validate name
     if (!formData.name.trim()) {
       newErrors.name = 'Tên nhãn hàng là bắt buộc';
     } else if (formData.name.trim().length < 2) {
       newErrors.name = 'Tên nhãn hàng phải có ít nhất 2 ký tự';
+    } else if (formData.name.trim().length > 100) {
+      newErrors.name = 'Tên nhãn hàng không được vượt quá 100 ký tự';
     }
 
+    // Validate logo
     if (!logoFile) {
       newErrors.logo = 'Logo là bắt buộc';
     }
 
+    // Validate description
     if (!formData.description.trim()) {
-      newErrors.description = 'Mô tả nhãn hàng là bắt buộc';
+      newErrors.description = 'Mô tả là bắt buộc';
     } else if (formData.description.trim().length < 10) {
       newErrors.description = 'Mô tả phải có ít nhất 10 ký tự';
+    } else if (formData.description.trim().length > 500) {
+      newErrors.description = 'Mô tả không được vượt quá 500 ký tự';
     }
 
+    // Validate categories
     if (formData.categoryIds.length === 0) {
       newErrors.categoryIds = 'Vui lòng chọn ít nhất một danh mục';
     }
@@ -147,209 +173,190 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
 
   const handleAddBrand = useCallback(async () => {
     if (!validateForm()) {
-      toast.error('Vui lòng sửa các lỗi trong biểu mẫu');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const logoUrl = await storageApi.fileUpload(logoFile!);
-      const result = await addBrand({
+      let logoUrl = '';
+      if (!logoFile) {
+         logoUrl = await storageApi.fileUpload(logoFile!);
+      }
+      const request: BrandInput = {
         name: formData.name.trim(),
-        imgUrl: logoUrl,
         description: formData.description.trim(),
         categoryIds: formData.categoryIds,
-      });
-
-      if (result.success) {
-        toast.success('Thêm nhãn hàng thành công!');
-        onClose();
-        resetForm();
-      } else {
-        toast.error(result.message);
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Đã xảy ra lỗi khi thêm nhãn hàng');
+        imgUrl: logoUrl,
+      };
+      await addBrand(request);
+      resetForm();
+      onClose();
+    } catch (error) {
+      console.error('Error creating brand:', error);
+      // Handle API errors here if needed
     } finally {
       setIsSubmitting(false);
     }
   }, [formData, logoFile, addBrand, onClose, resetForm, validateForm]);
 
-  const handleClose = useCallback(() => {
-    onClose();
-    resetForm();
-  }, [onClose, resetForm]);
+  const handleDialogClose = useCallback(() => {
+    if (!isSubmitting) {
+      resetForm();
+      onClose();
+    }
+  }, [isSubmitting, resetForm, onClose]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="pb-6 border-b">
-          <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Package className="w-6 h-6 text-blue-600" />
-            Thêm nhãn hàng mới
+    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-blue-600" />
+            Tạo nhãn hàng mới
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
-            Điền đầy đủ thông tin để tạo nhãn hàng mới trong hệ thống
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-8 pt-6">
-          {/* Basic Information Section */}
+        <div className="space-y-6 py-4">
+          {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
-              <Package className="w-5 h-5 text-blue-600" />
+              <FileText className="w-5 h-5 text-blue-600" />
               Thông tin cơ bản
             </h3>
+            
+            <FormField label="Tên nhãn hàng" required error={errors.name}>
+              <Input
+                value={formData.name}
+                onChange={(e) => handleFormChange('name', e.target.value)}
+                placeholder="Nhập tên nhãn hàng..."
+                className="h-11"
+                disabled={isSubmitting}
+              />
+            </FormField>
 
-            <div className="space-y-4">
-              <FormField label="Tên nhãn hàng" required error={errors.name}>
-                <Input
-                  value={formData.name}
-                  onChange={(e) => {
-                    setFormData((prev) => ({ ...prev, name: e.target.value }));
-                    if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
-                  }}
-                  placeholder="VD: Apple, Samsung, Nike..."
-                  disabled={isSubmitting}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </FormField>
-            </div>
-          </div>
-
-          {/* Logo Upload Section */}
-          <div className="space-y-4">
-            <FormField label="Logo" required error={errors.logo}>
-              <div className="bg-gray-50 rounded-lg p-6">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex-shrink-0">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleChooseLogo}
-                      disabled={isSubmitting}
-                      className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Chọn ảnh
-                    </Button>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleLogoChange}
-                      className="hidden"
-                    />
-                  </div>
-
-                  <div className="flex-1 flex justify-center">
-                    {logoPreview ? (
-                      <div className="relative w-40 h-40 group">
-                        <Image
-                          src={logoPreview}
-                          alt="Logo Preview"
-                          fill
-                          className="rounded-lg object-cover border-2 border-gray-200"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleRemoveLogo}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-100">
-                        <div className="text-center">
-                          <Package className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-500">Chưa có ảnh</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+            <FormField label="Mô tả" required error={errors.description}>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => handleFormChange('description', e.target.value)}
+                placeholder="Nhập mô tả về nhãn hàng..."
+                rows={4}
+                className="resize-none"
+                disabled={isSubmitting}
+              />
+              <div className="text-xs text-gray-500 text-right">
+                {formData.description.length}/500 ký tự
               </div>
             </FormField>
           </div>
 
-          {/* Description Section */}
+          {/* Logo Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
-              <Package className="w-5 h-5 text-purple-600" />
-              Mô tả nhãn hàng
+              <ImageIcon className="w-5 h-5 text-green-600" />
+              Logo nhãn hàng
             </h3>
-
-            <FormField label="Mô tả nhãn hàng" required error={errors.description}>
-              <Textarea
-                value={formData.description}
-                onChange={(e) => {
-                  setFormData((prev) => ({ ...prev, description: e.target.value }));
-                  if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
-                }}
-                placeholder="Mô tả về nhãn hàng, lịch sử, giá trị cốt lõi và điểm đặc biệt..."
-                rows={4}
-                disabled={isSubmitting}
-                className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              />
+            
+            <FormField label="Logo" required error={errors.logo}>
+              <div className="space-y-3">
+                {logoPreview ? (
+                  <div className="relative inline-block">
+                    <div className="w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                      <Image
+                        src={logoPreview}
+                        alt="Logo preview"
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
+                      onClick={handleRemoveLogo}
+                      disabled={isSubmitting}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div
+                    onClick={handleChooseLogo}
+                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+                  >
+                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-600">Click để chọn logo</p>
+                    <p className="text-xs text-gray-500">PNG, JPG, GIF tối đa 5MB</p>
+                  </div>
+                )}
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoChange}
+                  className="hidden"
+                  disabled={isSubmitting}
+                />
+                
+                {!logoPreview && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleChooseLogo}
+                    disabled={isSubmitting}
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Chọn logo
+                  </Button>
+                )}
+              </div>
             </FormField>
           </div>
 
           {/* Categories Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
-              <Package className="w-5 h-5 text-green-600" />
+              <Package className="w-5 h-5 text-purple-600" />
               Danh mục sản phẩm
             </h3>
-
-            <FormField label="Danh mục sản phẩm" required error={errors.categoryIds}>
-              {categoriesLoading ? (
-                <div className="flex items-center justify-center py-8 border border-gray-300 rounded-lg bg-gray-50">
-                  <RefreshCw className="h-4 w-4 animate-spin mr-2 text-blue-600" />
-                  <span className="text-sm text-gray-600">Đang tải danh mục...</span>
-                </div>
-              ) : (
-                <MultiSelect
-                  options={categories.map((cat) => ({
-                    value: cat.id,
-                    label: cat.name,
-                  }))}
-                  selected={formData.categoryIds}
-                  onChange={(selected) => {
-                    setFormData((prev) => ({ ...prev, categoryIds: selected }));
-                    if (errors.categoryIds) setErrors((prev) => ({ ...prev, categoryIds: '' }));
-                  }}
-                  placeholder="Chọn một hoặc nhiều danh mục..."
-                />
-              )}
+            
+            <FormField label="Chọn danh mục" required error={errors.categoryIds}>
+              <FancyMultiSelect
+                value={formData.categoryIds}
+                onChange={(selected) => handleFormChange('categoryIds', selected)}
+              />
             </FormField>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-4 pt-6 border-t bg-gray-50 -mx-6 -mb-6 px-6 py-4">
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4 border-t">
           <Button
+            type="button"
             variant="outline"
-            onClick={handleClose}
+            onClick={handleDialogClose}
             disabled={isSubmitting}
-            className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
           >
-            Hủy bỏ
+            <X className="w-4 h-4 mr-2" />
+            Hủy
           </Button>
           <Button
+            type="button"
             onClick={handleAddBrand}
             disabled={isSubmitting}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700"
           >
             {isSubmitting ? (
               <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                Đang thêm...
+                <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Đang tạo...
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 mr-2" />
-                Thêm nhãn hàng
+                <Building2 className="w-4 h-4 mr-2" />
+                Tạo nhãn hàng
               </>
             )}
           </Button>

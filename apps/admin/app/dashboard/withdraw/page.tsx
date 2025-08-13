@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 import { useWithdrawManager } from '@/hooks/use-withdraw-manager';
 import type { TWithdrawProfile } from '@/services/withdraw.api';
-import { AlertTriangle, Check, PauseCircle, Search, Store } from 'lucide-react';
+import { AlertTriangle, Check, Eye, PauseCircle, Search, Store } from 'lucide-react';
 import { useState } from 'react';
 
 const statusLabels: Record<string, string> = {
@@ -224,7 +224,10 @@ export default function WithdrawManagementPage() {
                   <TableCell>{withdraw.bankName}</TableCell>
                   <TableCell>{withdraw.bankBin}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(withdraw)}>
+                    <Button variant="outline" size="sm"
+                        className="px-3 py-1 text-sm border border-green-500 text-green-600 rounded hover:bg-green-500 hover:text-white transition-colors"
+                    onClick={() => handleViewDetails(withdraw)}>
+                      <Eye className="h-4 w-4 mr-1" />
                       Chi tiết
                     </Button>
                   </TableCell>

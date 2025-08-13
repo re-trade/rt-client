@@ -11,6 +11,7 @@ export type TCustomerProfile = {
   email: string;
   gender: string;
   enabled: boolean;
+  dob: string;
   lastUpdate: string;
 };
 
