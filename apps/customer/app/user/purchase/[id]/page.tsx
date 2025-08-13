@@ -105,7 +105,7 @@ export default function OrderDetailPage() {
   const canChangeStatus = () => {
     if (!currentOrder) return false;
     const status = currentOrder.orderStatus;
-    return status === 'PENDING' || status === 'PAYMENT_CONFIRMATION' || status === 'DELIVERED';
+    return status === 'Pending' || status === 'Payment Confirmation' || status === 'Delivered';
   };
 
   const getStatusDisplayWithDescription = (statusId: string) => {
