@@ -463,6 +463,28 @@ export function EditProductDialog({
                   <option value="DAMAGED">Hư hại</option>
                 </select>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
+                  Thương hiệu <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <SelectBrand
+                    value={formData.brandId}
+                    currentBrandId={formData.brandId}
+                    onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand || '')}
+                    disabled={formData.retraded}
+                  />
+                  {formData.retraded && (
+                    <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-500" />
+                  )}
+                </div>
+                {formData.retraded && (
+                  <p className="text-sm text-amber-600 mt-1">
+                    Không thể thay đổi thương hiệu cho sản phẩm bán lại.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -503,28 +525,6 @@ export function EditProductDialog({
               {formData.retraded && (
                 <p className="text-sm text-amber-600 mt-1">
                   Không thể thay đổi danh mục cho sản phẩm bán lại.
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
-                Thương hiệu <span className="text-red-500">*</span>
-              </Label>
-              <div className="relative">
-                <SelectBrand
-                  value={formData.brandId}
-                  currentBrandId={formData.brandId}
-                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand || '')}
-                  disabled={formData.retraded}
-                />
-                {formData.retraded && (
-                  <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-500" />
-                )}
-              </div>
-              {formData.retraded && (
-                <p className="text-sm text-amber-600 mt-1">
-                  Không thể thay đổi thương hiệu cho sản phẩm bán lại.
                 </p>
               )}
             </div>
