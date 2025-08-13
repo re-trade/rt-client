@@ -474,7 +474,7 @@ const ProductActions = ({
           onClick={() => onUnverify(product.id)}
         >
           <XCircle className="h-4 w-4 mr-1" />
-          Hủy duyệt
+          Cấm
         </Button>
       )}
     </div>

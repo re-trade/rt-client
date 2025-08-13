@@ -34,6 +34,8 @@ import {
   AlertCircle,
   AlertTriangle,
   CheckCircle,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Eye,
   Filter,
@@ -42,6 +44,7 @@ import {
   RefreshCw,
   Shield,
   TrendingUp,
+  Upload,
   X,
   XCircle,
 } from 'lucide-react';
@@ -343,20 +346,35 @@ const EvidenceDetailModal = ({
 }) => {
   const [fullSizeImage, setFullSizeImage] = useState<string | null>(null);
   const [isAddEvidenceOpen, setIsAddEvidenceOpen] = useState(false);
-  const [newEvidence, setNewEvidence] = useState<{ evidenceUrls: string[]; note: string }>({
+  const [newEvidence, setNewEvidence] = useState<{
+    evidenceUrls: string[];
+    evidenceFiles: File[];
+    note: string;
+  }>({
     evidenceUrls: [''],
+    evidenceFiles: [],
     note: '',
   });
-
   const [validationErrors, setValidationErrors] = useState<{
     urls: boolean;
+    files: boolean;
     note: boolean;
   }>({
     urls: false,
+    files: false,
     note: false,
   });
 
-  const { fetchEvidence, postEvidence, evidenceLoading } = useReportSeller();
+  const {
+    fetchEvidence,
+    postEvidence,
+    evidenceLoading,
+    isUploadingImage,
+    evidencePage,
+    evidenceMaxPage,
+    totalEvidence,
+    goToEvidencePage,
+  } = useReportSeller();
 
   const handleImageClick = (url: string) => {
     setFullSizeImage(url);
@@ -364,6 +382,28 @@ const EvidenceDetailModal = ({
 
   const handleCloseFullSize = () => {
     setFullSizeImage(null);
+  };
+
+  const handleFileChange = (e: any) => {
+    const files = Array.from(e.target.files || []);
+    setNewEvidence((prev) => ({ ...prev, evidenceFiles: files }));
+    if (files.length > 0 && validationErrors.files) {
+      setValidationErrors((prev) => ({ ...prev, files: false }));
+    }
+  };
+
+  const handleNoteChange = (value: string) => {
+    setNewEvidence((prev) => ({ ...prev, note: value }));
+    if (value.trim() && validationErrors.note) {
+      setValidationErrors((prev) => ({ ...prev, note: false }));
+    }
+  };
+
+  const handleUrlChange = (index: number, value: string) => {
+    setNewEvidence((prev) => ({
+      ...prev,
+      evidenceUrls: prev.evidenceUrls.map((url, i) => (i === index ? value : url)),
+    }));
   };
 
   const handleAddUrl = () => {
@@ -380,42 +420,29 @@ const EvidenceDetailModal = ({
     }));
   };
 
-  const handleUrlChange = (index: number, value: string) => {
-    setNewEvidence((prev) => ({
-      ...prev,
-      evidenceUrls: prev.evidenceUrls.map((url, i) => (i === index ? value : url)),
-    }));
-  };
-
-  const handleNoteChange = (value: string) => {
-    setNewEvidence((prev) => ({
-      ...prev,
-      note: value,
-    }));
-  };
-
   const handlePostEvidence = async () => {
     try {
-      setValidationErrors({ urls: false, note: false });
+      setValidationErrors({ urls: false, files: false, note: false });
 
-      const errors = { urls: false, note: false };
-
+      const errors = { urls: false, files: false, note: false };
       const validUrls = newEvidence.evidenceUrls.filter((url) => url.trim());
-      if (validUrls.length === 0) {
-        errors.urls = true;
-      }
 
-      if (!newEvidence.note.trim()) {
+      if (!validUrls.length && !newEvidence.evidenceFiles.length && !newEvidence.note.trim()) {
+        errors.urls = true;
+        errors.files = true;
+        errors.note = true;
+      } else if (!newEvidence.note.trim()) {
         errors.note = true;
       }
 
-      if (errors.urls || errors.note) {
+      if (errors.urls || errors.files || errors.note) {
         setValidationErrors(errors);
         return;
       }
 
       const result = await postEvidence(reportId, {
         evidenceUrls: validUrls,
+        evidenceFiles: newEvidence.evidenceFiles,
         note: newEvidence.note.trim(),
       });
 
@@ -423,8 +450,8 @@ const EvidenceDetailModal = ({
         toast.success('Thêm bằng chứng thành công!', {
           description: 'Bằng chứng đã được thêm vào báo cáo',
         });
-        setNewEvidence({ evidenceUrls: [''], note: '' });
-        setValidationErrors({ urls: false, note: false });
+        setNewEvidence({ evidenceUrls: [''], evidenceFiles: [], note: '' });
+        setValidationErrors({ urls: false, files: false, note: false });
         setIsAddEvidenceOpen(false);
 
         const updatedEvidence = await fetchEvidence(reportId);
@@ -435,8 +462,8 @@ const EvidenceDetailModal = ({
         });
       }
     } catch (error: any) {
-      toast.error('Có lỗi xảy ra', {
-        description: error.message || 'Không thể thêm bằng chứng vào lúc này',
+      toast.error('Lỗi khi thêm bằng chứng', {
+        description: error.message || 'Có lỗi không xác định xảy ra',
       });
     }
   };
@@ -464,6 +491,10 @@ const EvidenceDetailModal = ({
               <Plus className="h-4 w-4 mr-2" />
               Thêm bằng chứng
             </Button>
+
+            {totalEvidence > 0 && (
+              <div className="text-sm text-gray-600">Tổng cộng: {totalEvidence} bằng chứng</div>
+            )}
           </div>
 
           {evidence && Array.isArray(evidence) && evidence.length > 0 ? (
@@ -567,17 +598,77 @@ const EvidenceDetailModal = ({
                   </CardContent>
                 </Card>
               ))}
+
+              {evidenceMaxPage > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="text-sm text-gray-600">
+                    Trang {evidencePage} / {evidenceMaxPage}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => goToEvidencePage(evidencePage - 1, reportId)}
+                      disabled={evidencePage <= 1 || evidenceLoading}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Trước
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => goToEvidencePage(evidencePage + 1, reportId)}
+                      disabled={evidencePage >= evidenceMaxPage || evidenceLoading}
+                    >
+                      Sau
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : evidenceLoading ? (
+            <div className="text-center py-12">
+              <RefreshCw className="h-16 w-16 text-blue-500 mx-auto mb-4 animate-spin" />
+              <p className="text-gray-600 text-lg">Đang tải bằng chứng...</p>
+              <p className="text-gray-500 text-sm mt-2">Vui lòng chờ trong giây lát</p>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">Không có dữ liệu bằng chứng</p>
+            <div className="text-center py-16">
+              <div className="bg-gray-50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+                <Package className="h-12 w-12 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                Không có dữ liệu bằng chứng
+              </h3>
+              <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                Hiện tại chưa có bằng chứng nào được gửi cho báo cáo này. Bạn có thể thêm bằng chứng
+                mới bằng cách nhấn nút "Thêm bằng chứng" ở trên.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => fetchEvidence(reportId)}
+                  disabled={evidenceLoading}
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className={`h-4 w-4 ${evidenceLoading ? 'animate-spin' : ''}`} />
+                  Làm mới
+                </Button>
+                <Button
+                  onClick={() => setIsAddEvidenceOpen(true)}
+                  disabled={!reportId}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Thêm bằng chứng đầu tiên
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Full size image modal */}
       <Dialog open={!!fullSizeImage} onOpenChange={handleCloseFullSize}>
         <DialogContent className="max-w-[95vw] max-h-[95vh] p-0">
           <VisuallyHidden>
@@ -615,8 +706,8 @@ const EvidenceDetailModal = ({
         onOpenChange={(open) => {
           setIsAddEvidenceOpen(open);
           if (!open) {
-            setNewEvidence({ evidenceUrls: [''], note: '' });
-            setValidationErrors({ urls: false, note: false });
+            setNewEvidence({ evidenceUrls: [''], evidenceFiles: [], note: '' });
+            setValidationErrors({ urls: false, files: false, note: false });
           }
         }}
       >
@@ -624,11 +715,72 @@ const EvidenceDetailModal = ({
           <DialogHeader>
             <DialogTitle>Thêm bằng chứng mới</DialogTitle>
             <DialogDescription>
-              Nhập các URL bằng chứng và ghi chú cho báo cáo ID: {reportId}
+              Tải lên hình ảnh từ thiết bị hoặc nhập URL bằng chứng cho báo cáo ID: {reportId}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6">
+            {/* File Upload Section */}
             <div className="space-y-3">
+              <label className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                Tải lên từ thiết bị: <span className="text-red-500">*</span>
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                <div className="text-center">
+                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Chọn hình ảnh từ thiết bị của bạn</p>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Chọn tệp
+                    </label>
+                  </div>
+                </div>
+                {newEvidence.evidenceFiles.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm font-medium text-gray-700">
+                      Đã chọn {newEvidence.evidenceFiles.length} tệp:
+                    </p>
+                    <div className="space-y-1">
+                      {newEvidence.evidenceFiles.map((file, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between bg-gray-50 p-2 rounded"
+                        >
+                          <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                          <span className="text-xs text-gray-500">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {validationErrors.files && (
+                  <p className="text-red-500 text-sm mt-2">
+                    Vui lòng chọn ít nhất một tệp hoặc nhập URL
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="px-3 text-sm text-gray-500 bg-white">HOẶC</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            {/* <div className="space-y-3">
               <label className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                 URLs bằng chứng: <span className="text-red-500">*</span>
               </label>
@@ -639,16 +791,16 @@ const EvidenceDetailModal = ({
                       placeholder="Nhập URL bằng chứng (ví dụ: https://example.com/image.jpg)"
                       value={url}
                       onChange={(e) => {
-                        handleUrlChange(index, e.target.value);
+                        handleUrlChange(index, e.target.value)
                         if (validationErrors.urls && e.target.value.trim()) {
-                          setValidationErrors((prev) => ({ ...prev, urls: false }));
+                          setValidationErrors((prev) => ({ ...prev, urls: false }))
                         }
                       }}
-                      className={`${validationErrors.urls ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                      className={`${validationErrors.urls ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`}
                     />
                     {validationErrors.urls && index === 0 && (
                       <p className="text-red-500 text-sm mt-1">
-                        Vui lòng nhập ít nhất một URL bằng chứng
+                        Vui lòng chọn tệp hoặc nhập ít nhất một URL bằng chứng
                       </p>
                     )}
                   </div>
@@ -668,7 +820,9 @@ const EvidenceDetailModal = ({
                 <Plus className="h-4 w-4 mr-2" />
                 Thêm URL
               </Button>
-            </div>
+            </div> */}
+
+            {/* Note Section */}
             <div className="space-y-3">
               <label className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                 Ghi chú: <span className="text-red-500">*</span>
@@ -690,17 +844,18 @@ const EvidenceDetailModal = ({
                 )}
               </div>
             </div>
+
             <Separator />
             <div className="flex gap-3">
               <Button
                 onClick={handlePostEvidence}
-                disabled={evidenceLoading || !reportId}
+                disabled={evidenceLoading || isUploadingImage || !reportId}
                 className="flex-1"
               >
-                {evidenceLoading ? (
+                {evidenceLoading || isUploadingImage ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                    Đang gửi...
+                    {isUploadingImage ? 'Đang tải lên...' : 'Đang gửi...'}
                   </>
                 ) : (
                   'Gửi bằng chứng'
@@ -709,7 +864,7 @@ const EvidenceDetailModal = ({
               <Button
                 variant="outline"
                 onClick={() => setIsAddEvidenceOpen(false)}
-                disabled={evidenceLoading}
+                disabled={evidenceLoading || isUploadingImage}
               >
                 Hủy
               </Button>

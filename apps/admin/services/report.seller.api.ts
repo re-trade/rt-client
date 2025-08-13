@@ -77,16 +77,32 @@ const rejectReport = async (id: string): Promise<IResponseObject<null>> => {
   return response.data;
 };
 
-const getEvidence = async (id: string): Promise<TEvidence[]> => {
+const getEvidence = async (
+  id: string,
+  page: number = 0,
+  size: number = 10,
+  query?: string,
+): Promise<IResponseObject<TEvidence[]> | undefined> => {
   try {
     const response = await authApi.default.get<IResponseObject<TEvidence[]>>(
       `/report-seller/${id}/evidences/SYSTEM`,
-      { withCredentials: true },
+      {
+        withCredentials: true,
+        params: {
+          page,
+          size,
+          ...(query ? { q: query } : {}),
+        },
+      },
     );
-    return response.data.content || [];
+
+    if (response.data.success && response.status === 200) {
+      return response.data;
+    }
+    return undefined;
   } catch (error: any) {
     console.error('Error fetching evidence:', error.response || error.message);
-    return [];
+    return undefined;
   }
 };
 
@@ -132,4 +148,24 @@ const postEvidence = async (
   }
 };
 
-export { acceptReport, getEvidence, getReports, postEvidence, rejectReport };
+const uploadImage = async (file: File): Promise<string | undefined> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const response = await authApi.storage.post<IResponseObject<string>>(
+      '/files/upload',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+
+    return response.data.success ? response.data.content : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+export { acceptReport, getEvidence, getReports, postEvidence, rejectReport, uploadImage };
