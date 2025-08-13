@@ -1,20 +1,11 @@
 'use client';
 
-import type React from 'react';
-
+import CreateBrandDialog from '@/components/dialog/CreateBrandDialog';
+import ViewUpdateBrandDialog from '@/components/dialog/ViewUpdateBrandDialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { MultiSelect } from '@/components/ui/multi-select';
-import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -23,219 +14,44 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Textarea } from '@/components/ui/textarea';
 import useBrandManager from '@/hooks/use-brand-manager';
-import { AlertCircle, Building2, Eye, ImageIcon, Package, Plus, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import {
+  AlertCircle,
+  Building2,
+  Calendar,
+  Edit,
+  Package,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash,
+} from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
 
-const AdvancedFilters = ({
-  searchQuery,
-  onSearch,
-}: {
-  searchQuery: string;
-  onSearch: (query: string) => void;
-}) => {
-  const [filterType, setFilterType] = useState('');
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
-
-  const handleClearFilters = () => {
-    setFilterType('');
-    setLocalSearchQuery('');
-    onSearch('');
-  };
-
-  const handleSearch = () => {
-    onSearch(localSearchQuery);
-  };
-
-  return <Card></Card>;
-};
-
-const BrandDetailModal = ({
-  brand,
-  isOpen,
-  onClose,
-}: {
-  brand: any | null;
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
-  if (!brand) return null;
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-primary" />
-            Chi tiết nhãn hàng
-          </DialogTitle>
-          <DialogDescription>Thông tin đầy đủ về nhãn hàng này</DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          <div className="flex items-center justify-center">
-            {brand.imgUrl ? (
-              <div className="relative w-80 h-60">
-                {' '}
-                <img
-                  src={brand.imgUrl || '/placeholder.svg?height=96&width=96'}
-                  alt={`${brand.name} logo`}
-                  className="max-w-full max-h-full rounded-lg object-contain border-4 border-primary/20 shadow-lg"
-                />
-                <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full p-1">
-                  <ImageIcon className="h-4 w-4" />
-                </div>
-              </div>
-            ) : (
-              <div className="h-24 w-24 rounded-lg bg-muted flex items-center justify-center border-4 border-primary/20">
-                <ImageIcon className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-          <Separator />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">Mã nhãn hàng</Label>
-                <p className="text-lg font-mono bg-muted px-3 py-2 rounded-md">{brand.id}</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">Tên nhãn hàng</Label>
-                <p className="text-xl font-semibold">{brand.name}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const FormField = ({
-  label,
-  required = false,
-  error,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  error?: string;
-  children: React.ReactNode;
-}) => (
-  <div className="space-y-2">
-    <Label className="text-sm font-medium">
-      {label}
-      {required && <span className="text-destructive ml-1">*</span>}
-    </Label>
-    {children}
-    {error && (
-      <p className="text-sm text-destructive flex items-center gap-1">
-        <AlertCircle className="h-3 w-3" />
-        {error}
-      </p>
-    )}
-  </div>
-);
-
-export default function BrandManagementPage() {
+const BrandManagementPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [localSearchQuery, setLocalSearchQuery] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<any | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [newBrandName, setNewBrandName] = useState('');
-  const [newBrandImgUrl, setNewBrandImgUrl] = useState('');
-  const [newBrandDescription, setNewBrandDescription] = useState('');
-  const [newSelectedCategoryIds, setNewSelectedCategoryIds] = useState<string[]>([]);
+  const { brands, page, maxPage, totalBrands, loading, error, refetch, goToPage, fetchBrands } =
+    useBrandManager();
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const {
-    brands,
-    page,
-    maxPage,
-    totalBrands,
-    loading,
-    error,
-    refetch,
-    goToPage,
-    fetchBrands,
-    fetchCategories,
-    categories,
-    categoriesLoading,
-    categoriesError,
-    addBrand,
-  } = useBrandManager();
-
-  useEffect(() => {
-    if (isAddModalOpen) {
-      fetchCategories();
-    }
-  }, [isAddModalOpen, fetchCategories]);
-
-  const resetNewBrandForm = () => {
-    setNewBrandName('');
-    setNewBrandImgUrl('');
-    setNewBrandDescription('');
-    setNewSelectedCategoryIds([]);
-    setErrors({});
+  const handleSearch = () => {
+    setSearchQuery(localSearchQuery);
+    fetchBrands(localSearchQuery, 1);
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!newBrandName.trim()) {
-      newErrors.name = 'Tên nhãn hàng là bắt buộc';
-    } else if (newBrandName.trim().length < 2) {
-      newErrors.name = 'Tên nhãn hàng phải có ít nhất 2 ký tự';
-    }
-
-    if (!newBrandImgUrl.trim()) {
-      newErrors.imgUrl = 'URL logo là bắt buộc';
-    } else if (!isValidUrl(newBrandImgUrl)) {
-      newErrors.imgUrl = 'Vui lòng nhập URL hợp lệ';
-    }
-
-    if (!newBrandDescription.trim()) {
-      newErrors.description = 'Mô tả nhãn hàng là bắt buộc';
-    } else if (newBrandDescription.trim().length < 10) {
-      newErrors.description = 'Mô tả phải có ít nhất 10 ký tự';
-    }
-
-    if (newSelectedCategoryIds.length === 0) {
-      newErrors.categories = 'Vui lòng chọn ít nhất một danh mục';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    fetchBrands(query, 1);
-    setCurrentPage(1);
+  const handleClearSearch = () => {
+    setLocalSearchQuery('');
+    setSearchQuery('');
+    fetchBrands('', 1);
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > maxPage) return;
-    setCurrentPage(newPage);
     goToPage(newPage, searchQuery);
   };
 
@@ -244,358 +60,358 @@ export default function BrandManagementPage() {
     setIsDetailModalOpen(true);
   };
 
-  const handleAddBrand = async () => {
-    if (!validateForm()) {
-      toast.error('Vui lòng sửa các lỗi trong biểu mẫu trước khi gửi');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const result = await addBrand({
-        name: newBrandName.trim(),
-        imgUrl: newBrandImgUrl.trim(),
-        description: newBrandDescription.trim(),
-        categoryIds: newSelectedCategoryIds,
-      });
-
-      if (result.success) {
-        toast.success('Thêm nhãn hàng thành công!');
-        setIsAddModalOpen(false);
-        resetNewBrandForm();
-      } else {
-        toast.error(result.message);
-      }
-    } catch (err: any) {
-      toast.error(err.message || 'Đã xảy ra lỗi khi thêm nhãn hàng');
-    } finally {
-      setIsSubmitting(false);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
+  // Format date function
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('vi-VN');
+  };
+
+  // Get brand status badge
+  const getStatusBadge = (brand: any) => {
+    // Assuming brands have a status field or we determine based on some criteria
+    const isActive = true; // Replace with actual logic
+    return isActive ? (
+      <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-100">
+        Hoạt động
+      </Badge>
+    ) : (
+      <Badge variant="secondary" className="bg-gray-100 text-gray-800 hover:bg-gray-100">
+        Tạm dừng
+      </Badge>
+    );
+  };
+
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight">Quản lý nhãn hàng</h1>
-          <p className="text-muted-foreground mt-2">
-            Quản lý danh mục nhãn hàng của bạn một cách dễ dàng
-          </p>
-        </div>
-        <Button onClick={() => setIsAddModalOpen(true)} size="lg" className="shadow-lg">
-          <Plus className="h-5 w-5 mr-2" />
-          Thêm nhãn hàng mới
-        </Button>
-      </div>
-
-      {error && (
-        <Card className="border-destructive/50 bg-destructive/5">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              <div className="flex-1">
-                <p className="font-medium">Đã xảy ra lỗi</p>
-                <p className="text-sm">{error}</p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => refetch()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Thử lại
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {categoriesError && (
-        <Card className="border-destructive/50 bg-destructive/5">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              <div className="flex-1">
-                <p className="font-medium">Lỗi danh mục</p>
-                <p className="text-sm">{categoriesError}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <AdvancedFilters searchQuery={searchQuery} onSearch={handleSearch} />
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Danh sách nhãn hàng
-          </CardTitle>
-          <CardDescription>
-            {totalBrands > 0
-              ? `Hiển thị ${brands.length} trong tổng số ${totalBrands} nhãn hàng`
-              : 'Không tìm thấy nhãn hàng'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center space-y-4">
-                <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
-                <p className="text-muted-foreground">Đang tải nhãn hàng...</p>
-              </div>
-            </div>
-          ) : brands.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-              <div className="bg-muted rounded-full p-6">
-                <Package className="h-12 w-12 text-muted-foreground" />
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto p-6 max-w-7xl">
+        {/* Header - Improved */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <Package className="h-8 w-8 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Không tìm thấy nhãn hàng</h3>
-                <p className="text-muted-foreground">
-                  Thử điều chỉnh tìm kiếm hoặc thêm nhãn hàng mới để bắt đầu
+                <h1 className="text-3xl font-bold text-gray-900 mb-1">Quản lý nhãn hàng</h1>
+                <p className="text-gray-600">
+                  Hiện tại {brands.length} trong tổng số {totalBrands} nhãn hàng
                 </p>
               </div>
-              <Button onClick={() => setIsAddModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Thêm nhãn hàng đầu tiên
-              </Button>
             </div>
-          ) : (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-80">Logo</TableHead>
-                    <TableHead>Tên nhãn hàng</TableHead>
-                    <TableHead>ID</TableHead>
-                    <TableHead className="text-center">Hành động</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {brands.map((brand) => (
-                    <TableRow key={brand.id} className="hover:bg-muted/50">
-                      <TableCell className="w-40 h-24">
-                        {' '}
-                        {brand.imgUrl ? (
-                          <img
-                            src={brand.imgUrl}
-                            alt={`${brand.name} logo`}
-                            className="max-w-full max-h-full rounded-lg object-contain border shadow-sm"
-                            style={{ maxWidth: '160px', maxHeight: '96px' }}
-                          />
-                        ) : (
-                          <div className="h-10 w-10 bg-muted rounded-lg flex items-center justify-center border">
-                            <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{brand.name}</p>
-                          <p className="text-sm text-muted-foreground">Nhãn hàng</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <code className="bg-muted px-2 py-1 rounded text-sm">{brand.id}</code>
-                      </TableCell>
+            <Button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Thêm nhãn hàng
+            </Button>
+          </div>
+        </div>
 
-                      <TableCell className="flex items-center justify-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleView(brand)}
-                          className="p-0"
-                        >
-                          <Eye className="h-5 w-5" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {maxPage > 1 && (
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground">
-                    Trang {page} trên {maxPage} • Tổng {totalBrands} nhãn hàng
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(page - 1)}
-                      disabled={page === 1}
-                    >
-                      Trước
-                    </Button>
-                    <div className="flex items-center space-x-1">
-                      {Array.from({ length: Math.min(5, maxPage) }, (_, i) => {
-                        const pageNum = i + 1;
-                        return (
-                          <Button
-                            key={pageNum}
-                            variant={page === pageNum ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handlePageChange(pageNum)}
-                            className="w-8 h-8 p-0"
-                          >
-                            {pageNum}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(page + 1)}
-                      disabled={page === maxPage}
-                    >
-                      Tiếp
-                    </Button>
-                  </div>
+        {/* Error Display */}
+        {error && (
+          <Card className="mb-6 border-red-200 bg-red-50">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-3 text-red-700">
+                <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Có lỗi xảy ra</p>
+                  <p className="text-sm text-red-600">{error}</p>
                 </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetch()}
+                  className="border-red-200 text-red-700 hover:bg-red-100"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Thử lại
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-      <BrandDetailModal
-        brand={selectedBrand}
-        isOpen={isDetailModalOpen}
-        onClose={() => {
-          setIsDetailModalOpen(false);
-          setSelectedBrand(null);
-        }}
-      />
-
-      <Dialog
-        open={isAddModalOpen}
-        onOpenChange={(open) => {
-          setIsAddModalOpen(open);
-          if (!open) resetNewBrandForm();
-        }}
-      >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5 text-primary" />
-              Thêm nhãn hàng mới
-            </DialogTitle>
-            <DialogDescription>Điền thông tin bên dưới để tạo nhãn hàng mới</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField label="Tên nhãn hàng" required error={errors.name}>
+        {/* Search Section - Improved */}
+        <Card className="mb-6 shadow-sm border-gray-200">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  value={newBrandName}
-                  onChange={(e) => {
-                    setNewBrandName(e.target.value);
-                    if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
-                  }}
-                  placeholder="Nhập tên nhãn hàng"
-                  disabled={isSubmitting}
+                  placeholder="Tìm kiếm theo tên nhãn hàng..."
+                  value={localSearchQuery}
+                  onChange={(e) => setLocalSearchQuery(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 />
-              </FormField>
-
-              <FormField label="URL Logo" required error={errors.imgUrl}>
-                <Input
-                  value={newBrandImgUrl}
-                  onChange={(e) => {
-                    setNewBrandImgUrl(e.target.value);
-                    if (errors.imgUrl) setErrors((prev) => ({ ...prev, imgUrl: '' }));
-                  }}
-                  placeholder="https://example.com/logo.png"
-                  disabled={isSubmitting}
-                />
-              </FormField>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Tìm kiếm
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleClearSearch}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  Xóa
+                </Button>
+              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <FormField label="Mô tả nhãn hàng" required error={errors.description}>
-              <Textarea
-                value={newBrandDescription}
-                onChange={(e) => {
-                  setNewBrandDescription(e.target.value);
-                  if (errors.description) setErrors((prev) => ({ ...prev, description: '' }));
-                }}
-                placeholder="Mô tả về nhãn hàng, giá trị và điểm đặc biệt..."
-                rows={4}
-                disabled={isSubmitting}
-              />
-            </FormField>
+        {/* Main Content */}
+        <Card className="shadow-sm border-gray-200">
+          <CardHeader className="border-b border-gray-200 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                  Danh sách nhãn hàng
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  {totalBrands > 0
+                    ? `Quản lý và theo dõi ${totalBrands} nhãn hàng trong hệ thống`
+                    : 'Không tìm thấy nhãn hàng nào'}
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
 
-            <FormField label="Danh mục" required error={errors.categories}>
-              {categoriesLoading ? (
-                <div className="flex items-center justify-center py-8 border rounded-md">
-                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                  <span className="text-sm text-muted-foreground">Đang tải danh mục...</span>
-                </div>
-              ) : categoriesError ? (
-                <div className="text-destructive text-sm bg-destructive/5 p-3 rounded-md">
-                  Lỗi khi tải danh mục: {categoriesError}
-                </div>
-              ) : (
-                <MultiSelect
-                  options={categories.map((cat) => ({
-                    value: cat.id,
-                    label: cat.name,
-                  }))}
-                  selected={newSelectedCategoryIds}
-                  onChange={(selected) => {
-                    setNewSelectedCategoryIds(selected);
-                    if (errors.categories) setErrors((prev) => ({ ...prev, categories: '' }));
-                  }}
-                  placeholder="Chọn danh mục cho nhãn hàng..."
-                />
-              )}
-            </FormField>
-
-            {newBrandImgUrl && isValidUrl(newBrandImgUrl) && (
-              <div className="space-y-2">
-                <Label>Xem trước logo</Label>
-                <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/20">
-                  <img
-                    src={newBrandImgUrl || '/placeholder.svg?height=48&width=48'}
-                    alt="Xem trước logo"
-                    className="h-12 w-12 rounded-lg object-cover border"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <div>
-                    <p className="font-medium">{newBrandName || 'Tên nhãn hàng'}</p>
-                    <p className="text-sm text-muted-foreground">Xem trước logo</p>
-                  </div>
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="text-center space-y-3">
+                  <RefreshCw className="h-8 w-8 animate-spin mx-auto text-blue-600" />
+                  <p className="text-gray-600">Đang tải dữ liệu...</p>
                 </div>
               </div>
-            )}
-          </div>
-
-          <Separator />
-
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setIsAddModalOpen(false)}
-              disabled={isSubmitting}
-            >
-              Hủy
-            </Button>
-            <Button onClick={handleAddBrand} disabled={isSubmitting} className="min-w-24">
-              {isSubmitting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Đang thêm...
-                </>
-              ) : (
-                <>
+            ) : brands.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="bg-gray-100 rounded-full p-6 mb-4">
+                  <Package className="h-12 w-12 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Chưa có nhãn hàng nào</h3>
+                <p className="text-gray-600 mb-4">
+                  Bắt đầu bằng cách thêm nhãn hàng đầu tiên của bạn
+                </p>
+                <Button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
                   <Plus className="h-4 w-4 mr-2" />
-                  Thêm nhãn hàng
-                </>
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+                  Thêm nhãn hàng đầu tiên
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* Improved Table */}
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50 hover:bg-gray-50">
+                        <TableHead className="font-semibold text-gray-700 py-4">Logo</TableHead>
+                        <TableHead className="font-semibold text-gray-700 py-4">
+                          Tên nhãn hàng
+                        </TableHead>
+                        <TableHead className="font-semibold text-gray-700 py-4">Danh mục</TableHead>
+                        <TableHead className="font-semibold text-gray-700 py-4">Mô tả</TableHead>
+                        <TableHead className="font-semibold text-gray-700 py-4">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            Ngày tạo
+                          </div>
+                        </TableHead>
+                        <TableHead className="font-semibold text-gray-700 py-4 text-center">
+                          Thao tác
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {brands.map((brand) => (
+                        <TableRow
+                          key={brand.id}
+                          className="hover:bg-gray-50 transition-colors duration-150"
+                        >
+                          {/* Brand Info - Logo + Name */}
+                          <TableCell className="py-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-lg border border-gray-200 overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
+                                {brand.imgUrl ? (
+                                  <img
+                                    src={brand.imgUrl}
+                                    alt={`${brand.name} logo`}
+                                    className="max-w-full max-h-full object-contain"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-400 text-xs font-semibold">
+                                      {brand.name?.charAt(0) || '?'}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <div className="justify-center gap-2">
+                              <span className="text-gray-900 font-semibold text-lg">
+                                {brand.name}
+                              </span>
+                            </div>
+                          </TableCell>
+
+                          {/* Status */}
+                          <TableCell className="py-4">
+                            <div className="flex flex-wrap gap-1">
+                              {brand.categories.slice(0, 2).map((category) => (
+                                <Badge
+                                  key={category.id}
+                                  className="font-semibold text-orange-900 text-sm bg-orange-100 border border-orange-300"
+                                >
+                                  {category.name}
+                                </Badge>
+                              ))}
+                              {brand.categories.length > 2 && (
+                                <Badge className="text-xs font-medium text-orange-900 bg-orange-100 border border-orange-300">
+                                  +{brand.categories.length - 2}
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <span className="bg-gray-100 px-3 py-1.5 rounded-md text-sm text-gray-700 font-mono">
+                              {brand.description
+                                ? brand.description.length > 50
+                                  ? brand.description.slice(0, 50) + '...'
+                                  : brand.description
+                                : 'Chưa có mô tả'}
+                            </span>
+                          </TableCell>
+                          {/* Created Date */}
+                          <TableCell className="py-4">
+                            <span className="text-gray-600">{formatDate(brand.createdAt)}</span>
+                          </TableCell>
+
+                          {/* Actions */}
+                          <TableCell className="py-4">
+                            <div className="flex items-center justify-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleView(brand)}
+                                className="px-3 py-1 text-sm border border-blue-500 text-blue-600 rounded hover:bg-blue-500 hover:text-white transition-colors"
+                                title="Xem chi tiết"
+                              >
+                                <Edit className="h-4 w-4 inline mr-1" />
+                                Sửa
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="px-3 py-1 text-sm border border-red-500 text-red-600 rounded hover:bg-red-500 hover:text-white transition-colors"
+                                title="Tùy chọn khác"
+                              >
+                                <Trash className="h-4 w-4 inline mr-1" />
+                                Xoá
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Improved Pagination */}
+                {maxPage > 1 && (
+                  <div className="border-t border-gray-200 bg-white px-6 py-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="text-sm text-gray-600">
+                        Hiển thị <span className="font-medium">{brands.length}</span> trong tổng số{' '}
+                        <span className="font-medium">{totalBrands}</span> nhãn hàng
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePageChange(page - 1)}
+                          disabled={page === 1}
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                          ← Trước
+                        </Button>
+
+                        <div className="flex items-center space-x-1">
+                          {Array.from({ length: Math.min(5, maxPage) }, (_, i) => {
+                            let pageNum;
+                            if (maxPage <= 5) {
+                              pageNum = i + 1;
+                            } else {
+                              const start = Math.max(1, page - 2);
+                              const end = Math.min(maxPage, start + 4);
+                              pageNum = start + i;
+                              if (pageNum > end) return null;
+                            }
+
+                            return (
+                              <Button
+                                key={pageNum}
+                                variant={page === pageNum ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => handlePageChange(pageNum)}
+                                className={`w-8 h-8 p-0 ${
+                                  page === pageNum
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                }`}
+                              >
+                                {pageNum}
+                              </Button>
+                            );
+                          })}
+                        </div>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePageChange(page + 1)}
+                          disabled={page === maxPage}
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                          Tiếp →
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Dialogs */}
+        <CreateBrandDialog isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+
+        <ViewUpdateBrandDialog
+          brand={selectedBrand}
+          isOpen={isDetailModalOpen}
+          onClose={() => {
+            setIsDetailModalOpen(false);
+            setSelectedBrand(null);
+          }}
+        />
+      </div>
     </div>
   );
-}
+};
+
+export default BrandManagementPage;

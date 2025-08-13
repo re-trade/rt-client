@@ -4,6 +4,13 @@ export type TBrand = {
   id: string;
   name: string;
   imgUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  description: string;
+  categories: {
+    id: string;
+    name: string;
+  }[];
 };
 
 export type TCategory = {
@@ -109,6 +116,24 @@ const getCategories = async (): Promise<IResponseObject<TCategory[]> | undefined
     return undefined;
   } catch (error: any) {
     console.error('Error fetching categories:', error.response || error.message);
+    return undefined;
+  }
+};
+const updateBrand = async (
+  id: string,
+  data: BrandInput,
+): Promise<IResponseObject<TBrand> | undefined> => {
+  try {
+    const response = await authApi.default.put<IResponseObject<TBrand>>(`/brands/${id}`, data, {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+    });
+    if (response.status === 200 && response.data.success) {
+      return response.data;
+    }
+    return undefined;
+  } catch (error: any) {
+    console.error('Error updating brand:', error.response || error.message);
     return undefined;
   }
 };

@@ -1,9 +1,7 @@
 'use client';
 import { Badge } from '@/components/ui/badge';
-import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { getAllCategories } from '@/service/categories.api';
-import { Command as CommandPrimitive } from 'cmdk';
-import { RefreshCw, X, Check, Trash2, XCircle, Search, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, RefreshCw, Search, Trash2, X, XCircle } from 'lucide-react';
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
@@ -178,7 +176,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
   const selectables = useMemo(() => {
     if (!inputValue) return categories;
     return categories.filter((framework) =>
-      framework.label.toLowerCase().includes(inputValue.toLowerCase())
+      framework.label.toLowerCase().includes(inputValue.toLowerCase()),
     );
   }, [categories, inputValue]);
 
@@ -192,7 +190,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
       ) : (
         <div>
           {/* Main selector box */}
-          <div 
+          <div
             className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 cursor-pointer min-h-[40px]"
             onClick={() => setOpen(!open)}
           >
@@ -224,7 +222,9 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
                   <span className="text-muted-foreground">Chọn danh mục...</span>
                 )}
               </div>
-              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`}
+              />
             </div>
           </div>
 
@@ -243,7 +243,7 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                
+
                 {/* Clear All button - only show when there are selected items */}
                 {selected.length > 0 && (
                   <button
@@ -278,7 +278,9 @@ export function FancyMultiSelect({ onChange, value: initialValue = [], currentCa
                           >
                             {isSelected && <Check className="h-3 w-3 text-white" />}
                           </div>
-                          <span className={isSelected ? 'font-medium text-blue-600' : 'text-gray-700'}>
+                          <span
+                            className={isSelected ? 'font-medium text-blue-600' : 'text-gray-700'}
+                          >
                             {framework.label}
                           </span>
                         </div>
