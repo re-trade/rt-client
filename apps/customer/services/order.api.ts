@@ -156,7 +156,7 @@ export const orderApi = {
   async completeOrder(orderId: string): Promise<void> {
     try {
       const response = await authApi.default.put<IResponseObject<void>>(
-        `/combo/${orderId}/customer/completed`,
+        `/orders/combo/${orderId}/customer/completed`,
       );
       if (response.data.success) {
         return response.data.content;
