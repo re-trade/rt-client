@@ -106,7 +106,6 @@ const getEvidence = async (
   }
 };
 
-
 const postEvidence = async (
   id: string,
   data: { evidenceUrls: string[]; note: string },
