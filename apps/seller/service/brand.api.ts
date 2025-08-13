@@ -3,7 +3,7 @@ import { authApi, IResponseObject } from '@retrade/util';
 type TBrand = {
   id: string;
   name: string;
-  url: string;
+  imgUrl: string;
 };
 
 export const brandApi = {

@@ -205,6 +205,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
       condition: 'NEW',
       tags: [],
       status: 'DRAFT',
+      categorySelected: true,
     });
     setImagePreviews([]);
     setSelectedFiles([]);
@@ -306,6 +307,15 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   <option value="DAMAGED">Hư hại</option>
                 </select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
+                  Thương hiệu <span className="text-red-500">*</span>
+                </Label>
+                <SelectBrand
+                  value={formData.brandId}
+                  onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
+                />
+              </div>
             </div>
           </div>
 
@@ -326,15 +336,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               />
             </div>
 
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="brand" className="text-sm font-medium text-gray-700">
-                Thương hiệu <span className="text-red-500">*</span>
-              </Label>
-              <SelectBrand
-                value={formData.brandId}
-                onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
-              />
-            </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="space-y-2">
@@ -359,9 +361,9 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   <div className="mt-2">
                     <Label
                       htmlFor="warrantyExpiryDate"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-1"
                     >
-                      <Calendar className="w-4 h-4" />
+                      <Calendar className="w-4 h-4 text-gray-400" />
                       Ngày hết hạn bảo hành
                     </Label>
                     <Input
@@ -373,6 +375,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                       min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
+
                 )}
               </div>
 
