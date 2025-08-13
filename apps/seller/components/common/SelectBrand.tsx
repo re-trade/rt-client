@@ -11,9 +11,9 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { brandApi, type TBrand } from '@/service/brand.api';
 import { Check, ChevronsUpDown, ImageIcon } from 'lucide-react';
+import Image from 'next/image';
 import type * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 
 interface SelectBrandProps {
   value: string;
@@ -150,7 +150,7 @@ export function SelectBrand({
 
   const BrandLogo = ({ brand }: { brand: TBrand }) => {
     const hasError = imageErrors.has(brand.id);
-    
+
     if (!brand.imgUrl || hasError) {
       return (
         <div className="w-6 h-6 bg-gray-100 rounded-sm flex items-center justify-center mr-3 flex-shrink-0">
@@ -205,7 +205,7 @@ export function SelectBrand({
                       onSelect={() => handleSelectBrand(brand)}
                       className={cn(
                         'flex items-center py-2',
-                        disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+                        disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
                       )}
                     >
                       <BrandLogo brand={brand} />

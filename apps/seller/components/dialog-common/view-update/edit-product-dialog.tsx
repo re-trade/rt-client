@@ -468,58 +468,59 @@ export function EditProductDialog({
               )}
             </div>
 
+            {/* Warranty Section - Horizontal Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  Tình trạng bảo hành
+                </Label>
+                <select
+                  value={formData.hasWarranty ? 'yes' : 'no'}
+                  onChange={(e) => handleFormChange('hasWarranty', e.target.value === 'yes')}
+                  className="w-full h-11 px-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                  disabled={!isEdit}
+                >
+                  <option value="no">Không có bảo hành</option>
+                  <option value="yes">Còn bảo hành</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="warrantyExpiryDate"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4 text-gray-500" />
+                  Ngày hết hạn bảo hành
+                </Label>
+                <Input
+                  id="warrantyExpiryDate"
+                  type="date"
+                  value={formData.warrantyExpiryDate}
+                  onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
+                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={!isEdit || !formData.hasWarranty}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </div>
+
+            {/* Tags Section */}
             <div className="space-y-2 mt-4">
-              <Label htmlFor="tags" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="tags"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
+                <Tag className="w-4 h-4 text-green-600" />
                 Tags
               </Label>
               <TagInput
                 value={formData.tags}
                 onChange={(tags) => handleFormChange('tags', tags)}
                 placeholder="Nhập tag và nhấn Enter"
+                disabled={!isEdit}
               />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <div className="space-y-2">
-                <div className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id="hasWarranty"
-                    checked={formData.hasWarranty}
-                    onChange={(e) => handleFormChange('hasWarranty', e.target.checked)}
-                    className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    disabled={!isEdit}
-                  />
-                  <Label
-                    htmlFor="hasWarranty"
-                    className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                  >
-                    <Shield className="w-4 h-4" />
-                    Sản phẩm còn bảo hành
-                  </Label>
-                </div>
-
-                {formData.hasWarranty && (
-                  <div className="mt-2">
-                    <Label
-                      htmlFor="warrantyExpiryDate"
-                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Ngày hết hạn bảo hành
-                    </Label>
-                    <Input
-                      id="warrantyExpiryDate"
-                      type="date"
-                      value={formData.warrantyExpiryDate}
-                      onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
-                      className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      disabled={!isEdit}
-                      min={new Date().toISOString().split('T')[0]}
-                    />
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
