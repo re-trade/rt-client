@@ -278,7 +278,9 @@ export default function BrandManagementPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Quản lý nhãn hàng</h1>
-          <p className="text-muted-foreground mt-2">Quản lý danh mục nhãn hàng của bạn một cách dễ dàng</p>
+          <p className="text-muted-foreground mt-2">
+            Quản lý danh mục nhãn hàng của bạn một cách dễ dàng
+          </p>
         </div>
         <Button onClick={() => setIsAddModalOpen(true)} size="lg" className="shadow-lg">
           <Plus className="h-5 w-5 mr-2" />
@@ -377,7 +379,7 @@ export default function BrandManagementPage() {
                             src={brand.imgUrl}
                             alt={`${brand.name} logo`}
                             className="max-w-full max-h-full rounded-lg object-contain border shadow-sm"
-                            style={{ maxWidth: '160px', maxHeight: '96px' }} 
+                            style={{ maxWidth: '160px', maxHeight: '96px' }}
                           />
                         ) : (
                           <div className="h-10 w-10 bg-muted rounded-lg flex items-center justify-center border">
@@ -478,9 +480,7 @@ export default function BrandManagementPage() {
               <Plus className="h-5 w-5 text-primary" />
               Thêm nhãn hàng mới
             </DialogTitle>
-            <DialogDescription>
-              Điền thông tin bên dưới để tạo nhãn hàng mới
-            </DialogDescription>
+            <DialogDescription>Điền thông tin bên dưới để tạo nhãn hàng mới</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6 py-4">
