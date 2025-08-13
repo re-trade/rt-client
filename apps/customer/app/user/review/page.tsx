@@ -1,8 +1,8 @@
 'use client';
 
 import { ProductNoReview, ReviewResponse, reviewApi } from '@/services/product-review.api';
-import { MyReviewsTab } from '@components/common/review/MyReviewsTab';
-import { PendingReviewsTab } from '@components/common/review/PendingReviewsTab';
+import { MyReviewsTab } from '@components/review/MyReviewsTab';
+import { PendingReviewsTab } from '@components/review/PendingReviewsTab';
 import { Package, RefreshCw, Star } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 

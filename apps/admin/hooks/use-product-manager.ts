@@ -75,7 +75,7 @@ const useProductManager = () => {
       } else if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
         params.append('currentPrice', `0..${selectedFilter.maxPrice}`);
       }
-      params.append('verified', String(true));
+      // params.append('verified', String(true));
       const response = await productApi.searchProducts(page - 1, pageSize, params.toString(), []);
 
       setProducts(response.content || []);

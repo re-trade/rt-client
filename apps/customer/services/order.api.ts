@@ -121,6 +121,7 @@ export const orderApi = {
       throw error;
     }
   },
+
   async getOrderStats(): Promise<OrderStatsResponse> {
     try {
       const response =
@@ -129,6 +130,53 @@ export const orderApi = {
         return response.data.content;
       }
       throw new Error('Failed to fetch order stats');
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async cancelOrder(orderId: string, reason: string): Promise<void> {
+    try {
+      const response = await authApi.default.put<IResponseObject<void>>(
+        `/orders/combo/customer/cancel`,
+        {
+          orderComboId: orderId,
+          reason,
+        },
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to cancel order');
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async completeOrder(orderId: string): Promise<void> {
+    try {
+      const response = await authApi.default.put<IResponseObject<void>>(
+        `/orders/combo/${orderId}/customer/completed`,
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to complete order');
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async requestReturn(orderId: string, reason: string): Promise<OrderCombo> {
+    try {
+      const response = await authApi.default.post<OrderDetailResponse>(
+        `/orders/customer/combo/${orderId}/return-request`,
+        { reason },
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to request return');
     } catch (error) {
       throw error;
     }

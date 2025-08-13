@@ -48,7 +48,7 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
   if (!stats) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-muted-foreground">Không thể tải thống kê đánh giá</p>
+        <span className="text-muted-foreground">Không thể tải thống kê đánh giá</span>
       </Card>
     );
   }
@@ -72,10 +72,10 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
       color: 'text-amber-600',
       iconBgColor: 'bg-amber-100',
       customValue: (
-        <div className="flex items-center gap-1">
+        <span className="flex items-center gap-1">
           <span className="text-2xl font-bold">{stats.averageRating}</span>
           <Star className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-        </div>
+        </span>
       ),
     },
     {
@@ -110,10 +110,10 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
                   <p className="text-2xl font-bold text-slate-900">
                     {stat.customValue || stat.value}
                   </p>
-                  <p className="text-xs text-gray-600 flex items-center gap-1 mt-1">
+                  <span className="text-xs text-gray-600 flex items-center gap-1 mt-1">
                     <span className="text-green-600 font-medium">{stat.change}</span>
                     {stat.changeLabel}
-                  </p>
+                  </span>
                 </div>
                 <div
                   className={`h-12 w-12 rounded-full ${stat.iconBgColor} flex items-center justify-center`}

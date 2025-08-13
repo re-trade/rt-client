@@ -1,5 +1,13 @@
 import { authApi, IResponseObject } from '@retrade/util';
 
+export enum ProductStatusEnum {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED',
+  INIT = 'INIT',
+  DRAFT = 'DRAFT',
+}
+
 export type TProductStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED' | 'INIT' | 'DRAFT';
 
 export type TProduct = {
@@ -26,6 +34,7 @@ export type TProduct = {
   condition: string;
   status: TProductStatus;
   avgVote: number;
+  retraded: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -76,13 +85,6 @@ export type ProductFilterResponse = {
   minPrice: number;
   maxPrice: number;
 };
-
-interface QueryParams {
-  page: number;
-  size: number;
-  q?: string;
-  sort?: string;
-}
 
 export const productApi = {
   async getProducts(
@@ -177,5 +179,27 @@ export const productApi = {
       return response.data.content;
     }
     throw new Error('Failed to delete product');
+  },
+
+  async updateProductStatus(id: string, status: TProductStatus): Promise<TProduct> {
+    const response = await authApi.default.patch<IResponseObject<TProduct>>(`/products/status`, {
+      productId: id,
+      status: status,
+    });
+    if (response.data.success) {
+      return response.data.content;
+    }
+    throw new Error('Failed to update product status');
+  },
+  async updateProductQuantity(payload: { productId: string; quantity: number }) {
+    try {
+      const response = await authApi.default.patch<IResponseObject<void>>(
+        `/products/quantity`,
+        payload,
+      );
+      return response.data.success;
+    } catch {
+      return false;
+    }
   },
 };

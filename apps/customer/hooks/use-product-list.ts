@@ -39,9 +39,10 @@ export function useProductList() {
   const [filterError, setFilterError] = useState<string | null>(null);
   const keyword = searchParams.get('keyword') || '';
   const [page, setPage] = useState<number>(1);
-  const [maxPage, setMaxPage] = useState<number>(1);
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 9;
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -69,7 +70,8 @@ export function useProductList() {
       const response = await productApi.searchProducts(page - 1, PAGE_SIZE, params.toString(), []);
 
       setProducts(response.content || []);
-      setMaxPage(response.pagination?.totalPages ?? 1);
+      setTotalPages(response.pagination?.totalPages ?? 1);
+      setTotalElements(response.pagination?.totalElements ?? response.content?.length ?? 0);
     } catch {
       setError('Không thể tải sản phẩm. Vui lòng thử lại sau.');
     } finally {
@@ -161,7 +163,7 @@ export function useProductList() {
     setSelectedFilter,
     page,
     setPage,
-    maxPage,
-    setMaxPage,
+    totalElements,
+    totalPages,
   };
 }

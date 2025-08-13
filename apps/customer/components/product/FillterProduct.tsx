@@ -225,25 +225,30 @@ export default function ProductFilter({
             <div className="w-full flex gap-2">
               <input
                 type="number"
-                className="input input-sm w-full border border-orange-300"
+                className="input input-sm w-full border border-orange-300 text-gray-700 bg-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
                 placeholder="Giá thấp nhất"
-                min={selectedFilter.minPrice || ''}
-                max={selectedFilter.maxPrice || ''}
-                value={selectedFilter.minPrice || ''}
-                onChange={(e) =>
-                  handleSelectedFilterChange('minPrice', parseInt(e.target.value || '0'))
-                }
+                min={filter.minPrice}
+                max={selectedFilter.maxPrice || '0'}
+                value={selectedFilter.minPrice || '0'}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value || '0');
+                  if (value < 0) return;
+                  handleSelectedFilterChange('minPrice', value);
+                }}
               />
-              <span className="px-2 py-1 text-sm text-gray-500">–</span>
+              <span className="px-2 py-1 text-sm font-medium text-gray-600">–</span>
               <input
                 type="number"
-                className="input input-sm w-full border border-orange-300"
+                className="input input-sm w-full border border-orange-300 text-gray-700 bg-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
                 placeholder="Giá cao nhất"
+                min={selectedFilter.minPrice || '0'}
                 value={selectedFilter.maxPrice || ''}
-                max={selectedFilter.maxPrice || ''}
-                onChange={(e) =>
-                  handleSelectedFilterChange('maxPrice', parseInt(e.target.value || '0'))
-                }
+                max={filter.maxPrice || '0'}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value || '0');
+                  if (value < 0) return;
+                  handleSelectedFilterChange('maxPrice', value);
+                }}
               />
             </div>
           </FilterSection>

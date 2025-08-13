@@ -1,15 +1,14 @@
 'use client';
 
 import CarouselComponent from '@/components/Carousel';
+import { CategorySelector } from '@/components/category/CategorySelector';
 import ProductCard from '@/components/product/ProductCard';
-import { useAuth } from '@/hooks/use-auth';
 import { useProductHome } from '@/hooks/use-product-home';
 import { useProductList } from '@/hooks/use-product-list';
 import { TProduct } from '@/services/product.api';
 import {
   ChevronRight,
   Clock,
-  Filter,
   Grid3X3,
   MessageCircle,
   Package,
@@ -22,6 +21,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
 export default function Home() {
   const {
     products,
@@ -36,13 +36,14 @@ export default function Home() {
   } = useProductHome();
   const router = useRouter();
   const { handleSelectedFilterChange } = useProductList();
-  const { roles } = useAuth();
 
   const handleSelectCategory = (categoryId: string | null) => {
     if (categoryId) {
       handleSelectedFilterChange('categories', [categoryId]);
+      router.push(`/category/${categoryId}`);
+    } else {
+      router.push('/product');
     }
-    router.push(`/category/${categoryId || ''}`);
   };
 
   const ProductSection = ({
@@ -98,7 +99,7 @@ export default function Home() {
             </button>
           )}
           <button
-            className="text-[#121212] hover:text-[#525252] text-sm font-medium flex items-center gap-2 px-4 py-2 bg-[#FFD2B2] hover:bg-[#FFBB99] rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+            className="text-white hover:text-white text-sm font-medium flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
             onClick={() => router.push(`/product`)}
           >
             Xem tất cả
@@ -179,7 +180,7 @@ export default function Home() {
           {selectedCategoryId && (
             <button
               onClick={() => selectCategory(null)}
-              className="bg-[#FFD2B2] hover:bg-[#FFBB99] text-[#121212] px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Xem tất cả sản phẩm
             </button>
@@ -195,34 +196,6 @@ export default function Home() {
         <div className="rounded-xl overflow-hidden shadow-lg mx-4 sm:mx-6">
           <CarouselComponent />
         </div>
-
-        {/* Banner - Trở thành người bán */}
-        {/* {!roles.includes('ROLE_SELLER') && (
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 sm:p-8 mx-4 sm:mx-6 shadow-lg">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex-1 text-center sm:text-left">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-                    Bạn có đồ cũ muốn bán?
-                  </h2>
-                  <p className="text-green-100 text-sm sm:text-base">
-                    Đăng ký trở thành người bán và kiếm thêm thu nhập từ những món đồ không còn sử
-                    dụng
-                  </p>
-                </div>
-                <div className="flex-shrink-0">
-                  <button
-                    onClick={() => window.open(SELLER_ROUTES.REGISTER, '_blank')}
-                    className="bg-white text-green-600 hover:bg-green-50 px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
-                  >
-                    <Store className="w-5 h-5" />
-                    Trở thành người bán
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )} */}
 
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -264,61 +237,37 @@ export default function Home() {
 
         {/* Categories Section */}
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="bg-white py-6 px-6 sm:px-8 rounded-xl shadow-md border border-[#525252]/20">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#FFD2B2] rounded-lg">
-                  <Grid3X3 className="w-5 h-5 text-[#121212]" />
-                </div>
-                <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-[#121212]">Danh mục sản phẩm</h2>
-                  <p className="text-sm text-[#525252]">Khám phá theo từng danh mục</p>
+          {categoriesLoading ? (
+            <div className="bg-white py-6 px-8 rounded-xl shadow-md border border-orange-200">
+              <div className="flex items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Grid3X3 className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800">
+                      Danh mục sản phẩm
+                    </h2>
+                    <p className="text-sm text-gray-600">Khám phá theo từng danh mục</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-[#525252]" />
-                <span className="text-sm text-[#525252]">Lọc</span>
-              </div>
-            </div>
-
-            {categoriesLoading ? (
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <div
                     key={i}
-                    className="whitespace-nowrap bg-[#FFD2B2]/30 h-10 w-24 rounded-full animate-pulse flex-shrink-0"
+                    className="whitespace-nowrap bg-orange-100 h-10 w-24 rounded-full animate-pulse flex-shrink-0"
                   ></div>
                 ))}
               </div>
-            ) : (
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-[#FFD2B2] scrollbar-track-[#FDFEF9]">
-                <button
-                  onClick={() => handleSelectCategory(null)}
-                  className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
-                    selectedCategoryId === null
-                      ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
-                      : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                  }`}
-                >
-                  Tất cả
-                </button>
-
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => handleSelectCategory(category.id)}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 text-sm font-medium flex-shrink-0 ${
-                      selectedCategoryId === category.id
-                        ? 'bg-[#FFD2B2] text-[#121212] shadow-md border border-[#525252]/20'
-                        : 'bg-[#FDFEF9] text-[#525252] hover:bg-[#FFD2B2]/50 border border-[#525252]/20'
-                    }`}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <CategorySelector
+              categories={categories}
+              selectedCategoryId={selectedCategoryId}
+              onSelectCategoryAction={handleSelectCategory}
+            />
+          )}
         </div>
       </div>
 
@@ -409,30 +358,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/*  <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4 sm:px-6">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="flex justify-center mb-6">
-            <div className="p-3 bg-white/20 rounded-xl">
-              <Star className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Đừng bỏ lỡ cơ hội</h2>
-          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-            Đăng ký nhận thông báo về những món đồ cũ độc đáo và ưu đãi đặc biệt
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Nhập email của bạn"
-              className="flex-1 px-4 py-3 rounded-lg border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 text-gray-800"
-            />
-            <button className="bg-[#121212] hover:bg-[#525252] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-              Đăng ký
-            </button>
-          </div>
-        </div>
-      </section> */}
     </div>
   );
 }

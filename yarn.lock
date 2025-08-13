@@ -797,7 +797,7 @@
 
 "@radix-ui/react-popover@^1.1.14":
   version "1.1.14"
-  resolved "https://registry.npmjs.org/@radix-ui/react-popover/-/react-popover-1.1.14.tgz"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-popover/-/react-popover-1.1.14.tgz#5496d1986f0287cdfc77e73f70a887e4cb77ad08"
   integrity sha512-ODz16+1iIbGUfFEfKx2HTPKizg2MN39uIOV8MXeHnmdd3i/N9Wt7vU46wbHsqA0xoaQyXVcs0KIlBdOA2Y95bw==
   dependencies:
     "@radix-ui/primitive" "1.1.2"
@@ -2049,7 +2049,7 @@ clsx@^2.0.0, clsx@^2.1.1:
 
 cmdk@^1.1.1:
   version "1.1.1"
-  resolved "https://registry.npmjs.org/cmdk/-/cmdk-1.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/cmdk/-/cmdk-1.1.1.tgz#b8524272699ccaa37aaf07f36850b376bf3d58e5"
   integrity sha512-Vsv7kFaXm+ptHDMZ7izaRsP70GgrW9NBNGswt9OZaVBLlE0SNpDq8eu/VGXyF9r7M0azK3Wy7OlYXsuyYLFzHg==
   dependencies:
     "@radix-ui/react-compose-refs" "^1.1.1"

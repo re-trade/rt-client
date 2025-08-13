@@ -33,7 +33,6 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
-  // Helper function to format date
   const formatDate = (dateInput: number[] | string): string => {
     if (Array.isArray(dateInput) && dateInput.length === 3) {
       const [year, month, day] = dateInput;
@@ -45,7 +44,6 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
     return 'Không xác định';
   };
 
-  // Helper function to get condition label
   const getConditionLabel = (condition: string): { label: string; color: string } => {
     const conditions = {
       NEW: { label: 'Mới', color: 'bg-green-100 text-green-800' },
@@ -63,7 +61,6 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
     );
   };
 
-  // Helper function to get status label
   const getStatusLabel = (status: string): { label: string; color: string } => {
     const statuses = {
       DRAFT: { label: 'Bản nháp', color: 'bg-gray-100 text-gray-800' },
@@ -114,9 +111,7 @@ export function ProductDetailsDialog({ open, onOpenChange, product }: ProductDet
         </DialogHeader>
 
         <div className="p-6 space-y-8">
-          {/* Product Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Image Gallery */}
             <div className="space-y-4">
               <div className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden shadow-md">
                 {images.length > 0 ? (
