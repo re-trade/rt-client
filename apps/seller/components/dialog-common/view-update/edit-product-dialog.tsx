@@ -69,6 +69,7 @@ export function EditProductDialog({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedThumbnail, setSelectedThumbnail] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [warrantyDateError, setWarrantyDateError] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
@@ -103,6 +104,14 @@ export function EditProductDialog({
   }, [product]);
 
   useEffect(() => {
+    if (formData.hasWarranty && formData.warrantyExpiryDate) {
+      validateWarrantyDate(formData.warrantyExpiryDate);
+    } else {
+      setWarrantyDateError('');
+    }
+  }, [formData.hasWarranty, formData.warrantyExpiryDate]);
+
+  useEffect(() => {
     return () => {
       imagePreviews.forEach((url) => {
         if (url && url.startsWith('blob:')) {
@@ -129,6 +138,35 @@ export function EditProductDialog({
     } else {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
+
+    if (field === 'hasWarranty' && !value) {
+      setWarrantyDateError('');
+    }
+  };
+
+  const validateWarrantyDate = (dateValue: string) => {
+    if (!dateValue) {
+      setWarrantyDateError('');
+      return;
+    }
+
+    const today = new Date();
+    const warrantyDate = new Date(dateValue);
+
+    today.setHours(0, 0, 0, 0);
+    warrantyDate.setHours(0, 0, 0, 0);
+
+    if (warrantyDate <= today) {
+      setWarrantyDateError('Ngày hết hạn bảo hành phải là ngày trong tương lai');
+    } else {
+      setWarrantyDateError('');
+    }
+  };
+
+  const handleWarrantyDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    handleFormChange('warrantyExpiryDate', value);
+    validateWarrantyDate(value);
   };
 
   const handleChooseFiles = () => {
@@ -210,6 +248,29 @@ export function EditProductDialog({
     if (!isEdit) return;
     if (!isFormChanged()) {
       toast.info('Không có thay đổi để cập nhật');
+      return;
+    }
+
+    if (formData.hasWarranty) {
+      if (!formData.warrantyExpiryDate) {
+        toast.error('Vui lòng chọn ngày hết hạn bảo hành');
+        return;
+      }
+
+      const today = new Date();
+      const warrantyDate = new Date(formData.warrantyExpiryDate);
+
+      today.setHours(0, 0, 0, 0);
+      warrantyDate.setHours(0, 0, 0, 0);
+
+      if (warrantyDate <= today) {
+        toast.error('Ngày hết hạn bảo hành phải là ngày trong tương lai');
+        return;
+      }
+    }
+
+    if (warrantyDateError) {
+      toast.error(warrantyDateError);
       return;
     }
 
@@ -498,11 +559,27 @@ export function EditProductDialog({
                   id="warrantyExpiryDate"
                   type="date"
                   value={formData.warrantyExpiryDate}
-                  onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
-                  className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  onChange={handleWarrantyDateChange}
+                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
+                    warrantyDateError
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                      : ''
+                  }`}
                   disabled={!isEdit || !formData.hasWarranty}
-                  min={new Date().toISOString().split('T')[0]}
+                  min={(() => {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    return tomorrow.toISOString().split('T')[0];
+                  })()}
                 />
+                {formData.hasWarranty && isEdit && !warrantyDateError && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Chọn ngày trong tương lai (sau ngày hôm nay)
+                  </p>
+                )}
+                {warrantyDateError && (
+                  <p className="text-xs text-red-500 mt-1">{warrantyDateError}</p>
+                )}
               </div>
             </div>
 
