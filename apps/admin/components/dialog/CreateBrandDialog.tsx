@@ -1,18 +1,26 @@
 'use client';
 
-import { AlertCircle, Building2, FileText, Image as ImageIcon, Package, Trash2, Upload, X } from 'lucide-react';
+import {
+  AlertCircle,
+  Building2,
+  FileText,
+  Image as ImageIcon,
+  Package,
+  Upload,
+  X,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { FancyMultiSelect } from '@/components/common/MultiSectCate';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { FancyMultiSelect } from '@/components/common/MultiSectCate';
-import  useBrandManager  from '@/hooks/use-brand-manager';
-import Image from 'next/image';
-import { storageApi } from '@/services/storage.api';
+import useBrandManager from '@/hooks/use-brand-manager';
 import { BrandInput } from '@/services/brand.api';
+import { storageApi } from '@/services/storage.api';
+import Image from 'next/image';
 interface FormFieldProps {
   label: string;
   required?: boolean;
@@ -47,14 +55,15 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
     name: '',
     description: '',
     categoryIds: [] as string[],
-    logo: ''
+    logo: '',
   });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const { fetchCategories, categories, categoriesLoading, categoriesError, addBrand } = useBrandManager();
+
+  const { fetchCategories, categories, categoriesLoading, categoriesError, addBrand } =
+    useBrandManager();
 
   // Fetch categories when dialog opens
   useEffect(() => {
@@ -73,10 +82,10 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
   }, [logoPreview]);
 
   const handleFormChange = (field: keyof typeof formData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user makes changes
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -90,13 +99,13 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
       if (file) {
         // Validate file type
         if (!file.type.startsWith('image/')) {
-          setErrors(prev => ({ ...prev, logo: 'Vui lòng chọn file hình ảnh' }));
+          setErrors((prev) => ({ ...prev, logo: 'Vui lòng chọn file hình ảnh' }));
           return;
         }
 
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-          setErrors(prev => ({ ...prev, logo: 'Kích thước file không được vượt quá 5MB' }));
+          setErrors((prev) => ({ ...prev, logo: 'Kích thước file không được vượt quá 5MB' }));
           return;
         }
 
@@ -106,10 +115,10 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
         const imageUrl = URL.createObjectURL(file);
         setLogoPreview(imageUrl);
         setLogoFile(file);
-        
+
         // Clear logo error
         if (errors.logo) {
-          setErrors(prev => ({ ...prev, logo: '' }));
+          setErrors((prev) => ({ ...prev, logo: '' }));
         }
       }
       e.target.value = ''; // Reset input
@@ -130,7 +139,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
       name: '',
       description: '',
       categoryIds: [],
-      logo: ''
+      logo: '',
     });
     setErrors({});
     handleRemoveLogo();
@@ -180,7 +189,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
     try {
       let logoUrl = '';
       if (!logoFile) {
-         logoUrl = await storageApi.fileUpload(logoFile!);
+        logoUrl = await storageApi.fileUpload(logoFile!);
       }
       const request: BrandInput = {
         name: formData.name.trim(),
@@ -223,7 +232,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
               <FileText className="w-5 h-5 text-blue-600" />
               Thông tin cơ bản
             </h3>
-            
+
             <FormField label="Tên nhãn hàng" required error={errors.name}>
               <Input
                 value={formData.name}
@@ -255,18 +264,13 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
               <ImageIcon className="w-5 h-5 text-green-600" />
               Logo nhãn hàng
             </h3>
-            
+
             <FormField label="Logo" required error={errors.logo}>
               <div className="space-y-3">
                 {logoPreview ? (
                   <div className="relative inline-block">
                     <div className="w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-                      <Image
-                        src={logoPreview}
-                        alt="Logo preview"
-                        fill
-                        className="object-contain"
-                      />
+                      <Image src={logoPreview} alt="Logo preview" fill className="object-contain" />
                     </div>
                     <Button
                       type="button"
@@ -289,7 +293,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
                     <p className="text-xs text-gray-500">PNG, JPG, GIF tối đa 5MB</p>
                   </div>
                 )}
-                
+
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -298,7 +302,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
                   className="hidden"
                   disabled={isSubmitting}
                 />
-                
+
                 {!logoPreview && (
                   <Button
                     type="button"
@@ -321,7 +325,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
               <Package className="w-5 h-5 text-purple-600" />
               Danh mục sản phẩm
             </h3>
-            
+
             <FormField label="Chọn danh mục" required error={errors.categoryIds}>
               <FancyMultiSelect
                 value={formData.categoryIds}

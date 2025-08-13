@@ -84,7 +84,6 @@ const updateCategory = async (
   }
 };
 
-
 export {
   createCategory,
   getAllCategories,

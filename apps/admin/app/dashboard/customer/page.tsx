@@ -1,43 +1,60 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { useCustomerManager } from "@/hooks/use-customer-manager"
-import { Calendar } from "lucide-react"
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useCustomerManager } from '@/hooks/use-customer-manager';
 import {
   AlertCircle,
+  Calendar,
   CheckCircle,
   Eye,
   Filter,
-  Package,
-  RefreshCw,
-  XCircle,
-  Users,
-  UserCheck,
-  UserX,
-  Phone,
   Mail,
   MapPin,
-  User,
+  Package,
+  Phone,
+  RefreshCw,
   Shield,
   ShieldOff,
-  Clock,
-  Hash,
-  Building,
-} from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+  User,
+  UserCheck,
+  Users,
+  UserX,
+  XCircle,
+} from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const CustomerStats = ({ customers }: { customers: any[] }) => {
-  const totalCustomers = customers.length
-  const verifiedCustomers = customers.filter((p) => p.enabled).length
-  const blockedCustomers = customers.filter((p) => !p.enabled).length
+  const totalCustomers = customers.length;
+  const verifiedCustomers = customers.filter((p) => p.enabled).length;
+  const blockedCustomers = customers.filter((p) => !p.enabled).length;
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
@@ -80,8 +97,8 @@ const CustomerStats = ({ customers }: { customers: any[] }) => {
         </div>
       </Card>
     </div>
-  )
-}
+  );
+};
 
 const AdvancedFilters = ({
   searchQuery,
@@ -93,28 +110,28 @@ const AdvancedFilters = ({
   updatedAfter,
   setUpdatedAfter,
 }: {
-  searchQuery: string
-  onSearch: (query: string) => void
-  selectedStatus: string
-  setSelectedStatus: (status: string) => void
-  selectedGender: string
-  setSelectedGender: (gender: string) => void
-  updatedAfter: string
-  setUpdatedAfter: (date: string) => void
+  searchQuery: string;
+  onSearch: (query: string) => void;
+  selectedStatus: string;
+  setSelectedStatus: (status: string) => void;
+  selectedGender: string;
+  setSelectedGender: (gender: string) => void;
+  updatedAfter: string;
+  setUpdatedAfter: (date: string) => void;
 }) => {
   const handleClearFilters = () => {
-    onSearch("")
-    setSelectedStatus("all")
-    setSelectedGender("all")
-    setUpdatedAfter("")
-  }
+    onSearch('');
+    setSelectedStatus('all');
+    setSelectedGender('all');
+    setUpdatedAfter('');
+  };
 
   const activeFiltersCount = [
     searchQuery,
-    selectedStatus !== "all" ? selectedStatus : "",
-    selectedGender !== "all" ? selectedGender : "",
+    selectedStatus !== 'all' ? selectedStatus : '',
+    selectedGender !== 'all' ? selectedGender : '',
     updatedAfter,
-  ].filter(Boolean).length
+  ].filter(Boolean).length;
 
   return (
     <Card className="p-6 bg-white shadow-sm border border-gray-200">
@@ -126,7 +143,9 @@ const AdvancedFilters = ({
           <div>
             <h3 className="font-semibold text-gray-900">Bộ lọc nâng cao</h3>
             <p className="text-sm text-gray-500">
-              {activeFiltersCount > 0 ? `${activeFiltersCount} bộ lọc đang áp dụng` : "Không có bộ lọc nào"}
+              {activeFiltersCount > 0
+                ? `${activeFiltersCount} bộ lọc đang áp dụng`
+                : 'Không có bộ lọc nào'}
             </p>
           </div>
         </div>
@@ -213,8 +232,8 @@ const AdvancedFilters = ({
         </div>
       </div>
     </Card>
-  )
-}
+  );
+};
 
 const CustomerDetailModal = ({
   customer,
@@ -223,16 +242,23 @@ const CustomerDetailModal = ({
   onVerify,
   onReject,
 }: {
-  customer: any
-  isOpen: boolean
-  onClose: () => void
-  onVerify?: (id: string) => void
-  onReject?: (id: string) => void
+  customer: any;
+  isOpen: boolean;
+  onClose: () => void;
+  onVerify?: (id: string) => void;
+  onReject?: (id: string) => void;
 }) => {
-  if (!customer) return null
+  if (!customer) return null;
 
-  const isEnabled = customer.enabled
-
+  const isEnabled = customer.enabled;
+  const getCustomerInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[90vw] sm:max-w-7xl max-h-[90vh] overflow-y-auto">
@@ -253,22 +279,21 @@ const CustomerDetailModal = ({
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="relative">
               {customer.avatarUrl ? (
-                <img
-                  src={customer.avatarUrl || "/placeholder.svg"}
-                  alt={`${customer.firstName} ${customer.lastName}'s avatar`}
-                  className="h-32 w-32 rounded-full object-cover border-4 border-gray-200 shadow-lg"
-                />
+                <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
+                  <AvatarFallback className='text-5xl font-medium bg-orange-500 text-white'>
+                    {getCustomerInitials(customer.firstName + ' ' + customer.lastName)}
+                  </AvatarFallback>
+                </Avatar>
               ) : (
                 <div className="h-32 w-32 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-lg">
                   <User className="h-16 w-16 text-blue-500" />
                 </div>
               )}
               <Badge
-                className={`absolute -bottom-2 -right-2 px-3 py-1 ${
-                  isEnabled ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
-                }`}
+                className={`absolute -bottom-2 -right-2 px-3 py-1 ${isEnabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'
+                  }`}
               >
-                {isEnabled ? "Hoạt động" : "Bị khóa"}
+                {isEnabled ? 'Hoạt động' : 'Bị khóa'}
               </Badge>
             </div>
             <div>
@@ -304,7 +329,7 @@ const CustomerDetailModal = ({
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <p className="text-sm font-medium text-gray-600 mb-2">Giới tính</p>
                   <Badge variant="outline" className="text-base px-3 py-1">
-                    {customer.gender === "0" ? "👨 Nam" : "👩 Nữ"}
+                    {customer.gender === '0' ? '👨 Nam' : '👩 Nữ'}
                   </Badge>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -324,13 +349,13 @@ const CustomerDetailModal = ({
               </h3>
               <div className="space-y-5">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-full">
                       <Mail className="h-4 w-4 text-blue-600" />
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Email</p>
+                    <p className="text-sm font-medium text-gray-600">Email: </p>
+                    <p className="text-gray-900 font-medium">{customer.email}</p>
                   </div>
-                  <p className="text-gray-900 font-medium ml-11">{customer.email}</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex items-center gap-3 mb-2">
@@ -339,55 +364,24 @@ const CustomerDetailModal = ({
                     </div>
                     <p className="text-sm font-medium text-gray-600">Số điện thoại</p>
                   </div>
-                  <p className="text-gray-900 font-medium ml-11">{customer.phoneNumber || customer.phone}</p>
+                  <p className="text-gray-900 font-medium ml-11">
+                    {customer.phoneNumber || customer.phone}
+                  </p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-purple-100 rounded-full">
-                      <Calendar className="h-4 w-4 text-purple-600" />
+                      <MapPin className="h-4 w-4 text-purple-600" />
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Cập nhật lần cuối</p>
+                    <p className="text-sm font-medium text-gray-600">Địa chỉ</p>
                   </div>
                   <p className="text-gray-900 font-medium ml-11">
-                    {customer.updatedAt
-                      ? new Date(customer.updatedAt).toLocaleDateString("vi-VN")
-                      : "Không có thông tin"}
+                    {customer.address || 'Không có thông tin'}
                   </p>
                 </div>
               </div>
             </Card>
           </div>
-
-          <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-            <h3 className="font-semibold text-gray-900 mb-6 flex items-center gap-2 text-lg">
-              <div className="p-2 bg-orange-500 rounded-lg">
-                <MapPin className="h-5 w-5 text-white" />
-              </div>
-              Địa chỉ đầy đủ
-            </h3>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Địa chỉ chi tiết</p>
-                  <p className="text-gray-900 font-semibold text-lg">{customer.addressLine || customer.address}</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-gray-100">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Phường/Xã</p>
-                    <p className="text-gray-900 font-medium">{customer.ward}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Quận/Huyện</p>
-                    <p className="text-gray-900 font-medium">{customer.district}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Tỉnh/Thành phố</p>
-                    <p className="text-gray-900 font-medium">{customer.state}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
 
           {/* Mô tả */}
           {customer.description && (
@@ -429,20 +423,20 @@ const CustomerDetailModal = ({
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 export default function CustomerManagementPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedStatus, setSelectedStatus] = useState<string>("all")
-  const [selectedGender, setSelectedGender] = useState<string>("all")
-  const [updatedAfter, setUpdatedAfter] = useState<string>("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [sortField, setSortField] = useState<string>("name")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
-  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedGender, setSelectedGender] = useState<string>('all');
+  const [updatedAfter, setUpdatedAfter] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<string>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
 
   const {
     customers = [],
@@ -456,83 +450,92 @@ export default function CustomerManagementPage() {
     searchCustomers,
     handleBanCustomer,
     handleUnbanCustomer,
-  } = useCustomerManager()
+  } = useCustomerManager();
 
   const handleSort = (field: string) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortField(field)
-      setSortOrder("asc")
+      setSortField(field);
+      setSortOrder('asc');
     }
-  }
+  };
 
   const handleRefresh = () => {
-    refetch()
-  }
+    refetch();
+  };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    searchCustomers(query)
-  }
+    setSearchQuery(query);
+    searchCustomers(query);
+  };
 
   const handlePageChange = (newPage: number) => {
-    goToPage(newPage, searchQuery)
-  }
+    goToPage(newPage, searchQuery);
+  };
+
+    const getCustomerInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   const handleVerify = async (customerId: string) => {
     try {
-      const result = await handleUnbanCustomer(customerId)
+      const result = await handleUnbanCustomer(customerId);
       if (result) {
-        toast.success("Kích hoạt tài khoản thành công!", { position: "top-right" })
-        setDeleteSuccess("Kích hoạt tài khoản thành công!")
+        toast.success('Kích hoạt tài khoản thành công!', { position: 'top-right' });
+        setDeleteSuccess('Kích hoạt tài khoản thành công!');
       } else {
-        toast.error("Lỗi kích hoạt tài khoản", { position: "top-right" })
-        setDeleteError("Lỗi kích hoạt tài khoản")
+        toast.error('Lỗi kích hoạt tài khoản', { position: 'top-right' });
+        setDeleteError('Lỗi kích hoạt tài khoản');
       }
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || "Lỗi kích hoạt tài khoản"
-      toast.error(errorMessage, { position: "top-right" })
-      setDeleteError(errorMessage)
+      const errorMessage = err?.response?.data?.message || 'Lỗi kích hoạt tài khoản';
+      toast.error(errorMessage, { position: 'top-right' });
+      setDeleteError(errorMessage);
     }
-  }
+  };
 
   const handleReject = async (customerId: string) => {
     try {
-      const result = await handleBanCustomer(customerId)
+      const result = await handleBanCustomer(customerId);
       if (result) {
-        toast.success("Vô hiệu hóa tài khoản thành công!", { position: "top-right" })
-        setDeleteSuccess("Vô hiệu hóa tài khoản thành công!")
+        toast.success('Vô hiệu hóa tài khoản thành công!', { position: 'top-right' });
+        setDeleteSuccess('Vô hiệu hóa tài khoản thành công!');
       } else {
-        toast.error(result || "Lỗi vô hiệu hóa tài khoản", { position: "top-right" })
-        setDeleteError(result || "Lỗi vô hiệu hóa tài khoản")
+        toast.error(result || 'Lỗi vô hiệu hóa tài khoản', { position: 'top-right' });
+        setDeleteError(result || 'Lỗi vô hiệu hóa tài khoản');
       }
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || "Lỗi vô hiệu hóa tài khoản"
-      toast.error(errorMessage, { position: "top-right" })
-      setDeleteError(errorMessage)
+      const errorMessage = err?.response?.data?.message || 'Lỗi vô hiệu hóa tài khoản';
+      toast.error(errorMessage, { position: 'top-right' });
+      setDeleteError(errorMessage);
     }
-  }
+  };
 
   const handleView = (customer: any) => {
-    setSelectedCustomer(customer)
-    setIsDetailModalOpen(true)
-  }
+    setSelectedCustomer(customer);
+    setIsDetailModalOpen(true);
+  };
 
   const filteredCustomers = customers.filter((customer) => {
     const matchesStatus =
-      selectedStatus === "all" ||
-      (selectedStatus === "verified" && customer.enabled) ||
-      (selectedStatus === "pending" && !customer.enabled)
+      selectedStatus === 'all' ||
+      (selectedStatus === 'verified' && customer.enabled) ||
+      (selectedStatus === 'pending' && !customer.enabled);
 
-    const normalizedGender = String(customer.gender)
-    const matchesGender = selectedGender === "all" || normalizedGender === selectedGender
+    const normalizedGender = String(customer.gender);
+    const matchesGender = selectedGender === 'all' || normalizedGender === selectedGender;
 
-    const customerLastUpdate = new Date(customer.lastUpdate)
-    const matchesLastUpdate = !updatedAfter || customerLastUpdate > new Date(updatedAfter)
+    const customerLastUpdate = new Date(customer.lastUpdate);
+    const matchesLastUpdate = !updatedAfter || customerLastUpdate > new Date(updatedAfter);
 
-    return matchesStatus && matchesGender && matchesLastUpdate
-  })
+    return matchesStatus && matchesGender && matchesLastUpdate;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -544,8 +547,12 @@ export default function CustomerManagementPage() {
               <h1 className="text-3xl font-bold text-gray-900">Quản lý khách hàng</h1>
               <p className="text-gray-600 mt-2">Theo dõi và quản lý thông tin khách hàng của bạn</p>
             </div>
-            <Button onClick={handleRefresh} variant="outline" className="flex items-center gap-2 bg-transparent">
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              className="flex items-center gap-2 bg-transparent"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               Làm mới
             </Button>
           </div>
@@ -578,11 +585,15 @@ export default function CustomerManagementPage() {
               <AlertCircle className="h-5 w-5" />
               <div className="flex-1">
                 <span className="font-medium">Có lỗi xảy ra!</span> {error || deleteError}
-                {(error || deleteError)?.includes("đăng nhập") && (
+                {(error || deleteError)?.includes('đăng nhập') && (
                   <div className="mt-2 text-sm">
-                    <p>Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện thao tác này.</p>
+                    <p>
+                      Vui lòng đảm bảo bạn đã đăng nhập với tài khoản admin và có quyền thực hiện
+                      thao tác này.
+                    </p>
                     <p className="mt-1 text-xs text-red-600">
-                      <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3 giây.
+                      <strong>Lưu ý:</strong> Hệ thống sẽ tự động chuyển về trang đăng nhập sau 3
+                      giây.
                     </p>
                   </div>
                 )}
@@ -618,7 +629,9 @@ export default function CustomerManagementPage() {
         <Card className="shadow-sm border-0 bg-white">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Danh sách khách hàng ({filteredCustomers.length})</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Danh sách khách hàng ({filteredCustomers.length})
+              </h2>
             </div>
 
             {loading ? (
@@ -631,7 +644,9 @@ export default function CustomerManagementPage() {
             ) : customers.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <Package className="h-16 w-16 text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Không tìm thấy khách hàng</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Không tìm thấy khách hàng
+                </h3>
                 <p className="text-gray-500">Thử điều chỉnh bộ lọc hoặc tìm kiếm để xem kết quả</p>
               </div>
             ) : (
@@ -641,11 +656,15 @@ export default function CustomerManagementPage() {
                     <TableHeader>
                       <TableRow className="bg-gray-50">
                         <TableHead className="font-semibold text-gray-900">ID</TableHead>
-                        <TableHead className="font-semibold text-gray-900">Thông tin cá nhân</TableHead>
+                        <TableHead className="font-semibold text-gray-900">
+                          Thông tin cá nhân
+                        </TableHead>
                         <TableHead className="font-semibold text-gray-900">Liên hệ</TableHead>
                         <TableHead className="font-semibold text-gray-900">Địa chỉ</TableHead>
                         <TableHead className="font-semibold text-gray-900">Trạng thái</TableHead>
-                        <TableHead className="font-semibold text-gray-900 text-right">Thao tác</TableHead>
+                        <TableHead className="font-semibold text-gray-900 text-right">
+                          Thao tác
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
 
@@ -653,20 +672,21 @@ export default function CustomerManagementPage() {
                       {filteredCustomers.map((customer, index) => (
                         <TableRow
                           key={customer.id}
-                          className={`hover:bg-gray-50 transition-colors ${
-                            index % 2 === 0 ? "bg-white" : "bg-gray-25"
-                          }`}
+                          className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                            }`}
                         >
-                          <TableCell className="font-mono text-sm text-gray-600">#{customer.id}</TableCell>
+                          <TableCell className="font-mono text-sm text-gray-600">
+                            #{customer.id}
+                          </TableCell>
 
                           <TableCell>
                             <div className="flex items-center gap-3">
                               {customer.avatarUrl ? (
-                                <img
-                                  src={customer.avatarUrl || "/placeholder.svg"}
-                                  alt="Avatar"
-                                  className="h-10 w-10 rounded-full object-cover border-2 border-gray-100"
-                                />
+                                <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
+                                  <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
+                                    {getCustomerInitials(customer.firstName + ' ' + customer.lastName)}
+                                  </AvatarFallback>
+                                </Avatar>
                               ) : (
                                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                                   <User className="h-5 w-5 text-blue-500" />
@@ -701,11 +721,10 @@ export default function CustomerManagementPage() {
 
                           <TableCell>
                             <Badge
-                              className={`${
-                                customer.enabled
-                                  ? "bg-green-100 text-green-800 border-green-200"
-                                  : "bg-red-100 text-red-800 border-red-200"
-                              } font-medium`}
+                              className={`${customer.enabled
+                                  ? 'bg-green-100 text-green-800 border-green-200'
+                                  : 'bg-red-100 text-red-800 border-red-200'
+                                } font-medium`}
                               variant="outline"
                             >
                               {customer.enabled ? (
@@ -744,9 +763,10 @@ export default function CustomerManagementPage() {
                   <div className="mt-6 pt-4 border-t border-gray-200">
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-600">
-                        Hiển thị <span className="font-medium">{customers.length}</span> khách hàng trên trang{" "}
-                        <span className="font-medium">{page}</span> / <span className="font-medium">{maxPage}</span>{" "}
-                        (Tổng cộng <span className="font-medium">{totalCustomers}</span> khách hàng)
+                        Hiển thị <span className="font-medium">{customers.length}</span> khách hàng
+                        trên trang <span className="font-medium">{page}</span> /{' '}
+                        <span className="font-medium">{maxPage}</span> (Tổng cộng{' '}
+                        <span className="font-medium">{totalCustomers}</span> khách hàng)
                       </div>
 
                       <div className="flex items-center space-x-3">
@@ -762,20 +782,21 @@ export default function CustomerManagementPage() {
 
                         <div className="flex items-center gap-1">
                           {Array.from({ length: Math.min(5, maxPage) }, (_, i) => {
-                            const pageNum = Math.max(1, Math.min(maxPage - 4, page - 2)) + i
+                            const pageNum = Math.max(1, Math.min(maxPage - 4, page - 2)) + i;
                             return pageNum <= maxPage ? (
                               <Button
                                 key={pageNum}
-                                variant={page === pageNum ? "default" : "outline"}
+                                variant={page === pageNum ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handlePageChange(pageNum)}
-                                className={`w-10 h-8 ${
-                                  page === pageNum ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
-                                }`}
+                                className={`w-10 h-8 ${page === pageNum
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                  }`}
                               >
                                 {pageNum}
                               </Button>
-                            ) : null
+                            ) : null;
                           })}
                         </div>
 
@@ -802,37 +823,37 @@ export default function CustomerManagementPage() {
           customer={selectedCustomer}
           isOpen={isDetailModalOpen}
           onClose={() => {
-            setIsDetailModalOpen(false)
-            setSelectedCustomer(null)
+            setIsDetailModalOpen(false);
+            setSelectedCustomer(null);
           }}
           onVerify={async (id: string) => {
-            const result = await handleUnbanCustomer(id)
+            const result = await handleUnbanCustomer(id);
             if (result) {
-              toast.success("Kích hoạt tài khoản thành công!", { position: "top-right" })
-              setDeleteSuccess("Kích hoạt tài khoản thành công!")
+              toast.success('Kích hoạt tài khoản thành công!', { position: 'top-right' });
+              setDeleteSuccess('Kích hoạt tài khoản thành công!');
             } else {
-              toast.error(result || "Lỗi kích hoạt tài khoản", { position: "top-right" })
-              setDeleteError(result || "Lỗi kích hoạt tài khoản")
+              toast.error(result || 'Lỗi kích hoạt tài khoản', { position: 'top-right' });
+              setDeleteError(result || 'Lỗi kích hoạt tài khoản');
             }
-            setIsDetailModalOpen(false)
-            setSelectedCustomer(null)
-            refetch()
+            setIsDetailModalOpen(false);
+            setSelectedCustomer(null);
+            refetch();
           }}
           onReject={async (id: string) => {
-            const result = await handleBanCustomer(id)
+            const result = await handleBanCustomer(id);
             if (result) {
-              toast.success("Vô hiệu hóa tài khoản thành công!", { position: "top-right" })
-              setDeleteSuccess("Vô hiệu hóa tài khoản thành công!")
+              toast.success('Vô hiệu hóa tài khoản thành công!', { position: 'top-right' });
+              setDeleteSuccess('Vô hiệu hóa tài khoản thành công!');
             } else {
-              toast.error(result || "Lỗi vô hiệu hóa tài khoản", { position: "top-right" })
-              setDeleteError(result || "Lỗi vô hiệu hóa tài khoản")
+              toast.error(result || 'Lỗi vô hiệu hóa tài khoản', { position: 'top-right' });
+              setDeleteError(result || 'Lỗi vô hiệu hóa tài khoản');
             }
-            setIsDetailModalOpen(false)
-            setSelectedCustomer(null)
-            refetch()
+            setIsDetailModalOpen(false);
+            setSelectedCustomer(null);
+            refetch();
           }}
         />
       </div>
     </div>
-  )
+  );
 }
