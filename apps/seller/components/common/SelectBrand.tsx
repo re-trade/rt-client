@@ -10,9 +10,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { brandApi, type TBrand } from '@/service/brand.api';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, ImageIcon } from 'lucide-react';
 import type * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 
 interface SelectBrandProps {
   value: string;
@@ -32,6 +33,7 @@ export function SelectBrand({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [filteredBrands, setFilteredBrands] = useState<TBrand[]>([]);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -40,6 +42,7 @@ export function SelectBrand({
       setLoading(true);
       try {
         const data = await brandApi.getAllBrandNoPagination();
+        console.log('Fetched brands:', data);
         setBrands(data);
         setFilteredBrands(data);
 
@@ -97,6 +100,10 @@ export function SelectBrand({
     };
   }, [open, selectedBrand]);
 
+  const handleImageError = (brandId: string) => {
+    setImageErrors((prev) => new Set(prev).add(brandId));
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (disabled) return;
 
@@ -141,6 +148,31 @@ export function SelectBrand({
     }
   };
 
+  const BrandLogo = ({ brand }: { brand: TBrand }) => {
+    const hasError = imageErrors.has(brand.id);
+    
+    if (!brand.imgUrl || hasError) {
+      return (
+        <div className="w-6 h-6 bg-gray-100 rounded-sm flex items-center justify-center mr-3 flex-shrink-0">
+          <ImageIcon className="w-3 h-3 text-gray-400" />
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-6 h-6 mr-3 flex-shrink-0 relative rounded-sm overflow-hidden bg-gray-50">
+        <Image
+          src={brand.imgUrl}
+          alt={`${brand.name} logo`}
+          fill
+          className="object-contain"
+          sizes="24px"
+          onError={() => handleImageError(brand.id)}
+        />
+      </div>
+    );
+  };
+
   return (
     <div ref={containerRef} className="relative w-full">
       <div className="relative">
@@ -153,7 +185,7 @@ export function SelectBrand({
           onKeyDown={handleKeyDown}
           placeholder={loading ? 'Đang tải...' : 'Chọn hoặc tìm thương hiệu...'}
           disabled={loading || disabled}
-          className={`pr-8 ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+          className={`h-11 pr-8 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           autoComplete="off"
         />
         <ChevronsUpDown className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 shrink-0 opacity-50 pointer-events-none" />
@@ -171,15 +203,21 @@ export function SelectBrand({
                       key={brand.id}
                       value={brand.name}
                       onSelect={() => handleSelectBrand(brand)}
-                      className={disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
+                      className={cn(
+                        'flex items-center py-2',
+                        disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+                      )}
                     >
-                      <Check
-                        className={cn(
-                          'mr-2 h-4 w-4',
-                          brand.id === value ? 'opacity-100' : 'opacity-0',
-                        )}
-                      />
-                      {brand.name}
+                      <BrandLogo brand={brand} />
+                      <div className="flex items-center flex-1 min-w-0">
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4 flex-shrink-0',
+                            brand.id === value ? 'opacity-100' : 'opacity-0',
+                          )}
+                        />
+                        <span className="truncate">{brand.name}</span>
+                      </div>
                     </CommandItem>
                   ))}
                 </CommandGroup>
