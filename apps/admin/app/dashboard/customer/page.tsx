@@ -258,6 +258,9 @@ const CustomerDetailModal = ({
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const [showFallbackAvatar, setShowFallbackAvatar] = useState(false);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[90vw] sm:max-w-7xl max-h-[90vh] overflow-y-auto">
@@ -277,12 +280,13 @@ const CustomerDetailModal = ({
           {/* Avatar và thông tin cơ bản */}
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="relative">
-              {customer.avatarUrl ? (
-                <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-                  <AvatarFallback className="text-5xl font-medium bg-orange-500 text-white">
-                    {getCustomerInitials(customer.firstName + ' ' + customer.lastName)}
-                  </AvatarFallback>
-                </Avatar>
+              {customer.avatarUrl && !showFallbackAvatar ? (
+                <img
+                  src={customer.avatarUrl}
+                  alt={`${customer.firstName} ${customer.lastName}'s avatar`}
+                  className="h-32 w-32 rounded-full object-cover border-4 border-white shadow-lg"
+                  onError={() => setShowFallbackAvatar(true)}
+                />
               ) : (
                 <div className="h-32 w-32 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-lg">
                   <User className="h-16 w-16 text-blue-500" />
@@ -688,18 +692,26 @@ export default function CustomerManagementPage() {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               {customer.avatarUrl ? (
-                                <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                                  <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
-                                    {getCustomerInitials(
-                                      customer.firstName + ' ' + customer.lastName,
-                                    )}
-                                  </AvatarFallback>
-                                </Avatar>
-                              ) : (
-                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                                  <User className="h-5 w-5 text-blue-500" />
-                                </div>
-                              )}
+                                <img
+                                  src={customer.avatarUrl}
+                                  alt={`${customer.firstName} ${customer.lastName}'s avatar`}
+                                  className="h-8 w-8 rounded-full object-cover border-2 border-white shadow-sm"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                                  }}
+                                />
+                              ) : null}
+                              <Avatar
+                                className="h-8 w-8 border-2 border-white shadow-sm"
+                                style={{ display: customer.avatarUrl ? 'none' : 'flex' }}
+                              >
+                                <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
+                                  {getCustomerInitials(
+                                    customer.firstName + ' ' + customer.lastName,
+                                  )}
+                                </AvatarFallback>
+                              </Avatar>
                               <div>
                                 <p className="font-medium text-gray-900">
                                   {customer.firstName} {customer.lastName}
