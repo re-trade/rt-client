@@ -124,4 +124,61 @@ const getAccountById = async (
   }
 };
 
-export { getAccountById, getAccounts, toggleAccountStatus, updateAccountRoles };
+const banAccount = async (accountId: string): Promise<boolean> => {
+  try {
+    const result = await authApi.default.patch<IResponseObject<void>>(
+      `/accounts/${accountId}/ban`,
+      {},
+    );
+    return result.data.success && result.status === 200;
+  } catch {
+    return false;
+  }
+};
+
+const unbanAccount = async (accountId: string): Promise<boolean> => {
+  try {
+    const result = await authApi.default.patch<IResponseObject<void>>(
+      `/accounts/${accountId}/unban`,
+      {},
+    );
+    return result.data.success && result.status === 200;
+  } catch {
+    return false;
+  }
+};
+
+const banSeller = async (accountId: string): Promise<boolean> => {
+  try {
+    const result = await authApi.default.patch<IResponseObject<void>>(
+      `/accounts/${accountId}/seller/ban`,
+      {},
+    );
+    return result.data.success && result.status === 200;
+  } catch {
+    return false;
+  }
+};
+
+const unbanSeller = async (accountId: string): Promise<boolean> => {
+  try {
+    const result = await authApi.default.patch<IResponseObject<void>>(
+      `/accounts/${accountId}/seller/unban`,
+      {},
+    );
+    return result.data.success && result.status === 200;
+  } catch {
+    return false;
+  }
+};
+
+export {
+  banAccount,
+  banSeller,
+  getAccountById,
+  getAccounts,
+  toggleAccountStatus,
+  unbanAccount,
+  unbanSeller,
+  updateAccountRoles,
+};

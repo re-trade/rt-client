@@ -16,14 +16,12 @@ import {
   MapPin,
   Phone,
   Shield,
-  Star,
   Store,
   User,
   UserCheck,
   UserX,
 } from 'lucide-react';
 
-// Import the actual types from the API service
 import type { DetailedAccountResponse } from '@/services/account.api';
 
 interface DetailedUserDialogProps {
@@ -41,13 +39,17 @@ export function DetailedUserDialog({
 }: DetailedUserDialogProps) {
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('vi-VN', {
+    const date = new Date(dateString);
+    const dateStr = date.toLocaleDateString('vi-VN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+    });
+    const timeStr = date.toLocaleTimeString('vi-VN', {
       hour: '2-digit',
       minute: '2-digit',
     });
+    return `${timeStr} ${dateStr}`;
   };
 
   const getGenderText = (gender: number) => {
@@ -79,43 +81,46 @@ export function DetailedUserDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-[98vw] w-[98vw] max-h-[96vh] overflow-hidden p-0 bg-gradient-to-br from-slate-50 to-white border-0 shadow-2xl"
+        className="max-w-[98vw] w-[98vw] max-h-[85vh] overflow-hidden p-0 bg-gradient-to-br from-slate-50 to-white border-0 shadow-2xl flex flex-col"
         style={{ minWidth: '1200px' }}
       >
-        <DialogHeader className="px-8 pt-8 pb-6 bg-gradient-to-r from-orange-500 to-orange-600 text-white relative overflow-hidden">
+        <DialogHeader className="flex-shrink-0 px-6 pt-4 pb-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-black/5"></div>
           <div className="relative z-10">
-            <DialogTitle className="flex items-center gap-3 text-2xl font-bold">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <User className="h-7 w-7" />
+            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+              <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm">
+                <User className="h-5 w-5" />
               </div>
               Chi tiết người dùng
             </DialogTitle>
-            <DialogDescription className="text-orange-100 mt-2 text-base">
+            <DialogDescription className="text-orange-100 mt-1 text-sm">
               Thông tin chi tiết về tài khoản và hồ sơ người dùng trong hệ thống
             </DialogDescription>
           </div>
-          <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full"></div>
-          <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/5 rounded-full"></div>
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full"></div>
+          <div className="absolute -right-3 -bottom-3 w-16 h-16 bg-white/5 rounded-full"></div>
         </DialogHeader>
 
-        <div className="overflow-y-auto max-h-[calc(96vh-180px)] px-16 py-6">
-          <div className="space-y-6">
+        <div
+          className="flex-1 overflow-y-auto px-6 py-3"
+          style={{ maxHeight: 'calc(85vh - 180px)' }}
+        >
+          <div className="space-y-3">
             {/* Account Information Section */}
-            <div className="bg-white rounded-2xl shadow-lg border border-slate-200/50 overflow-hidden">
-              <div className="px-8 py-6 bg-gradient-to-r from-slate-100 to-slate-50 border-b border-slate-200/50">
-                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-3">
-                  <div className="p-2 bg-orange-100 rounded-xl">
-                    <User className="h-6 w-6 text-orange-600" />
+            <div className="bg-white rounded-xl shadow-md border-2 border-slate-300 overflow-hidden">
+              <div className="px-6 py-3 bg-gradient-to-r from-slate-100 to-slate-50 border-b-2 border-slate-300">
+                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <div className="p-1.5 bg-orange-100 rounded-lg">
+                    <User className="h-5 w-5 text-orange-600" />
                   </div>
                   Thông tin tài khoản
                 </h3>
               </div>
-              <div className="p-6">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div className="p-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                   {/* Username Column */}
                   <div className="group">
-                    <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors h-full">
+                    <div className="flex flex-col gap-1 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors h-full">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="p-1.5 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
                           <User className="h-4 w-4 text-orange-600" />
@@ -128,16 +133,14 @@ export function DetailedUserDialog({
 
                   {/* Email Column */}
                   <div className="group">
-                    <div className="flex flex-col gap-2 p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors h-full">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-                          <Mail className="h-4 w-4 text-blue-600" />
+                    <div className="flex flex-col gap-1 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors h-full">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="p-1 bg-blue-100 rounded group-hover:bg-blue-200 transition-colors">
+                          <Mail className="h-3 w-3 text-blue-600" />
                         </div>
                         <p className="text-xs font-medium text-slate-600">Email</p>
                       </div>
-                      <p className="text-base font-semibold text-slate-900 break-all">
-                        {user.email}
-                      </p>
+                      <p className="text-sm font-semibold text-slate-900 break-all">{user.email}</p>
                     </div>
                   </div>
 
@@ -200,7 +203,7 @@ export function DetailedUserDialog({
                 </div>
 
                 {/* Second Row - Security & Roles */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
                   {/* Security Info */}
                   <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
                     <p className="text-sm font-medium text-slate-600 mb-3">Bảo mật tài khoản</p>
@@ -271,17 +274,18 @@ export function DetailedUserDialog({
 
             {/* Customer Profile Section */}
             {user.customerProfile && (
-              <div className="bg-white rounded-2xl shadow-lg border border-blue-200/50 overflow-hidden">
-                <div className="px-8 py-6 bg-gradient-to-r from-blue-100 to-blue-50 border-b border-blue-200/50">
-                  <h3 className="text-xl font-bold text-blue-800 flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-xl">
-                      <User className="h-6 w-6 text-blue-600" />
+              <div className="bg-white rounded-xl shadow-md border-2 border-blue-300 overflow-hidden">
+                <div className="px-6 py-3 bg-gradient-to-r from-blue-100 to-blue-50 border-b-2 border-blue-300">
+                  <h3 className="text-lg font-bold text-blue-800 flex items-center gap-2">
+                    <div className="p-1.5 bg-blue-100 rounded-lg">
+                      <User className="h-5 w-5 text-blue-600" />
                     </div>
                     Hồ sơ khách hàng
                   </h3>
                 </div>
-                <div className="p-6">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="p-3">
+                  {/* First Row - Main Information (without address) */}
+                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                     {/* Name Column */}
                     <div className="group">
                       <div className="flex flex-col gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors h-full">
@@ -312,21 +316,6 @@ export function DetailedUserDialog({
                       </div>
                     </div>
 
-                    {/* Address Column */}
-                    <div className="group lg:col-span-2">
-                      <div className="flex flex-col gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors h-full">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="p-1.5 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
-                            <MapPin className="h-4 w-4 text-purple-600" />
-                          </div>
-                          <p className="text-xs font-medium text-blue-700">Địa chỉ</p>
-                        </div>
-                        <p className="text-base font-semibold text-blue-900">
-                          {user.customerProfile.address || 'Chưa cập nhật'}
-                        </p>
-                      </div>
-                    </div>
-
                     {/* Gender Column */}
                     <div className="group">
                       <div className="flex flex-col gap-2 p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 h-full">
@@ -347,24 +336,39 @@ export function DetailedUserDialog({
                       </div>
                     </div>
                   </div>
+
+                  {/* Second Row - Address (Full Width) */}
+                  <div className="group">
+                    <div className="flex flex-col gap-2 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                          <MapPin className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <p className="text-xs font-medium text-blue-700">Địa chỉ đầy đủ</p>
+                      </div>
+                      <p className="text-base font-semibold text-blue-900 leading-relaxed">
+                        {user.customerProfile.address || 'Chưa cập nhật địa chỉ'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Seller Profile Section */}
             {user.sellerProfile && (
-              <div className="bg-white rounded-2xl shadow-lg border border-emerald-200/50 overflow-hidden">
-                <div className="px-8 py-6 bg-gradient-to-r from-emerald-100 to-emerald-50 border-b border-emerald-200/50">
-                  <h3 className="text-xl font-bold text-emerald-800 flex items-center gap-3">
-                    <div className="p-2 bg-emerald-100 rounded-xl">
-                      <Store className="h-6 w-6 text-emerald-600" />
+              <div className="bg-white rounded-xl shadow-md border-2 border-emerald-300 overflow-hidden">
+                <div className="px-6 py-3 bg-gradient-to-r from-emerald-100 to-emerald-50 border-b-2 border-emerald-300">
+                  <h3 className="text-lg font-bold text-emerald-800 flex items-center gap-2">
+                    <div className="p-1.5 bg-emerald-100 rounded-lg">
+                      <Store className="h-5 w-5 text-emerald-600" />
                     </div>
                     Hồ sơ người bán
                   </h3>
                 </div>
-                <div className="p-6">
+                <div className="p-3">
                   {/* First Row - Main Information */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
                     {/* Shop Name */}
                     <div className="group lg:col-span-2">
                       <div className="flex flex-col gap-2 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors h-full">
@@ -445,8 +449,8 @@ export function DetailedUserDialog({
                     </div>
                   </div>
 
-                  {/* Second Row - Status & Metrics */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Second Row - Status */}
+                  <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-3">
                     {/* Verification Status */}
                     <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200">
                       <p className="text-sm font-medium text-emerald-700 mb-3">
@@ -461,27 +465,7 @@ export function DetailedUserDialog({
                       </div>
                     </div>
 
-                    {/* Rating */}
-                    <div className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200">
-                      <p className="text-sm font-medium text-yellow-800 mb-3">Đánh giá cửa hàng</p>
-                      <div className="flex items-center gap-2">
-                        <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                        <span className="text-xl font-bold text-yellow-800">
-                          {user.sellerProfile.avgVote?.toFixed(1) || 'N/A'}
-                        </span>
-                        <span className="text-sm text-yellow-700">/5.0</span>
-                      </div>
-                    </div>
-
-                    {/* Business Type */}
-                    <div className="p-4 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl border border-indigo-200">
-                      <p className="text-sm font-medium text-indigo-800 mb-2">Loại kinh doanh</p>
-                      <p className="text-base font-semibold text-indigo-900">
-                        {user.sellerProfile.businessType === 0 ? 'Cá nhân' : 'Doanh nghiệp'}
-                      </p>
-                    </div>
-
-                    {/* Verification Status */}
+                    {/* Overall Verification Status */}
                     <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
                       <p className="text-sm font-medium text-slate-700 mb-2">Xác minh tổng thể</p>
                       <p className="text-sm font-semibold text-slate-600">
@@ -495,26 +479,22 @@ export function DetailedUserDialog({
           </div>
         </div>
 
-        <DialogFooter className="px-16 py-6 bg-gradient-to-r from-slate-50 to-white border-t border-slate-200/50">
+        <DialogFooter className="flex-shrink-0 px-8 py-3 bg-gradient-to-r from-slate-50 to-white border-t-2 border-slate-300">
           <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <User className="h-4 w-4" />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs text-slate-600">
+                <User className="h-3 w-3" />
                 <span>ID: {user.id.slice(0, 8)}...</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <Calendar className="h-4 w-4" />
-                <span>Tham gia: {formatDate(user.joinInDate)}</span>
-              </div>
               {user.customerProfile && (
-                <div className="flex items-center gap-2 text-sm text-blue-600">
-                  <User className="h-4 w-4" />
+                <div className="flex items-center gap-1 text-xs text-blue-600">
+                  <User className="h-3 w-3" />
                   <span>Khách hàng</span>
                 </div>
               )}
               {user.sellerProfile && (
-                <div className="flex items-center gap-2 text-sm text-emerald-600">
-                  <Store className="h-4 w-4" />
+                <div className="flex items-center gap-1 text-xs text-emerald-600">
+                  <Store className="h-3 w-3" />
                   <span>Người bán</span>
                 </div>
               )}
@@ -523,7 +503,7 @@ export function DetailedUserDialog({
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="px-8 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200"
+                className="px-6 py-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200"
               >
                 Đóng
               </Button>
@@ -533,7 +513,7 @@ export function DetailedUserDialog({
                   onToggleBan(user.id, user.enabled ? 'active' : 'banned');
                   onOpenChange(false);
                 }}
-                className={`flex items-center gap-2 px-8 py-2 font-semibold transition-all duration-200 ${
+                className={`flex items-center gap-2 px-6 py-2 font-semibold transition-all duration-200 ${
                   user.enabled
                     ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl'
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl'
