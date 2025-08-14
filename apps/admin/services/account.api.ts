@@ -159,7 +159,7 @@ export const hasRole = (roles: Role[], targetRole: string): boolean => {
   }
 };
 
-export const transformRoleToCorrectFormat = (role: Role): RoleObject => {
+const transformRoleToCorrectFormat = (role: Role): RoleObject => {
   if (typeof role === 'string') {
     return {
       code: role,
@@ -184,7 +184,7 @@ export const transformRoleToCorrectFormat = (role: Role): RoleObject => {
   };
 };
 
-export const transformRolesToCorrectFormat = (roles: Role[]): RoleObject[] => {
+const transformRolesToCorrectFormat = (roles: Role[]): RoleObject[] => {
   try {
     if (!roles || !Array.isArray(roles)) {
       return [];
@@ -321,58 +321,11 @@ const unbanSeller = async (accountId: string): Promise<boolean> => {
   }
 };
 
-// Test function to verify role transformation
-export const testRoleTransformation = () => {
-  console.log('Testing role transformation...');
-
-  // Test case 1: String role
-  const stringRole = 'ROLE_ADMIN';
-  const transformedString = transformRoleToCorrectFormat(stringRole);
-  console.log('String role transformation:', { input: stringRole, output: transformedString });
-
-  // Test case 2: Object role with 'role' property
-  const objectRoleWithRole = { role: 'ROLE_CUSTOMER', enabled: true };
-  const transformedObjectRole = transformRoleToCorrectFormat(objectRoleWithRole);
-  console.log('Object role with role property:', {
-    input: objectRoleWithRole,
-    output: transformedObjectRole,
-  });
-
-  // Test case 3: Object role with 'authority' property
-  const objectRoleWithAuthority = { authority: 'ROLE_SELLER', enabled: false };
-  const transformedObjectAuthority = transformRoleToCorrectFormat(objectRoleWithAuthority);
-  console.log('Object role with authority property:', {
-    input: objectRoleWithAuthority,
-    output: transformedObjectAuthority,
-  });
-
-  // Test case 4: Object role with 'code' property (already correct)
-  const objectRoleWithCode = { code: 'ROLE_ADMIN', enabled: true };
-  const transformedObjectCode = transformRoleToCorrectFormat(objectRoleWithCode);
-  console.log('Object role with code property:', {
-    input: objectRoleWithCode,
-    output: transformedObjectCode,
-  });
-
-  // Test case 5: Array of mixed roles
-  const mixedRoles = [
-    'ROLE_ADMIN',
-    { role: 'ROLE_CUSTOMER', enabled: true },
-    { authority: 'ROLE_SELLER', enabled: false },
-    { code: 'ROLE_MODERATOR', enabled: true },
-  ];
-  const transformedArray = transformRolesToCorrectFormat(mixedRoles);
-  console.log('Mixed roles array transformation:', { input: mixedRoles, output: transformedArray });
-
-  console.log('Role transformation test completed!');
-};
-
 export {
   banAccount,
   banSeller,
   getAccountById,
   getAccounts,
-  testRoleTransformation,
   toggleAccountStatus,
   transformRolesToCorrectFormat,
   transformRoleToCorrectFormat,
