@@ -5,6 +5,7 @@ import {
   postBrand,
   TBrand,
   TCategory,
+  putBrand,
 } from '@/services/brand.api';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -97,7 +98,7 @@ const useBrandManager = (initialPage = 1, pageSize = 10) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await postBrand(data);
+        const response = await putBrand(id, data);
         if (response.success) {
           await fetchBrands(undefined, page);
           return { success: true, message: 'Brand updated successfully' };

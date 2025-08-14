@@ -627,10 +627,11 @@ const SellerDetailModal = ({
                   </div>
                 )}
                 <Badge
-                  className={`absolute -bottom-2 -right-2 px-3 py-1 ${seller.verified
-                    ? 'bg-green-500 hover:bg-green-600'
-                    : 'bg-orange-500 hover:bg-orange-600'
-                    }`}
+                  className={`absolute -bottom-2 -right-2 px-3 py-1 ${
+                    seller.verified
+                      ? 'bg-green-500 hover:bg-green-600'
+                      : 'bg-orange-500 hover:bg-orange-600'
+                  }`}
                 >
                   {getStatusText(seller.verified)}
                 </Badge>
@@ -783,10 +784,11 @@ const SellerDetailModal = ({
                       <p className="text-sm font-medium text-gray-600">Trạng thái cửa hàng:</p>
                     </div>
                     <Badge
-                      className={`${seller.verified
-                        ? 'bg-green-100 text-green-800 border-green-200'
-                        : 'bg-orange-100 text-orange-800 border-orange-200'
-                        } font-medium`}
+                      className={`${
+                        seller.verified
+                          ? 'bg-green-100 text-green-800 border-green-200'
+                          : 'bg-orange-100 text-orange-800 border-orange-200'
+                      } font-medium`}
                       variant="outline"
                     >
                       {getStatusText(seller.verified)}
@@ -807,7 +809,7 @@ const SellerDetailModal = ({
                         {getIdentityStatusText(seller.identityVerifiedStatus)}
                       </Badge>
                     </div>
-                   <div className="flex items-center gap-2 justify-end">
+                    <div className="flex items-center gap-2 justify-end">
                       <Button
                         variant="outline"
                         size="sm"
@@ -835,7 +837,6 @@ const SellerDetailModal = ({
                         )}
                       </Button>
                     </div>
-
                   </div>
                 </div>
               </div>
@@ -1179,8 +1180,9 @@ export default function SellerManagementPage() {
                       {filteredSellers.map((seller, index) => (
                         <TableRow
                           key={seller.id}
-                          className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                          className={`hover:bg-gray-50 transition-colors ${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                         >
                           <TableCell className="font-mono text-sm text-gray-600">
                             {seller.id.slice(0, 8)}
@@ -1238,10 +1240,11 @@ export default function SellerManagementPage() {
 
                           <TableCell>
                             <Badge
-                              className={`${seller.verified
-                                ? 'bg-green-100 text-green-800 border-green-200'
-                                : 'bg-orange-100 text-orange-800 border-orange-200'
-                                } font-medium`}
+                              className={`${
+                                seller.verified
+                                  ? 'bg-green-100 text-green-800 border-green-200'
+                                  : 'bg-orange-100 text-orange-800 border-orange-200'
+                              } font-medium`}
                               variant="outline"
                             >
                               {seller.verified ? (
@@ -1306,10 +1309,11 @@ export default function SellerManagementPage() {
                                 variant={page === pageNum ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handlePageChange(pageNum)}
-                                className={`w-10 h-8 ${page === pageNum
-                                  ? 'bg-blue-600 text-white'
-                                  : 'text-gray-700 hover:bg-gray-100'
-                                  }`}
+                                className={`w-10 h-8 ${
+                                  page === pageNum
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                                }`}
                               >
                                 {pageNum}
                               </Button>

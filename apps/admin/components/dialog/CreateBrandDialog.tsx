@@ -21,6 +21,7 @@ import useBrandManager from '@/hooks/use-brand-manager';
 import { BrandInput } from '@/services/brand.api';
 import { storageApi } from '@/services/storage.api';
 import Image from 'next/image';
+
 interface FormFieldProps {
   label: string;
   required?: boolean;
@@ -57,7 +58,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
     categoryIds: [] as string[],
     logo: '',
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof formData | 'logo', string>>>({});
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -132,6 +133,9 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
       setLogoPreview('');
       setLogoFile(null);
     }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   }, [logoPreview]);
 
   const resetForm = useCallback(() => {
@@ -146,7 +150,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
   }, [handleRemoveLogo]);
 
   const validateForm = useCallback(() => {
-    const newErrors: Partial<Record<keyof typeof formData, string>> = {};
+    const newErrors: Partial<Record<keyof typeof formData | 'logo', string>> = {};
 
     // Validate name
     if (!formData.name.trim()) {
@@ -164,7 +168,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
 
     // Validate description
     if (!formData.description.trim()) {
-      newErrors.description = 'Mô tả là bắt buộc';
+      newErrors.description = 'Mô tả nhãn hàng là bắt buộc';
     } else if (formData.description.trim().length < 10) {
       newErrors.description = 'Mô tả phải có ít nhất 10 ký tự';
     } else if (formData.description.trim().length > 500) {
@@ -188,8 +192,8 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
     setIsSubmitting(true);
     try {
       let logoUrl = '';
-      if (!logoFile) {
-        logoUrl = await storageApi.fileUpload(logoFile!);
+      if (logoFile) {
+        logoUrl = await storageApi.fileUpload(logoFile);
       }
       const request: BrandInput = {
         name: formData.name.trim(),
@@ -197,6 +201,7 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
         categoryIds: formData.categoryIds,
         imgUrl: logoUrl,
       };
+      console.log('Creating brand with data:', request);
       await addBrand(request);
       resetForm();
       onClose();
@@ -266,55 +271,78 @@ const CreateBrandDialog: React.FC<CreateBrandDialogProps> = ({ isOpen, onClose }
             </h3>
 
             <FormField label="Logo" required error={errors.logo}>
-              <div className="space-y-3">
-                {logoPreview ? (
-                  <div className="relative inline-block">
-                    <div className="w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-                      <Image src={logoPreview} alt="Logo preview" fill className="object-contain" />
-                    </div>
+              <div className="bg-gray-50 rounded-lg p-6">
+                <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="flex-shrink-0">
                     <Button
                       type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
-                      onClick={handleRemoveLogo}
+                      variant="outline"
+                      onClick={handleChooseLogo}
                       disabled={isSubmitting}
+                      className="h-11 px-4 border-dashed border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
                     >
-                      <X className="w-3 h-3" />
+                      <Upload className="w-4 h-4 mr-2" />
+                      Chọn ảnh mới
                     </Button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={handleLogoChange}
+                      className="hidden"
+                    />
                   </div>
-                ) : (
-                  <div
-                    onClick={handleChooseLogo}
-                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
-                  >
-                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">Click để chọn logo</p>
-                    <p className="text-xs text-gray-500">PNG, JPG, GIF tối đa 5MB</p>
+
+                  <div className="flex-1 flex justify-center">
+                    {logoPreview ? (
+                      <div className="relative w-55 h-40 group">
+                        <Image
+                          src={logoPreview}
+                          alt="Logo Preview"
+                          fill
+                          className="rounded-lg object-cover border-2 border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleRemoveLogo}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-100">
+                        <div className="text-center">
+                          <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-500">Chưa có ảnh</p>
+                          <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF tối đa 5MB</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+              </div>
+            </FormField>
+          </div>
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="hidden"
-                  disabled={isSubmitting}
-                />
+          {/* Description Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-gray-200">
+              <Package className="w-5 h-5 text-purple-600" />
+              Mô tả nhãn hàng
+            </h3>
 
-                {!logoPreview && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleChooseLogo}
-                    disabled={isSubmitting}
-                    className="w-full"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Chọn logo
-                  </Button>
-                )}
+            <FormField label="Mô tả nhãn hàng" required error={errors.description}>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => handleFormChange('description', e.target.value)}
+                placeholder="Mô tả về nhãn hàng, lịch sử, giá trị cốt lõi và điểm đặc biệt..."
+                rows={4}
+                disabled={isSubmitting}
+                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+              />
+              <div className="text-xs text-gray-500 text-right">
+                {formData.description.length}/500 ký tự
               </div>
             </FormField>
           </div>

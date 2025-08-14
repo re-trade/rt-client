@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import useBrandManager from '@/hooks/use-brand-manager';
+import { TBrand } from '@/services/brand.api';
 import {
   AlertCircle,
   Building2,
@@ -86,6 +87,54 @@ const BrandManagementPage = () => {
       </Badge>
     );
   };
+  // const BrandStats = ({ brand }: { brand: TBrand }) => {
+  //   const totalSellers = brand.id.length;
+  //   const totalStatusTrue = brand.filter((p) => p.status).length;
+  //   const totalStatusFalse = brand.filter((p) => !p.status).length;
+
+  //   return (
+  //     <div className="grid gap-6 md:grid-cols-3">
+  //       <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-all duration-300">
+  //         <div className="flex items-center justify-between">
+  //           <div>
+  //             <p className="text-sm font-medium text-blue-700 mb-1">Tổng số người bán</p>
+  //             <p className="text-3xl font-bold text-blue-900">{totalSellers}</p>
+  //             <p className="text-xs text-blue-600 mt-1">Tất cả cửa hàng</p>
+  //           </div>
+  //           <div className="p-3 bg-blue-500 rounded-full">
+  //             <Store className="h-8 w-8 text-white" />
+  //           </div>
+  //         </div>
+  //       </Card>
+
+  //       <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-all duration-300">
+  //         <div className="flex items-center justify-between">
+  //           <div>
+  //             <p className="text-sm font-medium text-green-700 mb-1">Đã xác minh</p>
+  //             <p className="text-3xl font-bold text-green-900">{verifiedSellers}</p>
+  //             <p className="text-xs text-green-600 mt-1">Đang hoạt động</p>
+  //           </div>
+  //           <div className="p-3 bg-green-500 rounded-full">
+  //             <UserCheck className="h-8 w-8 text-white" />
+  //           </div>
+  //         </div>
+  //       </Card>
+
+  //       <Card className="p-6 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-all duration-300">
+  //         <div className="flex items-center justify-between">
+  //           <div>
+  //             <p className="text-sm font-medium text-orange-700 mb-1">Đang chờ duyệt</p>
+  //             <p className="text-3xl font-bold text-orange-900">{pendingSellers}</p>
+  //             <p className="text-xs text-orange-600 mt-1">Chưa xác minh</p>
+  //           </div>
+  //           <div className="p-3 bg-orange-500 rounded-full">
+  //             <Clock className="h-8 w-8 text-white" />
+  //           </div>
+  //         </div>
+  //       </Card>
+  //     </div>
+  //   );
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -368,11 +417,10 @@ const BrandManagementPage = () => {
                                 variant={page === pageNum ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handlePageChange(pageNum)}
-                                className={`w-8 h-8 p-0 ${
-                                  page === pageNum
+                                className={`w-8 h-8 p-0 ${page === pageNum
                                     ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                                }`}
+                                  }`}
                               >
                                 {pageNum}
                               </Button>
