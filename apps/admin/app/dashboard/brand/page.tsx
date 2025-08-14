@@ -15,7 +15,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import useBrandManager from '@/hooks/use-brand-manager';
-import { TBrand } from '@/services/brand.api';
 import {
   AlertCircle,
   Building2,
@@ -417,10 +416,11 @@ const BrandManagementPage = () => {
                                 variant={page === pageNum ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => handlePageChange(pageNum)}
-                                className={`w-8 h-8 p-0 ${page === pageNum
+                                className={`w-8 h-8 p-0 ${
+                                  page === pageNum
                                     ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                                  }`}
+                                }`}
                               >
                                 {pageNum}
                               </Button>
