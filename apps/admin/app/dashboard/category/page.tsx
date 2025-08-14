@@ -156,31 +156,27 @@ export default function CategoryPage() {
     return (
       <>
         <tr
-          className={`hover:bg-gray-50 transition-colors ${
-            level > 0 ? 'border-l-4 border-blue-200 bg-blue-50/30' : ''
-          }`}
+          className={`hover:bg-gray-50 transition-colors ${level > 0 ? 'border-l-4 border-blue-200 bg-blue-50/30' : ''
+            }`}
         >
           <td className="px-6 py-4" style={{ paddingLeft: `${level * 32 + 24}px` }}>
             <div className="flex items-center gap-3">
               <button
-                className={`p-1 rounded hover:bg-blue-100 transition-colors ${
-                  hasChildren ? 'text-blue-600' : 'text-gray-400 cursor-default'
-                }`}
+                className={`p-1 rounded hover:bg-blue-100 transition-colors ${hasChildren ? 'text-blue-600' : 'text-gray-400 cursor-default'
+                  }`}
                 onClick={hasChildren ? () => setExpanded((e) => !e) : undefined}
                 disabled={!hasChildren}
               >
                 <ChevronRight
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    expanded ? 'rotate-90' : ''
-                  }`}
+                  className={`h-4 w-4 transition-transform duration-200 ${expanded ? 'rotate-90' : ''
+                    }`}
                 />
               </button>
               <span
-                className={`font-medium ${
-                  level === 0
+                className={`font-medium ${level === 0
                     ? 'text-lg text-gray-800 font-bold'
                     : 'text-sm text-blue-700 font-semibold'
-                }`}
+                  }`}
               >
                 {category.name}
               </span>
@@ -188,9 +184,13 @@ export default function CategoryPage() {
           </td>
           <td className="px-6 py-4">
             <div className="text-sm text-gray-600">
-              {category.description || (
-                <span className="text-gray-400 italic">(Không có mô tả)</span>
-              )}
+              {category.description
+                ? category.description.length > 48
+                  ? `${category.description.slice(0, 48)}...`
+                  : category.description
+                : <span className="text-gray-400 italic">(Không có mô tả)</span>
+              }
+
             </div>
           </td>
           <td className="px-6 py-4">
@@ -216,11 +216,10 @@ export default function CategoryPage() {
                 Sửa
               </button>
               <button
-                className={`px-3 py-1 text-sm border rounded transition-colors ${
-                  category.visible
+                className={`px-3 py-1 text-sm border rounded transition-colors ${category.visible
                     ? 'border-red-500 text-red-600 hover:bg-red-500 hover:text-white'
                     : 'border-green-500 text-green-600 hover:bg-green-500 hover:text-white'
-                }`}
+                  }`}
                 onClick={() => handleToggleVisible(normalizeCategory(category))}
               >
                 {category.visible ? (
@@ -366,6 +365,7 @@ export default function CategoryPage() {
                     .filter((cat) => !cat.parentId)
                     .map((cat) => (
                       <TreeTableRow key={cat.id} category={cat} />
+
                     ))}
                 </tbody>
               </table>
