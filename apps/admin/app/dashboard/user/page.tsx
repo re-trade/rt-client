@@ -27,7 +27,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAccountManager } from '@/hooks/use-account-manager';
-import { getAccountById, getRoleDisplayName, hasRole } from '@/services/account.api';
+import { getAccountById, getRoleDisplayName, hasRole, RoleObject } from '@/services/account.api';
 import {
   AlertCircle,
   Ban,
@@ -127,6 +127,12 @@ export default function UserManagementPage() {
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('vi-VN');
+  };
+
+  const handleActiveRole = (roles: RoleObject[], targetRole: 'ROLE_SELLER' | 'ROLE_CUSTOMER') => {
+    const role = roles.find((r) => r.code === targetRole);
+    if (!role) return true;
+    return role.enabled;
   };
 
   const getStatusBadge = (enabled: boolean, locked: boolean) => {
@@ -411,7 +417,9 @@ export default function UserManagementPage() {
                                   onClick={() =>
                                     handleToggleBan(
                                       user.id,
-                                      user.sellerProfile?.verified === false ? 'banned' : 'active',
+                                      !handleActiveRole(user.roles, 'ROLE_SELLER')
+                                        ? 'banned'
+                                        : 'active',
                                       'seller',
                                     )
                                   }
