@@ -12,6 +12,13 @@ export type TFilterSelected = {
   brands: string[];
   minPrice?: number;
   maxPrice?: number;
+  verified?: string;
+  status?: string;
+  condition?: string;
+  dateRange?: {
+    from?: string;
+    to?: string;
+  };
 };
 
 interface ApiResponse {
@@ -50,6 +57,10 @@ const useProductManager = () => {
     brands: [],
     minPrice: 0,
     maxPrice: 0,
+    verified: '',
+    status: '',
+    condition: '',
+    dateRange: {},
   });
   const keyword = searchParams.get('keyword') || '';
   const pageSize = 10;
@@ -61,21 +72,25 @@ const useProductManager = () => {
     try {
       const params = new URLSearchParams();
       if (keyword) params.append('keyword', keyword);
+      console.log(selectedFilter.status);
       if (selectedFilter.states.length)
         selectedFilter.states.forEach((s) => params.append('state', s));
+
+      if (selectedFilter.verified) params.append('verified', selectedFilter.verified);
+      if (selectedFilter.status) params.append('status', selectedFilter.status);
+      if (selectedFilter.condition) params.append('condition', selectedFilter.condition);
+
       if (selectedFilter.categories.length)
         selectedFilter.categories.forEach((c) => params.append('categoryId', c));
       if (selectedFilter.brands.length)
         selectedFilter.brands.forEach((b) => params.append('brand', b));
       if (selectedFilter.seller) params.append('seller', selectedFilter.seller);
+
       if (selectedFilter.minPrice && selectedFilter.minPrice > 0) {
         if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
           params.append('currentPrice', `${selectedFilter.minPrice}..${selectedFilter.maxPrice}`);
         }
-      } else if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
-        params.append('currentPrice', `0..${selectedFilter.maxPrice}`);
       }
-      // params.append('verified', String(true));
       const response = await productApi.searchProducts(page - 1, pageSize, params.toString(), []);
 
       setProducts(response.content || []);
@@ -137,23 +152,33 @@ const useProductManager = () => {
       brands: [],
       minPrice: 0,
       maxPrice: 0,
+      verified: '',
+      status: '',
+      condition: '',
+      dateRange: {},
     });
     setPage(1);
   }, []);
 
   const handleSelectedFilterChange = useCallback(
-    (key: keyof TFilterSelected, value: string | string[] | number | number[]) => {
+    (key: keyof TFilterSelected, value: string | string[] | number | number[] | object) => {
       setSelectedFilter((prev) => {
         const updated = { ...prev };
-        if (key === 'seller') {
-          updated.seller = updated.seller === value ? '' : (value as string);
+        if (key === 'seller' || key === 'verified' || key === 'status' || key === 'condition') {
+          updated[key] = updated[key] === value ? '' : (value as string);
         } else if (key === 'minPrice' || key === 'maxPrice') {
           updated[key] = value as number;
+        } else if (key === 'dateRange') {
+          updated[key] = value as { from?: string; to?: string };
         } else if (Array.isArray(prev[key])) {
           const list = prev[key] as string[];
-          updated[key] = list.includes(value as string)
-            ? list.filter((item) => item !== value)
-            : [...list, value as string];
+          if (Array.isArray(value)) {
+            updated[key] = value as string[];
+          } else {
+            updated[key] = list.includes(value as string)
+              ? list.filter((item) => item !== value)
+              : [...list, value as string];
+          }
         }
         return updated;
       });
@@ -161,6 +186,24 @@ const useProductManager = () => {
     },
     [],
   );
+
+  // Calculate active filters count
+  const getActiveFiltersCount = useCallback(() => {
+    let count = 0;
+    if (selectedFilter.states.length > 0) count++; // Geographical states
+    if (selectedFilter.categories.length > 0) count++;
+    if (selectedFilter.brands.length > 0) count++;
+    if (selectedFilter.seller) count++;
+    if (selectedFilter.verified) count++; // Verification status
+    if (selectedFilter.status) count++; // Product status
+    if (selectedFilter.condition) count++;
+    if (selectedFilter.minPrice && selectedFilter.minPrice > 0) count++;
+    if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) count++;
+    if (selectedFilter.dateRange?.from || selectedFilter.dateRange?.to) count++;
+    return count;
+  }, [selectedFilter]);
+
+  const activeFiltersCount = getActiveFiltersCount();
 
   useEffect(() => {
     fetchProducts();
@@ -219,6 +262,7 @@ const useProductManager = () => {
     keyword,
     selectedFilter,
     setSelectedFilter,
+    activeFiltersCount,
     fetchProducts,
     fetchFilter,
     refetch,

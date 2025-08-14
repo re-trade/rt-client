@@ -17,6 +17,7 @@ export type TProduct = {
   warrantyExpiryDate: string;
   model: string;
   currentPrice: number;
+  status: 'ACTIVE' | 'INACTIVE' | 'DELETED' | 'INIT' | 'PENDING' | 'DRAFT';
   categories: { id: string; name: string }[];
   tags: string[];
   keywords?: string[];
