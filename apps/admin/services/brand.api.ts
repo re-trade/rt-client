@@ -7,6 +7,7 @@ export type TBrand = {
   createdAt: string;
   updatedAt: string;
   description: string;
+  status: boolean;
   categories: {
     id: string;
     name: string;
@@ -104,6 +105,29 @@ const postBrand = async (data: BrandInput): Promise<IResponseObject<TBrand>> => 
     throw new Error(error.response?.data?.messages?.[0] || error.message || 'Failed to post brand');
   }
 };
+const putBrand = async (
+  id: string,
+  data: BrandInput,
+): Promise<IResponseObject<TBrand>> => {
+  try {
+    const response = await authApi.default.put<IResponseObject<TBrand>>(`/brands/${id}`, data, {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+    });
+   if (!response?.data || !response.data.success) {
+      throw new Error(response?.data?.messages?.[0] || 'Failed to put brand');
+    }
+    return response.data;
+  } catch (error: any) {
+    console.error('Error posting brand:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers,
+    });
+    throw new Error(error.response?.data?.messages?.[0] || error.message || 'Failed to put brand');
+  }
+};
 
 const getCategories = async (): Promise<IResponseObject<TCategory[]> | undefined> => {
   try {
@@ -119,26 +143,9 @@ const getCategories = async (): Promise<IResponseObject<TCategory[]> | undefined
     return undefined;
   }
 };
-const updateBrand = async (
-  id: string,
-  data: BrandInput,
-): Promise<IResponseObject<TBrand> | undefined> => {
-  try {
-    const response = await authApi.default.put<IResponseObject<TBrand>>(`/brands/${id}`, data, {
-      headers: { 'Content-Type': 'application/json' },
-      withCredentials: true,
-    });
-    if (response.status === 200 && response.data.success) {
-      return response.data;
-    }
-    return undefined;
-  } catch (error: any) {
-    console.error('Error updating brand:', error.response || error.message);
-    return undefined;
-  }
-};
 
-export { getBrands, getCategories, postBrand, type IResponseObject };
+
+export { getBrands, getCategories, postBrand,putBrand, type IResponseObject };
 
 function isValidUrl(arg0: string) {
   throw new Error('Function not implemented.');

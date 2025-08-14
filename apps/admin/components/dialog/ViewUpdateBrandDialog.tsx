@@ -20,6 +20,8 @@ import Image from 'next/image';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { FancyMultiSelect } from '../common/MultiSectCate';
+import { on } from 'events';
 
 interface FormFieldProps {
   label: string;
@@ -214,12 +216,23 @@ const ViewUpdateBrandDialog: React.FC<ViewUpdateBrandDialogProps> = ({
         finalImgUrl = await storageApi.fileUpload(logoFile);
       }
 
+
+      console.log('Updating brand with data:', {
+        id: brand.id,
+        name: formData.name.trim(),
+        imgUrl: finalImgUrl,
+        description: formData.description.trim(),
+        categoryIds: formData.categoryIds,
+      });
+
       const result = await updateBrand(brand.id, {
         name: formData.name.trim(),
         imgUrl: finalImgUrl,
         description: formData.description.trim(),
         categoryIds: formData.categoryIds,
       });
+
+      console.log('Update brand result:', result );
 
       if (result.success) {
         toast.success('Cập nhật nhãn hàng thành công!');
@@ -231,6 +244,8 @@ const ViewUpdateBrandDialog: React.FC<ViewUpdateBrandDialogProps> = ({
           categories: categories.filter((cat) => formData.categoryIds.includes(cat.id)),
         });
         setIsChanged(false);
+        resetForm();
+        onClose();
       } else {
         toast.error(result.message);
       }
@@ -388,25 +403,12 @@ const ViewUpdateBrandDialog: React.FC<ViewUpdateBrandDialogProps> = ({
             </h3>
 
             <FormField label="Danh mục sản phẩm" required error={errors.categoryIds}>
-              {categoriesLoading ? (
-                <div className="flex items-center justify-center py-8 border border-gray-300 rounded-lg bg-gray-50">
-                  <RefreshCw className="h-4 w-4 animate-spin mr-2 text-blue-600" />
-                  <span className="text-sm text-gray-600">Đang tải danh mục...</span>
-                </div>
-              ) : (
-                <MultiSelect
-                  options={categories.map((cat) => ({
-                    value: cat.id,
-                    label: cat.name,
-                  }))}
-                  selected={formData.categoryIds}
-                  onChange={(selected) => {
-                    setFormData((prev) => ({ ...prev, categoryIds: selected }));
-                    if (errors.categoryIds) setErrors((prev) => ({ ...prev, categoryIds: '' }));
-                  }}
-                  placeholder="Chọn một hoặc nhiều danh mục..."
-                />
-              )}
+            
+              <FancyMultiSelect
+                value={formData.categoryIds}
+                onChange={(selected) => setFormData((prev) => ({ ...prev, categoryIds: selected }))}
+              />
+    
             </FormField>
           </div>
         </div>

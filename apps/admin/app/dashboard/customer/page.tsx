@@ -739,7 +739,9 @@ export default function CustomerManagementPage() {
 
                           <TableCell>
                             <div className="max-w-48">
-                              <p className="text-sm text-gray-900 truncate">{customer.address.slice(0, 48)}</p>
+                              <p className="text-sm text-gray-900 truncate">
+                                {customer.address.slice(0, 48)}
+                              </p>
                             </div>
                           </TableCell>
 
