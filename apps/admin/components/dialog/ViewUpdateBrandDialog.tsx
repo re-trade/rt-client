@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MultiSelect } from '@/components/ui/multi-select';
 import { Textarea } from '@/components/ui/textarea';
 import useBrandManager from '@/hooks/use-brand-manager';
 import { TBrand } from '@/services/brand.api';
@@ -21,7 +20,6 @@ import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { FancyMultiSelect } from '../common/MultiSectCate';
-import { on } from 'events';
 
 interface FormFieldProps {
   label: string;
@@ -216,7 +214,6 @@ const ViewUpdateBrandDialog: React.FC<ViewUpdateBrandDialogProps> = ({
         finalImgUrl = await storageApi.fileUpload(logoFile);
       }
 
-
       console.log('Updating brand with data:', {
         id: brand.id,
         name: formData.name.trim(),
@@ -232,7 +229,7 @@ const ViewUpdateBrandDialog: React.FC<ViewUpdateBrandDialogProps> = ({
         categoryIds: formData.categoryIds,
       });
 
-      console.log('Update brand result:', result );
+      console.log('Update brand result:', result);
 
       if (result.success) {
         toast.success('Cập nhật nhãn hàng thành công!');
@@ -403,12 +400,10 @@ const ViewUpdateBrandDialog: React.FC<ViewUpdateBrandDialogProps> = ({
             </h3>
 
             <FormField label="Danh mục sản phẩm" required error={errors.categoryIds}>
-            
               <FancyMultiSelect
                 value={formData.categoryIds}
                 onChange={(selected) => setFormData((prev) => ({ ...prev, categoryIds: selected }))}
               />
-    
             </FormField>
           </div>
         </div>

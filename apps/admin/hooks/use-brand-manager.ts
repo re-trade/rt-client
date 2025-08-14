@@ -3,9 +3,9 @@ import {
   getBrands,
   getCategories,
   postBrand,
+  putBrand,
   TBrand,
   TCategory,
-  putBrand,
 } from '@/services/brand.api';
 import { useCallback, useEffect, useState } from 'react';
 

@@ -27,10 +27,13 @@ const ProductListEmpty = ({ length, setIsCreateOpen, clearFilters }: ProductList
               ? 'Chưa có sản phẩm nào. Hãy tạo sản phẩm đầu tiên của bạn!'
               : 'Không có sản phẩm nào phù hợp với bộ lọc hiện tại. Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm khác.'}
           </p>
+        </div>
+
+        <div className="flex justify-center">
           {length === 0 ? (
             <Button
               onClick={() => setIsCreateOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/20"
+              className="flex items-center gap-2 bg-gradient-to-r bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
             >
               <Plus className="w-4 h-4" />
               Tạo sản phẩm mới

@@ -642,7 +642,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
+            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
           >
             {isSubmitting ? 'Đang tạo...' : 'Tạo sản phẩm'}
           </Button>

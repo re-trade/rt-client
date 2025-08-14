@@ -263,7 +263,7 @@ const ProductTable = ({
                     </TooltipProvider>
                   </TableHead>
                   <TableHead
-                    className="w-20 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
+                    className="w-25 font-semibold text-slate-700 cursor-pointer hover:bg-slate-100 transition-colors"
                     onClick={() => handleSortChange && handleSortChange('quantity')}
                   >
                     <TooltipProvider>
@@ -363,7 +363,9 @@ const ProductTable = ({
                     </TableCell>
                     <TableCell>
                       <div className="font-semibold text-slate-900 line-clamp-2 hover:text-blue-600 transition-colors">
-                        {product.name}
+                        {product.name.length > 20
+                          ? `${product.name.slice(0, 20)}...`
+                          : product.name}
                       </div>
                     </TableCell>
                     <TableCell>

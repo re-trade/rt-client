@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -40,6 +41,7 @@ import {
   RotateCcw,
   Save,
   Truck,
+  TruckIcon,
   User,
   XCircle,
 } from 'lucide-react';
@@ -199,14 +201,15 @@ export function UpdateStatusDialog({
       }
     );
   };
-  console.log('dsjhgfdjfgjds', order);
+  console.log('check order', order);
 
   const requiresTrackingNumber = (status: OrderResponse['orderStatus']) => {
-    return ['DELIVERING', 'DELIVERED'].includes(status.code);
+    console.log('hjsdhjdsfhjsfdjhksfdjhksdjkh', status.code);
+    return ['PREPARING'].includes(status.code);
   };
 
   const handleSubmit = async () => {
-    if (requiresTrackingNumber(newStatus) && !trackingNumber.trim()) {
+    if (requiresTrackingNumber(order.orderStatus) && !trackingNumber.trim()) {
       alert('Vui lòng nhập mã vận đơn');
       return;
     }
@@ -239,7 +242,7 @@ export function UpdateStatusDialog({
   const isFormValid =
     newStatus.code !== order.orderStatus.code &&
     notes.trim() !== '' &&
-    (!requiresTrackingNumber(newStatus) || trackingNumber.trim() !== '');
+    (!requiresTrackingNumber(order.orderStatus) || trackingNumber.trim() !== '');
 
   const currentStatusConfig = getStatusConfig(order.orderStatus);
   const newStatusConfig = getStatusConfig(newStatus);
@@ -403,8 +406,7 @@ export function UpdateStatusDialog({
             </Select>
           </div>
 
-          {/* Tracking Number
-          {requiresTrackingNumber(newStatus) && (
+          {requiresTrackingNumber(order.orderStatus) && (
             <div className="space-y-2">
               <Label className="text-base font-medium flex items-center gap-2">
                 <TruckIcon className="h-4 w-4" />
@@ -420,7 +422,7 @@ export function UpdateStatusDialog({
                 Mã vận đơn sẽ được gửi cho khách hàng để theo dõi đơn hàng
               </p>
             </div>
-          )} */}
+          )}
 
           {/* Notes */}
           <div className="space-y-2">
