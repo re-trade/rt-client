@@ -27,7 +27,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAccountManager } from '@/hooks/use-account-manager';
-import { getAccountById } from '@/services/account.api';
+import { getAccountById, getRoleDisplayName, hasRole } from '@/services/account.api';
 import {
   AlertCircle,
   Ban,
@@ -46,13 +46,12 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const roleDisplayMap: Record<string, string> = {
-  ROLE_ADMIN: 'Admin',
-  ROLE_CUSTOMER: 'Customer',
-  ROLE_SELLER: 'Seller',
-};
-const roles = ['All', ...Object.keys(roleDisplayMap)];
-const statuses = ['All', 'active', 'banned'];
+const roles = ['All', 'ROLE_ADMIN', 'ROLE_CUSTOMER', 'ROLE_SELLER'];
+const statuses = [
+  { value: 'All', label: 'Tất cả trạng thái' },
+  { value: 'active', label: 'Đang hoạt động' },
+  { value: 'banned', label: 'Bị cấm' },
+];
 
 export default function UserManagementPage() {
   const {
@@ -69,17 +68,45 @@ export default function UserManagementPage() {
     setSelectedStatus,
     total,
     pageSize,
-    toggleStatus,
     refresh,
+    banAccount,
+    unbanAccount,
+    banSeller,
+    unbanSeller,
   } = useAccountManager();
 
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [loadingUserDetails, setLoadingUserDetails] = useState(false);
 
-  const handleToggleBan = async (userId: string, currentStatus: string) => {
+  const handleToggleBan = async (
+    userId: string,
+    currentStatus: string,
+    banType: 'account' | 'seller' = 'account',
+  ) => {
     const enabled = currentStatus !== 'banned';
-    await toggleStatus(userId, !enabled);
+
+    try {
+      let success = false;
+
+      if (banType === 'seller') {
+        success = enabled ? await banSeller(userId) : await unbanSeller(userId);
+      } else {
+        success = enabled ? await banAccount(userId) : await unbanAccount(userId);
+      }
+
+      if (success) {
+        await refresh();
+        if (selectedUser && selectedUser.id === userId) {
+          await handleViewUserDetails(userId);
+        }
+      }
+
+      return success;
+    } catch (error) {
+      console.error('Error toggling ban status:', error);
+      return false;
+    }
   };
 
   const handleViewUserDetails = async (userId: string) => {
@@ -102,7 +129,23 @@ export default function UserManagementPage() {
     return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
-  const getStatusBadge = (enabled: boolean) => {
+  const getStatusBadge = (enabled: boolean, locked: boolean) => {
+    if (locked) {
+      return (
+        <span
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border"
+          style={{
+            backgroundColor: '#fef2f2',
+            color: '#dc2626',
+            borderColor: '#fecaca',
+          }}
+        >
+          <Ban className="h-3 w-3" />
+          Tài khoản bị cấm
+        </span>
+      );
+    }
+
     return enabled ? (
       <span
         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border"
@@ -194,11 +237,15 @@ export default function UserManagementPage() {
                     <SelectValue placeholder="Vai trò" />
                   </SelectTrigger>
                   <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role === 'All' ? 'Tất cả vai trò' : roleDisplayMap[role] || role}
-                      </SelectItem>
-                    ))}
+                    {roles.map((role) => {
+                      const displayName =
+                        role === 'All' ? 'Tất cả vai trò' : getRoleDisplayName(role);
+                      return (
+                        <SelectItem key={role} value={role}>
+                          {displayName}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
@@ -207,12 +254,8 @@ export default function UserManagementPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {statuses.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status === 'All'
-                          ? 'Tất cả trạng thái'
-                          : status === 'active'
-                            ? 'Hoạt động'
-                            : 'Bị cấm'}
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -285,17 +328,23 @@ export default function UserManagementPage() {
                         <TableCell className="text-slate-600">{user.email}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {user.roles.includes('ROLE_ADMIN') ? (
+                            {user.locked ? (
+                              <Ban className="h-4 w-4 text-red-500" />
+                            ) : hasRole(user.roles || [], 'ROLE_ADMIN') ? (
                               <Shield className="h-4 w-4 text-red-500" />
                             ) : (
                               <User className="h-4 w-4 text-orange-500" />
                             )}
                             <span className="text-sm font-medium">
-                              {user.roles.map((role) => roleDisplayMap[role]).join(', ')}
+                              {user.locked
+                                ? 'Vai trò tạm thời không khả dụng'
+                                : (user.roles || [])
+                                    .map((role) => getRoleDisplayName(role))
+                                    .join(', ') || 'Chưa có vai trò'}
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell>{getStatusBadge(user.enabled)}</TableCell>
+                        <TableCell>{getStatusBadge(user.enabled, user.locked)}</TableCell>
                         <TableCell className="text-slate-600">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4 text-slate-400" />
@@ -338,13 +387,50 @@ export default function UserManagementPage() {
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={() =>
-                                  handleToggleBan(user.id, user.enabled ? 'active' : 'banned')
+                                  handleToggleBan(
+                                    user.id,
+                                    user.locked ? 'banned' : 'active',
+                                    'account',
+                                  )
                                 }
-                                className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                className={`cursor-pointer ${
+                                  user.locked
+                                    ? 'text-emerald-600 focus:text-emerald-600 focus:bg-emerald-50'
+                                    : 'text-red-600 focus:text-red-600 focus:bg-red-50'
+                                }`}
                               >
-                                <Ban className="h-4 w-4 mr-2" />
-                                {user.enabled ? 'Cấm người dùng' : 'Bỏ cấm người dùng'}
+                                {user.locked ? (
+                                  <UserCheck className="h-4 w-4 mr-2" />
+                                ) : (
+                                  <Ban className="h-4 w-4 mr-2" />
+                                )}
+                                {user.locked ? 'Bỏ cấm tài khoản' : 'Cấm tài khoản'}
                               </DropdownMenuItem>
+                              {hasRole(user.roles || [], 'ROLE_SELLER') && (
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleToggleBan(
+                                      user.id,
+                                      user.sellerProfile?.verified === false ? 'banned' : 'active',
+                                      'seller',
+                                    )
+                                  }
+                                  className={`cursor-pointer ${
+                                    user.sellerProfile?.verified === false
+                                      ? 'text-blue-600 focus:text-blue-600 focus:bg-blue-50'
+                                      : 'text-orange-600 focus:text-orange-600 focus:bg-orange-50'
+                                  }`}
+                                >
+                                  {user.sellerProfile?.verified === false ? (
+                                    <UserCheck className="h-4 w-4 mr-2" />
+                                  ) : (
+                                    <Ban className="h-4 w-4 mr-2" />
+                                  )}
+                                  {user.sellerProfile?.verified === false
+                                    ? 'Bỏ cấm người bán'
+                                    : 'Cấm người bán'}
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>

@@ -14,6 +14,7 @@ import { Ban, Eye, Shield } from 'lucide-react';
 
 // Import the actual types from the API service
 import type { AccountResponse } from '@/services/account.api';
+import { getRoleDisplayName, hasRole } from '@/services/account.api';
 
 interface ViewUserDialogProps {
   user: AccountResponse;
@@ -46,15 +47,27 @@ export function ViewUserDialog({ user, onToggleBan }: ViewUserDialogProps) {
             <div className="font-medium">Roles</div>
             <div className="col-span-3">
               <div className="flex items-center gap-2">
-                {user.roles.map((role) => (
-                  <span
-                    key={role}
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700"
-                  >
-                    {role.includes('ADMIN') && <Shield className="h-3 w-3" />}
-                    {role.replace('ROLE_', '')}
+                {user.locked ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <Ban className="h-3 w-3" />
+                    Vai trò tạm thời không khả dụng
                   </span>
-                ))}
+                ) : (
+                  <>
+                    {(user.roles || []).map((role, index) => (
+                      <span
+                        key={typeof role === 'string' ? role : `role-${index}`}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700"
+                      >
+                        {hasRole([role], 'ROLE_ADMIN') && <Shield className="h-3 w-3" />}
+                        {getRoleDisplayName(role)}
+                      </span>
+                    ))}
+                    {(!user.roles || user.roles.length === 0) && (
+                      <span className="text-xs text-gray-500">Chưa được phân quyền</span>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -63,10 +76,14 @@ export function ViewUserDialog({ user, onToggleBan }: ViewUserDialogProps) {
             <div className="col-span-3">
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  user.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  user.locked
+                    ? 'bg-red-100 text-red-800'
+                    : user.enabled
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
                 }`}
               >
-                {user.enabled ? 'Active' : 'Banned'}
+                {user.locked ? 'Tài khoản bị cấm' : user.enabled ? 'Hoạt động' : 'Vô hiệu hóa'}
               </span>
             </div>
           </div>
@@ -83,12 +100,12 @@ export function ViewUserDialog({ user, onToggleBan }: ViewUserDialogProps) {
         </div>
         <DialogFooter>
           <Button
-            variant={user.enabled ? 'destructive' : 'default'}
-            onClick={() => onToggleBan(user.id, user.enabled ? 'active' : 'banned')}
+            variant={user.locked ? 'default' : 'destructive'}
+            onClick={() => onToggleBan(user.id, user.locked ? 'banned' : 'active')}
             className="flex items-center gap-2"
           >
             <Ban className="h-4 w-4" />
-            {user.enabled ? 'Ban User' : 'Unban User'}
+            {user.locked ? 'Bỏ cấm tài khoản' : 'Cấm tài khoản'}
           </Button>
         </DialogFooter>
       </DialogContent>

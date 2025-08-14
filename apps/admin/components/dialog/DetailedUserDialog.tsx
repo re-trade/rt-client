@@ -23,10 +23,11 @@ import {
 } from 'lucide-react';
 
 import type { DetailedAccountResponse } from '@/services/account.api';
+import { getRoleDisplayName, hasRole } from '@/services/account.api';
 
 interface DetailedUserDialogProps {
   user: DetailedAccountResponse;
-  onToggleBan: (userId: string, currentStatus: string) => void;
+  onToggleBan: (userId: string, currentStatus: string, banType?: 'account' | 'seller') => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -249,15 +250,29 @@ export function DetailedUserDialog({
                   <div className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
                     <p className="text-sm font-medium text-orange-800 mb-3">Vai trò hệ thống</p>
                     <div className="flex flex-wrap gap-2">
-                      {user.roles.map((role) => (
-                        <div
-                          key={role}
-                          className="flex items-center gap-1 px-3 py-1 bg-white/80 text-orange-800 rounded-lg text-sm font-semibold shadow-sm border border-orange-200"
-                        >
-                          {role.includes('ADMIN') && <Shield className="h-3 w-3" />}
-                          <span>{role.replace('ROLE_', '')}</span>
+                      {user.locked ? (
+                        <div className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-800 rounded-lg text-sm font-semibold shadow-sm border border-red-200">
+                          <Ban className="h-3 w-3" />
+                          <span>Vai trò tạm thời không khả dụng (Tài khoản bị cấm)</span>
                         </div>
-                      ))}
+                      ) : (
+                        <>
+                          {(user.roles || []).map((role, index) => (
+                            <div
+                              key={typeof role === 'string' ? role : `role-${index}`}
+                              className="flex items-center gap-1 px-3 py-1 bg-white/80 text-orange-800 rounded-lg text-sm font-semibold shadow-sm border border-orange-200"
+                            >
+                              {hasRole([role], 'ROLE_ADMIN') && <Shield className="h-3 w-3" />}
+                              <span>{getRoleDisplayName(role)}</span>
+                            </div>
+                          ))}
+                          {(!user.roles || user.roles.length === 0) && (
+                            <div className="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-sm">
+                              Chưa được phân quyền
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -507,21 +522,46 @@ export function DetailedUserDialog({
               >
                 Đóng
               </Button>
-              <Button
-                variant={user.enabled ? 'destructive' : 'default'}
-                onClick={() => {
-                  onToggleBan(user.id, user.enabled ? 'active' : 'banned');
-                  onOpenChange(false);
-                }}
-                className={`flex items-center gap-2 px-6 py-2 font-semibold transition-all duration-200 ${
-                  user.enabled
-                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl'
-                }`}
-              >
-                <Ban className="h-4 w-4" />
-                {user.enabled ? 'Cấm người dùng' : 'Bỏ cấm người dùng'}
-              </Button>
+
+              {/* Enhanced Ban/Unban Options */}
+              <div className="flex items-center gap-3">
+                {/* Account Ban/Unban Button */}
+                <Button
+                  variant={user.locked ? 'default' : 'destructive'}
+                  onClick={() => {
+                    onToggleBan(user.id, user.locked ? 'banned' : 'active', 'account');
+                    onOpenChange(false);
+                  }}
+                  className={`flex items-center gap-2 px-6 py-2 font-semibold transition-all duration-200 ${
+                    user.locked
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl'
+                      : 'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl'
+                  }`}
+                >
+                  <Ban className="h-4 w-4" />
+                  {user.locked ? 'Bỏ cấm tài khoản' : 'Cấm tài khoản'}
+                </Button>
+
+                {/* Seller Ban/Unban Button - Only show if user has ROLE_SELLER */}
+                {hasRole(user.roles || [], 'ROLE_SELLER') && (
+                  <Button
+                    variant={user.sellerProfile?.verified === false ? 'default' : 'destructive'}
+                    onClick={() => {
+                      const isSellerBanned = user.sellerProfile?.verified === false;
+                      onToggleBan(user.id, isSellerBanned ? 'banned' : 'active', 'seller');
+                      onOpenChange(false);
+                    }}
+                    className={`flex items-center gap-2 px-6 py-2 font-semibold transition-all duration-200 ${
+                      user.sellerProfile?.verified === false
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                        : 'bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl'
+                    }`}
+                  >
+                    <Store className="h-4 w-4" />
+                    {user.sellerProfile?.verified === false ? 'Bỏ cấm người bán' : 'Cấm người bán'}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </DialogFooter>

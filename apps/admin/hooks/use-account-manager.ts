@@ -2,8 +2,13 @@
 
 import {
   AccountResponse,
+  banAccount,
+  banSeller,
   getAccounts,
+  hasRole,
   toggleAccountStatus,
+  unbanAccount,
+  unbanSeller,
   updateAccountRoles,
 } from '@/services/account.api';
 import { useCallback, useEffect, useState } from 'react';
@@ -70,6 +75,58 @@ const useAccountManager = () => {
     }
   };
 
+  const handleBanAccount = async (accountId: string) => {
+    try {
+      const success = await banAccount(accountId);
+      if (success) {
+        await fetchAccounts();
+      }
+      return success;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to ban account');
+      return false;
+    }
+  };
+
+  const handleUnbanAccount = async (accountId: string) => {
+    try {
+      const success = await unbanAccount(accountId);
+      if (success) {
+        await fetchAccounts();
+      }
+      return success;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to unban account');
+      return false;
+    }
+  };
+
+  const handleBanSeller = async (accountId: string) => {
+    try {
+      const success = await banSeller(accountId);
+      if (success) {
+        await fetchAccounts();
+      }
+      return success;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to ban seller');
+      return false;
+    }
+  };
+
+  const handleUnbanSeller = async (accountId: string) => {
+    try {
+      const success = await unbanSeller(accountId);
+      if (success) {
+        await fetchAccounts();
+      }
+      return success;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to unban seller');
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
@@ -80,10 +137,12 @@ const useAccountManager = () => {
         !searchQuery ||
         (account.username?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
         (account.email?.toLowerCase() || '').includes(searchQuery.toLowerCase());
-      const matchesRole = selectedRole === 'All' || (account.roles || []).includes(selectedRole);
+      const matchesRole = selectedRole === 'All' || hasRole(account.roles || [], selectedRole);
       const matchesStatus =
         selectedStatus === 'All' ||
-        (selectedStatus === 'active' ? account.enabled : !account.enabled);
+        (selectedStatus === 'active'
+          ? account.enabled && !account.locked
+          : !account.enabled || account.locked);
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [accounts, searchQuery, selectedRole, selectedStatus]);
@@ -105,6 +164,10 @@ const useAccountManager = () => {
     refresh: fetchAccounts,
     toggleStatus: handleToggleStatus,
     updateRoles: handleUpdateRoles,
+    banAccount: handleBanAccount,
+    unbanAccount: handleUnbanAccount,
+    banSeller: handleBanSeller,
+    unbanSeller: handleUnbanSeller,
   };
 };
 
