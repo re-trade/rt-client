@@ -28,7 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useSellerManager } from '@/hooks/use-seller-manager';
-import { TSellerProfile, approveSeller, getIdCardImage } from '@/services/seller.api';
+import { approveSeller, getIdCardImage, TSellerProfile } from '@/services/seller.api';
 import {
   AlertCircle,
   AlertTriangle,
@@ -41,17 +41,13 @@ import {
   Filter,
   Mail,
   MapPin,
-  Package,
   Phone,
   RefreshCw,
   Search,
   Shield,
   ShieldOff,
   Store,
-  User,
   UserCheck,
-  Users,
-  UserX,
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -632,8 +628,8 @@ const SellerDetailModal = ({
                 )}
                 <Badge
                   className={`absolute -bottom-2 -right-2 px-3 py-1 ${seller.verified
-                      ? 'bg-green-500 hover:bg-green-600'
-                      : 'bg-orange-500 hover:bg-orange-600'
+                    ? 'bg-green-500 hover:bg-green-600'
+                    : 'bg-orange-500 hover:bg-orange-600'
                     }`}
                 >
                   {getStatusText(seller.verified)}
@@ -663,22 +659,48 @@ const SellerDetailModal = ({
                       <p className="text-gray-900 font-semibold text-lg">{seller.shopName}</p>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <p className="text-sm font-medium text-gray-600">Loại kinh doanh:</p>
-                      <p className="text-gray-900 font-medium">
-                        {seller.businessType || 'Chưa cập nhật'}
-                      </p>
-                    </div>
-                  </div>
                   {seller.description && (
                     <div className="bg-white p-4 rounded-lg shadow-sm">
                       <div className="space-y-2">
                         <p className="text-sm font-medium text-gray-600">Mô tả:</p>
-                        <p className="text-gray-900 text-sm leading-relaxed">{seller.description}</p>
+                        <p className="text-gray-900 text-sm leading-relaxed">
+                          {seller.description}
+                        </p>
                       </div>
                     </div>
                   )}
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 className="font-semibold text-gray-900 mb-6 flex items-center gap-2 text-lg">
+                      <div className="p-2 bg-gray-500 rounded-lg">
+                        <Clock className="h-5 w-5 text-white" />
+                      </div>
+                      Ngày khởi tạo và cập nhật
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-gray-600">Ngày tạo:</p>
+                          <p className="text-gray-900 font-medium">
+                            {new Date(seller.createdAt).toLocaleDateString('vi-VN')}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(seller.createdAt).toLocaleTimeString('vi-VN')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-gray-600">Cập nhật lần cuối:</p>
+                          <p className="text-gray-900 font-medium">
+                            {new Date(seller.updatedAt).toLocaleDateString('vi-VN')}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(seller.updatedAt).toLocaleTimeString('vi-VN')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </Card>
 
@@ -744,6 +766,7 @@ const SellerDetailModal = ({
                 </div>
               </Card>
             </div>
+
             {/* Verification Status */}
             <Card className="p-6 bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
               <h3 className="font-semibold text-gray-900 mb-6 flex items-center gap-2 text-lg">
@@ -752,14 +775,17 @@ const SellerDetailModal = ({
                 </div>
                 Trạng thái xác minh
               </h3>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="space-y-4 ">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-600">Trạng thái cửa hàng:</p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                      <Shield className="h-5 w-5 text-gray-600" />
+                      <p className="text-sm font-medium text-gray-600">Trạng thái cửa hàng:</p>
+                    </div>
                     <Badge
                       className={`${seller.verified
-                          ? 'bg-green-100 text-green-800 border-green-200'
-                          : 'bg-orange-100 text-orange-800 border-orange-200'
+                        ? 'bg-green-100 text-green-800 border-green-200'
+                        : 'bg-orange-100 text-orange-800 border-orange-200'
                         } font-medium`}
                       variant="outline"
                     >
@@ -768,76 +794,48 @@ const SellerDetailModal = ({
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-600">Trạng thái CCCD:</p>
-                    <Badge
-                      className={`${getIdentityStatusColor(seller.identityVerifiedStatus)} font-medium`}
-                      variant="outline"
-                    >
-                      {getIdentityStatusText(seller.identityVerifiedStatus)}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-gray-600" />
+                      <p className="text-sm font-medium text-gray-600">Trạng thái CCCD:</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        className={`${getIdentityStatusColor(seller.identityVerifiedStatus)} font-medium`}
+                        variant="outline"
+                      >
+                        {getIdentityStatusText(seller.identityVerifiedStatus)}
+                      </Badge>
+                    </div>
+                   <div className="flex items-center gap-2 justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewIdCard('FRONT')}
+                        disabled={isLoadingIdCard}
+                        className="bg-white border-blue-200 text-blue-700 hover:bg-blue-50"
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Xem mặt trước
+                        {isLoadingIdCard && selectedCardType === 'FRONT' && (
+                          <RefreshCw className="h-4 w-4 ml-2 animate-spin" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewIdCard('BACK')}
+                        disabled={isLoadingIdCard}
+                        className="bg-white border-blue-200 text-blue-700 hover:bg-blue-50"
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Xem mặt sau
+                        {isLoadingIdCard && selectedCardType === 'BACK' && (
+                          <RefreshCw className="h-4 w-4 ml-2 animate-spin" />
+                        )}
+                      </Button>
+                    </div>
 
-              {/* ID Card Buttons */}
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => handleViewIdCard('FRONT')}
-                  disabled={isLoadingIdCard}
-                  className="flex items-center gap-2 bg-white border-blue-200 text-blue-700 hover:bg-blue-50"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  Xem CCCD mặt trước
-                  {isLoadingIdCard && selectedCardType === 'FRONT' && (
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleViewIdCard('BACK')}
-                  disabled={isLoadingIdCard}
-                  className="flex items-center gap-2 bg-white border-blue-200 text-blue-700 hover:bg-blue-50"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  Xem CCCD mặt sau
-                  {isLoadingIdCard && selectedCardType === 'BACK' && (
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                  )}
-                </Button>
-              </div>
-            </Card>
-
-            {/* Timestamps */}
-            <Card className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-6 flex items-center gap-2 text-lg">
-                <div className="p-2 bg-gray-500 rounded-lg">
-                  <Clock className="h-5 w-5 text-white" />
-                </div>
-                Thông tin thời gian
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-600">Ngày tạo:</p>
-                    <p className="text-gray-900 font-medium">
-                      {new Date(seller.createdAt).toLocaleDateString('vi-VN')}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(seller.createdAt).toLocaleTimeString('vi-VN')}
-                    </p>
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-600">Cập nhật lần cuối:</p>
-                    <p className="text-gray-900 font-medium">
-                      {new Date(seller.updatedAt).toLocaleDateString('vi-VN')}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(seller.updatedAt).toLocaleTimeString('vi-VN')}
-                    </p>
                   </div>
                 </div>
               </div>
@@ -1157,9 +1155,7 @@ export default function SellerManagementPage() {
             ) : sellers.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <Store className="h-16 w-16 text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Không tìm thấy người bán
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Không tìm thấy người bán</h3>
                 <p className="text-gray-500">Thử điều chỉnh bộ lọc hoặc tìm kiếm để xem kết quả</p>
               </div>
             ) : (
@@ -1233,9 +1229,7 @@ export default function SellerManagementPage() {
 
                           <TableCell>
                             <div className="max-w-48">
-                              <p className="text-sm text-gray-900 truncate">
-                                {seller.addressLine}
-                              </p>
+                              <p className="text-sm text-gray-900 truncate">{seller.addressLine}</p>
                               <p className="text-xs text-gray-500 truncate">
                                 {seller.ward}, {seller.district}, {seller.state}
                               </p>
@@ -1245,8 +1239,8 @@ export default function SellerManagementPage() {
                           <TableCell>
                             <Badge
                               className={`${seller.verified
-                                  ? 'bg-green-100 text-green-800 border-green-200'
-                                  : 'bg-orange-100 text-orange-800 border-orange-200'
+                                ? 'bg-green-100 text-green-800 border-green-200'
+                                : 'bg-orange-100 text-orange-800 border-orange-200'
                                 } font-medium`}
                               variant="outline"
                             >
@@ -1313,8 +1307,8 @@ export default function SellerManagementPage() {
                                 size="sm"
                                 onClick={() => handlePageChange(pageNum)}
                                 className={`w-10 h-8 ${page === pageNum
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-700 hover:bg-gray-100'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'text-gray-700 hover:bg-gray-100'
                                   }`}
                               >
                                 {pageNum}

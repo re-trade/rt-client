@@ -322,7 +322,7 @@ const ViewUpdateBrandDialog: React.FC<ViewUpdateBrandDialogProps> = ({
 
                   <div className="flex-1 flex justify-center">
                     {logoPreview ? (
-                      <div className="relative w-40 h-40 group">
+                      <div className="relative w-55 h-40 group">
                         <Image
                           src={logoPreview}
                           alt="Logo Preview"

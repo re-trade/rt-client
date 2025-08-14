@@ -405,7 +405,7 @@ export function UpdateStatusDialog({
             </Select>
           </div>
 
-          {/* Tracking Number */}
+          {/* Tracking Number
           {requiresTrackingNumber(newStatus) && (
             <div className="space-y-2">
               <Label className="text-base font-medium flex items-center gap-2">
@@ -422,7 +422,7 @@ export function UpdateStatusDialog({
                 Mã vận đơn sẽ được gửi cho khách hàng để theo dõi đơn hàng
               </p>
             </div>
-          )}
+          )} */}
 
           {/* Notes */}
           <div className="space-y-2">
