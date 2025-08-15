@@ -120,15 +120,15 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
 
         const paymentUrl = await initPayment(paymentPayload);
 
-        if (paymentUrl) {
-          setOrderSuccess(true);
-          setCurrentStep('result');
-          setTimeout(() => {
-            window.location.href = paymentUrl;
-          }, 2000);
-        } else {
-          throw new Error('Không nhận được URL thanh toán');
+        if (!paymentUrl || paymentUrl.trim() === '') {
+          throw new Error('Không nhận được URL thanh toán từ server');
         }
+
+        setOrderSuccess(true);
+        setCurrentStep('result');
+        setTimeout(() => {
+          window.location.href = paymentUrl;
+        }, 2000);
       }
     } catch (error) {
       console.error('Error creating order:', error);

@@ -5,6 +5,7 @@ import { unAuthApi } from '@retrade/util';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
 
+// Re-export types for consistency
 export interface Address {
   id: string;
   name: string;
@@ -97,21 +98,30 @@ const addressSchema = Joi.object({
   isDefault: Joi.boolean().required(),
 });
 
+/**
+ * Address management hook for dedicated address management pages
+ * Provides full CRUD operations with isolated state management
+ */
 export function useAddressManagement() {
+  // Address list state - isolated to this context
   const [addresses, setAddresses] = useState<Address[]>([]);
 
+  // Modal state - isolated to this context
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
+  // Form state - isolated to this context
   const [formData, setFormData] = useState<AddressFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
+  // Location data - isolated to this context
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
 
+  // Loading states - isolated to this context
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -146,7 +156,6 @@ export function useAddressManagement() {
     try {
       setLoading(true);
       const response = await unAuthApi.province.get<Province[]>('/p/');
-      console.log(response);
       setProvinces(response.data);
     } catch {
       setErrors({ general: 'Không thể tải danh sách tỉnh/thành phố' });
@@ -189,22 +198,26 @@ export function useAddressManagement() {
     }
   }, []);
 
+  // Load addresses on mount
   useEffect(() => {
     fetchAddresses();
   }, [fetchAddresses]);
 
+  // Load provinces when modals open
   useEffect(() => {
     if (isCreateOpen || isUpdateOpen) {
       fetchProvinces();
     }
   }, [isCreateOpen, isUpdateOpen, fetchProvinces]);
 
+  // Load districts when province changes
   useEffect(() => {
     if (formData.country) {
       fetchDistricts(formData.country);
     }
   }, [formData.country, fetchDistricts]);
 
+  // Load wards when district changes
   useEffect(() => {
     if (formData.district) {
       fetchWards(formData.district);
@@ -282,12 +295,14 @@ export function useAddressManagement() {
     (key: keyof AddressFormData, value: string | boolean) => {
       setFormData((prev) => ({ ...prev, [key]: value }));
 
+      // Clear related fields when parent location changes
       if (key === 'country') {
         setFormData((prev) => ({ ...prev, district: '', ward: '' }));
       } else if (key === 'district') {
         setFormData((prev) => ({ ...prev, ward: '' }));
       }
 
+      // Clear error for this field
       if (errors[key]) {
         setErrors((prev) => ({ ...prev, [key]: '' }));
       }
@@ -317,6 +332,7 @@ export function useAddressManagement() {
         return false;
       }
 
+      // Find selected location names
       const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
       const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
       const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
@@ -362,6 +378,7 @@ export function useAddressManagement() {
       setSubmitting(true);
       setErrors({});
 
+      // Validate form data
       const { error } = addressSchema.validate(formData, { abortEarly: false });
       if (error) {
         const validationErrors: Record<string, string> = {};
@@ -374,6 +391,7 @@ export function useAddressManagement() {
         return false;
       }
 
+      // Find selected location names
       const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
       const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
       const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
@@ -417,7 +435,7 @@ export function useAddressManagement() {
     async (addressId: string): Promise<boolean> => {
       try {
         setLoading(true);
-        const response = await contactApi.removeContact(addressId);
+        const response = await contactApi.deleteContact(addressId);
         if (!response) {
           throw new Error('Không thể xóa địa chỉ');
         }
@@ -434,23 +452,29 @@ export function useAddressManagement() {
   );
 
   return {
+    // Address list
     addresses,
 
+    // Modal state
     isCreateOpen,
     isUpdateOpen,
     selectedAddress,
 
+    // Form state
     formData,
     errors,
     touched,
 
+    // Location data
     provinces,
     districts,
     wards,
 
+    // Loading states
     loading,
     submitting,
 
+    // Actions
     openCreateDialog,
     openUpdateDialog,
     closeDialogs,

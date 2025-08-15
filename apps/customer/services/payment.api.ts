@@ -23,17 +23,50 @@ export interface PaymentStatusResponse {
 
 export const paymentApi = {
   async initPayment(payload: PaymentInitRequest): Promise<string> {
+    if (!payload.paymentMethodId || !payload.orderId) {
+      throw new Error('Thông tin thanh toán không hợp lệ');
+    }
+
     try {
       const response = await authApi.default.post<IResponseObject<string>>(
         '/payments/init',
         payload,
       );
-      if (response.data.success) {
-        return response.data.content;
+
+      if (response.data.success && response.data.content) {
+        const paymentUrl = response.data.content.trim();
+        if (!paymentUrl) {
+          throw new Error('Không nhận được URL thanh toán từ server');
+        }
+
+        try {
+          new URL(paymentUrl);
+        } catch {
+          throw new Error('URL thanh toán không hợp lệ');
+        }
+
+        return paymentUrl;
       }
-      throw new Error('Failed to initialize payment');
-    } catch (error) {
-      throw error;
+
+      const errorMessage = response.data.message || 'Không thể khởi tạo thanh toán';
+      throw new Error(errorMessage);
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+      }
+      if (error.response?.status === 403) {
+        throw new Error('Không có quyền thực hiện thanh toán');
+      }
+      if (error.response?.status === 404) {
+        throw new Error('Không tìm thấy thông tin đơn hàng');
+      }
+      if (error.response?.status >= 500) {
+        throw new Error('Lỗi server. Vui lòng thử lại sau');
+      }
+
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Không thể khởi tạo thanh toán';
+      throw new Error(errorMessage);
     }
   },
 
@@ -42,12 +75,28 @@ export const paymentApi = {
       const response = await authApi.default.get<IResponseObject<PaymentMethod[]>>(
         '/payments/methods?page=0&size=10',
       );
-      if (response.data.success) {
-        return response.data.content;
+
+      if (response.data.success && response.data.content) {
+        const methods = response.data.content;
+        if (!Array.isArray(methods)) {
+          throw new Error('Dữ liệu phương thức thanh toán không hợp lệ');
+        }
+        return methods;
       }
-      throw new Error('Failed to fetch payment methods');
-    } catch (error) {
-      throw error;
+
+      const errorMessage = response.data.message || 'Không thể tải phương thức thanh toán';
+      throw new Error(errorMessage);
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+      }
+      if (error.response?.status >= 500) {
+        throw new Error('Lỗi server. Vui lòng thử lại sau');
+      }
+
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Không thể tải phương thức thanh toán';
+      throw new Error(errorMessage);
     }
   },
 

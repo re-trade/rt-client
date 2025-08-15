@@ -68,6 +68,7 @@ export default function AddressSelectionModal({
 
   const handleCreateNew = () => {
     onCreateNewAddress();
+    // Don't call onClose() here - the create dialog will handle its own lifecycle
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -93,7 +94,6 @@ export default function AddressSelectionModal({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-4 sm:px-6 py-4 flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -112,21 +112,28 @@ export default function AddressSelectionModal({
           </button>
         </div>
 
-        {/* Search Bar */}
         <div className="p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors duration-200" />
             <input
               type="text"
               placeholder="Tìm kiếm theo tên, địa chỉ, số điện thoại..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-colors"
+              className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-orange-200 focus:border-orange-500 outline-none transition-all duration-200 bg-white hover:border-gray-300 shadow-sm hover:shadow-md placeholder:text-gray-400"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors duration-200"
+                aria-label="Xóa tìm kiếm"
+              >
+                <X className="w-3 h-3 text-gray-600" />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-12">
@@ -170,54 +177,60 @@ export default function AddressSelectionModal({
             </div>
           ) : (
             <div className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                {filteredAddresses.map((address) => {
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {filteredAddresses.map((address, index) => {
                   const isSelected = selectedAddressId === address.id;
                   return (
-                    <div
-                      key={address.id}
-                      onClick={() => handleAddressSelect(address)}
-                      className={`relative p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        isSelected
-                          ? 'bg-orange-50 border-orange-300 ring-2 ring-orange-200 shadow-md'
-                          : 'bg-white border-gray-200 hover:border-orange-200 hover:shadow-sm'
-                      }`}
-                    >
-                      {isSelected && (
-                        <div className="absolute top-3 right-3">
-                          <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-                            <Check className="w-4 h-4 text-white" />
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="pr-8">
-                        <div className="flex items-center gap-2 mb-3">
-                          <h4 className="font-semibold text-gray-800">{address.name}</h4>
-                          {address.defaulted && (
-                            <span className="bg-orange-100 text-orange-700 text-xs font-medium px-2 py-0.5 rounded">
-                              Mặc định
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <User className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                            <span>{address.customerName}</span>
+                    <div key={address.id} className="group">
+                      <div
+                        onClick={() => handleAddressSelect(address)}
+                        className={`bg-white p-5 rounded-xl border cursor-pointer transition-shadow ${
+                          isSelected
+                            ? 'border-orange-400 shadow-lg ring-2 ring-orange-200'
+                            : 'border-orange-200 shadow-sm hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex flex-col space-y-3">
+                          <div className="flex justify-between items-center">
+                            <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+                              <span
+                                className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-sm mr-2 ${
+                                  isSelected
+                                    ? 'bg-orange-500 text-white'
+                                    : 'bg-orange-100 text-orange-600'
+                                }`}
+                              >
+                                {isSelected ? <Check className="w-3 h-3" /> : index + 1}
+                              </span>
+                              {address.name}
+                            </h2>
+                            {address.defaulted && (
+                              <span className="bg-orange-100 text-orange-700 text-xs font-medium px-2.5 py-1 rounded">
+                                Mặc định
+                              </span>
+                            )}
                           </div>
 
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Phone className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                            <span>{address.phone}</span>
-                          </div>
+                          <div className="space-y-2 pl-2 border-l-2 border-orange-500">
+                            <div className="flex items-start space-x-2">
+                              <User className="w-4 h-4 text-orange-500 mt-0.5" />
+                              <p className="text-sm font-medium text-gray-800">
+                                {address.customerName}
+                              </p>
+                            </div>
 
-                          <div className="flex items-start gap-2 text-sm text-gray-600">
-                            <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <div>{address.addressLine}</div>
-                              <div className="text-xs text-gray-500">
-                                {address.ward}, {address.district}, {address.state}
+                            <div className="flex items-start space-x-2">
+                              <Phone className="w-4 h-4 text-orange-500 mt-0.5" />
+                              <p className="text-sm text-gray-600">{address.phone}</p>
+                            </div>
+
+                            <div className="flex items-start space-x-2">
+                              <MapPin className="w-4 h-4 text-orange-500 mt-0.5" />
+                              <div>
+                                <p className="text-sm text-gray-600">{address.addressLine}</p>
+                                <p className="text-sm text-gray-600">
+                                  {address.ward}, {address.district}, {address.state}
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -231,9 +244,11 @@ export default function AddressSelectionModal({
               <div className="border-t border-gray-200 pt-6">
                 <button
                   onClick={handleCreateNew}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] group"
                 >
-                  <Plus className="w-5 h-5" />
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors duration-200">
+                    <Plus className="w-4 h-4" />
+                  </div>
                   Thêm địa chỉ mới
                 </button>
               </div>

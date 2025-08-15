@@ -153,10 +153,8 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       </AnimatePresence>
     );
 
-    // Return null during SSR since we can't access document
     if (!mounted) return null;
 
-    // Use createPortal to render the modal directly to body
     return createPortal(modalContent, document.body);
   },
 );

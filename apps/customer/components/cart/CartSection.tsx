@@ -155,7 +155,6 @@ export default function CartSection({
         />
       ))}
 
-      {/* Overall Cart Summary */}
       {Object.keys(cartGroups).length > 0 && <CartSummaryBar selectedItems={selectedItems} />}
 
       <Modal
