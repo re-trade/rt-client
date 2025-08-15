@@ -121,9 +121,18 @@ function useCart() {
   const addToCart = useCallback(
     async (productId: string, quantity: number = 1) => {
       try {
-        await cartApi.addToCart(productId, quantity);
-        await fetchCart(true);
-        return true;
+        const response = await cartApi.addToCart(productId, quantity);
+        if (response.success) {
+          await fetchCart(true);
+          return {
+            success: response.success,
+            message: response.messages,
+          };
+        }
+        return {
+          success: response.success,
+          message: response.messages,
+        };
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Có lỗi xảy ra khi thêm vào giỏ hàng';
@@ -137,10 +146,19 @@ function useCart() {
   const removeFromCart = useCallback(
     async (productId: string) => {
       try {
-        await cartApi.removeFromCart(productId);
+        const response = await cartApi.removeFromCart(productId);
+        if (!response.success) {
+          return {
+            success: response.success,
+            message: response.messages,
+          };
+        }
         setSelectedItems((prev) => prev.filter((item) => item.productId !== productId));
         await fetchCart(true);
-        return true;
+        return {
+          success: response.success,
+          message: response.messages,
+        };
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi xóa sản phẩm';
         setError(errorMessage);
@@ -153,9 +171,23 @@ function useCart() {
   const updateCartItemQuantity = useCallback(
     async (productId: string, quantity: number) => {
       try {
-        await cartApi.updateCartItemQuantity(productId, quantity);
+        const response = await cartApi.updateCartItemQuantity(productId, quantity);
+        if (!response.success) {
+          return {
+            success: response.success,
+            message: response.messages,
+          };
+        }
+
+        setSelectedItems((prev) =>
+          prev.map((item) => (item.productId === productId ? { ...item, quantity } : item)),
+        );
+
         await fetchCart(true);
-        return true;
+        return {
+          success: response.success,
+          message: response.messages,
+        };
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Có lỗi xảy ra khi cập nhật số lượng';
@@ -194,18 +226,22 @@ function useCart() {
 
     cart.cartGroupResponses.forEach((group) => {
       group.items.forEach((item) => {
-        if (selectedItems.find((selected) => selected.productId === item.productId)) {
-          originalPrice += item.totalPrice;
-          total += item.totalPrice;
+        const selectedItem = selectedItems.find(
+          (selected) => selected.productId === item.productId,
+        );
+        if (selectedItem) {
+          // Use the current quantity from selectedItems, which should be updated when quantity changes
+          const itemTotal = item.totalPrice * selectedItem.quantity;
+          originalPrice += itemTotal;
+          total += itemTotal;
         }
       });
     });
-    const tax = Math.round(total * 0.05);
 
     setCartSummary({
       originalPrice,
-      tax,
-      total: total + tax,
+      tax: 0, // Tax removed as requested
+      total: total, // Total without tax
     });
   }, [selectedItems, cart]);
 

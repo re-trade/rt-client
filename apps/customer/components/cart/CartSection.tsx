@@ -5,6 +5,7 @@ import CartSkeleton from '@/components/cart/CartSkeleton';
 import Checkbox from '@/components/reusable/checkbox';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/context/CartContext';
+import { useToast } from '@/context/ToastContext';
 import {
   IconAlertTriangle,
   IconCheck,
@@ -80,7 +81,7 @@ export default function CartSection({
   const [itemToRemove, setItemToRemove] = useState<{ id: string; name: string } | null>(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [quantityUpdates, setQuantityUpdates] = useState<Record<string, number>>({});
-
+  const toast = useToast();
   const handleProductSelect = (itemId: string, quantity: number, event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     if (
@@ -105,13 +106,27 @@ export default function CartSection({
     setShowRemoveModal(true);
   };
 
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+  const handleQuantityChange = (itemId: string, newQuantity: number, maxQuantity?: number) => {
     if (newQuantity < 1) return;
+
+    // Check if new quantity exceeds available stock
+    if (maxQuantity && newQuantity > maxQuantity) {
+      toast.showToast(`Số lượng không thể vượt quá ${maxQuantity} sản phẩm có sẵn`, 'warning');
+      return;
+    }
+
     updateCartItemQuantity(itemId, newQuantity).then((result) => {
-      if (result) {
+      if (result.success) {
         setQuantityUpdates((prev) => ({ ...prev, [itemId]: newQuantity }));
+        toast.showToast('Cập nhật số lượng thành công', 'success');
+      } else {
+        result.message.forEach((message) => toast.showToast(message, 'warning'));
       }
     });
+  };
+
+  const handleAdjustToMaxQuantity = (itemId: string, maxQuantity: number) => {
+    handleQuantityChange(itemId, maxQuantity, maxQuantity);
   };
 
   const confirmRemove = async () => {
@@ -195,7 +210,8 @@ export default function CartSection({
           if (allShopItemsSelected) {
             shopSection.items.forEach((item) => {
               if (selectedItems.find((selected) => selected.productId === item.productId)) {
-                toggleItemSelection(item.productId, item.quantity);
+                const currentQuantity = quantityUpdates[item.productId] || item.quantity;
+                toggleItemSelection(item.productId, currentQuantity);
               }
             });
           } else {
@@ -204,7 +220,8 @@ export default function CartSection({
                 item.productAvailable &&
                 !selectedItems.find((selected) => selected.productId === item.productId)
               ) {
-                toggleItemSelection(item.productId, item.quantity);
+                const currentQuantity = quantityUpdates[item.productId] || item.quantity;
+                toggleItemSelection(item.productId, currentQuantity);
               }
             });
           }
@@ -299,11 +316,22 @@ export default function CartSection({
                       );
                       const isRemoving = removingItems.has(item.productId);
                       const currentQuantity = quantityUpdates[item.productId] || item.quantity;
+                      const availableQuantity = item.productQuantity || 0;
+                      const isQuantityExceeded = currentQuantity > availableQuantity;
+                      const canIncrement = currentQuantity < availableQuantity;
 
                       const handleIncrement = () =>
-                        handleQuantityChange(item.productId, currentQuantity + 1);
+                        handleQuantityChange(
+                          item.productId,
+                          currentQuantity + 1,
+                          availableQuantity,
+                        );
                       const handleDecrement = () =>
-                        handleQuantityChange(item.productId, currentQuantity - 1);
+                        handleQuantityChange(
+                          item.productId,
+                          currentQuantity - 1,
+                          availableQuantity,
+                        );
 
                       return (
                         <div
@@ -320,7 +348,7 @@ export default function CartSection({
                           onClick={(e) =>
                             !isSoldOut &&
                             !isRemoving &&
-                            handleProductSelect(item.productId, item.quantity, e)
+                            handleProductSelect(item.productId, currentQuantity, e)
                           }
                         >
                           {/* Removing Overlay */}
@@ -345,7 +373,7 @@ export default function CartSection({
                             ) : !isSoldOut && !isRemoving ? (
                               <div
                                 onClick={(e) =>
-                                  handleCheckboxClick(item.productId, item.quantity, e)
+                                  handleCheckboxClick(item.productId, currentQuantity, e)
                                 }
                               >
                                 <Checkbox
@@ -393,24 +421,39 @@ export default function CartSection({
                                 className="text-xs"
                                 maxLength={50}
                               />
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={handleDecrement}
-                                  disabled={isRemoving || isSoldOut || currentQuantity <= 1}
-                                  className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                >
-                                  <IconMinus size={14} />
-                                </button>
-                                <span className="text-sm font-medium text-gray-800">
-                                  {currentQuantity}
-                                </span>
-                                <button
-                                  onClick={handleIncrement}
-                                  disabled={isRemoving || isSoldOut}
-                                  className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                >
-                                  <IconPlus size={14} />
-                                </button>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={handleDecrement}
+                                    disabled={isRemoving || isSoldOut || currentQuantity <= 1}
+                                    className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                  >
+                                    <IconMinus size={14} />
+                                  </button>
+                                  <span className="text-sm font-medium text-gray-800">
+                                    {currentQuantity}
+                                  </span>
+                                  <button
+                                    onClick={handleIncrement}
+                                    disabled={isRemoving || isSoldOut || !canIncrement}
+                                    className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                  >
+                                    <IconPlus size={14} />
+                                  </button>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Còn lại: {availableQuantity}
+                                </div>
+                                {isQuantityExceeded && (
+                                  <button
+                                    onClick={() =>
+                                      handleAdjustToMaxQuantity(item.productId, availableQuantity)
+                                    }
+                                    className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200"
+                                  >
+                                    Điều chỉnh về {availableQuantity}
+                                  </button>
+                                )}
                               </div>
                               <p className="text-base font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded inline-block">
                                 {item.totalPrice * currentQuantity}₫
@@ -467,24 +510,39 @@ export default function CartSection({
                                   className="text-sm"
                                   maxLength={80}
                                 />
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={handleDecrement}
-                                    disabled={isRemoving || isSoldOut || currentQuantity <= 1}
-                                    className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                  >
-                                    <IconMinus size={16} />
-                                  </button>
-                                  <span className="text-base font-medium text-gray-800">
-                                    {currentQuantity}
-                                  </span>
-                                  <button
-                                    onClick={handleIncrement}
-                                    disabled={isRemoving || isSoldOut}
-                                    className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                  >
-                                    <IconPlus size={16} />
-                                  </button>
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={handleDecrement}
+                                      disabled={isRemoving || isSoldOut || currentQuantity <= 1}
+                                      className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                    >
+                                      <IconMinus size={16} />
+                                    </button>
+                                    <span className="text-base font-medium text-gray-800">
+                                      {currentQuantity}
+                                    </span>
+                                    <button
+                                      onClick={handleIncrement}
+                                      disabled={isRemoving || isSoldOut || !canIncrement}
+                                      className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                                    >
+                                      <IconPlus size={16} />
+                                    </button>
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    Còn lại: {availableQuantity}
+                                  </div>
+                                  {isQuantityExceeded && (
+                                    <button
+                                      onClick={() =>
+                                        handleAdjustToMaxQuantity(item.productId, availableQuantity)
+                                      }
+                                      className="text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded hover:bg-yellow-200"
+                                    >
+                                      Điều chỉnh về {availableQuantity}
+                                    </button>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-4">
                                   <button
@@ -588,7 +646,6 @@ export default function CartSection({
         </div>
       )}
 
-      {/* Remove Confirmation Modal */}
       <Modal
         opened={showRemoveModal}
         onClose={cancelRemove}

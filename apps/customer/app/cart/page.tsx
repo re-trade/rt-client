@@ -50,7 +50,6 @@ const ShoppingCart: React.FC = () => {
           <div className={`space-y-6 md:space-y-8 ${showSummary ? 'w-full xl:w-2/3' : 'w-full'}`}>
             <CartSection {...cartHook} />
 
-            {/* Product Recommendations */}
             <div className="hidden lg:block bg-white rounded-xl p-6 md:p-8 shadow-lg border border-orange-100 hover:shadow-xl transition-all duration-300">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">

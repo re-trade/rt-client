@@ -281,7 +281,6 @@ export default function CartSummary({
         </div>
       </div>
 
-      {/* Order Summary Card */}
       <div className="rounded-xl border border-orange-100 bg-white shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 md:p-6 border-b border-orange-100">
           <div className="flex items-center gap-3">
@@ -314,16 +313,6 @@ export default function CartSummary({
               </div>
               <span className="text-sm md:text-base font-semibold text-gray-800">
                 {cartSummary.originalPrice.toLocaleString('vi-VN')}₫
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-50 shadow-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></div>
-                <span className="text-sm md:text-base font-medium text-gray-600">Thuế</span>
-              </div>
-              <span className="text-sm md:text-base font-semibold text-gray-800">
-                {cartSummary.tax.toLocaleString('vi-VN')}₫
               </span>
             </div>
           </div>

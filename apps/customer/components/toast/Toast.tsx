@@ -4,45 +4,16 @@ import { ToastMessage, ToastType } from '@/hooks/use-toast';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, Check, Info, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 type ToastProps = {
   messages: ToastMessage[];
+  onRemove: (id: string) => void;
   closable?: boolean;
 };
 
-export default function Toast({ messages, closable = true }: ToastProps) {
-  const [visibleMessages, setVisibleMessages] = useState<ToastMessage[]>([]);
-
-  useEffect(() => {
-    const newMessages = messages.filter(
-      (msg) => !visibleMessages.some((visMsg) => visMsg.id === msg.id),
-    );
-
-    if (newMessages.length > 0) {
-      newMessages.forEach((msg, index) => {
-        setTimeout(() => {
-          setVisibleMessages((prev) => [...prev, msg]);
-        }, index * 100);
-      });
-    }
-    const timers: NodeJS.Timeout[] = [];
-
-    newMessages.forEach((msg) => {
-      const timer = setTimeout(() => {
-        handleClose(msg.id);
-      }, 5000);
-
-      timers.push(timer);
-    });
-
-    return () => {
-      timers.forEach((timer) => clearTimeout(timer));
-    };
-  }, [messages]);
-
+export default function Toast({ messages, onRemove, closable = true }: ToastProps) {
   const handleClose = (id: string) => {
-    setVisibleMessages((prev) => prev.filter((msg) => msg.id !== id));
+    onRemove(id);
   };
 
   const getStyles = (type: ToastType): { containerClass: string; iconBg: string } => {
@@ -123,7 +94,7 @@ export default function Toast({ messages, closable = true }: ToastProps) {
   return (
     <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-[9999]">
       <AnimatePresence mode="popLayout">
-        {visibleMessages.map((msg) => {
+        {messages.map((msg) => {
           const styles = getStyles(msg.type);
 
           return (
