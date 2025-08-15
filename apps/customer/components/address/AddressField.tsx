@@ -1,6 +1,6 @@
 'use client';
 
-import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
+import { AddressFormData, District, Province, Ward } from '@/hooks/use-checkout-address-manager';
 
 interface FieldProps {
   field: {

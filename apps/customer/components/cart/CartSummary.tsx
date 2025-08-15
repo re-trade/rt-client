@@ -1,7 +1,10 @@
 'use client';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/hooks/use-cart';
+import { useCheckoutAddressManager } from '@/hooks/use-checkout-address-manager';
 import { usePayment } from '@/hooks/use-payment';
+import AddressCreateDialog from '@components/address/AddressCreateDialog';
+import AddressSelectionModal from '@components/address/AddressSelectionModal';
 import { CreateOrderRequest } from '@services/order.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -9,9 +12,6 @@ import { useEffect, useState } from 'react';
 
 export default function CartSummary({
   cartSummary,
-  contacts,
-  selectedAddressId,
-  selectAddress,
   selectedItems,
   createOrder,
   isCreateOrder,
@@ -32,6 +32,30 @@ export default function CartSummary({
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
 
+  const {
+    addresses,
+    selectedAddress,
+    isCreateOpen,
+    isSelectionOpen,
+    openSelectionDialog,
+    openCreateDialog,
+    openCreateFromSelection,
+    closeDialogs,
+    selectAddress,
+    createAddress,
+    formData,
+    errors,
+    touched,
+    provinces,
+    districts,
+    wards,
+    loading: addressLoading,
+    submitting,
+    addressesLoading,
+    handleFieldChange,
+    handleFieldBlur,
+  } = useCheckoutAddressManager();
+
   useEffect(() => {
     getPaymentMethods().catch(console.error);
   }, [getPaymentMethods]);
@@ -39,7 +63,7 @@ export default function CartSummary({
   const finalTotal = cartSummary.total;
 
   const validateOrder = (): string | null => {
-    if (!selectedAddressId) {
+    if (!selectedAddress) {
       return 'Vui lòng chọn địa chỉ giao hàng';
     }
 
@@ -66,7 +90,7 @@ export default function CartSummary({
     try {
       const orderPayload: CreateOrderRequest = {
         items: selectedItems,
-        addressId: selectedAddressId!,
+        addressId: selectedAddress!.id,
       };
 
       const createdOrder = await createOrder(orderPayload);
@@ -109,7 +133,7 @@ export default function CartSummary({
   const canCheckout =
     selectedItems &&
     selectedItems.length > 0 &&
-    selectedAddressId &&
+    selectedAddress &&
     selectedPaymentMethodId &&
     !isProcessing;
 
@@ -143,57 +167,111 @@ export default function CartSummary({
           </div>
         </div>
 
-        <div className="p-4 md:p-6 bg-orange-25">
-          <label
-            htmlFor="address-select"
-            className="block text-sm font-semibold text-gray-700 mb-3"
-          >
-            Chọn địa chỉ giao hàng:
-          </label>
-          <div className="relative">
-            <select
-              id="address-select"
-              value={selectedAddressId ?? ''}
-              onChange={(e) => selectAddress(e.target.value)}
-              className="w-full rounded-lg border border-orange-200 bg-white px-4 py-3 text-sm md:text-base text-gray-700 shadow-sm transition-all duration-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-400 focus:ring-opacity-50 hover:border-orange-300 appearance-none"
-            >
-              <option value="" disabled>
-                -- Chọn địa chỉ --
-              </option>
-              {contacts.map((address) => (
-                <option key={address.id} value={address.id}>
-                  {address.customerName} - {address.phone} - {address.name}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-orange-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
-          </div>
+        <div className="p-3 md:p-4 bg-orange-25">
+          {selectedAddress ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-gray-700">
+                  Địa chỉ giao hàng:
+                </label>
+                <button
+                  onClick={openSelectionDialog}
+                  className="text-orange-600 hover:text-orange-700 text-xs font-medium transition-colors"
+                >
+                  Thay đổi
+                </button>
+              </div>
 
-          {selectedAddressId && (
-            <div className="mt-4 p-3 md:p-4 bg-white rounded-lg border border-orange-100 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs md:text-sm text-gray-600 mb-1">Địa chỉ đã chọn:</p>
-                  <p className="font-semibold text-sm md:text-base text-gray-800 break-words">
-                    {contacts.find((c) => c.id === selectedAddressId)?.name}
-                  </p>
+              <div className="bg-white p-3 rounded-lg border border-orange-200">
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-medium text-gray-800 text-sm">{selectedAddress.name}</h4>
+                  {selectedAddress.defaulted && (
+                    <span className="bg-orange-100 text-orange-700 text-xs font-medium px-1.5 py-0.5 rounded">
+                      Mặc định
+                    </span>
+                  )}
+                </div>
+
+                <div className="space-y-0.5 text-xs text-gray-600">
+                  <div className="flex items-center gap-1.5">
+                    <svg
+                      className="w-3 h-3 text-orange-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <span>
+                      {selectedAddress.customerName} • {selectedAddress.phone}
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-1.5">
+                    <svg
+                      className="w-3 h-3 text-orange-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    <div className="leading-tight">
+                      <div>{selectedAddress.addressLine}</div>
+                      <div className="text-gray-500">
+                        {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.state}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-orange-100 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-orange-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-600 text-xs mb-3">Chưa chọn địa chỉ giao hàng</p>
+              <button
+                onClick={openSelectionDialog}
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 rounded-lg transition-all duration-200 text-xs font-medium shadow-md hover:shadow-lg"
+              >
+                Chọn địa chỉ giao hàng
+              </button>
             </div>
           )}
         </div>
@@ -471,6 +549,32 @@ export default function CartSummary({
           </button>
         </div>
       </Modal>
+
+      <AddressSelectionModal
+        open={isSelectionOpen}
+        onClose={closeDialogs}
+        onSelectAddress={selectAddress}
+        onCreateNewAddress={openCreateFromSelection}
+        addresses={addresses}
+        selectedAddressId={selectedAddress?.id}
+        loading={addressesLoading}
+      />
+
+      <AddressCreateDialog
+        open={isCreateOpen}
+        onClose={closeDialogs}
+        onCreate={createAddress}
+        formData={formData}
+        errors={errors}
+        touched={touched}
+        provinces={provinces}
+        districts={districts}
+        wards={wards}
+        loading={addressLoading}
+        submitting={submitting}
+        onFieldChange={handleFieldChange}
+        onFieldBlur={handleFieldBlur}
+      />
     </div>
   );
 }

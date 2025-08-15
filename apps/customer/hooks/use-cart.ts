@@ -272,6 +272,7 @@ function useCart() {
     clearCart,
     createOrder,
     isCreateOrder,
+    refreshAddresses: fetchAddresses,
   };
 }
 
