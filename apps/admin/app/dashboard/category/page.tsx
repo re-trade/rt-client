@@ -1,6 +1,14 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCategoryManager } from '@/hooks/use-category-manager';
@@ -9,14 +17,6 @@ import { unAuthApi } from '@retrade/util/src/api/instance';
 import { ChevronRight, Edit, Eye, EyeOff, MoreHorizontal, Plus, Tag } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 
 const normalizeCategory = (cat: any): Category => ({
   ...cat,
@@ -164,27 +164,31 @@ export default function CategoryPage() {
     return (
       <>
         <tr
-          className={`hover:bg-gray-50 transition-colors ${level > 0 ? 'border-l-4 border-blue-200 bg-blue-50/30' : ''
-            }`}
+          className={`hover:bg-gray-50 transition-colors ${
+            level > 0 ? 'border-l-4 border-blue-200 bg-blue-50/30' : ''
+          }`}
         >
           <td className="px-6 py-4" style={{ paddingLeft: `${level * 32 + 24}px` }}>
             <div className="flex items-center gap-3">
               <button
-                className={`p-1 rounded hover:bg-blue-100 transition-colors ${hasChildren ? 'text-blue-600' : 'text-gray-400 cursor-default'
-                  }`}
+                className={`p-1 rounded hover:bg-blue-100 transition-colors ${
+                  hasChildren ? 'text-blue-600' : 'text-gray-400 cursor-default'
+                }`}
                 onClick={hasChildren ? () => setExpanded((e) => !e) : undefined}
                 disabled={!hasChildren}
               >
                 <ChevronRight
-                  className={`h-4 w-4 transition-transform duration-200 ${expanded ? 'rotate-90' : ''
-                    }`}
+                  className={`h-4 w-4 transition-transform duration-200 ${
+                    expanded ? 'rotate-90' : ''
+                  }`}
                 />
               </button>
               <span
-                className={`font-medium ${level === 0
-                  ? 'text-lg text-gray-800 font-bold'
-                  : 'text-sm text-blue-700 font-semibold'
-                  }`}
+                className={`font-medium ${
+                  level === 0
+                    ? 'text-lg text-gray-800 font-bold'
+                    : 'text-sm text-blue-700 font-semibold'
+                }`}
               >
                 {category.name}
               </span>
@@ -228,9 +232,7 @@ export default function CategoryPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem
-                  onClick={() => handleToggleVisible(normalizeCategory(category))}
-                >
+                <DropdownMenuItem onClick={() => handleToggleVisible(normalizeCategory(category))}>
                   {category.visible ? (
                     <>
                       <EyeOff className="h-4 w-4 inline mr-1" />
@@ -251,9 +253,7 @@ export default function CategoryPage() {
                   Chỉnh sửa danh mục
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => openCreateDialog(category.id)}
-                >
+                <DropdownMenuItem onClick={() => openCreateDialog(category.id)}>
                   <Plus className="h-4 w-4 inline mr-1" />
                   Thêm con danh mục
                 </DropdownMenuItem>
