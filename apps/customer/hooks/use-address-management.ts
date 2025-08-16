@@ -1,11 +1,11 @@
 'use client';
 
-import { getInputHandler } from '@/components/input/getInputHandle';
 import { contactApi, TAddress } from '@/services/contact.api';
 import { unAuthApi } from '@retrade/util';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
 
+// Re-export types for consistency
 export interface Address {
   id: string;
   name: string;
@@ -38,88 +38,90 @@ export interface Ward {
 }
 
 export interface AddressFormData {
+  name: string;
   customerName: string;
   phoneNumber: string;
-  name: string;
-  addressLine: string;
   country: string;
   district: string;
   ward: string;
-  isDefault: boolean;
+  addressLine: string;
   type: number;
+  isDefault: boolean;
 }
 
-const addressSchema = Joi.object({
-  customerName: Joi.string().trim().min(1).required().messages({
-    'string.empty': 'Họ và tên không được để trống',
-    'any.required': 'Họ và tên là bắt buộc',
-  }),
-  phoneNumber: Joi.string()
-    .pattern(/^\d{9,15}$/)
-    .required()
-    .messages({
-      'string.pattern.base': 'Số điện thoại không hợp lệ (9-15 chữ số)',
-      'string.empty': 'Số điện thoại không được để trống',
-      'any.required': 'Số điện thoại là bắt buộc',
-    }),
-  addressLine: Joi.string().trim().min(1).required().messages({
-    'string.empty': 'Địa chỉ không được để trống',
-    'any.required': 'Địa chỉ là bắt buộc',
-  }),
-  country: Joi.string().trim().min(1).required().messages({
-    'string.empty': 'Vui lòng chọn Tỉnh/Thành phố',
-    'any.required': 'Tỉnh/Thành phố là bắt buộc',
-  }),
-  district: Joi.string().trim().min(1).required().messages({
-    'string.empty': 'Vui lòng chọn Quận/Huyện',
-    'any.required': 'Quận/Huyện là bắt buộc',
-  }),
-  ward: Joi.string().trim().min(1).required().messages({
-    'string.empty': 'Vui lòng chọn Phường/Xã',
-    'any.required': 'Phường/Xã là bắt buộc',
-  }),
-  name: Joi.string().trim().min(1).required().messages({
-    'string.empty': 'Tên địa chỉ không được để trống',
-    'any.required': 'Tên địa chỉ là bắt buộc',
-  }),
-  isDefault: Joi.boolean().default(false),
-  type: Joi.number().default(0),
-});
-
 const initialFormData: AddressFormData = {
+  name: '',
   customerName: '',
   phoneNumber: '',
-  name: '',
-  addressLine: '',
   country: '',
   district: '',
   ward: '',
+  addressLine: '',
+  type: 1,
   isDefault: false,
-  type: 0,
 };
 
-function validateAllFields(data: AddressFormData): Record<string, string> {
-  const { error } = addressSchema.validate(data, { abortEarly: false });
-  if (!error) return {};
-  const newErrors: Record<string, string> = {};
-  error.details.forEach((detail) => {
-    const key = detail.path[0] as string;
-    newErrors[key] = detail.message;
-  });
-  return newErrors;
-}
+const addressSchema = Joi.object({
+  name: Joi.string().required().messages({
+    'string.empty': 'Tên địa chỉ không được để trống',
+    'any.required': 'Tên địa chỉ là bắt buộc',
+  }),
+  customerName: Joi.string().required().messages({
+    'string.empty': 'Tên người nhận không được để trống',
+    'any.required': 'Tên người nhận là bắt buộc',
+  }),
+  phoneNumber: Joi.string()
+    .pattern(/^[0-9]{10,11}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Số điện thoại phải có 10-11 chữ số',
+      'string.empty': 'Số điện thoại không được để trống',
+      'any.required': 'Số điện thoại là bắt buộc',
+    }),
+  country: Joi.string().required().messages({
+    'string.empty': 'Vui lòng chọn tỉnh/thành phố',
+    'any.required': 'Tỉnh/thành phố là bắt buộc',
+  }),
+  district: Joi.string().required().messages({
+    'string.empty': 'Vui lòng chọn quận/huyện',
+    'any.required': 'Quận/huyện là bắt buộc',
+  }),
+  ward: Joi.string().required().messages({
+    'string.empty': 'Vui lòng chọn phường/xã',
+    'any.required': 'Phường/xã là bắt buộc',
+  }),
+  addressLine: Joi.string().required().messages({
+    'string.empty': 'Địa chỉ chi tiết không được để trống',
+    'any.required': 'Địa chỉ chi tiết là bắt buộc',
+  }),
+  type: Joi.number().required(),
+  isDefault: Joi.boolean().required(),
+});
 
-export function useAddressManager() {
+/**
+ * Address management hook for dedicated address management pages
+ * Provides full CRUD operations with isolated state management
+ */
+export function useAddressManagement() {
+  // Address list state - isolated to this context
   const [addresses, setAddresses] = useState<Address[]>([]);
+
+  // Modal state - isolated to this context
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+
+  // Form state - isolated to this context
   const [formData, setFormData] = useState<AddressFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // Location data - isolated to this context
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
+
+  // Loading states - isolated to this context
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -196,81 +198,36 @@ export function useAddressManager() {
     }
   }, []);
 
+  // Load addresses on mount
   useEffect(() => {
     fetchAddresses();
   }, [fetchAddresses]);
 
+  // Load provinces when modals open
   useEffect(() => {
     if (isCreateOpen || isUpdateOpen) {
       fetchProvinces();
     }
   }, [isCreateOpen, isUpdateOpen, fetchProvinces]);
 
+  // Load districts when province changes
   useEffect(() => {
     if (formData.country) {
       fetchDistricts(formData.country);
     }
   }, [formData.country, fetchDistricts]);
 
+  // Load wards when district changes
   useEffect(() => {
     if (formData.district) {
       fetchWards(formData.district);
     }
   }, [formData.district, fetchWards]);
 
-  const validateField = useCallback((key: string, value: string) => {
-    const { error } = addressSchema.extract(key).validate(value);
-    return error ? error.details[0]?.message : '';
-  }, []);
-
-  const handleFieldChange = useCallback(
-    (key: keyof AddressFormData, value: string | boolean) => {
-      if (
-        typeof value === 'string' &&
-        ['customerName', 'phoneNumber', 'addressLine', 'name'].includes(key)
-      ) {
-        const handler = getInputHandler(key);
-        value = handler(value);
-      }
-
-      setFormData((prev) => ({ ...prev, [key]: value }));
-
-      if (key === 'country') {
-        setFormData((prev) => ({ ...prev, district: '', ward: '' }));
-      } else if (key === 'district') {
-        setFormData((prev) => ({ ...prev, ward: '' }));
-      }
-
-      if (typeof value === 'string' && touched[key]) {
-        setErrors((prev) => ({
-          ...prev,
-          [key]: validateField(key, value) || '',
-        }));
-      }
-    },
-    [touched, validateField],
-  );
-
-  const handleFieldBlur = useCallback(
-    (key: keyof AddressFormData) => {
-      setTouched((prev) => ({ ...prev, [key]: true }));
-      const value = formData[key];
-      if (typeof value === 'string') {
-        setErrors((prev) => ({
-          ...prev,
-          [key]: validateField(key, value) || '',
-        }));
-      }
-    },
-    [formData, validateField],
-  );
-
   const resetForm = useCallback(() => {
     setFormData(initialFormData);
     setErrors({});
     setTouched({});
-    setDistricts([]);
-    setWards([]);
   }, []);
 
   const openCreateDialog = useCallback(() => {
@@ -281,19 +238,16 @@ export function useAddressManager() {
   const openUpdateDialog = useCallback(async (address: Address) => {
     setSelectedAddress(address);
     setFormData({
+      name: address.name,
       customerName: address.customerName,
       phoneNumber: address.phoneNumber,
-      name: address.name,
-      addressLine: address.addressLine,
       country: '',
       district: '',
       ward: '',
-      isDefault: address.isDefault,
+      addressLine: address.addressLine,
       type: address.type,
+      isDefault: address.isDefault,
     });
-
-    setErrors({});
-    setTouched({});
 
     try {
       setLoading(true);
@@ -337,24 +291,54 @@ export function useAddressManager() {
     resetForm();
   }, [resetForm]);
 
-  const createAddress = useCallback(async () => {
-    const newErrors = validateAllFields(formData);
-    if (Object.keys(newErrors).length) {
-      setErrors(newErrors);
-      setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
-      return false;
-    }
+  const handleFieldChange = useCallback(
+    (key: keyof AddressFormData, value: string | boolean) => {
+      setFormData((prev) => ({ ...prev, [key]: value }));
 
+      // Clear related fields when parent location changes
+      if (key === 'country') {
+        setFormData((prev) => ({ ...prev, district: '', ward: '' }));
+      } else if (key === 'district') {
+        setFormData((prev) => ({ ...prev, ward: '' }));
+      }
+
+      // Clear error for this field
+      if (errors[key]) {
+        setErrors((prev) => ({ ...prev, [key]: '' }));
+      }
+    },
+    [errors],
+  );
+
+  const handleFieldBlur = useCallback((key: keyof AddressFormData) => {
+    setTouched((prev) => ({ ...prev, [key]: true }));
+  }, []);
+
+  const createAddress = useCallback(async (): Promise<boolean> => {
     try {
       setSubmitting(true);
+      setErrors({});
+
+      // Validate form data
+      const { error } = addressSchema.validate(formData, { abortEarly: false });
+      if (error) {
+        const validationErrors: Record<string, string> = {};
+        error.details.forEach((detail) => {
+          if (detail.path[0]) {
+            validationErrors[detail.path[0] as string] = detail.message;
+          }
+        });
+        setErrors(validationErrors);
+        return false;
+      }
+
+      // Find selected location names
       const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
       const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
       const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
 
       if (!selectedProvince || !selectedDistrict || !selectedWard) {
-        setErrors({
-          general: 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã',
-        });
+        setErrors({ general: 'Vui lòng chọn đầy đủ thông tin địa điểm' });
         return false;
       }
 
@@ -387,27 +371,38 @@ export function useAddressManager() {
     }
   }, [formData, provinces, districts, wards, closeDialogs, fetchAddresses]);
 
-  const updateAddress = useCallback(async () => {
+  const updateAddress = useCallback(async (): Promise<boolean> => {
     if (!selectedAddress) return false;
-
-    const newErrors = validateAllFields(formData);
-    if (Object.keys(newErrors).length) {
-      setErrors(newErrors);
-      setTouched(Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {}));
-      return false;
-    }
 
     try {
       setSubmitting(true);
-      const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
-      const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
-      const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
-      if (!selectedProvince || !selectedDistrict || !selectedWard) {
-        setErrors({ general: 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã' });
+      setErrors({});
+
+      // Validate form data
+      const { error } = addressSchema.validate(formData, { abortEarly: false });
+      if (error) {
+        const validationErrors: Record<string, string> = {};
+        error.details.forEach((detail) => {
+          if (detail.path[0]) {
+            validationErrors[detail.path[0] as string] = detail.message;
+          }
+        });
+        setErrors(validationErrors);
         return false;
       }
 
-      const addressData: Omit<TAddress, 'id'> = {
+      // Find selected location names
+      const selectedProvince = provinces.find((p) => p.code.toString() === formData.country);
+      const selectedDistrict = districts.find((d) => d.code.toString() === formData.district);
+      const selectedWard = wards.find((w) => w.code.toString() === formData.ward);
+
+      if (!selectedProvince || !selectedDistrict || !selectedWard) {
+        setErrors({ general: 'Vui lòng chọn đầy đủ thông tin địa điểm' });
+        return false;
+      }
+
+      const addressData: TAddress = {
+        id: selectedAddress.id,
         customerName: formData.customerName,
         phone: formData.phoneNumber,
         name: formData.name,
@@ -436,37 +431,50 @@ export function useAddressManager() {
     }
   }, [selectedAddress, formData, provinces, districts, wards, closeDialogs, fetchAddresses]);
 
-  const deleteAddress = useCallback(async (id: string) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) return;
-    try {
-      setLoading(true);
-      const response = await contactApi.removeContact(id);
-      if (!response) throw new Error('Không thể xóa địa chỉ');
-      setAddresses((prev) => prev.filter((addr) => addr.id !== id));
-    } catch (error: any) {
-      setErrors({ general: error.response?.data?.message || 'Không thể xóa địa chỉ' });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const refreshAddresses = useCallback(() => {
-    fetchAddresses();
-  }, [fetchAddresses]);
+  const deleteAddress = useCallback(
+    async (addressId: string): Promise<boolean> => {
+      try {
+        setLoading(true);
+        const response = await contactApi.deleteContact(addressId);
+        if (!response) {
+          throw new Error('Không thể xóa địa chỉ');
+        }
+        await fetchAddresses();
+        return true;
+      } catch (error: any) {
+        setErrors({ general: error.response?.data?.message || 'Không thể xóa địa chỉ' });
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAddresses],
+  );
 
   return {
+    // Address list
     addresses,
+
+    // Modal state
     isCreateOpen,
     isUpdateOpen,
     selectedAddress,
+
+    // Form state
     formData,
     errors,
     touched,
+
+    // Location data
     provinces,
     districts,
     wards,
+
+    // Loading states
     loading,
     submitting,
+
+    // Actions
     openCreateDialog,
     openUpdateDialog,
     closeDialogs,
@@ -476,6 +484,6 @@ export function useAddressManager() {
     handleFieldChange,
     handleFieldBlur,
     resetForm,
-    refreshAddresses,
+    refreshAddresses: fetchAddresses,
   };
 }

@@ -1,9 +1,10 @@
 'use client';
 
-import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
+import { AddressFormData, District, Province, Ward } from '@/hooks/use-checkout-address-manager';
 import { AddressField } from '@components/address/AddressField';
 import { Check, MapPin, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   open: boolean;
@@ -47,12 +48,33 @@ export default function AddressCreateDialog({
   onFieldBlur,
 }: Props) {
   const [validationTriggered, setValidationTriggered] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
       setValidationTriggered(false);
     }
+  }, [open]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      // Focus the modal when it opens
+      if (modalRef.current) {
+        modalRef.current.focus();
+      }
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [open]);
 
   useEffect(() => {
@@ -99,18 +121,27 @@ export default function AddressCreateDialog({
     }
   };
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+  const modalContent = (
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-[100000] p-2 sm:p-4 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      style={{ zIndex: 100000 }}
+    >
       <div
         ref={modalRef}
-        className="bg-white text-gray-800 rounded-xl shadow-xl w-11/12 max-w-3xl p-0 overflow-hidden"
+        className="bg-white text-gray-800 rounded-xl shadow-xl w-full max-w-3xl p-0 overflow-hidden max-h-[90vh] sm:min-h-[50vh] flex flex-col"
+        tabIndex={-1}
       >
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 flex justify-between items-center">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-4 sm:px-6 py-4 flex justify-between items-center flex-shrink-0">
           <div className="flex items-center">
             <MapPin className="w-5 h-5 mr-2 text-white" />
-            <h3 className="text-xl font-bold text-white">Thêm địa chỉ mới</h3>
+            <h3 id="modal-title" className="text-xl font-bold text-white">
+              Thêm địa chỉ mới
+            </h3>
           </div>
           <button
             className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
@@ -120,7 +151,7 @@ export default function AddressCreateDialog({
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {fields.map((field) => (
               <AddressField
@@ -197,4 +228,6 @@ export default function AddressCreateDialog({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 }

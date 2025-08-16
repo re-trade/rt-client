@@ -1,6 +1,6 @@
 'use client';
 
-import { useAddressManager } from '@/hooks/use-address-manager';
+import { useAddressManagement } from '@/hooks/use-address-management';
 import AddressCard from '@components/address/AddressCard';
 import AddressCreateDialog from '@components/address/AddressCreateDialog';
 import AddressSkeleton from '@components/address/AddressSkeleton';
@@ -30,7 +30,7 @@ export default function AddressPage() {
     handleFieldChange,
     handleFieldBlur,
     refreshAddresses,
-  } = useAddressManager();
+  } = useAddressManagement();
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 

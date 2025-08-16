@@ -14,7 +14,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ToastContext.Provider value={toastHook}>
       {children}
-      <Toast messages={toastHook.messages} />
+      <Toast messages={toastHook.messages} onRemove={toastHook.removeToast} />
     </ToastContext.Provider>
   );
 };

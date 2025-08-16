@@ -1,6 +1,6 @@
 'use client';
 
-import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-manager';
+import { AddressFormData, District, Province, Ward } from '@/hooks/use-address-management';
 import { AddressField } from '@components/address/AddressField';
 import { Check, MapPin, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';

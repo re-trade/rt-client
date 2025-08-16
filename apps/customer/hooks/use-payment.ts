@@ -70,7 +70,16 @@ export function usePayment() {
     }));
   }, []);
 
-  const initPayment = useCallback(async (payload: PaymentInitRequest): Promise<string | null> => {
+  const initPayment = useCallback(async (payload: PaymentInitRequest): Promise<string> => {
+    if (!payload.paymentMethodId || !payload.orderId) {
+      const error = new Error('Thông tin thanh toán không đầy đủ');
+      setPaymentState((prev) => ({
+        ...prev,
+        error: error.message,
+      }));
+      throw error;
+    }
+
     setPaymentState((prev) => ({
       ...prev,
       isInitializingPayment: true,
@@ -78,7 +87,7 @@ export function usePayment() {
     }));
 
     try {
-      const response = await paymentApi.initPayment(payload);
+      const paymentUrl = await paymentApi.initPayment(payload);
 
       setPaymentState((prev) => ({
         ...prev,
@@ -86,11 +95,9 @@ export function usePayment() {
         error: null,
       }));
 
-      // Return the payment URL from the response content
-      return response;
+      return paymentUrl;
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || error.message || 'Không thể khởi tạo thanh toán';
+      const errorMessage = error.message || 'Không thể khởi tạo thanh toán';
 
       setPaymentState((prev) => ({
         ...prev,
@@ -98,7 +105,7 @@ export function usePayment() {
         error: errorMessage,
       }));
 
-      throw error;
+      throw new Error(errorMessage);
     }
   }, []);
 
