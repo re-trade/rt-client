@@ -374,10 +374,11 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                   {paymentMethods.map((method) => (
                     <div
                       key={method.id}
-                      className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 ${selectedPaymentMethodId === method.id
+                      className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 ${
+                        selectedPaymentMethodId === method.id
                           ? 'border-orange-600 bg-orange-50 ring-2 ring-orange-200'
                           : 'border-gray-200 hover:border-orange-400 bg-white hover:shadow-md'
-                        }`}
+                      }`}
                       onClick={() => selectPaymentMethod(method.id)}
                     >
                       <div className="flex items-center gap-3">
@@ -421,10 +422,11 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
               <button
                 onClick={handleBuyNow}
                 disabled={!canPurchase}
-                className={`w-full font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${canPurchase
+                className={`w-full font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+                  canPurchase
                     ? 'bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white shadow-lg hover:shadow-xl'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
-                  }`}
+                }`}
               >
                 {isProcessing ? (
                   <>
