@@ -44,6 +44,12 @@ export const statusConfig = {
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     icon: Truck,
   },
+  RETRIEVED: {
+    label: 'Đã lấy hàng',
+    description: 'Khách hàng đã lấy hàng thành công',
+    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    icon: Package,
+  },
   DELIVERED: {
     label: 'Đã giao',
     description: 'Đơn hàng đã được giao thành công',
