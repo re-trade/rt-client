@@ -25,6 +25,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
+import * as XLSX from 'xlsx';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -123,6 +124,22 @@ const ProductStats = ({ products }: { products: TProduct[] }) => {
 
 // Legacy AdvancedFilters component replaced with AdminProductFilter
 
+// Helper function để chuyển đổi condition text
+const getConditionText = (condition: string) => {
+  switch (condition) {
+    case 'NEW':
+      return 'Mới';
+    case 'LIKE_NEW':
+      return 'Như mới';
+    case 'USED_GOOD':
+      return 'Đã sử dụng - Tốt';
+    case 'DAMAGED':
+      return 'Bị hư hỏng';
+    default:
+      return condition;
+  }
+};
+
 const ProductDetailModal = ({
   product,
   isOpen,
@@ -137,21 +154,6 @@ const ProductDetailModal = ({
   onReject?: (id: string) => void;
 }) => {
   if (!product) return null;
-
-  const getConditionText = (condition: string) => {
-    switch (condition) {
-      case 'NEW':
-        return 'Mới';
-      case 'LIKE_NEW':
-        return 'Như mới';
-      case 'USED_GOOD':
-        return 'Đã sử dụng - Tốt';
-      case 'DAMAGED':
-        return 'Bị hư hỏng';
-      default:
-        return condition;
-    }
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -468,6 +470,7 @@ export default function ProductManagementPage() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const {
     products,
@@ -486,6 +489,7 @@ export default function ProductManagementPage() {
     goToPage,
     verifyProduct,
     unverifyProduct,
+    getAllProductsForExport,
     handleFilterReset,
   } = useProductManager();
 
@@ -559,8 +563,157 @@ export default function ProductManagementPage() {
     DRAFT: 'Bản nháp',
   };
   const handleExport = () => {
-    console.log('Export products');
-    toast.info('Tính năng xuất dữ liệu đang được phát triển');
+    try {
+      if (products.length === 0) {
+        toast.warning('Không có dữ liệu để xuất!');
+        return;
+      }
+
+      const exportData = products.map((product) => ({
+        'ID Sản phẩm': product.id,
+        'Tên sản phẩm': product.name,
+        'Mô tả ngắn': product.shortDescription || '',
+        'Giá hiện tại': product.currentPrice,
+        'Số lượng': product.quantity,
+        'Thương hiệu': product.brand || '',
+        Model: product.model || '',
+        'Tình trạng': getConditionText(product.condition),
+        'Xác minh': product.verified ? 'Đã xác minh' : 'Chưa xác minh',
+        'Trạng thái hoạt động': productStatusLabels[product.status] || product.status,
+        'Người bán': product.sellerShopName,
+        'ID Người bán': product.sellerId,
+        'Danh mục': product.categories.map((cat) => cat.name).join(', '),
+        Tags: product.tags ? product.tags.join(', ') : '',
+        'Ngày tạo': new Date(product.createdAt).toLocaleDateString('vi-VN'),
+        'Bảo hành đến': product.warrantyExpiryDate
+          ? new Date(product.warrantyExpiryDate).toLocaleDateString('vi-VN')
+          : 'Không có',
+      }));
+
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const columnWidths = [
+        { wch: 15 }, // ID Sản phẩm
+        { wch: 30 }, // Tên sản phẩm
+        { wch: 25 }, // Mô tả ngắn
+        { wch: 15 }, // Giá hiện tại
+        { wch: 10 }, // Số lượng
+        { wch: 15 }, // Thương hiệu
+        { wch: 15 }, // Model
+        { wch: 20 }, // Tình trạng
+        { wch: 15 }, // Xác minh
+        { wch: 20 }, // Trạng thái hoạt động
+        { wch: 25 }, // Người bán
+        { wch: 15 }, // ID Người bán
+        { wch: 30 }, // Danh mục
+        { wch: 25 }, // Tags
+        { wch: 15 }, // Ngày tạo
+        { wch: 15 }, // Bảo hành đến
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sản phẩm');
+
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const fileName = `danh_sach_san_pham_trang_${page}_${timestamp}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
+
+      toast.success(`Đã xuất ${exportData.length} sản phẩm từ trang ${page} thành công!`);
+    } catch (error) {
+      console.error('Lỗi khi xuất dữ liệu:', error);
+      toast.error('Có lỗi xảy ra khi xuất dữ liệu. Vui lòng thử lại.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportAll = async () => {
+    try {
+      if (totalProducts === 0) {
+        toast.warning('Không có dữ liệu để xuất!');
+        return;
+      }
+
+      toast.info('Đang chuẩn bị xuất tất cả sản phẩm...');
+      setExporting(true);
+
+      const allProducts = await getAllProductsForExport();
+
+      console.log('All products fetched:', allProducts.length, allProducts);
+
+      let productsToExport = allProducts;
+
+      if (allProducts.length === 0) {
+        console.log('No products from API, trying to use current page data...');
+
+        if (products.length > 0) {
+          toast.warning('API không trả về dữ liệu. Sẽ xuất dữ liệu trang hiện tại.');
+          productsToExport = products;
+        } else {
+          toast.warning('Không có sản phẩm nào để xuất!');
+          return;
+        }
+      }
+
+      const exportData = productsToExport.map((product) => ({
+        'ID Sản phẩm': product.id,
+        'Tên sản phẩm': product.name,
+        'Mô tả ngắn': product.shortDescription || '',
+        'Giá hiện tại': product.currentPrice,
+        'Số lượng': product.quantity,
+        'Thương hiệu': product.brand || '',
+        Model: product.model || '',
+        'Tình trạng': getConditionText(product.condition),
+        'Xác minh': product.verified ? 'Đã xác minh' : 'Chưa xác minh',
+        'Trạng thái hoạt động': productStatusLabels[product.status] || product.status,
+        'Người bán': product.sellerShopName,
+        'ID Người bán': product.sellerId,
+        'Danh mục': product.categories.map((cat) => cat.name).join(', '),
+        Tags: product.tags ? product.tags.join(', ') : '',
+        'Ngày tạo': new Date(product.createdAt).toLocaleDateString('vi-VN'),
+        'Bảo hành đến': product.warrantyExpiryDate
+          ? new Date(product.warrantyExpiryDate).toLocaleDateString('vi-VN')
+          : 'Không có',
+      }));
+
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+      const columnWidths = [
+        { wch: 15 }, // ID Sản phẩm
+        { wch: 30 }, // Tên sản phẩm
+        { wch: 25 }, // Mô tả ngắn
+        { wch: 15 }, // Giá hiện tại
+        { wch: 10 }, // Số lượng
+        { wch: 15 }, // Thương hiệu
+        { wch: 15 }, // Model
+        { wch: 20 }, // Tình trạng
+        { wch: 15 }, // Xác minh
+        { wch: 20 }, // Trạng thái hoạt động
+        { wch: 25 }, // Người bán
+        { wch: 15 }, // ID Người bán
+        { wch: 30 }, // Danh mục
+        { wch: 25 }, // Tags
+        { wch: 15 }, // Ngày tạo
+        { wch: 15 }, // Bảo hành đến
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Tất cả sản phẩm');
+
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const fileName = `danh_sach_tat_ca_san_pham_${timestamp}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
+
+      toast.success(`Đã xuất thành công ${exportData.length} sản phẩm!`);
+    } catch (error) {
+      console.error('Lỗi khi xuất tất cả dữ liệu:', error);
+      toast.error('Có lỗi xảy ra khi xuất tất cả dữ liệu. Vui lòng thử lại.');
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
@@ -588,15 +741,44 @@ export default function ProductManagementPage() {
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Làm mới
             </Button>
-            <Button
-              onClick={handleExport}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 border-slate-200 hover:bg-slate-50"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Xuất dữ liệu
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 border-slate-200 hover:bg-slate-50"
+                  disabled={products.length === 0 || loading || exporting}
+                >
+                  {exporting ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  {exporting ? 'Đang xuất...' : 'Xuất dữ liệu'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-white/95 backdrop-blur-sm shadow-xl border-slate-200"
+              >
+                <DropdownMenuLabel className="text-slate-700">Chọn loại xuất</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleExport}
+                  className="hover:bg-blue-50 hover:text-blue-700"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Xuất trang hiện tại ({products.length} sản phẩm)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleExportAll()}
+                  className="hover:bg-green-50 hover:text-green-700"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Xuất tất cả ({totalProducts} sản phẩm)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
