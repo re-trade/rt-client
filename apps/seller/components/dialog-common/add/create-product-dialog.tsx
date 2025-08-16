@@ -7,16 +7,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import TagInput from '@/components/ui/tag-input';
-import { CreateProductDto, productApi } from '@/service/product.api';
+import { CreateProductDto, productApi, TProductStatus } from '@/service/product.api';
 import { storageApi } from '@/service/storage.api';
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
-import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
+import { Calendar, Check, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-
+import { Checkbox } from "@/components/ui/checkbox"
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 interface CreateProductDialogProps {
   open: boolean;
@@ -41,7 +41,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
     condition: 'NEW' as const,
     categoryIds: [] as string[],
     tags: [] as string[],
-    status: 'DRAFT' as const,
+    status: 'INIT' as TProductStatus,
     categorySelected: true,
   });
 
@@ -53,6 +53,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
   const [warrantyDateError, setWarrantyDateError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const [tick, setTick] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -76,6 +77,10 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
     if (field === 'hasWarranty' && !value) {
       setWarrantyDateError('');
     }
+  };
+  const handleTickChange = (checked: boolean) => {
+    setTick(checked);
+    handleFormChange('status', checked ? 'DRAFT' : 'INIT');
   };
 
   const validateWarrantyDate = (dateValue: string) => {
@@ -257,7 +262,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
       warrantyExpiryDate: '',
       condition: 'NEW',
       tags: [],
-      status: 'DRAFT',
+      status: 'INIT',
       categorySelected: true,
     });
     setImagePreviews([]);
@@ -419,11 +424,10 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   type="date"
                   value={formData.warrantyExpiryDate}
                   onChange={handleWarrantyDateChange}
-                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
-                    warrantyDateError
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                      : ''
-                  }`}
+                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${warrantyDateError
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : ''
+                    }`}
                   min={(() => {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -504,7 +508,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               </div>
             </div>
           </div>
-
           {/* Images Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
@@ -622,8 +625,29 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                     </div>
                   )}
                 </div>
+
               </div>
             </div>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 mt-4">
+              <Checkbox
+                id="draft-checkbox"
+                checked={formData.status === 'DRAFT'}
+                onCheckedChange={(checked) => handleFormChange('status', checked ? 'DRAFT' : 'PUBLISHED')}
+                onClick={() => handleTickChange(!tick)}
+                className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-white data-[state=checked]:border-orange-500 data-[state=checked]:text-orange-500 focus:ring-orange-500 focus:ring-offset-0"
+              />
+              <Label htmlFor="draft-checkbox" className="text-sm font-medium text-gray-700">
+                Lưu bản nháp( Tích nếu bạn muốn lưu làm bản nháp, sản phẩm sẽ không được duyệt cho đến khi bạn chuyển sang trạng thái khởi tạo )
+              </Label>
+
+            </div>
+            {!tick && (
+              <p className="text-xs text-gray-500">
+                Sản phẩm sẽ lưu vào bản nháp.
+              </p>
+            )}
           </div>
         </div>
 
