@@ -35,6 +35,11 @@ export const orderStatusConfig = {
     color: '#059669',
     group: 'completed',
   },
+  RETRIEVED: {
+    label: 'Đã lấy hàng',
+    color: '#3b82f6',
+    group: 'completed',
+  },
   COMPLETED: {
     label: 'Hoàn thành',
     color: '#22c55e',
