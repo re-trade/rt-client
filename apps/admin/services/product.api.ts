@@ -82,6 +82,56 @@ export const productApi = {
     }
   },
 
+  async getAllProductsForExport(): Promise<TProduct[]> {
+    try {
+      const allProducts: TProduct[] = [];
+      let page = 0;
+      const size = 50;
+      let hasMore = true;
+
+      console.log('Starting to fetch all products for export...');
+
+      while (hasMore) {
+        console.log(`Fetching page ${page} with size ${size}...`);
+        
+        const response = await unAuthApi.default.get<IResponseObject<IPaginationResponse<TProduct>>>(
+          '/products',
+          {
+            params: {
+              page,
+              size,
+            },
+          },
+        );
+
+        console.log(`Page ${page} response:`, response.data);
+
+        if (response.data.success && response.data.content?.content) {
+          const products = response.data.content.content;
+          console.log(`Page ${page} has ${products.length} products`);
+          allProducts.push(...products);
+          
+          // Kiểm tra xem còn trang nào không
+          if (response.data.content.totalPages <= page + 1 || products.length < size) {
+            console.log(`No more pages. Total pages: ${response.data.content.totalPages}, current page: ${page}`);
+            hasMore = false;
+          } else {
+            page++;
+          }
+        } else {
+          console.log(`Page ${page} failed or no content:`, response.data);
+          hasMore = false;
+        }
+      }
+
+      console.log(`Total products fetched: ${allProducts.length}`);
+      return allProducts;
+    } catch (error) {
+      console.error('Error fetching all products for export:', error);
+      throw new Error('Failed to fetch all products for export');
+    }
+  },
+
   async getProduct(id: string): Promise<TProduct> {
     const response = await unAuthApi.default.get<IResponseObject<TProduct>>(`/products/${id}`);
     if (response.data.success) {
