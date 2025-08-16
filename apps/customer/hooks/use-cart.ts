@@ -26,6 +26,7 @@ function useCart() {
   });
   const [products, setProducts] = useState<TProduct[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [productsLoading, setProductsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [isCreateOrder, setIsCreateOrder] = useState<boolean>(false);
@@ -83,13 +84,17 @@ function useCart() {
     }
   }, []);
 
-  const fetchRecommendProduct = useCallback(async () => {
+  const fetchRecommendProduct = useCallback(async (silent = false) => {
+    if (!silent) {
+      setProductsLoading(true);
+    }
     try {
-      const data = await productApi.getProducts(0, 3);
+      const data = await productApi.getProducts(0, 6);
       setProducts(data);
     } catch {
-      setError('Không thể tải sản phẩm');
       setProducts([]);
+    } finally {
+      setProductsLoading(false);
     }
   }, []);
 
@@ -255,9 +260,11 @@ function useCart() {
     cart,
     cartGroups,
     loading,
+    productsLoading,
     error,
     refreshing,
     refresh: fetchCart,
+    refreshProducts: fetchRecommendProduct,
     toggleShopSection,
     toggleItemSelection,
     selectedItems,

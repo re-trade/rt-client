@@ -138,7 +138,6 @@ export default function CartProductItem({
         !isSoldOut && !isRemoving && onProductSelect(item.productId, currentQuantity, e)
       }
     >
-      {/* Removing Overlay */}
       {isRemoving && (
         <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-20 rounded-lg">
           <div className="flex items-center gap-2 text-red-600">
@@ -148,7 +147,6 @@ export default function CartProductItem({
         </div>
       )}
 
-      {/* Selection Indicator */}
       <div className="absolute top-3 right-3 z-10">
         {isSelected && !isSoldOut && !isRemoving ? (
           <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-200">
@@ -168,7 +166,6 @@ export default function CartProductItem({
         ) : null}
       </div>
 
-      {/* Mobile Layout */}
       <div className="flex items-start gap-3 md:hidden pr-8">
         <div className="relative rounded-lg overflow-hidden bg-orange-25 p-2 flex-shrink-0">
           <Image
@@ -199,51 +196,73 @@ export default function CartProductItem({
           </p>
           <ProductDescription description={item.description} className="text-xs" maxLength={50} />
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleDecrement}
-                disabled={isRemoving || isSoldOut || currentQuantity <= 1}
-                className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-              >
-                <IconMinus size={14} />
-              </button>
-              <span className="text-sm font-medium text-gray-800">{currentQuantity}</span>
-              <button
-                onClick={handleIncrement}
-                disabled={isRemoving || isSoldOut || !canIncrement}
-                className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-              >
-                <IconPlus size={14} />
-              </button>
-            </div>
-            <div className="text-xs text-gray-500">Còn lại: {availableQuantity}</div>
-            {isQuantityExceeded && (
-              <button
-                onClick={() => onAdjustToMaxQuantity(item.productId, availableQuantity)}
-                className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200"
-              >
-                Điều chỉnh về {availableQuantity}
-              </button>
+            {isSoldOut ? (
+              <div className="space-y-2">
+                <div className="text-center py-2">
+                  <span className="text-red-600 text-sm font-medium">Hết hàng</span>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveClick(item.productId, item.productName, e);
+                  }}
+                  disabled={isRemoving}
+                  className="w-full bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                >
+                  <IconTrash size={16} />
+                  Xóa khỏi giỏ hàng
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleDecrement}
+                    disabled={isRemoving || currentQuantity <= 1}
+                    className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                  >
+                    <IconMinus size={14} />
+                  </button>
+                  <span className="text-sm font-medium text-gray-800">{currentQuantity}</span>
+                  <button
+                    onClick={handleIncrement}
+                    disabled={isRemoving || !canIncrement}
+                    className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                  >
+                    <IconPlus size={14} />
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500">Còn lại: {availableQuantity}</div>
+                {isQuantityExceeded && (
+                  <button
+                    onClick={() => onAdjustToMaxQuantity(item.productId, availableQuantity)}
+                    className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200"
+                  >
+                    Điều chỉnh về {availableQuantity}
+                  </button>
+                )}
+              </>
             )}
           </div>
           <p className="text-base font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded inline-block">
             {item.totalPrice * currentQuantity}₫
           </p>
-          <div className="mt-2">
-            <button
-              type="button"
-              onClick={(e) => onRemoveClick(item.productId, item.productName, e)}
-              disabled={isRemoving}
-              className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 transition-colors font-medium p-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <IconTrash size={12} />
-              Xóa
-            </button>
-          </div>
+          {!isSoldOut && (
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={(e) => onRemoveClick(item.productId, item.productName, e)}
+                disabled={isRemoving}
+                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 transition-colors font-medium p-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <IconTrash size={12} />
+                Xóa
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Desktop Layout */}
       <div className="hidden md:flex md:items-center md:justify-between md:gap-6 w-full pr-10">
         <div className="flex items-center gap-4 flex-1">
           <div className="relative rounded-lg overflow-hidden bg-orange-25 p-2 flex-shrink-0">
@@ -276,44 +295,67 @@ export default function CartProductItem({
             </p>
             <ProductDescription description={item.description} className="text-sm" maxLength={80} />
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleDecrement}
-                  disabled={isRemoving || isSoldOut || currentQuantity <= 1}
-                  className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                >
-                  <IconMinus size={16} />
-                </button>
-                <span className="text-base font-medium text-gray-800">{currentQuantity}</span>
-                <button
-                  onClick={handleIncrement}
-                  disabled={isRemoving || isSoldOut || !canIncrement}
-                  className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                >
-                  <IconPlus size={16} />
-                </button>
-              </div>
-              <div className="text-sm text-gray-500">Còn lại: {availableQuantity}</div>
-              {isQuantityExceeded && (
-                <button
-                  onClick={() => onAdjustToMaxQuantity(item.productId, availableQuantity)}
-                  className="text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded hover:bg-yellow-200"
-                >
-                  Điều chỉnh về {availableQuantity}
-                </button>
+              {isSoldOut ? (
+                <div className="space-y-2">
+                  <div className="text-center py-2">
+                    <span className="text-red-600 text-base font-medium">Hết hàng</span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveClick(item.productId, item.productName, e);
+                    }}
+                    disabled={isRemoving}
+                    className="w-full bg-red-500 text-white px-4 py-3 rounded-lg text-base font-bold hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                  >
+                    <IconTrash size={18} />
+                    Xóa khỏi giỏ hàng
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleDecrement}
+                      disabled={isRemoving || currentQuantity <= 1}
+                      className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                    >
+                      <IconMinus size={16} />
+                    </button>
+                    <span className="text-base font-medium text-gray-800">{currentQuantity}</span>
+                    <button
+                      onClick={handleIncrement}
+                      disabled={isRemoving || !canIncrement}
+                      className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
+                    >
+                      <IconPlus size={16} />
+                    </button>
+                  </div>
+                  <div className="text-sm text-gray-500">Còn lại: {availableQuantity}</div>
+                  {isQuantityExceeded && (
+                    <button
+                      onClick={() => onAdjustToMaxQuantity(item.productId, availableQuantity)}
+                      className="text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded hover:bg-yellow-200"
+                    >
+                      Điều chỉnh về {availableQuantity}
+                    </button>
+                  )}
+                </>
               )}
             </div>
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={(e) => onRemoveClick(item.productId, item.productName, e)}
-                disabled={isRemoving}
-                className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 transition-colors font-medium p-2 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <IconTrash size={16} />
-                Xóa khỏi giỏ hàng
-              </button>
-            </div>
+            {!isSoldOut && (
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={(e) => onRemoveClick(item.productId, item.productName, e)}
+                  disabled={isRemoving}
+                  className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 transition-colors font-medium p-2 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <IconTrash size={16} />
+                  Xóa khỏi giỏ hàng
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
