@@ -6,6 +6,7 @@ import PaymentStatus from '@/components/payment/PaymentStatus';
 import { useToast } from '@/context/ToastContext';
 import { useOrderDetail } from '@/hooks/use-order-detail';
 import { orderApi } from '@/services/order.api';
+import { getSellerProfile } from '@/services/seller.api';
 import {
   ArrowLeft,
   Calendar,
@@ -25,11 +26,12 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function OrderDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const orderId = params.id as string;
   const { currentOrder, isLoading, error, getStatusDisplay, getOrderById } =
     useOrderDetail(orderId);
@@ -125,6 +127,31 @@ export default function OrderDetailPage() {
     return {
       ...baseStatus,
     };
+  };
+
+  const handleViewSeller = () => {
+    if (currentOrder?.sellerId) {
+      router.push(`/seller/${currentOrder.sellerId}`);
+    }
+  };
+
+  const handleChatWithSeller = async () => {
+    if (!currentOrder?.sellerId) {
+      showToast('Không thể tìm thấy thông tin người bán', 'error');
+      return;
+    }
+
+    try {
+      // Get seller profile to get accountId
+      const sellerProfile = await getSellerProfile(currentOrder.sellerId);
+      if (sellerProfile?.accountId) {
+        router.push(`/chat/${sellerProfile.accountId}`);
+      } else {
+        showToast('Không thể kết nối với người bán', 'error');
+      }
+    } catch (error) {
+      showToast('Có lỗi xảy ra khi kết nối với người bán', 'error');
+    }
   };
 
   if (isLoading) {
@@ -332,13 +359,19 @@ export default function OrderDetailPage() {
               <p className="text-sm text-gray-600">ID: {currentOrder.sellerId.slice(0, 8)}...</p>
             </div>
             <div className="flex space-x-2">
-              <button className="flex items-center space-x-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors">
+              <button
+                onClick={handleChatWithSeller}
+                className="flex items-center space-x-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors"
+              >
                 <MessageCircle className="w-4 h-4" />
                 <span>Nhắn tin</span>
               </button>
-              <button className="flex items-center space-x-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors">
+              <button
+                onClick={handleViewSeller}
+                className="flex items-center space-x-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors"
+              >
                 <User className="w-4 h-4" />
-                <span>Xem shop</span>
+                <span>Xem người bán</span>
               </button>
             </div>
           </div>
@@ -464,7 +497,10 @@ export default function OrderDetailPage() {
               </>
             )}
 
-            <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200">
+            <button
+              onClick={handleChatWithSeller}
+              className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
+            >
               <MessageCircle className="w-4 h-4" />
               <span>Liên hệ người bán</span>
             </button>
