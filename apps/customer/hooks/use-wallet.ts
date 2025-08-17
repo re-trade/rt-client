@@ -46,13 +46,15 @@ export const useWallet = () => {
       const response = await getWithdrawals(page, size);
       if (response?.success) {
         setWithdrawals(response.content || []);
-        setTotalItems(response.pagination?.totalPages || 0);
+        setTotalItems(response.pagination?.totalElements || 0);
       } else {
         setWithdrawals([]);
+        setTotalItems(0);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch withdrawal history');
       setWithdrawals([]);
+      setTotalItems(0);
     } finally {
       setLoading((prev) => ({ ...prev, withdrawals: false }));
     }

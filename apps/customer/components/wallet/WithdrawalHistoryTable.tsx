@@ -1,15 +1,6 @@
+import Pagination from '@/components/common/Pagination';
 import { WithdrawalRequest } from '@/services/wallet.api';
-import {
-  Ban,
-  Calendar,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Download,
-  Wallet,
-  X,
-} from 'lucide-react';
+import { Ban, Calendar, CheckCircle2, Clock, Download, Wallet, X } from 'lucide-react';
 import React from 'react';
 
 interface WithdrawalHistoryTableProps {
@@ -201,40 +192,18 @@ const WithdrawalHistoryTable: React.FC<WithdrawalHistoryTableProps> = ({
       </div>
 
       {totalPages > 1 && (
-        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-          <div>
-            <p className="text-sm text-gray-600 font-medium">
-              Hiển thị {page * size + 1}-{Math.min((page + 1) * size, totalItems)} trong{' '}
-              <span className="font-bold text-gray-900">{totalItems}</span> kết quả
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => onPageChange(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className={`p-2 rounded-lg transition-all duration-200 ${
-                page === 0
-                  ? 'text-gray-400 cursor-not-allowed bg-gray-200'
-                  : 'text-gray-700 hover:bg-gray-200 bg-white shadow-sm border border-gray-300'
-              }`}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <span className="text-sm text-gray-700 font-semibold bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-300">
-              Trang {page + 1} / {totalPages}
-            </span>
-            <button
-              onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
-              disabled={page >= totalPages - 1}
-              className={`p-2 rounded-lg transition-all duration-200 ${
-                page >= totalPages - 1
-                  ? 'text-gray-400 cursor-not-allowed bg-gray-200'
-                  : 'text-gray-700 hover:bg-gray-200 bg-white shadow-sm border border-gray-300'
-              }`}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
+        <div className="border-t border-gray-200 p-6">
+          <Pagination
+            currentPage={page + 1}
+            totalPages={totalPages}
+            totalElements={totalItems}
+            onPageChange={(newPage) => onPageChange(newPage - 1)}
+            loading={loading}
+            theme="default"
+            showInfo={true}
+            showQuickJump={totalPages > 10}
+            size="md"
+          />
         </div>
       )}
     </>

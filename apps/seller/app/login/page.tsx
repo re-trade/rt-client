@@ -50,6 +50,8 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const isFormValid = formData.username.trim() !== '' && formData.password.trim() !== '';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -144,9 +146,9 @@ export default function Login() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isFormValid}
                 className={`w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg font-medium text-lg transition-all duration-200 ${
-                  isSubmitting
+                  isSubmitting || !isFormValid
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:from-orange-600 hover:to-orange-700 hover:shadow-lg transform hover:-translate-y-0.5'
                 }`}
