@@ -22,7 +22,9 @@ const BankIcon = ({ bank }: { bank: BankResponse }) => {
       <div
         className={`w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-500 rounded flex items-center justify-center ${bank.url ? 'hidden' : ''}`}
       >
-        <span className="text-white text-xs font-bold">{bank.code?.charAt(0) || 'B'}</span>
+        <span className="text-white text-xs font-bold">
+          {bank.code?.charAt(0) || 'B'}
+        </span>
       </div>
     </div>
   );

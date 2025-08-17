@@ -212,7 +212,7 @@ export default function WalletPage() {
           form={bankAccountForm}
           banks={banks}
           loading={creatingBankAccount}
-          onChange={(field, value) => setBankAccountForm((prev) => ({ ...prev, [field]: value }))}
+          onChange={(field, value) => setBankAccountForm(prev => ({ ...prev, [field]: value }))}
           onClose={closeBankAccountCreationModal}
           onSave={createBankAccount}
         />

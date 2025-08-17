@@ -10,7 +10,7 @@ interface WithdrawalModalProps {
   withdrawContent: string;
   setWithdrawContent: (content: string) => void;
   selectedBankAccount: BankAccountResponse | null;
-  setSelectedBankAccount: (account: BankAccountResponse | undefined) => void;
+  setSelectedBankAccount: (account?: BankAccountResponse) => void;
   userBankAccounts: BankAccountResponse[];
   loadingBankAccounts: boolean;
   balance: number;
@@ -61,7 +61,7 @@ const WithdrawalModal = ({
   const resetForm = () => {
     setWithdrawAmount('');
     setWithdrawContent('');
-    setSelectedBankAccount(undefined);
+    setSelectedBankAccount();
   };
 
   const handleAmountChange = (value: string) => {
