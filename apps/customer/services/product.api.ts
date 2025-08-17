@@ -168,4 +168,25 @@ export const productApi = {
     }
     return response.data.content;
   },
+  async getProductsBySeller(
+    sellerId: string,
+    page: number = 0,
+    size: number = 12,
+    searchQuery?: string,
+  ): Promise<IResponseObject<TProduct[]>> {
+    const queryParts = [`seller=${sellerId}`];
+    if (searchQuery && searchQuery.trim()) {
+      queryParts.push(`keyword=${encodeURIComponent(searchQuery.trim())}`);
+    }
+    queryParts.push('verified=true');
+
+    const response = await unAuthApi.default.get<IResponseObject<TProduct[]>>('/products/search', {
+      params: {
+        page,
+        size,
+        q: queryParts.join('&'),
+      },
+    });
+    return response.data;
+  },
 };
