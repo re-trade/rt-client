@@ -19,6 +19,26 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
+// Order status progression mapping (ascending order)
+export const statusOrder = {
+  PENDING: 1,
+  PAYMENT_CONFIRMATION: 2,
+  PREPARING: 3,
+  DELIVERING: 4,
+  DELIVERED: 5,
+  RETRIEVED: 6,
+  COMPLETED: 7,
+  CANCELLED: 8,
+  PAYMENT_CANCELLED: 9,
+  PAYMENT_FAILED: 10,
+  RETURNING: 11,
+  RETURNED: 12,
+  REFUNDED: 13,
+  RETURN_REJECTED: 14,
+  RETURN_REQUESTED: 15,
+  RETURN_APPROVED: 16,
+} as const;
+
 export const statusConfig = {
   PENDING: {
     label: 'Chưa thanh toán',
@@ -45,9 +65,9 @@ export const statusConfig = {
     icon: Truck,
   },
   RETRIEVED: {
-    label: 'Đã lấy hàng',
-    description: 'Khách hàng đã lấy hàng thành công',
-    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    label: 'Đã nhận hàng',
+    description: 'Bạn có thể hoàn thành đơn hàng hoặc yêu cầu trả hàng',
+    color: 'bg-orange-100 text-orange-800 border-orange-200',
     icon: Package,
   },
   DELIVERED: {

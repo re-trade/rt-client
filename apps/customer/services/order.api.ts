@@ -181,6 +181,20 @@ export const orderApi = {
       throw error;
     }
   },
+
+  async confirmRetrieved(orderId: string): Promise<void> {
+    try {
+      const response = await authApi.default.put<IResponseObject<void>>(
+        `/orders/combo/${orderId}/customer/delivery-confirmed`,
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to confirm retrieved status');
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export interface PaymentMethod {
