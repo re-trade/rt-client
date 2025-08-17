@@ -306,7 +306,8 @@ export default function Home() {
               {
                 step: '1',
                 title: 'Đăng đồ bạn muốn bán',
-                description: 'Chụp ảnh đẹp, mô tả chi tiết và đăng tin miễn phí trong vài phút.',
+                description:
+                  'Đăng tin đồ cũ nhanh chóng: chụp ảnh rõ nét, mô tả đầy đủ và tìm người chủ mới cho món đồ.',
                 icon: <Upload className="w-8 h-8" />,
                 color: 'bg-blue-100 text-blue-600',
                 bgColor: 'bg-blue-50',
@@ -314,7 +315,7 @@ export default function Home() {
               {
                 step: '2',
                 title: 'Tìm đồ cũ yêu thích',
-                description: 'Duyệt qua hàng ngàn món đồ cũ chất lượng được kiểm duyệt kỹ lưỡng.',
+                description: 'Khám phá nhiều món đồ cũ đa dạng, được kiểm duyệt trước khi đăng.',
                 icon: <Search className="w-8 h-8" />,
                 color: 'bg-green-100 text-green-600',
                 bgColor: 'bg-green-50',
@@ -322,7 +323,8 @@ export default function Home() {
               {
                 step: '3',
                 title: 'Liên hệ & giao dịch',
-                description: 'Chat trực tiếp với người bán để thỏa thuận giá cả và giao nhận.',
+                description:
+                  'Trao đổi thông tin và thỏa thuận qua nền tảng để tiến hành giao dịch an toàn.',
                 icon: <MessageCircle className="w-8 h-8" />,
                 color: 'bg-orange-100 text-orange-600',
                 bgColor: 'bg-orange-50',
@@ -351,7 +353,10 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-16">
-            <button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-1 flex items-center gap-3 mx-auto text-lg">
+            <button
+              onClick={() => router.push('/product')}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-1 flex items-center gap-3 mx-auto text-lg"
+            >
               Bắt đầu ngay
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>

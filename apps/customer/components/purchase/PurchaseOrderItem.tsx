@@ -1,7 +1,9 @@
 import { OrderCombo } from '@services/order.api';
+import { getSellerProfile } from '@services/seller.api';
 import { Eye, Heart, MessageCircle, Package, Star, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { memo } from 'react';
 
 interface Props {
@@ -33,6 +35,23 @@ const formatDate = (dateString?: string) => {
 };
 
 const PurchaseOrderItem = memo(({ order, statusDisplay }: Props) => {
+  const router = useRouter();
+
+  const handleChatWithSeller = async () => {
+    if (!order?.sellerId) {
+      return;
+    }
+
+    try {
+      const sellerProfile = await getSellerProfile(order.sellerId);
+      if (sellerProfile?.accountId) {
+        router.push(`/chat/${sellerProfile.accountId}`);
+      }
+    } catch (error) {
+      console.error('Error getting seller profile:', error);
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl border border-orange-200 overflow-hidden hover:shadow-lg transition-all duration-200">
       <div className="p-6 border-b border-orange-200">
@@ -142,7 +161,10 @@ const PurchaseOrderItem = memo(({ order, statusDisplay }: Props) => {
             </>
           )}
 
-          <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200">
+          <button
+            onClick={handleChatWithSeller}
+            className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
+          >
             <MessageCircle className="w-4 h-4" />
             <span>Liên hệ người bán</span>
           </button>

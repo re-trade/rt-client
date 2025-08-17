@@ -85,11 +85,8 @@ export const ordersApi = {
     }
 
     const orders = response.data.success && response.data.content ? response.data.content : [];
-    // Use non-null assertion operator to address TypeScript errors
-    // This tells TypeScript to trust that we've handled undefined cases elsewhere
     const pagination = response.data.pagination;
 
-    // @ts-ignore: Suppress TypeScript errors for pagination properties
     return {
       orders,
       totalPages: pagination ? pagination.totalPages || 1 : 1,
