@@ -1,7 +1,7 @@
-import { handlePhoneInput } from '@/components/input/InputHandle';
+import { useToast } from '@/context/ToastContext';
 import { checkEmailAvailability, checkUsernameAvailability } from '@/services/account.api';
 import { registerInternal } from '@/services/auth.api';
-import { fileApi } from '@/services/file.api';
+
 import Joi from 'joi';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -37,7 +37,7 @@ export type FormData = {
   phone: string;
   address: string;
   gender: string;
-  avatarUrl: string;
+
   password: string;
   rePassword: string;
 };
@@ -48,17 +48,10 @@ export type CustomerRegisterHookReturn = {
 
   usernameValidation: ValidationState;
   emailValidation: ValidationState;
+  phoneValidation: ValidationState;
 
   errors: Record<string, string>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-
-  avatarFile: File | null;
-  avatarPreview: string;
-  avatarError: string;
-  handleAvatarUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  removeAvatar: () => void;
-  triggerFileInput: () => void;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
 
   showPassword: boolean;
   showConfirmPassword: boolean;
@@ -71,12 +64,18 @@ export type CustomerRegisterHookReturn = {
 };
 
 const registerSchema = Joi.object({
-  username: Joi.string().required().min(3).max(30).alphanum().messages({
-    'string.empty': 'Tên đăng nhập không được để trống',
-    'string.min': 'Tên đăng nhập phải có ít nhất 3 ký tự',
-    'string.max': 'Tên đăng nhập không được vượt quá 30 ký tự',
-    'string.alphanum': 'Tên đăng nhập chỉ được chứa chữ cái và số',
-  }),
+  username: Joi.string()
+    .required()
+    .min(3)
+    .max(30)
+    .pattern(/^[a-z]+$/)
+    .messages({
+      'string.empty': 'Tên đăng nhập không được để trống',
+      'string.min': 'Tên đăng nhập phải có ít nhất 3 ký tự',
+      'string.max': 'Tên đăng nhập không được vượt quá 30 ký tự',
+      'string.pattern.base':
+        'Tên đăng nhập chỉ được chứa chữ cái thường, không có số, ký tự đặc biệt hoặc khoảng trắng',
+    }),
   email: Joi.string()
     .email({ tlds: { allow: false } })
     .required()
@@ -115,14 +114,12 @@ const registerSchema = Joi.object({
     'string.empty': 'Xác nhận mật khẩu không được để trống',
     'any.only': 'Mật khẩu và xác nhận mật khẩu không khớp',
   }),
-  avatarUrl: Joi.string().optional().allow(''),
 });
 
 const useDebounce = (callback: () => void, delay: number, dependencies: React.DependencyList) => {
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const savedCallback = useRef(callback);
 
-  // Remember the latest callback
   useEffect(() => {
     savedCallback.current = callback;
   }, [callback]);
@@ -141,7 +138,6 @@ const useDebounce = (callback: () => void, delay: number, dependencies: React.De
         clearTimeout(timeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...dependencies, delay]);
 
   const cancel = useCallback(() => {
@@ -155,7 +151,7 @@ const useDebounce = (callback: () => void, delay: number, dependencies: React.De
 
 export const useCustomerRegister = (): CustomerRegisterHookReturn => {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState<FormData>({
     username: '',
@@ -165,12 +161,11 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
     phone: '',
     address: '',
     gender: '',
-    avatarUrl: '',
+
     password: '',
     rePassword: '',
   });
 
-  // Validation states
   const [usernameValidation, setUsernameValidation] = useState<ValidationState>({
     isValid: null,
     isValidating: false,
@@ -183,20 +178,24 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
     message: '',
   });
 
+  const [phoneValidation, setPhoneValidation] = useState<ValidationState>({
+    isValid: null,
+    isValidating: false,
+    message: '',
+  });
+
   const [currentUsername, setCurrentUsername] = useState('');
   const [currentEmail, setCurrentEmail] = useState('');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string>('');
-  const [avatarError, setAvatarError] = useState<string>('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const validateUsername = useCallback(async (username: string) => {
-    if (!username || username.length < 3) {
+    if (!username) {
       setUsernameValidation({
         isValid: null,
         isValidating: false,
@@ -205,12 +204,48 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
       return;
     }
 
-    const usernameRegex = /^[a-zA-Z0-9]+$/;
-    if (!usernameRegex.test(username)) {
+    if (/[A-Z]/.test(username)) {
       setUsernameValidation({
         isValid: false,
         isValidating: false,
-        message: 'Tên đăng nhập chỉ được chứa chữ cái và số',
+        message: 'Tên đăng nhập chỉ được chứa chữ cái thường',
+      });
+      return;
+    }
+
+    if (/[0-9]/.test(username)) {
+      setUsernameValidation({
+        isValid: false,
+        isValidating: false,
+        message: 'Tên đăng nhập không được chứa số',
+      });
+      return;
+    }
+
+    if (/[^a-z]/.test(username)) {
+      setUsernameValidation({
+        isValid: false,
+        isValidating: false,
+        message:
+          'Tên đăng nhập chỉ được chứa chữ cái thường, không có ký tự đặc biệt hoặc khoảng trắng',
+      });
+      return;
+    }
+
+    if (username.length < 3) {
+      setUsernameValidation({
+        isValid: false,
+        isValidating: false,
+        message: 'Tên đăng nhập phải có ít nhất 3 ký tự',
+      });
+      return;
+    }
+
+    if (username.length > 30) {
+      setUsernameValidation({
+        isValid: false,
+        isValidating: false,
+        message: 'Tên đăng nhập không được vượt quá 30 ký tự',
       });
       return;
     }
@@ -278,6 +313,41 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
     }
   }, []);
 
+  const validatePhone = useCallback((phone: string) => {
+    if (!phone) {
+      setPhoneValidation({
+        isValid: null,
+        isValidating: false,
+        message: '',
+      });
+      return;
+    }
+
+    if (!/^\d*$/.test(phone)) {
+      setPhoneValidation({
+        isValid: false,
+        isValidating: false,
+        message: 'Số điện thoại chỉ được chứa chữ số',
+      });
+      return;
+    }
+
+    if (phone.length !== 10) {
+      setPhoneValidation({
+        isValid: false,
+        isValidating: false,
+        message: 'Số điện thoại phải có đúng 10 chữ số',
+      });
+      return;
+    }
+
+    setPhoneValidation({
+      isValid: true,
+      isValidating: false,
+      message: 'Số điện thoại hợp lệ',
+    });
+  }, []);
+
   const { cancel: cancelUsernameDebounce } = useDebounce(
     () => {
       if (currentUsername) {
@@ -307,24 +377,25 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-
-      if (name === 'phone' && e.target instanceof HTMLInputElement) {
-        handlePhoneInput(e as React.ChangeEvent<HTMLInputElement>);
-      }
-
-      setFormData((prev) => ({ ...prev, [name]: value }));
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      const { name } = e.target;
+      let { value } = e.target;
 
       if (name === 'username') {
-        setCurrentUsername(value);
-        if (!value) {
-          setUsernameValidation({
-            isValid: null,
-            isValidating: false,
-            message: '',
-          });
+        value = value.toLowerCase();
+        value = value.replace(/[^a-z]/g, '');
+        if (value.length > 30) {
+          value = value.substring(0, 30);
         }
+
+        setCurrentUsername(value);
+        validateUsername(value);
+      } else if (name === 'phone') {
+        value = value.replace(/[^0-9]/g, '');
+        if (value.length > 10) {
+          value = value.substring(0, 10);
+        }
+
+        validatePhone(value);
       } else if (name === 'email') {
         setCurrentEmail(value);
         if (!value) {
@@ -335,49 +406,14 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
           });
         }
       } else if (name === 'address') {
-        // Always clear address errors when address is being set
-        // regardless of value to avoid validation conflicts
         setErrors((prev) => ({ ...prev, address: '' }));
       }
+
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     },
-    [],
+    [validateUsername, validatePhone],
   );
-
-  const handleAvatarUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setAvatarError('');
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        setAvatarError('Vui lòng chọn file hình ảnh hợp lệ.');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setAvatarError('Kích thước file không được vượt quá 5MB.');
-        return;
-      }
-
-      setAvatarFile(file);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setAvatarPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
-
-  const removeAvatar = useCallback(() => {
-    setAvatarFile(null);
-    setAvatarPreview('');
-    setFormData((prev) => ({ ...prev, avatarUrl: '' }));
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }, []);
-
-  const triggerFileInput = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
 
   const togglePasswordVisibility = useCallback(
     (field: 'password' | 'confirmPassword') => {
@@ -392,7 +428,6 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
       e.preventDefault();
       setIsLoading(true);
       setErrors({});
-      setAvatarError('');
 
       try {
         if (!termsAccepted) {
@@ -400,11 +435,11 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
             ...prev,
             terms: 'Bạn phải đồng ý với Điều khoản và Chính sách.',
           }));
+          showToast('Vui lòng đồng ý với Điều khoản và Chính sách', 'error');
           setIsLoading(false);
           return;
         }
 
-        // Check validation states
         if (usernameValidation.isValidating || emailValidation.isValidating) {
           setErrors((prev) => ({
             ...prev,
@@ -419,6 +454,7 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
             ...prev,
             username: usernameValidation.message,
           }));
+          showToast('Tên đăng nhập chưa hợp lệ', 'error');
           setIsLoading(false);
           return;
         }
@@ -428,12 +464,21 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
             ...prev,
             email: emailValidation.message,
           }));
+          showToast('Email chưa hợp lệ', 'error');
           setIsLoading(false);
           return;
         }
 
-        // Special handling for address field - check for province, district, and ward
-        // We need all three components in the address string
+        if (phoneValidation.isValid === false) {
+          setErrors((prev) => ({
+            ...prev,
+            phone: phoneValidation.message,
+          }));
+          showToast('Số điện thoại chưa hợp lệ', 'error');
+          setIsLoading(false);
+          return;
+        }
+
         const addressParts = formData.address.split(',').map((part) => part.trim());
         if (!formData.address || addressParts.length < 3) {
           setErrors((prev) => ({
@@ -453,31 +498,32 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
             }
           });
           setErrors(newErrors);
+          showToast('Vui lòng kiểm tra lại thông tin đăng ký', 'error');
           setIsLoading(false);
           return;
         }
 
-        let avatarUrl = formData.avatarUrl;
-        if (avatarFile) {
-          avatarUrl = await fileApi.fileUpload(avatarFile);
-        }
         const submitData = {
           ...formData,
           gender: formData.gender ? Number(formData.gender) : undefined,
-          avatarUrl,
         };
 
         await registerInternal(submitData);
+        showToast(
+          'Đăng ký tài khoản thành công! Đang chuyển hướng đến trang đăng nhập...',
+          'success',
+        );
         setTimeout(() => router.push('/login'), 2000);
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error ? err.message : 'Có lỗi xảy ra. Vui lòng thử lại.';
         setErrors((prev) => ({ ...prev, general: errorMessage }));
+        showToast(errorMessage, 'error');
       } finally {
         setIsLoading(false);
       }
     },
-    [formData, termsAccepted, usernameValidation, emailValidation, avatarFile, router],
+    [formData, termsAccepted, usernameValidation, emailValidation, phoneValidation, router],
   );
 
   return {
@@ -486,17 +532,10 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
 
     usernameValidation,
     emailValidation,
+    phoneValidation,
 
     errors,
     setErrors,
-
-    avatarFile,
-    avatarPreview,
-    avatarError,
-    handleAvatarUpload,
-    removeAvatar,
-    triggerFileInput,
-    fileInputRef,
 
     showPassword,
     showConfirmPassword,

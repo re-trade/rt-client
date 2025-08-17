@@ -49,6 +49,8 @@ export default function LoginPage() {
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  const isFormValid = formData.username.trim() !== '' && formData.password.trim() !== '';
+
   const validateForm = () => {
     const { error } = loginSchema.validate(formData, { abortEarly: false });
     if (error) {
@@ -163,7 +165,12 @@ export default function LoginPage() {
               )}
             </CardContent>
             <CardFooter>
-              <Button className="w-full" size="lg" type="submit" disabled={isLoading}>
+              <Button
+                className="w-full"
+                size="lg"
+                type="submit"
+                disabled={isLoading || !isFormValid}
+              >
                 {isLoading && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />}
                 {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </Button>
