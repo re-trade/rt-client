@@ -12,10 +12,10 @@ import ContentSkeleton from '@components/product/ProductContentSkeleton';
 import { ProductHistoryList } from '@components/product/ProductHistoryList';
 import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
 import ProductInfoSkeleton from '@components/product/ProductInfoSkeleton';
+import ProductWarningBanner from '@components/product/ProductWarningBanner';
 import RelatedProducts from '@components/related-product/RelatedProduct';
 import ReviewsList from '@components/review/ListReview';
 import ShareButton from '@components/share/ShareButton';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -116,9 +116,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
         try {
           const response = await reviewApi.getTotalReviews(productDetail.id);
           setTotalReviews(response);
-        } catch (_error) {
-          // Error handled silently
-        }
+        } catch (_) {}
       }
     };
     fetching();
@@ -200,47 +198,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
           </ol>
         </nav>
 
-        {!productDetail.verified && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="mb-6 bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 border-t border-b border-orange-300 shadow-md overflow-hidden relative"
-          >
-            <div className="py-3 relative">
-              <motion.div
-                animate={{ x: [1000, -1000] }}
-                transition={{
-                  duration: 15,
-                  repeat: Infinity,
-                  ease: 'linear',
-                }}
-                className="whitespace-nowrap flex items-center text-white font-semibold"
-              >
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdWarning className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">CẢNH BÁO: Sản phẩm chưa được xác minh</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdSecurity className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">Vui lòng kiểm tra kỹ trước khi mua</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdWarning className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">CẢNH BÁO: Sản phẩm chưa được xác minh</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdSecurity className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">Vui lòng kiểm tra kỹ trước khi mua</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
+        <ProductWarningBanner productDetail={productDetail} sellerProfile={sellerProfile} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div className="space-y-4">

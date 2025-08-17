@@ -41,11 +41,11 @@ const WithdrawalModal = ({
 }: WithdrawalModalProps) => {
   const handleWithdrawalSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
     if (!selectedBankAccount || !withdrawAmount || !withdrawContent) {
       return;
     }
 
+    // Validate amount
     const amount = parseFloat(withdrawAmount);
     if (isNaN(amount) || amount <= 0 || amount > balance) {
       return;
