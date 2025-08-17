@@ -1,9 +1,16 @@
 'use client';
 
-import { useWallet } from '@/hooks/use-wallet';
-import { BankAccountResponse, BankResponse, getBankByBin, getBanks, getUserBankAccounts, insertBankAccount } from '@/services/payment-method.api';
-import { CreateWithdrawalRequest } from '@/services/wallet.api';
 import { useToast } from '@/hooks/use-toast';
+import { useWallet } from '@/hooks/use-wallet';
+import {
+  BankAccountResponse,
+  BankResponse,
+  getBankByBin,
+  getBanks,
+  getUserBankAccounts,
+  insertBankAccount,
+} from '@/services/payment-method.api';
+import { CreateWithdrawalRequest } from '@/services/wallet.api';
 import { useCallback, useEffect, useState } from 'react';
 
 export const useWalletManager = () => {
@@ -38,7 +45,7 @@ export const useWalletManager = () => {
   const [bankAccountForm, setBankAccountForm] = useState({
     selectedBankBin: '',
     accountNumber: '',
-    userBankName: ''
+    userBankName: '',
   });
   const [creatingBankAccount, setCreatingBankAccount] = useState(false);
 
@@ -83,7 +90,11 @@ export const useWalletManager = () => {
   }, []);
 
   const createBankAccount = useCallback(async () => {
-    if (!bankAccountForm.selectedBankBin || !bankAccountForm.accountNumber || !bankAccountForm.userBankName) {
+    if (
+      !bankAccountForm.selectedBankBin ||
+      !bankAccountForm.accountNumber ||
+      !bankAccountForm.userBankName
+    ) {
       showToast('Vui lòng điền đầy đủ thông tin', 'warning');
       return;
     }
@@ -104,7 +115,7 @@ export const useWalletManager = () => {
       });
 
       if (response?.success) {
-        setUserBankAccounts(prev => [...prev, response.content]);
+        setUserBankAccounts((prev) => [...prev, response.content]);
         setBankAccountCreationModalOpen(false);
         setBankAccountForm({ selectedBankBin: '', accountNumber: '', userBankName: '' });
         showToast('Thêm tài khoản ngân hàng thành công', 'success');

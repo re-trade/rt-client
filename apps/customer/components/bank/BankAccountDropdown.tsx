@@ -218,7 +218,9 @@ const BankAccountDropdown = ({
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h4 className="font-semibold text-gray-800 text-sm group-hover:text-orange-700">Thêm tài khoản mới</h4>
+                    <h4 className="font-semibold text-gray-800 text-sm group-hover:text-orange-700">
+                      Thêm tài khoản mới
+                    </h4>
                     <p className="text-xs text-gray-600">Thêm tài khoản ngân hàng khác</p>
                   </div>
                 </div>

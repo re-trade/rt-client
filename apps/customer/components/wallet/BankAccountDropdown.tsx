@@ -2,8 +2,8 @@
 
 import { BankAccountResponse, BankResponse, getBankByBin } from '@/services/payment-method.api';
 import { ChevronDown, Plus } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 
 interface BankAccountDropdownProps {
   selectedBankAccount: BankAccountResponse | null;
