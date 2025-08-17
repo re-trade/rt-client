@@ -5,7 +5,6 @@ import { unAuthApi } from '@retrade/util';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
 
-// Re-export types for consistency
 export interface Address {
   id: string;
   name: string;
@@ -106,6 +105,12 @@ export function useAddressManagement() {
   // Address list state - isolated to this context
   const [addresses, setAddresses] = useState<Address[]>([]);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(6);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   // Modal state - isolated to this context
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
@@ -125,32 +130,38 @@ export function useAddressManagement() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchAddresses = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await contactApi.getContacts(0, 10);
-      const mapped: Address[] = response
-        ? response.map((item) => ({
-            id: item.id,
-            name: item.name,
-            customerName: item.customerName,
-            phoneNumber: item.phone,
-            state: item.state,
-            country: item.country,
-            district: item.district,
-            ward: item.ward,
-            addressLine: item.addressLine,
-            type: item.type,
-            isDefault: item.defaulted,
-          }))
-        : [];
-      setAddresses(mapped);
-    } catch {
-      setErrors({ general: 'Không thể tải danh sách địa chỉ' });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchAddresses = useCallback(
+    async (page: number = 0) => {
+      try {
+        setLoading(true);
+        const response = await contactApi.getContacts(page, pageSize);
+        const mapped: Address[] = response.addresses
+          ? response.addresses.map((item) => ({
+              id: item.id,
+              name: item.name,
+              customerName: item.customerName,
+              phoneNumber: item.phone,
+              state: item.state,
+              country: item.country,
+              district: item.district,
+              ward: item.ward,
+              addressLine: item.addressLine,
+              type: item.type,
+              isDefault: item.defaulted,
+            }))
+          : [];
+        setAddresses(mapped);
+        setTotalElements(response.pagination.totalElements);
+        setTotalPages(response.pagination.totalPages);
+        setCurrentPage(response.pagination.page);
+      } catch {
+        setErrors({ general: 'Không thể tải danh sách địa chỉ' });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pageSize],
+  );
 
   const fetchProvinces = useCallback(async () => {
     try {
@@ -435,7 +446,7 @@ export function useAddressManagement() {
     async (addressId: string): Promise<boolean> => {
       try {
         setLoading(true);
-        const response = await contactApi.deleteContact(addressId);
+        const response = await contactApi.removeContact(addressId);
         if (!response) {
           throw new Error('Không thể xóa địa chỉ');
         }
@@ -451,30 +462,41 @@ export function useAddressManagement() {
     [fetchAddresses],
   );
 
+  const goToPage = useCallback(
+    (page: number) => {
+      const apiPage = page - 1;
+      if (apiPage >= 0 && apiPage < totalPages) {
+        setCurrentPage(apiPage);
+        fetchAddresses(apiPage);
+      }
+    },
+    [totalPages, fetchAddresses],
+  );
+
   return {
-    // Address list
     addresses,
 
-    // Modal state
+    currentPage: currentPage + 1,
+    pageSize,
+    totalElements,
+    totalPages,
+    goToPage,
+
     isCreateOpen,
     isUpdateOpen,
     selectedAddress,
 
-    // Form state
     formData,
     errors,
     touched,
 
-    // Location data
     provinces,
     districts,
     wards,
 
-    // Loading states
     loading,
     submitting,
 
-    // Actions
     openCreateDialog,
     openUpdateDialog,
     closeDialogs,

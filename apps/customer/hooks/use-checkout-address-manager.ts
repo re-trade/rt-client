@@ -5,7 +5,6 @@ import { unAuthApi } from '@retrade/util';
 import Joi from 'joi';
 import { useCallback, useEffect, useState } from 'react';
 
-// Re-export types for consistency
 export interface Province {
   code: number;
   name: string;
@@ -84,31 +83,22 @@ const addressSchema = Joi.object({
   isDefault: Joi.boolean().required(),
 });
 
-/**
- * Checkout-specific address manager hook
- * Isolated state management for checkout/cart contexts
- * Only handles address creation, not full CRUD operations
- */
 export function useCheckoutAddressManager() {
   // Modal state - isolated to this context
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isSelectionOpen, setIsSelectionOpen] = useState(false);
 
-  // Address data - isolated to this context
   const [addresses, setAddresses] = useState<TAddress[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<TAddress | null>(null);
 
-  // Form state - isolated to this context
   const [formData, setFormData] = useState<AddressFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  // Location data - isolated to this context
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
 
-  // Loading states - isolated to this context
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [addressesLoading, setAddressesLoading] = useState(false);
@@ -119,9 +109,9 @@ export function useCheckoutAddressManager() {
       console.log('Fetching addresses...');
       const response = await contactApi.getContacts(0, 50); // Get up to 50 addresses
       console.log('Addresses response:', response);
-      if (response && Array.isArray(response)) {
-        setAddresses(response);
-        console.log('Addresses loaded successfully:', response.length);
+      if (response && response.addresses && Array.isArray(response.addresses)) {
+        setAddresses(response.addresses);
+        console.log('Addresses loaded successfully:', response.addresses.length);
       } else {
         setAddresses([]);
       }
