@@ -23,7 +23,7 @@ export default function BankAccountsPage() {
     setIsModalOpen,
     updateUserBankAccount,
   } = usePaymentMethod();
-  const { messages } = useToast();
+  const { messages, removeToast } = useToast();
 
   // State for dropdown selection
   const [selectedAccount, setSelectedAccount] = useState<BankAccountResponse | null>(null);
@@ -83,7 +83,7 @@ export default function BankAccountsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
-      <Toast messages={messages} />
+      <Toast messages={messages} onRemove={removeToast} />
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden">
           <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 border-b border-orange-200">

@@ -1,5 +1,6 @@
 'use client';
 
+import BankAccountModal from '@/components/bank/BankAccountModal';
 import WalletBalanceCard from '@/components/wallet/WalletBalanceCard';
 import WithdrawalHistoryTable from '@/components/wallet/WithdrawalHistoryTable';
 import WithdrawalModal from '@/components/wallet/WithdrawalModal';
@@ -30,12 +31,23 @@ export default function WalletPage() {
     setBankAccountModalOpen,
     userBankAccounts,
     loadingBankAccounts,
+    fetchUserBankAccounts,
+
+    bankAccountCreationModalOpen,
+    setBankAccountCreationModalOpen,
+    banks,
+    bankAccountForm,
+    setBankAccountForm,
+    creatingBankAccount,
 
     setPage,
     refresh,
     handleWithdrawalSubmit,
     cancelWithdrawal,
     openWithdrawalModal,
+    openBankAccountCreationModal,
+    closeBankAccountCreationModal,
+    createBankAccount,
 
     formatCurrency,
     formatDate,
@@ -184,14 +196,25 @@ export default function WalletPage() {
           setWithdrawContent={setWithdrawContent}
           selectedBankAccount={selectedBankAccount}
           setSelectedBankAccount={setSelectedBankAccount}
-          bankAccountModalOpen={bankAccountModalOpen}
-          setBankAccountModalOpen={setBankAccountModalOpen}
           userBankAccounts={userBankAccounts}
           loadingBankAccounts={loadingBankAccounts}
           balance={balance}
           processingWithdrawal={processingWithdrawal}
           onSubmit={handleWithdrawalSubmit}
           formatCurrency={formatCurrency}
+          onCreateNewBankAccount={openBankAccountCreationModal}
+          onFetchBankAccounts={fetchUserBankAccounts}
+        />
+
+        <BankAccountModal
+          open={bankAccountCreationModalOpen}
+          editingAccount={null}
+          form={bankAccountForm}
+          banks={banks}
+          loading={creatingBankAccount}
+          onChange={(field, value) => setBankAccountForm((prev) => ({ ...prev, [field]: value }))}
+          onClose={closeBankAccountCreationModal}
+          onSave={createBankAccount}
         />
       </div>
     </div>

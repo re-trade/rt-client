@@ -1,5 +1,5 @@
 'use client';
-import { useCart } from '@/hooks/use-cart';
+import { useCart } from '@/context/CartContext';
 import { useCheckoutAddressManager } from '@/hooks/use-checkout-address-manager';
 import { usePayment } from '@/hooks/use-payment';
 import { useToast } from '@/hooks/use-toast';
