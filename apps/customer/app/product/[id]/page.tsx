@@ -122,6 +122,13 @@ function ProductDetail({ params }: { params: { id: string } }) {
     fetching();
   }, [productDetail]);
 
+  const handleQuantityKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (isNaN(value) || value < 1) {
@@ -133,6 +140,15 @@ function ProductDetail({ params }: { params: { id: string } }) {
     } else {
       setQuantity(value);
       setStockWarning(productDetail ? value >= productDetail.quantity * 0.8 : false);
+    }
+  };
+
+  const handleQuantityBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const value = parseInt(inputValue);
+    if (inputValue === '' || isNaN(value) || value < 1) {
+      setQuantity(1);
+      setStockWarning(false);
     }
   };
 
@@ -375,12 +391,13 @@ function ProductDetail({ params }: { params: { id: string } }) {
                               <MdRemove size={16} className="text-gray-600" />
                             </button>
                             <input
-                              type="number"
+                              type="text"
                               value={quantity}
                               onChange={handleQuantityInput}
+                              onKeyDown={handleQuantityKeyPress}
+                              onBlur={handleQuantityBlur}
                               className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
-                              min="1"
-                              max={productDetail.quantity}
+                              placeholder="1"
                             />
                             <button
                               onClick={() => handleQuantityChange(true)}
