@@ -28,19 +28,6 @@ const WithdrawalHistoryTable: React.FC<WithdrawalHistoryTableProps> = ({
 }) => {
   const totalPages = Math.ceil(totalItems / size);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'COMPLETED':
-        return 'text-green-600';
-      case 'PENDING':
-        return 'text-orange-600';
-      case 'REJECTED':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
-
   const getStatusBadgeStyle = (status: string) => {
     switch (status) {
       case 'COMPLETED':
@@ -117,6 +104,9 @@ const WithdrawalHistoryTable: React.FC<WithdrawalHistoryTableProps> = ({
                 Trạng thái
               </th>
               <th className="py-4 px-6 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Ngày nộp đơn
+              </th>
+              <th className="py-4 px-6 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 Ngày xử lý
               </th>
               <th className="py-4 px-6 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -169,7 +159,19 @@ const WithdrawalHistoryTable: React.FC<WithdrawalHistoryTableProps> = ({
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 mr-2 text-gray-500" />
                     <div>
-                      <div className="font-medium">{formatDate(withdrawal.processedDate)}</div>
+                      <div className="font-medium">{formatDate(withdrawal.createdDate)}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="py-5 px-6 text-gray-600">
+                  <div className="flex items-center">
+                    <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                    <div>
+                      <div className="font-medium">
+                        {withdrawal.processedDate
+                          ? formatDate(withdrawal.processedDate)
+                          : 'Chưa xử lí'}
+                      </div>
                     </div>
                   </div>
                 </td>

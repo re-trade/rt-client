@@ -23,7 +23,7 @@ export default function BankAccountsPage() {
     setIsModalOpen,
     updateUserBankAccount,
   } = usePaymentMethod();
-  const { messages } = useToast();
+  const { messages, removeToast } = useToast();
 
   // State for dropdown selection
   const [selectedAccount, setSelectedAccount] = useState<BankAccountResponse | null>(null);
@@ -83,7 +83,7 @@ export default function BankAccountsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
-      <Toast messages={messages} />
+      <Toast messages={messages} onRemove={removeToast} />
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="bg-white rounded-xl shadow-md border border-orange-200 overflow-hidden">
           <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 border-b border-orange-200">
@@ -131,7 +131,7 @@ export default function BankAccountsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-8 border border-orange-200">
+        <div className="bg-gradient-to-r from-white to-orange-50 rounded-xl shadow-lg p-8 border border-orange-200 hover:shadow-xl transition-shadow duration-300">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Quản lý tài khoản ngân hàng</h2>
             <p className="text-gray-600 text-sm">
@@ -153,13 +153,13 @@ export default function BankAccountsPage() {
 
           {/* Selected Account Details */}
           {selectedAccount && (
-            <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Chi tiết tài khoản</h3>
                 <div className="flex space-x-3">
                   <button
                     onClick={() => openEditModal(selectedAccount)}
-                    className="flex items-center justify-center bg-orange-100 text-orange-700 hover:bg-orange-200 p-2.5 rounded-lg transition-all duration-200 border border-orange-200"
+                    className="flex items-center justify-center bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 p-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -172,7 +172,7 @@ export default function BankAccountsPage() {
                   </button>
                   <button
                     onClick={() => handleDelete(selectedAccount.id)}
-                    className="flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-100 p-2.5 rounded-lg transition-all duration-200 border border-red-200"
+                    className="flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-100 p-2.5 rounded-lg transition-all duration-200 border border-red-200 shadow-sm hover:shadow-md"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path

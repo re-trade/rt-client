@@ -68,12 +68,7 @@ const ShoppingCart: React.FC = () => {
           {showSummary && (
             <div className="w-full xl:w-1/3">
               <div className="xl:sticky xl:top-6">
-                <CartSummary
-                  cartSummary={cartHook.cartSummary}
-                  selectedItems={cartHook.selectedItems}
-                  createOrder={cartHook.createOrder}
-                  isCreateOrder={cartHook.isCreateOrder}
-                />
+                <CartSummary {...cartHook} />
               </div>
             </div>
           )}
