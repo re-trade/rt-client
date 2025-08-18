@@ -86,7 +86,7 @@ export default function ProductManagement() {
     try {
       toast.loading('Đang xóa sản phẩm...');
       const response = await productApi.deleteProduct(productToDelete.id);
-      if(!response.success){
+      if (!response.success) {
         toast.error(response.messages);
       }
       toast.success('Đã xóa sản phẩm thành công');

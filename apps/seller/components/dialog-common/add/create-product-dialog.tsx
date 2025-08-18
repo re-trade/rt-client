@@ -412,7 +412,9 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   <Checkbox
                     id="hasWarranty"
                     checked={formData.hasWarranty}
-                    onCheckedChange={(checked) => handleFormChange('hasWarranty', checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      handleFormChange('hasWarranty', checked as boolean)
+                    }
                     className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500 data-[state=checked]:text-white focus:ring-orange-500 focus:ring-offset-0"
                   />
                   <Label
@@ -423,7 +425,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                     Sản phẩm có bảo hành
                   </Label>
                 </div>
-          {formData.hasWarranty && (
+                {formData.hasWarranty && (
                   <div className="mt-2">
                     <Label
                       htmlFor="warrantyExpiryDate"

@@ -184,8 +184,6 @@ export const productApi = {
     return undefined;
   },
 
-
-
   async updateProductStatus(id: string, status: TProductStatus): Promise<TProduct> {
     const response = await authApi.default.patch<IResponseObject<TProduct>>(`/products/status`, {
       productId: id,
