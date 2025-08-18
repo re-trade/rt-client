@@ -14,12 +14,26 @@ import '@uiw/react-md-editor/markdown-editor.css';
 import { DollarSign, Package, Plus, RefreshCw, Star, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
+import { productApi } from '@/service/product.api';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<TProduct | null>(null);
+
+
 
   const {
     productList,
@@ -64,12 +78,29 @@ export default function ProductManagement() {
     setIsDetailsOpen(true);
   };
 
-  const handleDeleteProduct = async (product: TProduct) => {
+  const handleDeleteProduct = (product: TProduct) => {
+    setProductToDelete(product);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteProduct = async () => {
+    if (!productToDelete) return;
+
     try {
-      toast.success('Đã xoá sản phẩm thành công');
+      toast.loading('Đang xóa sản phẩm...');
+
+      // Gọi API delete product
+      await productApi.deleteProduct(productToDelete.id);
+
+      toast.success('Đã xóa sản phẩm thành công');
       fetchProducts();
     } catch (error) {
-      toast.error('Lỗi khi xoá sản phẩm');
+      console.error('Error deleting product:', error);
+      toast.error('Lỗi khi xóa sản phẩm');
+    } finally {
+      toast.dismiss();
+      setIsDeleteDialogOpen(false);
+      setProductToDelete(null);
     }
   };
 
@@ -209,7 +240,29 @@ export default function ProductManagement() {
             fetchProducts();
           }}
         />
-
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Xác nhận xóa sản phẩm</AlertDialogTitle>
+              <AlertDialogDescription>
+                Bạn có chắc chắn muốn xóa sản phẩm "{productToDelete?.name}"?
+                <br />
+                <span className="text-red-600 font-medium">
+                  Hành động này không thể hoàn tác.
+                </span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Hủy</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDeleteProduct}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Xóa
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <EditProductDialog
           open={isEditOpen}
           isEdit={true}

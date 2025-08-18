@@ -81,8 +81,8 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
   const handleTickChange = (checked: boolean) => {
     setTick(checked);
     handleFormChange('status', checked ? 'DRAFT' : 'INIT');
-  };
 
+  };
   const validateWarrantyDate = (dateValue: string) => {
     if (!dateValue) {
       setWarrantyDateError('');
@@ -173,7 +173,33 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
       toast.error('Vui lòng chọn ít nhất một danh mục');
       return;
     }
-
+    if (formData.quantity <= 0) {
+      toast.error('Vui lòng nhập số lượng sản phẩm hợp lệ và lớn hơn 0');
+      return;
+    }
+    if (formData.shortDescription.trim().length === 0) {
+      toast.error('Vui lòng nhập mô tả ngắn cho sản phẩm');
+      return;
+    }
+    if (formData.description.trim().length === 0) {
+      toast.error('Vui lòng nhập mô tả cho sản phẩm');
+      return;
+    }
+    if (formData.tags.length === 0) {
+      toast.error('Vui lòng nhập ít nhất một thẻ cho sản phẩm');
+      return;
+    }
+    if (!thumbnailFile) {
+      toast.error('Vui lòng chọn ảnh đại diện cho sản phẩm');
+      return;
+    }
+    if (formData.model.trim().length === 0) {
+      toast.error('Vui lòng nhập model cho sản phẩm');
+    }
+    if (selectedFiles.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một hình ảnh chi tiết cho sản phẩm');
+      return;
+    }
     if (formData.hasWarranty) {
       if (!formData.warrantyExpiryDate) {
         toast.error('Vui lòng chọn ngày hết hạn bảo hành');
@@ -230,8 +256,10 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
         status: formData.status,
         tags: formData.tags.filter((tag) => tag !== ''),
       };
-
-      await productApi.createProduct(productData);
+      const response= await productApi.createProduct(productData);
+      if(!response.success) {
+        toast.error(response.message);
+      }
       toast.success('Tạo sản phẩm thành công');
       onOpenChange(false);
       resetForm();
@@ -633,15 +661,12 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
             <div className="flex items-center space-x-2 mt-4">
               <Checkbox
                 id="draft-checkbox"
-                checked={formData.status === 'DRAFT'}
-                onCheckedChange={(checked) =>
-                  handleFormChange('status', checked ? 'DRAFT' : 'PUBLISHED')
-                }
-                onClick={() => handleTickChange(!tick)}
+                checked={tick}
+                onCheckedChange={(checked) => handleTickChange(checked as boolean)}
                 className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-white data-[state=checked]:border-orange-500 data-[state=checked]:text-orange-500 focus:ring-orange-500 focus:ring-offset-0"
               />
               <Label htmlFor="draft-checkbox" className="text-sm font-medium text-gray-700">
-                Lưu bản nháp( Tích nếu bạn muốn lưu làm bản nháp, sản phẩm sẽ không được duyệt cho
+                Lưu dưới dạng bản nháp( Tích nếu bạn muốn lưu làm bản nháp, sản phẩm sẽ không được duyệt cho
                 đến khi bạn chuyển sang trạng thái khởi tạo )
               </Label>
             </div>
