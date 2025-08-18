@@ -56,8 +56,8 @@ export default function PolicyPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Chính sách & Điều khoản</h1>
           <p className="text-xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
-            Tìm hiểu về các chính sách, điều khoản và quy định của ReTrade để đảm bảo trải nghiệm
-            mua sắm an toàn và minh bạch cho tất cả người dùng.
+            Tìm hiểu về các chính sách, điều khoản và quy định của ReTrade - nền tảng mua bán đồ cũ 
+            an toàn và minh bạch, kết nối cộng đồng yêu thích đồ cũ.
           </p>
         </div>
       </div>
@@ -161,15 +161,16 @@ function PrivacyPolicyContent() {
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Thu thập thông tin</h3>
           <p className="text-gray-600 leading-relaxed mb-4">
-            ReTrade thu thập thông tin cá nhân của bạn khi bạn đăng ký tài khoản, thực hiện giao
-            dịch, hoặc tương tác với nền tảng của chúng tôi. Các thông tin này bao gồm:
+            ReTrade thu thập thông tin cá nhân của bạn khi bạn đăng ký tài khoản, đăng bán đồ cũ, 
+            thực hiện giao dịch, hoặc tương tác với cộng đồng mua bán đồ cũ. Các thông tin này bao gồm:
           </p>
-          <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
-            <li>Thông tin cá nhân: Họ tên, email, số điện thoại, địa chỉ</li>
-            <li>Thông tin giao dịch: Lịch sử mua hàng, phương thức thanh toán</li>
-            <li>Thông tin kỹ thuật: Địa chỉ IP, loại thiết bị, trình duyệt</li>
-            <li>Thông tin hành vi: Cách bạn sử dụng website, sở thích mua sắm</li>
-          </ul>
+                      <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
+              <li>Thông tin cá nhân: Họ tên, email, số điện thoại, địa chỉ</li>
+              <li>Thông tin giao dịch: Lịch sử mua bán đồ cũ, phương thức thanh toán</li>
+              <li>Thông tin kỹ thuật: Địa chỉ IP, loại thiết bị, trình duyệt</li>
+              <li>Thông tin hành vi: Cách bạn sử dụng website, sở thích về đồ cũ</li>
+              <li>Thông tin sản phẩm: Ảnh, mô tả đồ cũ bạn đăng bán</li>
+            </ul>
         </section>
 
         <section>
@@ -178,11 +179,12 @@ function PrivacyPolicyContent() {
             Chúng tôi sử dụng thông tin cá nhân của bạn để:
           </p>
           <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
-            <li>Xử lý đơn hàng và cung cấp dịch vụ khách hàng</li>
-            <li>Cải thiện trải nghiệm người dùng và tùy chỉnh nội dung</li>
-            <li>Gửi thông báo về đơn hàng, khuyến mãi và cập nhật dịch vụ</li>
-            <li>Phân tích và nghiên cứu để phát triển sản phẩm</li>
-            <li>Đảm bảo an toàn và bảo mật cho nền tảng</li>
+            <li>Xử lý giao dịch mua bán đồ cũ và cung cấp dịch vụ khách hàng</li>
+            <li>Cải thiện trải nghiệm người dùng và gợi ý đồ cũ phù hợp</li>
+            <li>Gửi thông báo về giao dịch, khuyến mãi và cập nhật dịch vụ</li>
+            <li>Phân tích và nghiên cứu để phát triển nền tảng mua bán đồ cũ</li>
+            <li>Đảm bảo an toàn và bảo mật cho cộng đồng ReTrade</li>
+            <li>Kiểm duyệt sản phẩm đồ cũ để đảm bảo chất lượng</li>
           </ul>
         </section>
 
@@ -193,9 +195,11 @@ function PrivacyPolicyContent() {
             ba mà không có sự đồng ý của bạn, trừ các trường hợp sau:
           </p>
           <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4 mt-4">
-            <li>Với các đối tác dịch vụ để xử lý đơn hàng (vận chuyển, thanh toán)</li>
+            <li>Với người mua/người bán để hoàn thành giao dịch đồ cũ</li>
+            <li>Với các đối tác dịch vụ để xử lý giao dịch (vận chuyển, thanh toán)</li>
             <li>Khi được yêu cầu bởi pháp luật hoặc cơ quan có thẩm quyền</li>
-            <li>Để bảo vệ quyền lợi và an toàn của ReTrade và người dùng</li>
+            <li>Để bảo vệ quyền lợi và an toàn của cộng đồng ReTrade</li>
+            <li>Để kiểm duyệt và đảm bảo chất lượng sản phẩm đồ cũ</li>
           </ul>
         </section>
 
@@ -219,6 +223,8 @@ function PrivacyPolicyContent() {
             <li>Quyền xóa tài khoản và thông tin cá nhân</li>
             <li>Quyền từ chối nhận email marketing</li>
             <li>Quyền khiếu nại về việc xử lý dữ liệu</li>
+            <li>Quyền quản lý sản phẩm đồ cũ đã đăng bán</li>
+            <li>Quyền xem lịch sử giao dịch mua bán đồ cũ</li>
           </ul>
         </section>
       </div>
@@ -247,23 +253,24 @@ function TermsOfServiceContent() {
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Chấp nhận điều khoản</h3>
           <p className="text-gray-600 leading-relaxed">
-            Bằng việc truy cập và sử dụng nền tảng ReTrade, bạn đồng ý tuân thủ và bị ràng buộc bởi
-            các điều khoản và điều kiện này. Nếu bạn không đồng ý với bất kỳ phần nào của các điều
-            khoản này, vui lòng không sử dụng dịch vụ của chúng tôi.
+            Bằng việc truy cập và sử dụng nền tảng ReTrade - nền tảng mua bán đồ cũ, bạn đồng ý tuân thủ 
+            và bị ràng buộc bởi các điều khoản và điều kiện này. Nếu bạn không đồng ý với bất kỳ phần 
+            nào của các điều khoản này, vui lòng không sử dụng dịch vụ của chúng tôi.
           </p>
         </section>
 
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">2. Mô tả dịch vụ</h3>
           <p className="text-gray-600 leading-relaxed mb-4">
-            ReTrade là nền tảng thương mại điện tử cho phép người dùng:
+            ReTrade là nền tảng mua bán đồ cũ chuyên nghiệp cho phép người dùng:
           </p>
           <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
-            <li>Mua và bán các sản phẩm đã qua sử dụng</li>
-            <li>Tạo và quản lý tài khoản cá nhân</li>
+            <li>Mua và bán các sản phẩm đồ cũ chất lượng, đã qua sử dụng</li>
+            <li>Tạo và quản lý tài khoản cá nhân với hồ sơ mua bán</li>
             <li>Tương tác với người dùng khác thông qua hệ thống nhắn tin</li>
-            <li>Đánh giá và nhận xét về sản phẩm và người bán</li>
-            <li>Sử dụng các dịch vụ thanh toán và vận chuyển tích hợp</li>
+            <li>Đánh giá và nhận xét về sản phẩm đồ cũ và người bán</li>
+            <li>Sử dụng các dịch vụ thanh toán và vận chuyển linh hoạt</li>
+            <li>Tham gia cộng đồng yêu thích đồ cũ và bảo vệ môi trường</li>
           </ul>
         </section>
 
@@ -286,22 +293,24 @@ function TermsOfServiceContent() {
             Khi sử dụng ReTrade, bạn cam kết không:
           </p>
           <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
-            <li>Đăng bán các sản phẩm bị cấm hoặc vi phạm pháp luật</li>
-            <li>Cung cấp thông tin sai lệch về sản phẩm hoặc bản thân</li>
+            <li>Đăng bán các sản phẩm đồ cũ bị cấm hoặc vi phạm pháp luật</li>
+            <li>Cung cấp thông tin sai lệch về tình trạng đồ cũ hoặc bản thân</li>
             <li>Sử dụng ngôn ngữ không phù hợp hoặc có tính chất xúc phạm</li>
-            <li>Thực hiện các hành vi gian lận hoặc lừa đảo</li>
+            <li>Thực hiện các hành vi gian lận hoặc lừa đảo khi mua bán đồ cũ</li>
             <li>Vi phạm quyền sở hữu trí tuệ của bên thứ ba</li>
             <li>Sử dụng bot hoặc công cụ tự động để thao tác hệ thống</li>
+            <li>Đăng bán đồ cũ không đúng tình trạng thực tế</li>
+            <li>Gian lận về giá trị hoặc chất lượng đồ cũ</li>
           </ul>
         </section>
 
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">5. Giao dịch và thanh toán</h3>
           <p className="text-gray-600 leading-relaxed">
-            ReTrade đóng vai trò là nền tảng kết nối người mua và người bán. Chúng tôi không chịu
-            trách nhiệm về chất lượng sản phẩm, tính chính xác của mô tả, hoặc khả năng thực hiện
+            ReTrade đóng vai trò là nền tảng kết nối người mua và người bán đồ cũ. Chúng tôi không chịu
+            trách nhiệm về chất lượng đồ cũ, tính chính xác của mô tả tình trạng, hoặc khả năng thực hiện
             giao dịch của các bên. Tuy nhiên, chúng tôi cung cấp các công cụ và dịch vụ hỗ trợ để
-            đảm bảo giao dịch diễn ra thuận lợi.
+            đảm bảo giao dịch mua bán đồ cũ diễn ra thuận lợi và an toàn.
           </p>
         </section>
 
@@ -309,8 +318,8 @@ function TermsOfServiceContent() {
           <h3 className="text-xl font-semibold text-gray-800 mb-4">6. Chấm dứt dịch vụ</h3>
           <p className="text-gray-600 leading-relaxed">
             ReTrade có quyền tạm ngừng hoặc chấm dứt tài khoản của bạn nếu phát hiện vi phạm các
-            điều khoản này hoặc có hành vi có thể gây hại đến nền tảng và cộng đồng người dùng. Bạn
-            cũng có thể tự nguyện đóng tài khoản bất cứ lúc nào.
+            điều khoản này hoặc có hành vi có thể gây hại đến nền tảng mua bán đồ cũ và cộng đồng 
+            người dùng. Bạn cũng có thể tự nguyện đóng tài khoản bất cứ lúc nào.
           </p>
         </section>
       </div>
@@ -338,13 +347,14 @@ function ReturnPolicyContent() {
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Điều kiện đổi trả</h3>
           <p className="text-gray-600 leading-relaxed mb-4">
-            ReTrade hỗ trợ đổi trả sản phẩm trong các trường hợp sau:
+            ReTrade hỗ trợ đổi trả đồ cũ trong các trường hợp sau:
           </p>
           <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
-            <li>Sản phẩm không đúng như mô tả của người bán</li>
-            <li>Sản phẩm bị hư hỏng trong quá trình vận chuyển</li>
-            <li>Nhận nhầm sản phẩm khác với đơn hàng đã đặt</li>
-            <li>Sản phẩm có lỗi kỹ thuật không được thông báo trước</li>
+            <li>Đồ cũ không đúng như mô tả tình trạng của người bán</li>
+            <li>Đồ cũ bị hư hỏng thêm trong quá trình vận chuyển</li>
+            <li>Nhận nhầm đồ cũ khác với đơn hàng đã đặt</li>
+            <li>Đồ cũ có lỗi kỹ thuật không được thông báo trước</li>
+            <li>Tình trạng đồ cũ kém hơn so với mô tả ban đầu</li>
           </ul>
         </section>
 
@@ -793,7 +803,7 @@ function UserAgreementContent() {
               <ul className="text-green-700 text-sm space-y-2">
                 <li>• Bảo vệ thông tin cá nhân tuyệt đối</li>
                 <li>• Hệ thống thanh toán an toàn</li>
-                <li>• Kiểm duyệt sản phẩm nghiêm ngặt</li>
+                <li>• Kiểm duyệt đồ cũ nghiêm ngặt</li>
                 <li>• Hỗ trợ 24/7 khi có vấn đề</li>
               </ul>
             </div>
@@ -801,9 +811,9 @@ function UserAgreementContent() {
               <h4 className="font-semibold text-blue-800 mb-3">⭐ Chất lượng dịch vụ</h4>
               <ul className="text-blue-700 text-sm space-y-2">
                 <li>• Giao diện thân thiện, dễ sử dụng</li>
-                <li>• Tìm kiếm thông minh và chính xác</li>
-                <li>• Giao hàng nhanh chóng, đúng hẹn</li>
-                <li>• Chính sách đổi trả linh hoạt</li>
+                <li>• Tìm kiếm đồ cũ thông minh và chính xác</li>
+                <li>• Giao dịch trực tiếp, linh hoạt</li>
+                <li>• Chính sách đổi trả phù hợp với đồ cũ</li>
               </ul>
             </div>
           </div>
@@ -817,9 +827,9 @@ function UserAgreementContent() {
                 ✓
               </div>
               <div>
-                <h5 className="font-semibold text-gray-800">Mua sắm miễn phí</h5>
+                <h5 className="font-semibold text-gray-800">Mua bán đồ cũ miễn phí</h5>
                 <p className="text-gray-600 text-sm">
-                  Không mất phí đăng ký, duyệt sản phẩm và đặt hàng
+                  Không mất phí đăng ký, duyệt đồ cũ và thực hiện giao dịch
                 </p>
               </div>
             </div>
@@ -830,7 +840,7 @@ function UserAgreementContent() {
               <div>
                 <h5 className="font-semibold text-gray-800">Bảo vệ quyền lợi</h5>
                 <p className="text-gray-600 text-sm">
-                  Được bảo vệ bởi chính sách đổi trả và hoàn tiền
+                  Được bảo vệ bởi chính sách đổi trả và hoàn tiền phù hợp với đồ cũ
                 </p>
               </div>
             </div>
@@ -841,7 +851,7 @@ function UserAgreementContent() {
               <div>
                 <h5 className="font-semibold text-gray-800">Hỗ trợ tận tình</h5>
                 <p className="text-gray-600 text-sm">
-                  Đội ngũ CSKH chuyên nghiệp, phản hồi nhanh chóng
+                  Đội ngũ CSKH chuyên nghiệp, hiểu rõ đặc thù mua bán đồ cũ
                 </p>
               </div>
             </div>
