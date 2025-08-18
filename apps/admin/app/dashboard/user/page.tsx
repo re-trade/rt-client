@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -27,11 +28,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAccountManager } from '@/hooks/use-account-manager';
-import { getAccountById, getRoleDisplayName, hasRole, RoleObject } from '@/services/account.api';
+import {
+  DetailedAccountResponse,
+  getAccountById,
+  getRoleDisplayName,
+  hasRole,
+  RoleObject,
+} from '@/services/account.api';
 import {
   AlertCircle,
   Ban,
   Calendar,
+  Download,
   Edit,
   Eye,
   Loader2,
@@ -45,6 +53,8 @@ import {
   UserX,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
 
 const roles = ['All', 'ROLE_ADMIN', 'ROLE_CUSTOMER', 'ROLE_SELLER'];
 const statuses = [
@@ -75,9 +85,10 @@ export default function UserManagementPage() {
     unbanSeller,
   } = useAccountManager();
 
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<DetailedAccountResponse | null>(null);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [loadingUserDetails, setLoadingUserDetails] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const handleToggleBan = async (
     userId: string,
@@ -127,6 +138,99 @@ export default function UserManagementPage() {
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('vi-VN');
+  };
+
+  const handleExport = () => {
+    try {
+      if (accounts.length === 0) {
+        toast.warning('Không có dữ liệu để xuất!');
+        return;
+      }
+
+      setExporting(true);
+
+      // Chuẩn bị dữ liệu để export
+      const exportData = accounts.map((user) => ({
+        'ID Người dùng': user.id,
+        'Tên đăng nhập': user.username,
+        Email: user.email,
+        'Trạng thái tài khoản': user.enabled ? 'Hoạt động' : 'Bị cấm',
+        'Trạng thái khóa': user.locked ? 'Bị khóa' : 'Không bị khóa',
+        'Sử dụng 2FA': user.using2FA ? 'Có' : 'Không',
+        'Đã đổi tên': user.changedUsername ? 'Có' : 'Không',
+        'Lần đăng nhập cuối': user.lastLogin
+          ? new Date(user.lastLogin).toLocaleDateString('vi-VN')
+          : 'Chưa đăng nhập',
+        'Ngày tham gia': formatDate(user.joinInDate),
+        'Vai trò':
+          user.roles?.map((role) => getRoleDisplayName(role)).join(', ') || 'Chưa có vai trò',
+        'Vai trò Seller': hasRole(user.roles || [], 'ROLE_SELLER') ? 'Có' : 'Không',
+        'Vai trò Customer': hasRole(user.roles || [], 'ROLE_CUSTOMER') ? 'Có' : 'Không',
+        'Vai trò Admin': hasRole(user.roles || [], 'ROLE_ADMIN') ? 'Có' : 'Không',
+      }));
+
+      // Tạo workbook và worksheet
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+      // Điều chỉnh độ rộng cột
+      const columnWidths = [
+        { wch: 15 }, // ID Người dùng
+        { wch: 20 }, // Tên đăng nhập
+        { wch: 25 }, // Email
+        { wch: 20 }, // Trạng thái tài khoản
+        { wch: 20 }, // Trạng thái khóa
+        { wch: 15 }, // Sử dụng 2FA
+        { wch: 15 }, // Đã đổi tên
+        { wch: 20 }, // Lần đăng nhập cuối
+        { wch: 15 }, // Ngày tham gia
+        { wch: 30 }, // Vai trò
+        { wch: 15 }, // Vai trò Seller
+        { wch: 15 }, // Vai trò Customer
+        { wch: 15 }, // Vai trò Admin
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Thêm worksheet vào workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Người dùng');
+
+      // Tạo tên file với timestamp
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const fileName = `danh_sach_nguoi_dung_trang_${page + 1}_${timestamp}.xlsx`;
+
+      // Download file
+      XLSX.writeFile(workbook, fileName);
+
+      toast.success(`Đã xuất ${exportData.length} người dùng từ trang ${page + 1} thành công!`);
+    } catch (error) {
+      console.error('Lỗi khi xuất dữ liệu:', error);
+      toast.error('Có lỗi xảy ra khi xuất dữ liệu. Vui lòng thử lại.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportAll = async () => {
+    try {
+      if (total === 0) {
+        toast.warning('Không có dữ liệu để xuất!');
+        return;
+      }
+
+      toast.info('Đang chuẩn bị xuất tất cả người dùng...');
+      setExporting(true);
+
+      // TODO: Implement API call để lấy tất cả người dùng
+      // Hiện tại sẽ sử dụng dữ liệu trang hiện tại
+      toast.warning(
+        'Tính năng xuất tất cả người dùng cần API riêng. Hiện tại chỉ xuất được trang hiện tại.',
+      );
+    } catch (error) {
+      console.error('Lỗi khi xuất tất cả dữ liệu:', error);
+      toast.error('Có lỗi xảy ra khi xuất tất cả dữ liệu. Vui lòng thử lại.');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleActiveRole = (roles: RoleObject[], targetRole: 'ROLE_SELLER' | 'ROLE_CUSTOMER') => {
@@ -197,6 +301,56 @@ export default function UserManagementPage() {
                   Hiện tại {accounts.length} trong tổng số {total} người dùng
                 </p>
               </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={refresh}
+                variant="outline"
+                size="sm"
+                disabled={loading}
+                className="flex items-center gap-2 border-slate-200 hover:bg-slate-50"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Làm mới
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 border-slate-200 hover:bg-slate-50"
+                    disabled={accounts.length === 0 || loading || exporting}
+                  >
+                    {exporting ? (
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4 mr-2" />
+                    )}
+                    {exporting ? 'Đang xuất...' : 'Xuất dữ liệu'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="bg-white/95 backdrop-blur-sm shadow-xl border-slate-200"
+                >
+                  <DropdownMenuLabel className="text-slate-700">Chọn loại xuất</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleExport}
+                    className="hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Xuất trang hiện tại ({accounts.length} người dùng)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleExportAll()}
+                    className="hover:bg-green-50 hover:text-green-700"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Xuất tất cả ({total} người dùng)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -423,20 +577,10 @@ export default function UserManagementPage() {
                                       'seller',
                                     )
                                   }
-                                  className={`cursor-pointer ${
-                                    user.sellerProfile?.verified === false
-                                      ? 'text-blue-600 focus:text-blue-600 focus:bg-blue-50'
-                                      : 'text-orange-600 focus:text-orange-600 focus:bg-orange-50'
-                                  }`}
+                                  className="cursor-pointer text-orange-600 focus:text-orange-600 focus:bg-orange-50"
                                 >
-                                  {user.sellerProfile?.verified === false ? (
-                                    <UserCheck className="h-4 w-4 mr-2" />
-                                  ) : (
-                                    <Ban className="h-4 w-4 mr-2" />
-                                  )}
-                                  {user.sellerProfile?.verified === false
-                                    ? 'Bỏ cấm người bán'
-                                    : 'Cấm người bán'}
+                                  <Ban className="h-4 w-4 mr-2" />
+                                  Cấm người bán
                                 </DropdownMenuItem>
                               )}
                             </DropdownMenuContent>
