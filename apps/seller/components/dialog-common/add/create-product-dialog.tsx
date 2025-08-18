@@ -12,13 +12,13 @@ import { CreateProductDto, productApi, TProductStatus } from '@/service/product.
 import { storageApi } from '@/service/storage.api';
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
-import { frameData } from 'framer-motion';
 import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
+
 interface CreateProductDialogProps {
   open: boolean;
   onSuccess: () => void;
@@ -77,13 +77,15 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
 
     if (field === 'hasWarranty' && !value) {
       setWarrantyDateError('');
+      setFormData((prev) => ({ ...prev, warrantyExpiryDate: '' }));
     }
   };
+
   const handleTickChange = (checked: boolean) => {
     setTick(checked);
     handleFormChange('status', checked ? 'DRAFT' : 'INIT');
-
   };
+
   const validateWarrantyDate = (dateValue: string) => {
     if (!dateValue) {
       setWarrantyDateError('');
@@ -196,6 +198,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
     }
     if (formData.model.trim().length === 0) {
       toast.error('Vui lòng nhập model cho sản phẩm');
+      return;
     }
     if (selectedFiles.length === 0) {
       toast.error('Vui lòng chọn ít nhất một hình ảnh chi tiết cho sản phẩm');
@@ -257,8 +260,8 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
         status: formData.status,
         tags: formData.tags.filter((tag) => tag !== ''),
       };
-      const response= await productApi.createProduct(productData);
-      if(!response.success) {
+      const response = await productApi.createProduct(productData);
+      if (!response.success) {
         toast.error(response.message);
       }
       toast.success('Tạo sản phẩm thành công');
@@ -298,6 +301,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
     setSelectedFiles([]);
     setThumbnailPreview('');
     setThumbnailFile(undefined);
+    setTick(false);
   };
 
   return (
@@ -403,6 +407,42 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
                 />
               </div>
+              <div className="space-y-2">
+                <div className="flex items-center mb-2">
+                  <Checkbox
+                    id="hasWarranty"
+                    checked={formData.hasWarranty}
+                    onCheckedChange={(checked) => handleFormChange('hasWarranty', checked as boolean)}
+                    className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500 data-[state=checked]:text-white focus:ring-orange-500 focus:ring-offset-0"
+                  />
+                  <Label
+                    htmlFor="hasWarranty"
+                    className="text-sm font-medium text-gray-700 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Shield className="w-4 h-4 text-orange-500" />
+                    Sản phẩm có bảo hành
+                  </Label>
+                </div>
+          {formData.hasWarranty && (
+                  <div className="mt-2">
+                    <Label
+                      htmlFor="warrantyExpiryDate"
+                      className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Ngày hết hạn bảo hành
+                    </Label>
+                    <Input
+                      id="warrantyExpiryDate"
+                      type="date"
+                      value={formData.warrantyExpiryDate}
+                      onChange={(e) => handleFormChange('warrantyExpiryDate', e.target.value)}
+                      className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -423,60 +463,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               />
             </div>
 
-            {/* Warranty Section - Horizontal Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-600" />
-                  Tình trạng bảo hành
-                </Label>
-                <select
-                  value={formData.hasWarranty ? 'yes' : 'no'}
-                  onChange={(e) => handleFormChange('hasWarranty', e.target.value === 'yes')}
-                  className="w-full h-11 px-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
-                >
-                  <option value="no">Không có bảo hành</option>
-                  <option value="yes">Còn bảo hành</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="warrantyExpiryDate"
-                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4 text-gray-500" />
-                  Ngày hết hạn bảo hành
-                </Label>
-                <Input
-                  id="warrantyExpiryDate"
-                  type="date"
-                  value={formData.warrantyExpiryDate}
-                  onChange={handleWarrantyDateChange}
-                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${warrantyDateError
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                    : ''
-                    }`}
-                  min={(() => {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    return tomorrow.toISOString().split('T')[0];
-                  })()}
-                  disabled={!formData.hasWarranty}
-                />
-                {formData.hasWarranty && !warrantyDateError && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Chọn ngày trong tương lai (sau ngày hôm nay)
-                  </p>
-                )}
-                {warrantyDateError && (
-                  <p className="text-xs text-red-500 mt-1">{warrantyDateError}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Tags Section */}
-            <div className="space-y-2 mt-4">
+            <div className="space-y-2">
               <Label
                 htmlFor="tags"
                 className="text-sm font-medium text-gray-700 flex items-center gap-2"
@@ -500,7 +487,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
             </h3>
 
             <div className="space-y-6">
-              {/* Mô tả ngắn */}
               <div className="space-y-2">
                 <Label htmlFor="shortDescription" className="text-sm font-medium text-gray-700">
                   Mô tả ngắn
@@ -518,7 +504,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                 />
               </div>
 
-              {/* Mô tả chi tiết */}
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium text-gray-700">
                   Mô tả chi tiết
@@ -531,12 +516,13 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   preview="edit"
                   data-color-mode="light"
                   textareaProps={{
-                    placeholder: 'Nhập mô tả ngắn gọn về sản phẩm',
+                    placeholder: 'Nhập mô tả chi tiết về sản phẩm',
                   }}
                 />
               </div>
             </div>
           </div>
+
           {/* Images Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-200">
@@ -544,7 +530,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               Hình ảnh sản phẩm
             </h3>
 
-            {/* Thumbnail */}
             <div className="bg-gray-50 rounded-lg p-6">
               <div className="flex flex-col lg:flex-row gap-6">
                 <div className="flex-shrink-0">
@@ -598,7 +583,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               </div>
             </div>
 
-            {/* Product Images */}
             <div className="bg-gray-50 rounded-lg p-6">
               <div className="flex flex-col lg:flex-row gap-6">
                 <div className="flex-shrink-0">
@@ -657,20 +641,29 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               </div>
             </div>
           </div>
+
+          {/* Draft Checkbox */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2 mt-4">
+            <div className="flex items-center space-x-2">
               <Checkbox
                 id="draft-checkbox"
                 checked={tick}
                 onCheckedChange={(checked) => handleTickChange(checked as boolean)}
-                className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-white data-[state=checked]:border-orange-500 data-[state=checked]:text-orange-500 focus:ring-orange-500 focus:ring-offset-0"
+                className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500 data-[state=checked]:text-white focus:ring-orange-500 focus:ring-offset-0"
               />
-              <Label htmlFor="draft-checkbox" className="text-sm font-medium text-gray-700">
-                Lưu dưới dạng bản nháp( Tích nếu bạn muốn lưu làm bản nháp, sản phẩm sẽ không được duyệt cho
-                đến khi bạn chuyển sang trạng thái khởi tạo )
+              <Label
+                htmlFor="draft-checkbox"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2 cursor-pointer"
+              >
+                <Package className="w-4 h-4 text-orange-500" />
+                Lưu dưới dạng bản nháp
               </Label>
             </div>
-            {!tick && <p className="text-xs text-gray-500">Sản phẩm sẽ lưu vào bản nháp.</p>}
+            <p className="text-xs text-gray-500">
+              {tick
+                ? 'Sản phẩm sẽ được lưu dưới dạng bản nháp và không được duyệt cho đến khi chuyển sang trạng thái khởi tạo.'
+                : 'Sản phẩm sẽ được lưu và gửi để duyệt ngay lập tức.'}
+            </p>
           </div>
         </div>
 

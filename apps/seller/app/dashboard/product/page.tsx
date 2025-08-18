@@ -5,16 +5,6 @@ import { EditProductDialog } from '@/components/dialog-common/view-update/edit-p
 import { ProductDetailsDialog } from '@/components/dialog-common/view-update/view-detail-product';
 import ProductFilter from '@/components/product/ProductFilter';
 import ProductTable from '@/components/product/ProductTable';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import useProduct from '@/hooks/use-product';
-import { CreateProductDto, TProduct } from '@/service/product.api';
-import '@uiw/react-markdown-preview/markdown.css';
-import '@uiw/react-md-editor/markdown-editor.css';
-import { DollarSign, Package, Plus, RefreshCw, Star, TrendingUp } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import { productApi } from '@/service/product.api';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +15,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import useProduct from '@/hooks/use-product';
+import { CreateProductDto, productApi, TProduct } from '@/service/product.api';
+import '@uiw/react-markdown-preview/markdown.css';
+import '@uiw/react-md-editor/markdown-editor.css';
+import { DollarSign, Package, Plus, RefreshCw, Star, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 export default function ProductManagement() {
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -32,8 +31,6 @@ export default function ProductManagement() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<TProduct | null>(null);
-
-
 
   const {
     productList,
@@ -88,10 +85,10 @@ export default function ProductManagement() {
 
     try {
       toast.loading('Đang xóa sản phẩm...');
-
-      // Gọi API delete product
-      await productApi.deleteProduct(productToDelete.id);
-
+      const response = await productApi.deleteProduct(productToDelete.id);
+      if(!response.success){
+        toast.error(response.messages);
+      }
       toast.success('Đã xóa sản phẩm thành công');
       fetchProducts();
     } catch (error) {
@@ -247,9 +244,7 @@ export default function ProductManagement() {
               <AlertDialogDescription>
                 Bạn có chắc chắn muốn xóa sản phẩm "{productToDelete?.name}"?
                 <br />
-                <span className="text-red-600 font-medium">
-                  Hành động này không thể hoàn tác.
-                </span>
+                <span className="text-red-600 font-medium">Hành động này không thể hoàn tác.</span>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
