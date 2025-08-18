@@ -12,7 +12,6 @@ import { CreateProductDto, productApi, TProductStatus } from '@/service/product.
 import { storageApi } from '@/service/storage.api';
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
-import { frameData } from 'framer-motion';
 import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -453,10 +452,11 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   type="date"
                   value={formData.warrantyExpiryDate}
                   onChange={handleWarrantyDateChange}
-                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${warrantyDateError
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                    : ''
-                    }`}
+                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
+                    warrantyDateError
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                      : ''
+                  }`}
                   min={(() => {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);

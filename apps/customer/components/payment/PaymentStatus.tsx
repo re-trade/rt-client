@@ -98,28 +98,21 @@ export default function PaymentStatus({ orderId }: PaymentStatusProps) {
           orderId: paymentState.data?.orderId || orderId,
         });
 
-        if (paymentUrl) {
-          window.open(paymentUrl, '_blank');
-          showToast(TOAST_MESSAGES.REDIRECTING, 'info');
-          setShowPaymentMethods(false);
-          setTimeout(fetchPaymentStatus, 3000);
-        } else {
-          throw new Error(ERROR_MESSAGES.INIT_PAYMENT);
+        if (!paymentUrl || paymentUrl.trim() === '') {
+          throw new Error('Không nhận được URL thanh toán từ server');
         }
+
+        window.open(paymentUrl, '_blank');
+        showToast(TOAST_MESSAGES.REDIRECTING, 'info');
+        setShowPaymentMethods(false);
+        setTimeout(fetchPaymentStatus, 3000);
       } catch (error: any) {
-        const errorMessage = getErrorMessage(error, ERROR_MESSAGES.INIT_PAYMENT);
+        const errorMessage = error.message || ERROR_MESSAGES.INIT_PAYMENT;
         setShowPaymentMethods(false);
         showToast(errorMessage, 'error');
       }
     },
-    [
-      initPayment,
-      orderId,
-      paymentState.data?.orderId,
-      showToast,
-      getErrorMessage,
-      fetchPaymentStatus,
-    ],
+    [initPayment, orderId, paymentState.data?.orderId, showToast, fetchPaymentStatus],
   );
   const handlePayNowClick = useCallback(async () => {
     try {

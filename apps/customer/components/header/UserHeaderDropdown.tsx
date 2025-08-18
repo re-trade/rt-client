@@ -89,7 +89,11 @@ const UserHeaderDropdown = () => {
               {renderAvatar()}
               <div>
                 <p className="font-semibold text-gray-800">Xin chào!</p>
-                <p className="text-sm text-gray-600">{profile?.username || account?.username}</p>
+                <p className="text-sm text-gray-600">
+                  {profile?.firstName && profile?.lastName
+                    ? `${profile.firstName} ${profile.lastName}`
+                    : profile?.username || account?.username || 'Người dùng'}
+                </p>
               </div>
             </div>
           </div>

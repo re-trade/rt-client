@@ -8,6 +8,7 @@ export interface CartItemResponse {
   totalPrice: number;
   addedAt: string;
   productAvailable: boolean;
+  productQuantity: number;
   description: string;
   quantity: number;
 }
@@ -39,9 +40,9 @@ export const cartApi = {
     }
   },
 
-  async addToCart(productId: string, quantity: number): Promise<CartResponse> {
+  async addToCart(productId: string, quantity: number): Promise<IResponseObject<CartResponse>> {
     try {
-      const response = await authApi.default.post<CartResponse>('/carts/items', {
+      const response = await authApi.default.post<IResponseObject<CartResponse>>('/carts/items', {
         productId,
         quantity,
       });
@@ -51,18 +52,23 @@ export const cartApi = {
     }
   },
 
-  async removeFromCart(productId: string): Promise<CartResponse> {
+  async removeFromCart(productId: string): Promise<IResponseObject<CartResponse>> {
     try {
-      const response = await authApi.default.delete<CartResponse>(`/carts/items/${productId}`);
+      const response = await authApi.default.delete<IResponseObject<CartResponse>>(
+        `/carts/items/${productId}`,
+      );
       return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  async updateCartItemQuantity(productId: string, quantity: number): Promise<CartResponse> {
+  async updateCartItemQuantity(
+    productId: string,
+    quantity: number,
+  ): Promise<IResponseObject<CartResponse>> {
     try {
-      const response = await authApi.default.put<CartResponse>(`/carts/items`, {
+      const response = await authApi.default.put<IResponseObject<CartResponse>>(`/carts/items`, {
         productId,
         quantity,
       });

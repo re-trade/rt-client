@@ -6,6 +6,7 @@ import PaymentStatus from '@/components/payment/PaymentStatus';
 import { useToast } from '@/context/ToastContext';
 import { useOrderDetail } from '@/hooks/use-order-detail';
 import { orderApi } from '@/services/order.api';
+import { getSellerProfile } from '@/services/seller.api';
 import {
   ArrowLeft,
   Calendar,
@@ -25,11 +26,12 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function OrderDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const orderId = params.id as string;
   const { currentOrder, isLoading, error, getStatusDisplay, getOrderById } =
     useOrderDetail(orderId);
@@ -76,7 +78,10 @@ export default function OrderDetailPage() {
     setTimeout(() => setCopiedOrderId(false), 2000);
   };
 
-  const handleStatusChange = async (action: 'cancel' | 'complete' | 'return', reason?: string) => {
+  const handleStatusChange = async (
+    action: 'cancel' | 'complete' | 'return' | 'confirm',
+    reason?: string,
+  ) => {
     try {
       let updatedOrder;
 
@@ -93,6 +98,10 @@ export default function OrderDetailPage() {
           updatedOrder = await orderApi.requestReturn(orderId, reason!);
           showToast('Yêu cầu trả hàng đã được gửi', 'success');
           break;
+        case 'confirm':
+          updatedOrder = await orderApi.confirmRetrieved(orderId);
+          showToast('Đã xác nhận nhận hàng thành công', 'success');
+          break;
       }
 
       await getOrderById();
@@ -105,7 +114,12 @@ export default function OrderDetailPage() {
   const canChangeStatus = () => {
     if (!currentOrder) return false;
     const status = currentOrder.orderStatus;
-    return status === 'Pending' || status === 'Payment Confirmation' || status === 'Delivered';
+    return (
+      status === 'Pending' ||
+      status === 'Payment Confirmation' ||
+      status === 'Delivered' ||
+      status === 'RETRIEVED'
+    );
   };
 
   const getStatusDisplayWithDescription = (statusId: string) => {
@@ -113,6 +127,31 @@ export default function OrderDetailPage() {
     return {
       ...baseStatus,
     };
+  };
+
+  const handleViewSeller = () => {
+    if (currentOrder?.sellerId) {
+      router.push(`/seller/${currentOrder.sellerId}`);
+    }
+  };
+
+  const handleChatWithSeller = async () => {
+    if (!currentOrder?.sellerId) {
+      showToast('Không thể tìm thấy thông tin người bán', 'error');
+      return;
+    }
+
+    try {
+      // Get seller profile to get accountId
+      const sellerProfile = await getSellerProfile(currentOrder.sellerId);
+      if (sellerProfile?.accountId) {
+        router.push(`/chat/${sellerProfile.accountId}`);
+      } else {
+        showToast('Không thể kết nối với người bán', 'error');
+      }
+    } catch (error) {
+      showToast('Có lỗi xảy ra khi kết nối với người bán', 'error');
+    }
   };
 
   if (isLoading) {
@@ -210,12 +249,23 @@ export default function OrderDetailPage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <Clock className="w-5 h-5 text-orange-600" />
-            </div>
-            Trạng thái đơn hàng
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Clock className="w-5 h-5 text-orange-600" />
+              </div>
+              Trạng thái đơn hàng
+            </h2>
+            {canChangeStatus() && (
+              <button
+                onClick={() => setShowStatusChangeDialog(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl text-sm font-medium"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Quản lý đơn hàng</span>
+              </button>
+            )}
+          </div>
           <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
             <div
               className={`p-3 rounded-full ${statusDisplay.color.replace('border-', 'bg-').replace('text-', 'text-white ').split(' ')[0]} text-white`}
@@ -309,13 +359,19 @@ export default function OrderDetailPage() {
               <p className="text-sm text-gray-600">ID: {currentOrder.sellerId.slice(0, 8)}...</p>
             </div>
             <div className="flex space-x-2">
-              <button className="flex items-center space-x-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors">
+              <button
+                onClick={handleChatWithSeller}
+                className="flex items-center space-x-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors"
+              >
                 <MessageCircle className="w-4 h-4" />
                 <span>Nhắn tin</span>
               </button>
-              <button className="flex items-center space-x-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors">
+              <button
+                onClick={handleViewSeller}
+                className="flex items-center space-x-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors"
+              >
                 <User className="w-4 h-4" />
-                <span>Xem shop</span>
+                <span>Xem người bán</span>
               </button>
             </div>
           </div>
@@ -428,16 +484,6 @@ export default function OrderDetailPage() {
 
         <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
           <div className="flex flex-wrap gap-3">
-            {canChangeStatus() && (
-              <button
-                onClick={() => setShowStatusChangeDialog(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                <Edit3 className="w-4 h-4" />
-                <span>Thay đổi trạng thái</span>
-              </button>
-            )}
-
             {currentOrder.orderStatus === 'DELIVERED' && (
               <>
                 <button className="flex items-center gap-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors duration-200">
@@ -451,7 +497,10 @@ export default function OrderDetailPage() {
               </>
             )}
 
-            <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200">
+            <button
+              onClick={handleChatWithSeller}
+              className="flex items-center gap-2 px-4 py-2 bg-white text-gray-600 border border-orange-200 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200"
+            >
               <MessageCircle className="w-4 h-4" />
               <span>Liên hệ người bán</span>
             </button>

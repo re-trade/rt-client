@@ -1,6 +1,6 @@
 'use client';
 
-import { useOrder } from '@/hooks/use-order';
+import { statusOrder, useOrder } from '@/hooks/use-order';
 import { orderApi, OrderCombo, OrderStatsResponse } from '@/services/order.api';
 import Pagination from '@components/common/Pagination';
 import PurchaseOrderEmpty from '@components/purchase/PurchaseOrderEmpty';
@@ -31,6 +31,7 @@ export default function PurchasePage() {
     updateSearchFilter,
     updateOrderStatusFilter,
     getStatusDisplay,
+    sortOrdersByStatus,
     getMyOrders,
     goToPage,
   } = useOrder();
@@ -113,7 +114,7 @@ export default function PurchasePage() {
               searchTerm={search || ''}
             />
           ) : (
-            <OrderList orders={orders} getStatusDisplay={getStatusDisplay} />
+            <OrderList orders={sortOrdersByStatus(orders)} getStatusDisplay={getStatusDisplay} />
           )}
         </div>
 
@@ -254,39 +255,45 @@ const SearchAndFilter = memo(
                 </button>
 
                 {/* Các option trạng thái */}
-                {Object.entries(orderStatusRecord).map(([key, status]) => {
-                  const IconComponent = status.config.icon;
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => {
-                        updateOrderStatusFilter(key);
-                        setIsDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                        selectedOrderStatuses === key
-                          ? 'bg-amber-50 border-l-4 border-amber-500'
-                          : ''
-                      }`}
-                    >
-                      <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
-                        {IconComponent ? (
-                          <IconComponent className="w-4 h-4 text-gray-600" />
-                        ) : (
-                          <Filter className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div
-                          className={`w-full px-3 py-1 rounded-md text-sm font-medium ${status.config.color} text-center`}
-                        >
-                          {status.config.label}
+                {Object.entries(orderStatusRecord)
+                  .sort(([, a], [, b]) => {
+                    const orderA = statusOrder[a.code as keyof typeof statusOrder] || 999;
+                    const orderB = statusOrder[b.code as keyof typeof statusOrder] || 999;
+                    return orderA - orderB;
+                  })
+                  .map(([key, status]) => {
+                    const IconComponent = status.config.icon;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => {
+                          updateOrderStatusFilter(key);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                          selectedOrderStatuses === key
+                            ? 'bg-amber-50 border-l-4 border-amber-500'
+                            : ''
+                        }`}
+                      >
+                        <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
+                          {IconComponent ? (
+                            <IconComponent className="w-4 h-4 text-gray-600" />
+                          ) : (
+                            <Filter className="w-4 h-4 text-gray-400" />
+                          )}
                         </div>
-                      </div>
-                    </button>
-                  );
-                })}
+                        <div className="flex-1">
+                          <div
+                            className={`w-full px-3 py-1 rounded-md text-sm font-medium ${status.config.color} text-center`}
+                          >
+                            {status.config.label}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
               </div>
             )}
           </div>

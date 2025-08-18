@@ -28,35 +28,37 @@ export default function BankAccountModal({
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 z-[9999] transition-opacity duration-300 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
+      <div className="fixed inset-0 flex items-center justify-center z-[10000] px-4">
         <div
-          className="bg-white text-[#121212] rounded-xl shadow-xl w-11/12 max-w-2xl p-0 overflow-hidden transform transition-all duration-300 scale-100"
+          className="bg-gradient-to-r from-white to-orange-50 text-gray-800 rounded-xl shadow-2xl w-11/12 max-w-2xl p-0 overflow-hidden transform transition-all duration-300 scale-100 border border-orange-200"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="bg-[#FFD2B2] px-6 py-4 flex justify-between items-center">
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 flex justify-between items-center">
             <div className="flex items-center">
-              <svg
-                className="w-5 h-5 mr-2 text-[#121212]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                />
-              </svg>
-              <h2 className="text-xl font-bold text-[#121212]">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3">
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-white">
                 {editingAccount ? 'Sửa thông tin tài khoản' : 'Thêm tài khoản mới'}
               </h2>
             </div>
             <button
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-[#121212] hover:bg-white/40 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
               onClick={onClose}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +79,7 @@ export default function BankAccountModal({
             />
 
             <div>
-              <label className="block text-sm font-semibold text-[#121212] mb-1">
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
                 Tên chủ tài khoản
               </label>
               <input
@@ -85,17 +87,15 @@ export default function BankAccountModal({
                 placeholder="NGUYEN VAN A"
                 value={form.userBankName}
                 onChange={(e) => onChange('userBankName', e.target.value.toUpperCase())}
-                className="input w-full px-4 py-2.5 border border-[#525252]/20 text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all"
+                className="w-full px-4 py-3 border border-orange-200 text-gray-800 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all shadow-sm hover:shadow-md"
               />
-              <p className="text-xs text-[#525252] mt-1">
+              <p className="text-xs text-gray-600 mt-2">
                 Nhập tên chủ tài khoản theo đúng thông tin trên thẻ ngân hàng
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#121212] mb-1">
-                Số tài khoản
-              </label>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">Số tài khoản</label>
               <input
                 type="tel"
                 inputMode="numeric"
@@ -115,17 +115,17 @@ export default function BankAccountModal({
                     e.preventDefault();
                   }
                 }}
-                className="input w-full px-4 py-2.5 border border-[#525252]/20 text-[#121212] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD2B2] focus:border-[#FFD2B2] transition-all font-mono"
+                className="w-full px-4 py-3 border border-orange-200 text-gray-800 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all font-mono shadow-sm hover:shadow-md"
               />
-              <p className="text-xs text-[#525252] mt-1">
+              <p className="text-xs text-gray-600 mt-2">
                 Chỉ nhập số, không có dấu cách hoặc ký tự đặc biệt
               </p>
             </div>
           </div>
-          <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+          <div className="bg-gradient-to-r from-orange-50 to-orange-100 px-6 py-4 flex justify-end space-x-4 border-t border-orange-200">
             <button
               onClick={onClose}
-              className="px-6 py-2.5 bg-[#525252]/10 text-[#121212] rounded-lg hover:bg-[#525252]/20 transition-colors font-medium"
+              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium border border-gray-200 hover:border-gray-300"
             >
               Hủy bỏ
             </button>
@@ -134,10 +134,10 @@ export default function BankAccountModal({
               disabled={
                 loading || !form.selectedBankBin || !form.userBankName || !form.accountNumber
               }
-              className="px-6 py-2.5 bg-[#FFD2B2] text-[#121212] font-semibold rounded-lg hover:bg-[#FFB980] transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             >
               {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#121212] border-t-transparent" />
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
               ) : (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path

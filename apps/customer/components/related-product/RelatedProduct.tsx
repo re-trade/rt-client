@@ -2,6 +2,8 @@
 
 import { TProduct } from '@/services/product.api';
 import ProductCard from '@components/product/ProductCard';
+import ProductSectionEmpty from '@components/product/ProductSectionEmpty';
+import { Grid3X3 } from 'lucide-react';
 
 interface RelatedProductsProps {
   products: TProduct[];
@@ -10,9 +12,17 @@ interface RelatedProductsProps {
 export default function RelatedProducts({ products }: RelatedProductsProps) {
   if (!products.length) {
     return (
-      <div className="text-gray-500 flex items-center justify-between">
-        <p>Không có sản phẩm liên quan.</p>
-      </div>
+      <ProductSectionEmpty
+        title="Không có sản phẩm liên quan"
+        description="Hiện tại chúng tôi chưa tìm thấy sản phẩm liên quan nào cho sản phẩm này."
+        icon={Grid3X3}
+        showBrowseButton={true}
+        showRefreshButton={false}
+        showCategories={false}
+        browseButtonText="Xem thêm sản phẩm"
+        browseButtonPath="/product"
+        size="sm"
+      />
     );
   }
 
