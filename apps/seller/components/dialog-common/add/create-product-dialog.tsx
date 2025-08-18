@@ -3,6 +3,7 @@
 import { FancyMultiSelect } from '@/components/common/MultiSectCate';
 import { SelectBrand } from '@/components/common/SelectBrand';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,12 +12,11 @@ import { CreateProductDto, productApi, TProductStatus } from '@/service/product.
 import { storageApi } from '@/service/storage.api';
 import '@uiw/react-markdown-preview/markdown.css';
 import '@uiw/react-md-editor/markdown-editor.css';
-import { Calendar, Check, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
+import { Calendar, Image as ImageIcon, Package, Shield, Tag, Upload, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Checkbox } from "@/components/ui/checkbox"
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 interface CreateProductDialogProps {
   open: boolean;
@@ -424,10 +424,11 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                   type="date"
                   value={formData.warrantyExpiryDate}
                   onChange={handleWarrantyDateChange}
-                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${warrantyDateError
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                    : ''
-                    }`}
+                  className={`h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 ${
+                    warrantyDateError
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                      : ''
+                  }`}
                   min={(() => {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -625,7 +626,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                     </div>
                   )}
                 </div>
-
               </div>
             </div>
           </div>
@@ -634,20 +634,18 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               <Checkbox
                 id="draft-checkbox"
                 checked={formData.status === 'DRAFT'}
-                onCheckedChange={(checked) => handleFormChange('status', checked ? 'DRAFT' : 'PUBLISHED')}
+                onCheckedChange={(checked) =>
+                  handleFormChange('status', checked ? 'DRAFT' : 'PUBLISHED')
+                }
                 onClick={() => handleTickChange(!tick)}
                 className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-white data-[state=checked]:border-orange-500 data-[state=checked]:text-orange-500 focus:ring-orange-500 focus:ring-offset-0"
               />
               <Label htmlFor="draft-checkbox" className="text-sm font-medium text-gray-700">
-                Lưu bản nháp( Tích nếu bạn muốn lưu làm bản nháp, sản phẩm sẽ không được duyệt cho đến khi bạn chuyển sang trạng thái khởi tạo )
+                Lưu bản nháp( Tích nếu bạn muốn lưu làm bản nháp, sản phẩm sẽ không được duyệt cho
+                đến khi bạn chuyển sang trạng thái khởi tạo )
               </Label>
-
             </div>
-            {!tick && (
-              <p className="text-xs text-gray-500">
-                Sản phẩm sẽ lưu vào bản nháp.
-              </p>
-            )}
+            {!tick && <p className="text-xs text-gray-500">Sản phẩm sẽ lưu vào bản nháp.</p>}
           </div>
         </div>
 
