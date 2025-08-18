@@ -1,5 +1,6 @@
 'use client';
 
+import { useDebounce } from '@/hooks/use-debounce';
 import { productApi, TProduct, TProductFilter } from '@/services/product.api';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -24,6 +25,7 @@ export function useProductList() {
     minPrice: 0,
     maxPrice: 0,
   });
+
   const [selectedFilter, setSelectedFilter] = useState<TFilterSelected>({
     states: [],
     categories: [],
@@ -44,6 +46,9 @@ export function useProductList() {
 
   const PAGE_SIZE = 9;
 
+  // Debounce the selected filter to prevent excessive API calls during rapid changes
+  const debouncedSelectedFilter = useDebounce(selectedFilter, 400);
+
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -52,19 +57,22 @@ export function useProductList() {
       const params = new URLSearchParams();
 
       if (keyword) params.append('keyword', keyword);
-      if (selectedFilter.states.length)
-        selectedFilter.states.forEach((s) => params.append('state', s));
-      if (selectedFilter.categories.length)
-        selectedFilter.categories.forEach((c) => params.append('categoryId', c));
-      if (selectedFilter.brands.length)
-        selectedFilter.brands.forEach((b) => params.append('brand', b));
-      if (selectedFilter.seller) params.append('seller', selectedFilter.seller);
-      if (selectedFilter.minPrice && selectedFilter.minPrice > 0) {
-        if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
-          params.append('currentPrice', `${selectedFilter.minPrice}..${selectedFilter.maxPrice}`);
+      if (debouncedSelectedFilter.states.length)
+        debouncedSelectedFilter.states.forEach((s) => params.append('state', s));
+      if (debouncedSelectedFilter.categories.length)
+        debouncedSelectedFilter.categories.forEach((c) => params.append('categoryId', c));
+      if (debouncedSelectedFilter.brands.length)
+        debouncedSelectedFilter.brands.forEach((b) => params.append('brand', b));
+      if (debouncedSelectedFilter.seller) params.append('seller', debouncedSelectedFilter.seller);
+      if (debouncedSelectedFilter.minPrice && debouncedSelectedFilter.minPrice > 0) {
+        if (debouncedSelectedFilter.maxPrice && debouncedSelectedFilter.maxPrice > 0) {
+          params.append(
+            'currentPrice',
+            `${debouncedSelectedFilter.minPrice}..${debouncedSelectedFilter.maxPrice}`,
+          );
         }
-      } else if (selectedFilter.maxPrice && selectedFilter.maxPrice > 0) {
-        params.append('currentPrice', `0..${selectedFilter.maxPrice}`);
+      } else if (debouncedSelectedFilter.maxPrice && debouncedSelectedFilter.maxPrice > 0) {
+        params.append('currentPrice', `0..${debouncedSelectedFilter.maxPrice}`);
       }
       params.append('verified', String(true));
       const response = await productApi.searchProducts(page - 1, PAGE_SIZE, params.toString(), []);
@@ -77,14 +85,14 @@ export function useProductList() {
     } finally {
       setLoading(false);
     }
-  }, [keyword, page, selectedFilter]);
+  }, [keyword, page, debouncedSelectedFilter]);
 
   const fetchFilter = useCallback(async () => {
     setFilterLoading(true);
     setFilterError(null);
     try {
-      const response = await productApi.getProductFilter(keyword);
-      setFilter(response);
+      const filterResponse = await productApi.getProductFilter(keyword);
+      setFilter(filterResponse);
     } catch {
       setFilterError('Không thể tải filter. Vui lòng thử lại sau.');
     } finally {
@@ -138,6 +146,11 @@ export function useProductList() {
     setPage(1);
   }, []);
 
+  // Return filter as-is since count filtering is removed from API
+  const getValidatedFilter = useCallback((): TProductFilter => {
+    return filter;
+  }, [filter]);
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
@@ -153,7 +166,7 @@ export function useProductList() {
     error,
     filterError,
     products,
-    filter,
+    filter: getValidatedFilter(),
     keyword,
     handleFilterChange,
     handlePageChange,
