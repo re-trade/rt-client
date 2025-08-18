@@ -56,7 +56,7 @@ export default function PolicyPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Chính sách & Điều khoản</h1>
           <p className="text-xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
-            Tìm hiểu về các chính sách, điều khoản và quy định của ReTrade - nền tảng mua bán đồ cũ 
+            Tìm hiểu về các chính sách, điều khoản và quy định của ReTrade - nền tảng mua bán đồ cũ
             an toàn và minh bạch, kết nối cộng đồng yêu thích đồ cũ.
           </p>
         </div>
@@ -161,16 +161,17 @@ function PrivacyPolicyContent() {
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Thu thập thông tin</h3>
           <p className="text-gray-600 leading-relaxed mb-4">
-            ReTrade thu thập thông tin cá nhân của bạn khi bạn đăng ký tài khoản, đăng bán đồ cũ, 
-            thực hiện giao dịch, hoặc tương tác với cộng đồng mua bán đồ cũ. Các thông tin này bao gồm:
+            ReTrade thu thập thông tin cá nhân của bạn khi bạn đăng ký tài khoản, đăng bán đồ cũ,
+            thực hiện giao dịch, hoặc tương tác với cộng đồng mua bán đồ cũ. Các thông tin này bao
+            gồm:
           </p>
-                      <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
-              <li>Thông tin cá nhân: Họ tên, email, số điện thoại, địa chỉ</li>
-              <li>Thông tin giao dịch: Lịch sử mua bán đồ cũ, phương thức thanh toán</li>
-              <li>Thông tin kỹ thuật: Địa chỉ IP, loại thiết bị, trình duyệt</li>
-              <li>Thông tin hành vi: Cách bạn sử dụng website, sở thích về đồ cũ</li>
-              <li>Thông tin sản phẩm: Ảnh, mô tả đồ cũ bạn đăng bán</li>
-            </ul>
+          <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
+            <li>Thông tin cá nhân: Họ tên, email, số điện thoại, địa chỉ</li>
+            <li>Thông tin giao dịch: Lịch sử mua bán đồ cũ, phương thức thanh toán</li>
+            <li>Thông tin kỹ thuật: Địa chỉ IP, loại thiết bị, trình duyệt</li>
+            <li>Thông tin hành vi: Cách bạn sử dụng website, sở thích về đồ cũ</li>
+            <li>Thông tin sản phẩm: Ảnh, mô tả đồ cũ bạn đăng bán</li>
+          </ul>
         </section>
 
         <section>
@@ -253,9 +254,9 @@ function TermsOfServiceContent() {
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">1. Chấp nhận điều khoản</h3>
           <p className="text-gray-600 leading-relaxed">
-            Bằng việc truy cập và sử dụng nền tảng ReTrade - nền tảng mua bán đồ cũ, bạn đồng ý tuân thủ 
-            và bị ràng buộc bởi các điều khoản và điều kiện này. Nếu bạn không đồng ý với bất kỳ phần 
-            nào của các điều khoản này, vui lòng không sử dụng dịch vụ của chúng tôi.
+            Bằng việc truy cập và sử dụng nền tảng ReTrade - nền tảng mua bán đồ cũ, bạn đồng ý tuân
+            thủ và bị ràng buộc bởi các điều khoản và điều kiện này. Nếu bạn không đồng ý với bất kỳ
+            phần nào của các điều khoản này, vui lòng không sử dụng dịch vụ của chúng tôi.
           </p>
         </section>
 
@@ -307,10 +308,10 @@ function TermsOfServiceContent() {
         <section>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">5. Giao dịch và thanh toán</h3>
           <p className="text-gray-600 leading-relaxed">
-            ReTrade đóng vai trò là nền tảng kết nối người mua và người bán đồ cũ. Chúng tôi không chịu
-            trách nhiệm về chất lượng đồ cũ, tính chính xác của mô tả tình trạng, hoặc khả năng thực hiện
-            giao dịch của các bên. Tuy nhiên, chúng tôi cung cấp các công cụ và dịch vụ hỗ trợ để
-            đảm bảo giao dịch mua bán đồ cũ diễn ra thuận lợi và an toàn.
+            ReTrade đóng vai trò là nền tảng kết nối người mua và người bán đồ cũ. Chúng tôi không
+            chịu trách nhiệm về chất lượng đồ cũ, tính chính xác của mô tả tình trạng, hoặc khả năng
+            thực hiện giao dịch của các bên. Tuy nhiên, chúng tôi cung cấp các công cụ và dịch vụ hỗ
+            trợ để đảm bảo giao dịch mua bán đồ cũ diễn ra thuận lợi và an toàn.
           </p>
         </section>
 
@@ -318,7 +319,7 @@ function TermsOfServiceContent() {
           <h3 className="text-xl font-semibold text-gray-800 mb-4">6. Chấm dứt dịch vụ</h3>
           <p className="text-gray-600 leading-relaxed">
             ReTrade có quyền tạm ngừng hoặc chấm dứt tài khoản của bạn nếu phát hiện vi phạm các
-            điều khoản này hoặc có hành vi có thể gây hại đến nền tảng mua bán đồ cũ và cộng đồng 
+            điều khoản này hoặc có hành vi có thể gây hại đến nền tảng mua bán đồ cũ và cộng đồng
             người dùng. Bạn cũng có thể tự nguyện đóng tài khoản bất cứ lúc nào.
           </p>
         </section>
