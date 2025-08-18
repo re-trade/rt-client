@@ -147,15 +147,21 @@ export const productApi = {
   },
   async createProduct(product: CreateProductDto): Promise<IResponseObject<TProduct>> {
     const response = await authApi.default.post<IResponseObject<TProduct>>('/products', product);
-    if (response.data.success) {
-      return createResponseObject({
-        code: response.data.code,
-        messages: response.data.message,
-        success: response.data.success,
-        content: response.data.content,
-      });
-    }
-    throw new Error('Failed to create product');
+    return createResponseObject({
+      code: response.data.code,
+      messages: response.data.message,
+      success: response.data.success,
+      content: response.data.content,
+    });
+  },
+  async deleteProduct(id: string): Promise<IResponseObject<TProduct>> {
+    const response = await authApi.default.delete<IResponseObject<TProduct>>(`/products/${id}`);
+    return createResponseObject({
+      code: response.data.code,
+      messages: response.data.message,
+      success: response.data.success,
+      content: response.data.content,
+    });
   },
 
   async updateProduct(id: string, product: UpdateProductDto): Promise<TProduct> {
@@ -176,14 +182,6 @@ export const productApi = {
       return response.data.content;
     }
     return undefined;
-  },
-
-  async deleteProduct(id: string): Promise<TProduct> {
-    const response = await authApi.default.delete<IResponseObject<TProduct>>(`/products/${id}`);
-    if (response.data.success) {
-      return response.data.content;
-    }
-    throw new Error('Failed to delete product');
   },
 
   async updateProductStatus(id: string, status: TProductStatus): Promise<TProduct> {
