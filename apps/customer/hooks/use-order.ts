@@ -19,6 +19,26 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+// Order status progression mapping (ascending order)
+export const statusOrder = {
+  PENDING: 1,
+  PAYMENT_CONFIRMATION: 2,
+  PREPARING: 3,
+  DELIVERING: 4,
+  DELIVERED: 5,
+  RETRIEVED: 6,
+  COMPLETED: 7,
+  CANCELLED: 8,
+  PAYMENT_CANCELLED: 9,
+  PAYMENT_FAILED: 10,
+  RETURNING: 11,
+  RETURNED: 12,
+  REFUNDED: 13,
+  RETURN_REJECTED: 14,
+  RETURN_REQUESTED: 15,
+  RETURN_APPROVED: 16,
+} as const;
+
 export const statusConfig = {
   PENDING: {
     label: 'Chưa thanh toán',
@@ -44,6 +64,11 @@ export const statusConfig = {
     label: 'Đã giao',
     color: 'bg-amber-100 text-amber-800 border-amber-200',
     icon: CheckCircle,
+  },
+  RETRIEVED: {
+    label: 'Đã lấy hàng',
+    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    icon: Package,
   },
   CANCELLED: {
     label: 'Đã hủy',
@@ -316,6 +341,27 @@ export function useOrder() {
     );
   };
 
+  const sortOrdersByStatus = useCallback(
+    (orders: OrderCombo[]) => {
+      return [...orders].sort((a, b) => {
+        const statusA = orderState.orderStatusRecord[a.orderStatusId]?.code || 'PENDING';
+        const statusB = orderState.orderStatusRecord[b.orderStatusId]?.code || 'PENDING';
+
+        const orderA = statusOrder[statusA as keyof typeof statusOrder] || 999;
+        const orderB = statusOrder[statusB as keyof typeof statusOrder] || 999;
+
+        // Primary sort: by status order (ascending)
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+
+        // Secondary sort: by creation date (newest first)
+        return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
+      });
+    },
+    [orderState.orderStatusRecord],
+  );
+
   const updateOrderStatusFilter = useCallback((orderStatusId: string | null) => {
     setOrderState((prev) => ({
       ...prev,
@@ -361,6 +407,7 @@ export function useOrder() {
     updateSearchFilter,
     updateOrderStatusFilter,
     getStatusDisplay,
+    sortOrdersByStatus,
     goToPage,
     nextPage,
     previousPage,

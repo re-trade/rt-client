@@ -90,6 +90,12 @@ export function OrderTable({
         text: 'Đã giao hàng',
         pulse: false,
       },
+      RETRIEVED: {
+        color: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
+        icon: <RotateCcw className="h-3.5 w-3.5" />,
+        text: 'Đã lấy hàng',
+        pulse: false,
+      },
       CANCELLED: {
         color: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
         icon: <Ban className="h-3.5 w-3.5" />,

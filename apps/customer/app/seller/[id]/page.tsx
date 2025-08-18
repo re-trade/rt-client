@@ -1,4 +1,6 @@
 'use client';
+import SellerProductsSection from '@/components/seller/SellerProductsSection';
+import { useAuth } from '@/context/AuthContext';
 import { useSellerProfile } from '@/hooks/use-seller-profile';
 import {
   IconCalendar,
@@ -13,6 +15,7 @@ import {
   IconShoppingBag,
   IconStar,
   IconTrophy,
+  IconUser,
 } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -22,6 +25,7 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
 
   const { sellerProfile, sellerMetrics, achievements, loading, loadingMetrics, error } =
     useSellerProfile(id);
+  const { sellerProfile: currentUserSellerProfile } = useAuth();
 
   const router = useRouter();
 
@@ -114,6 +118,12 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
                 <h1 className="text-2xl md:text-3xl font-bold text-white">
                   {sellerProfile.shopName}
                 </h1>
+                {currentUserSellerProfile?.id === id && (
+                  <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                    <IconUser size={14} />
+                    Đây là bạn
+                  </span>
+                )}
                 {sellerProfile.verified ? (
                   <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                     <IconShieldCheck size={14} />
@@ -327,23 +337,16 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3">
-              <button
-                onClick={() =>
-                  router.push(`/product?keyword=${encodeURIComponent(sellerProfile.shopName)}`)
-                }
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                Xem sản phẩm
-              </button>
-
-              <button
-                onClick={() => router.push(`/chat/${sellerProfile.accountId}`)}
-                className="w-full border border-gray-300 text-gray-600 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200"
-              >
-                Chat với người bán
-              </button>
-            </div>
+            {currentUserSellerProfile?.id !== id && (
+              <div className="space-y-3">
+                <button
+                  onClick={() => router.push(`/chat/${sellerProfile.accountId}`)}
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Chat với người bán
+                </button>
+              </div>
+            )}
 
             <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-6 border border-orange-200">
               <h4 className="font-bold text-gray-800 mb-4">Cam kết chất lượng</h4>
@@ -366,6 +369,8 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
             </div>
           </div>
         </div>
+
+        <SellerProductsSection sellerId={id} sellerName={sellerProfile.shopName} />
       </div>
     </div>
   );

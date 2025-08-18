@@ -16,15 +16,14 @@ export default function Footer() {
                 ReTrade
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                Nền tảng thương mại điện tử hàng đầu, kết nối người mua và người bán với những sản
-                phẩm chất lượng cao.
+                Trao đổi đồ cũ dễ dàng – kết nối người cần và người nhường.
               </p>
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-gray-600">
                 <IconMapPin size={18} className="text-orange-500 flex-shrink-0" />
                 <span className="text-sm">
-                  Tòa nhà Vietcomreal, 68 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. HCM
+                  Lô E2a-7, Đường D1, Khu Công nghệ cao, Phường Tăng Nhơn Phú, TP. HCM
                 </span>
               </div>
               <div className="flex items-center gap-3 text-gray-600">

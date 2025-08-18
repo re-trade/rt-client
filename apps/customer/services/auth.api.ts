@@ -35,7 +35,6 @@ type TRegister = {
   lastName: string;
   phone: string;
   address: string;
-  avatarUrl: string;
 };
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();

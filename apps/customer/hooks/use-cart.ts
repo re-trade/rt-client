@@ -77,8 +77,8 @@ function useCart() {
 
   const fetchAddresses = useCallback(async () => {
     try {
-      const data = await contactApi.getContacts();
-      setContacts(data);
+      const response = await contactApi.getContacts();
+      setContacts(response.addresses);
     } catch {
       setError('Không thể tải địa chỉ');
     }

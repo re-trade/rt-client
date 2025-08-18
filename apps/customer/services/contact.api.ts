@@ -15,14 +15,23 @@ export type TAddress = {
 };
 
 export const contactApi = {
-  async getContacts(page: number = 0, size: number = 10): Promise<TAddress[]> {
+  async getContacts(page: number = 0, size: number = 10) {
     const response = await authApi.default.get<IResponseObject<TAddress[]>>('/contacts', {
       params: {
         page,
         size,
       },
     });
-    return response.data.success ? response.data.content : [];
+    return {
+      addresses: response.data.success ? response.data.content : [],
+      pagination: response.data.pagination || {
+        content: [],
+        page: 0,
+        size: 0,
+        totalPages: 0,
+        totalElements: 0,
+      },
+    };
   },
   async getContact(id: string): Promise<TAddress | null> {
     const response = await authApi.default.get<IResponseObject<TAddress>>(`/contacts/${id}`);

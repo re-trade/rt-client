@@ -10,7 +10,6 @@ const OrderStatusDropdown = ({ statusFilter, setStatusFilter }: Props) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -34,6 +33,11 @@ const OrderStatusDropdown = ({ statusFilter, setStatusFilter }: Props) => {
         return {
           label: 'Đã giao hàng',
           color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        };
+      case 'RETRIEVED':
+        return {
+          label: 'Đã lấy hàng',
+          color: 'bg-blue-50 text-blue-700 border-blue-200',
         };
       case 'COMPLETED':
         return { label: 'Đã hoàn tất', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
@@ -98,6 +102,7 @@ const OrderStatusDropdown = ({ statusFilter, setStatusFilter }: Props) => {
             'PREPARING',
             'DELIVERING',
             'DELIVERED',
+            'RETRIEVED',
             'COMPLETED',
             'CANCELLED',
             'RETURNING',

@@ -83,6 +83,9 @@ const OrderStats = ({ orders }: { orders: TOrder[] }) => {
   const deliveredOrders = orders.filter((o) =>
     o.orderCombos.some((combo) => combo.status === 'DELIVERED'),
   ).length;
+  const retrievedOrders = orders.filter((o) =>
+    o.orderCombos.some((combo) => combo.status === 'RETRIEVED'),
+  ).length;
   const cancelledOrders = orders.filter((o) =>
     o.orderCombos.some((combo) => combo.status === 'CANCELLED'),
   ).length;
@@ -568,6 +571,8 @@ export default function OrderManagementPage() {
         return 'bg-red-100 text-red-800 border-red-200';
       case 'DELIVERED':
         return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'RETRIEVED':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
         return 'bg-slate-100 text-slate-800 border-slate-200';
     }
