@@ -1,16 +1,22 @@
 'use client';
 
-import { useAddressManager } from '@/hooks/use-address-manager';
+import { useAddressManagement } from '@/hooks/use-address-management';
 import AddressCard from '@components/address/AddressCard';
 import AddressCreateDialog from '@components/address/AddressCreateDialog';
 import AddressSkeleton from '@components/address/AddressSkeleton';
 import AddressUpdateDialog from '@components/address/AddressUpdateDialog';
+import Pagination from '@components/common/Pagination';
 import { Gift, Home, MapPin, Navigation, Plus, RefreshCw, Shield, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function AddressPage() {
   const {
     addresses,
+    currentPage,
+    pageSize,
+    totalElements,
+    totalPages,
+    goToPage,
     isCreateOpen,
     isUpdateOpen,
     openCreateDialog,
@@ -30,7 +36,7 @@ export default function AddressPage() {
     handleFieldChange,
     handleFieldBlur,
     refreshAddresses,
-  } = useAddressManager();
+  } = useAddressManagement();
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
@@ -135,7 +141,7 @@ export default function AddressPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 font-medium ">Tổng địa chỉ</p>
-                      <p className="text-xl font-bold text-gray-800 ">{addresses.length}</p>
+                      <p className="text-xl font-bold text-gray-800 ">{totalElements}</p>
                     </div>
                   </div>
                 </div>
@@ -174,11 +180,11 @@ export default function AddressPage() {
                   </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto pr-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {addresses.map((addr, idx) => (
                     <div key={addr.id} className="group">
                       <AddressCard
-                        index={idx}
+                        index={(currentPage - 1) * pageSize + idx}
                         address={addr}
                         onEdit={openUpdateDialog}
                         onDelete={deleteAddress}
@@ -186,6 +192,19 @@ export default function AddressPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={goToPage}
+                    theme="default"
+                    showInfo={true}
+                    showQuickJump={false}
+                  />
+                )}
               </div>
             </>
           )}

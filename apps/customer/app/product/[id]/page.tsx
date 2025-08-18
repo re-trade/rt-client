@@ -12,10 +12,10 @@ import ContentSkeleton from '@components/product/ProductContentSkeleton';
 import { ProductHistoryList } from '@components/product/ProductHistoryList';
 import ProductImageSkeleton from '@components/product/ProductImageSkeleton';
 import ProductInfoSkeleton from '@components/product/ProductInfoSkeleton';
+import ProductWarningBanner from '@components/product/ProductWarningBanner';
 import RelatedProducts from '@components/related-product/RelatedProduct';
 import ReviewsList from '@components/review/ListReview';
 import ShareButton from '@components/share/ShareButton';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -116,13 +116,18 @@ function ProductDetail({ params }: { params: { id: string } }) {
         try {
           const response = await reviewApi.getTotalReviews(productDetail.id);
           setTotalReviews(response);
-        } catch (_error) {
-          // Error handled silently
-        }
+        } catch (_) {}
       }
     };
     fetching();
   }, [productDetail]);
+
+  const handleQuantityKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
+  };
 
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -135,6 +140,15 @@ function ProductDetail({ params }: { params: { id: string } }) {
     } else {
       setQuantity(value);
       setStockWarning(productDetail ? value >= productDetail.quantity * 0.8 : false);
+    }
+  };
+
+  const handleQuantityBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const value = parseInt(inputValue);
+    if (inputValue === '' || isNaN(value) || value < 1) {
+      setQuantity(1);
+      setStockWarning(false);
     }
   };
 
@@ -200,47 +214,7 @@ function ProductDetail({ params }: { params: { id: string } }) {
           </ol>
         </nav>
 
-        {!productDetail.verified && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="mb-6 bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 border-t border-b border-orange-300 shadow-md overflow-hidden relative"
-          >
-            <div className="py-3 relative">
-              <motion.div
-                animate={{ x: [1000, -1000] }}
-                transition={{
-                  duration: 15,
-                  repeat: Infinity,
-                  ease: 'linear',
-                }}
-                className="whitespace-nowrap flex items-center text-white font-semibold"
-              >
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdWarning className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">CẢNH BÁO: Sản phẩm chưa được xác minh</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdSecurity className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">Vui lòng kiểm tra kỹ trước khi mua</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdWarning className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">CẢNH BÁO: Sản phẩm chưa được xác minh</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-                <span className="flex items-center space-x-3 mx-8">
-                  <MdSecurity className="h-5 w-5 text-yellow-200 flex-shrink-0" />
-                  <span className="text-lg">Vui lòng kiểm tra kỹ trước khi mua</span>
-                </span>
-                <span className="text-orange-200 mx-4">•</span>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
+        <ProductWarningBanner productDetail={productDetail} sellerProfile={sellerProfile} />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div className="space-y-4">
@@ -417,12 +391,13 @@ function ProductDetail({ params }: { params: { id: string } }) {
                               <MdRemove size={16} className="text-gray-600" />
                             </button>
                             <input
-                              type="number"
+                              type="text"
                               value={quantity}
                               onChange={handleQuantityInput}
+                              onKeyDown={handleQuantityKeyPress}
+                              onBlur={handleQuantityBlur}
                               className="w-16 text-center border-none outline-none bg-transparent text-gray-600"
-                              min="1"
-                              max={productDetail.quantity}
+                              placeholder="1"
                             />
                             <button
                               onClick={() => handleQuantityChange(true)}

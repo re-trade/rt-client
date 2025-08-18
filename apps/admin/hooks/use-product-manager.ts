@@ -249,6 +249,16 @@ const useProductManager = () => {
     }
   };
 
+  const getAllProductsForExport = async () => {
+    try {
+      return await productApi.getAllProductsForExport();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi lấy tất cả sản phẩm';
+      toast.error(errorMessage, { position: 'top-right' });
+      throw err;
+    }
+  };
+
   return {
     products,
     page,
@@ -270,6 +280,7 @@ const useProductManager = () => {
     goToPage,
     verifyProduct,
     unverifyProduct,
+    getAllProductsForExport,
     handleFilterChange,
     handlePageChange,
     handleFilterReset,

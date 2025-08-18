@@ -45,6 +45,11 @@ export const statusConfig = {
     color: 'bg-amber-100 text-amber-800 border-amber-200',
     icon: CheckCircle,
   },
+  RETRIEVED: {
+    label: 'Đã lấy hàng',
+    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    icon: Package,
+  },
   CANCELLED: {
     label: 'Đã hủy',
     color: 'bg-red-100 text-red-800 border-red-200',

@@ -204,13 +204,13 @@ const BrandManagementPage = () => {
                 <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700 text-white">
                   Tìm kiếm
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   onClick={handleClearSearch}
                   className="border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   Xóa
-                </Button>
+                </Button> */}
               </div>
             </div>
           </CardContent>

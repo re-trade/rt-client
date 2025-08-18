@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 export type ToastType = 'info' | 'success' | 'error' | 'warning';
@@ -11,26 +11,31 @@ export type ToastMessage = {
   text: string;
 };
 
-function useToast(duration = 3000) {
+function useToast() {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
+  const timersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  const removeToast = useCallback((id: string) => {
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
+    setMessages((prev) => prev.filter((msg) => msg.id !== id));
+  }, []);
 
   const showToast = useCallback(
     (text: string, type: ToastType = 'info') => {
       const id = uuidv4();
       const newToast: ToastMessage = { id, text, type };
       setMessages((prev) => [...prev, newToast]);
-
-      setTimeout(() => {
-        setMessages((prev) => prev.filter((msg) => msg.id !== id));
-      }, duration);
+      const timer = setTimeout(() => {
+        removeToast(id);
+      }, 4000);
+      timersRef.current.set(id, timer);
     },
-    [duration],
+    [removeToast],
   );
-
-  const removeToast = useCallback((id: string) => {
-    setMessages((prev) => prev.filter((msg) => msg.id !== id));
-  }, []);
-
   return {
     messages,
     showToast,

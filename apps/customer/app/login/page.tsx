@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/context/ToastContext';
 import Joi from 'joi';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -38,6 +38,8 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const isFormValid = formData.username.trim() !== '' && formData.password.trim() !== '';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -67,7 +69,7 @@ export default function Login() {
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-transparent"></div>
           <div className="absolute bottom-8 left-8 text-white">
             <h2 className="text-3xl font-bold mb-2">Chào mừng bạn trở lại</h2>
-            <p className="text-orange-100">Khám phá những ưu đãi đặc biệt tại Retrade Shop</p>
+            <p className="text-orange-100">Khám phá những điều đặc biệt tại ReTrade</p>
           </div>
         </div>
 
@@ -77,7 +79,7 @@ export default function Login() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-4">
                 Đăng nhập tài khoản
               </h1>
-              <p className="text-gray-600">Chào mừng bạn trở lại với Retrade Shop!</p>
+              <p className="text-gray-600">Chào mừng bạn trở lại với ReTrade!</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -131,9 +133,9 @@ export default function Login() {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !isFormValid}
                 className={`w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg font-medium text-lg transition-all duration-200 ${
-                  isLoading
+                  isLoading || !isFormValid
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:from-orange-600 hover:to-orange-700 hover:shadow-lg transform hover:-translate-y-0.5'
                 }`}

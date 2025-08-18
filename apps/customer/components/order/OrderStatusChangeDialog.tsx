@@ -9,7 +9,10 @@ interface OrderStatusChangeDialogProps {
   isOpen: boolean;
   onClose: () => void;
   order: OrderCombo | null;
-  onStatusChange: (action: 'cancel' | 'complete' | 'return', reason?: string) => Promise<void>;
+  onStatusChange: (
+    action: 'cancel' | 'complete' | 'return' | 'confirm',
+    reason?: string,
+  ) => Promise<void>;
 }
 
 export default function OrderStatusChangeDialog({
@@ -18,9 +21,9 @@ export default function OrderStatusChangeDialog({
   order,
   onStatusChange,
 }: OrderStatusChangeDialogProps) {
-  const [selectedAction, setSelectedAction] = useState<'cancel' | 'complete' | 'return' | null>(
-    null,
-  );
+  const [selectedAction, setSelectedAction] = useState<
+    'cancel' | 'complete' | 'return' | 'confirm' | null
+  >(null);
   const [reason, setReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -41,11 +44,12 @@ export default function OrderStatusChangeDialog({
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isHolding && selectedAction === 'cancel') {
+    if (isHolding && selectedAction === 'cancel' && !isSubmitting) {
       interval = setInterval(() => {
         setHoldProgress((prev) => {
           const newProgress = prev + 2;
           if (newProgress >= 100) {
+            setIsHolding(false);
             handleSubmit();
             return 100;
           }
@@ -59,25 +63,29 @@ export default function OrderStatusChangeDialog({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isHolding, selectedAction]);
+  }, [isHolding, selectedAction, isSubmitting]);
 
   const handleMouseDown = () => {
     if (
       selectedAction === 'cancel' &&
       !isSubmitting &&
+      !isHolding &&
       (!selectedActionConfig?.requiresReason || reason.trim())
     ) {
       setIsHolding(true);
+      setHoldProgress(0);
     }
   };
 
   const handleMouseUp = () => {
-    setIsHolding(false);
-    setHoldProgress(0);
+    if (!isSubmitting) {
+      setIsHolding(false);
+      setHoldProgress(0);
+    }
   };
 
   const handleSubmit = async () => {
-    if (!selectedAction) return;
+    if (!selectedAction || isSubmitting) return;
 
     if ((selectedAction === 'cancel' || selectedAction === 'return') && !reason.trim()) {
       setError('Vui lòng nhập lý do');
@@ -85,6 +93,8 @@ export default function OrderStatusChangeDialog({
     }
 
     setIsSubmitting(true);
+    setIsHolding(false);
+    setHoldProgress(0);
     setError('');
 
     try {
@@ -117,11 +127,24 @@ export default function OrderStatusChangeDialog({
     }
 
     if (status === 'Delivered') {
+      actions.push({
+        key: 'confirm' as const,
+        label: 'Xác nhận đã nhận hàng',
+        description: 'Xác nhận bạn đã nhận được đơn hàng này',
+        icon: CheckCircle,
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50',
+        borderColor: 'border-orange-200',
+        requiresReason: false,
+      });
+    }
+
+    if (status === 'RETRIEVED') {
       actions.push(
         {
           key: 'complete' as const,
           label: 'Hoàn thành đơn hàng',
-          description: 'Xác nhận đã nhận hàng và hoàn thành đơn hàng',
+          description: 'Xác nhận đơn hàng đã hoàn tất',
           icon: CheckCircle,
           color: 'text-green-600',
           bgColor: 'bg-green-50',
@@ -156,7 +179,7 @@ export default function OrderStatusChangeDialog({
     <Modal
       opened={isOpen}
       onClose={handleClose}
-      title="Thay đổi trạng thái đơn hàng"
+      title="Quản lý đơn hàng"
       size="xl"
       closeOnClickOutside={!isSubmitting}
     >
@@ -171,7 +194,7 @@ export default function OrderStatusChangeDialog({
                 Đơn hàng #{order.comboId.slice(0, 8)}...
               </h3>
               <p className="text-base text-gray-600 mt-2">
-                Chọn hành động bạn muốn thực hiện với đơn hàng này
+                Chọn thao tác bạn muốn thực hiện với đơn hàng này
               </p>
               <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white border border-orange-300 text-orange-700">
                 Trạng thái hiện tại: {order.orderStatus}

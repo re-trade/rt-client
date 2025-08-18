@@ -8,7 +8,6 @@ const CartEmpty = () => {
   return (
     <div className="flex flex-col items-center justify-center py-12 md:py-20 px-4">
       <div className="text-center space-y-6">
-        {/* Empty Cart Icon */}
         <div className="mx-auto w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
           <svg
             className="w-12 h-12 md:w-16 md:h-16 text-orange-400"
@@ -24,8 +23,6 @@ const CartEmpty = () => {
             />
           </svg>
         </div>
-
-        {/* Title and Description */}
         <div className="space-y-3">
           <h2 className="text-xl md:text-2xl font-bold text-gray-800">Giỏ hàng trống</h2>
           <p className="text-sm md:text-base text-gray-600 max-w-md mx-auto">
@@ -33,8 +30,6 @@ const CartEmpty = () => {
             tôi!
           </p>
         </div>
-
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => router.push('/')}
@@ -51,8 +46,6 @@ const CartEmpty = () => {
             Tiếp tục mua sắm
           </button>
         </div>
-
-        {/* Suggested Categories */}
         <div className="mt-8 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-500 mb-4">Danh mục phổ biến:</p>
           <div className="flex flex-wrap gap-2 justify-center">

@@ -8,7 +8,8 @@ export type WithdrawalRequest = {
   id: string;
   amount: number;
   status: 'PENDING' | 'COMPLETED' | 'REJECTED';
-  processedDate: string;
+  processedDate?: string;
+  createdDate: string;
   bankBin: string;
   bankName: string;
   bankUrl: string;

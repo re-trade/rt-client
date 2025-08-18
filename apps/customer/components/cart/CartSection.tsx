@@ -1,69 +1,14 @@
 'use client';
 
 import CartEmpty from '@/components/cart/CartEmpty';
+import CartShopSection from '@/components/cart/CartShopSection';
 import CartSkeleton from '@/components/cart/CartSkeleton';
-import Checkbox from '@/components/reusable/checkbox';
+import CartSummaryBar from '@/components/cart/CartSummaryBar';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/context/CartContext';
-import {
-  IconAlertTriangle,
-  IconCheck,
-  IconChevronDown,
-  IconChevronUp,
-  IconMinus,
-  IconPlus,
-  IconTrash,
-} from '@tabler/icons-react';
-import Image from 'next/image';
+import { useToast } from '@/context/ToastContext';
+import { IconAlertTriangle } from '@tabler/icons-react';
 import { useState } from 'react';
-
-function ProductDescription({
-  description,
-  className = '',
-  maxLength = 100,
-}: {
-  description: string;
-  className?: string;
-  maxLength?: number;
-}) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  if (!description) return null;
-
-  const shouldTruncate = description.length > maxLength;
-  const displayText =
-    shouldTruncate && !isExpanded ? description.slice(0, maxLength) + '...' : description;
-
-  return (
-    <div className={className}>
-      <p className="text-gray-600 leading-tight">
-        {displayText}
-        {shouldTruncate && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsExpanded(!isExpanded);
-            }}
-            className="ml-1 text-orange-600 hover:text-orange-700 font-medium inline-flex items-center transition-colors"
-            style={{ fontSize: '0.7rem' }}
-          >
-            {isExpanded ? (
-              <>
-                <span>Thu gọn</span>
-                <IconChevronUp size={10} className="ml-0.5" />
-              </>
-            ) : (
-              <>
-                <span>Xem thêm</span>
-                <IconChevronDown size={10} className="ml-0.5" />
-              </>
-            )}
-          </button>
-        )}
-      </p>
-    </div>
-  );
-}
 
 export default function CartSection({
   cartGroups,
@@ -80,7 +25,7 @@ export default function CartSection({
   const [itemToRemove, setItemToRemove] = useState<{ id: string; name: string } | null>(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [quantityUpdates, setQuantityUpdates] = useState<Record<string, number>>({});
-
+  const toast = useToast();
   const handleProductSelect = (itemId: string, quantity: number, event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     if (
@@ -105,13 +50,27 @@ export default function CartSection({
     setShowRemoveModal(true);
   };
 
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
+  const handleQuantityChange = (itemId: string, newQuantity: number, maxQuantity?: number) => {
     if (newQuantity < 1) return;
+
+    // Check if new quantity exceeds available stock
+    if (maxQuantity && newQuantity > maxQuantity) {
+      toast.showToast(`Số lượng không thể vượt quá ${maxQuantity} sản phẩm có sẵn`, 'warning');
+      return;
+    }
+
     updateCartItemQuantity(itemId, newQuantity).then((result) => {
-      if (result) {
+      if (result.success) {
         setQuantityUpdates((prev) => ({ ...prev, [itemId]: newQuantity }));
+        toast.showToast('Cập nhật số lượng thành công', 'success');
+      } else {
+        result.message.forEach((message) => toast.showToast(message, 'warning'));
       }
     });
+  };
+
+  const handleAdjustToMaxQuantity = (itemId: string, maxQuantity: number) => {
+    handleQuantityChange(itemId, maxQuantity, maxQuantity);
   };
 
   const confirmRemove = async () => {
@@ -178,417 +137,26 @@ export default function CartSection({
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {Object.entries(cartGroups).map(([sellerId, shopSection]) => {
-        const shopSelectedCount = shopSection.items.filter((item) =>
-          selectedItems.find((selected) => selected.productId === item.productId),
-        ).length;
-        const shopAvailableCount = shopSection.items.filter((item) => item.productAvailable).length;
-        const allShopItemsSelected =
-          shopSelectedCount === shopAvailableCount && shopAvailableCount > 0;
-        const someShopItemsSelected =
-          shopSelectedCount > 0 && shopSelectedCount < shopAvailableCount;
+      {Object.entries(cartGroups).map(([sellerId, shopSection]) => (
+        <CartShopSection
+          key={sellerId}
+          sellerId={sellerId}
+          shopSection={shopSection}
+          selectedItems={selectedItems}
+          removingItems={removingItems}
+          quantityUpdates={quantityUpdates}
+          onToggleShopSection={toggleShopSection}
+          onProductSelect={handleProductSelect}
+          onCheckboxClick={handleCheckboxClick}
+          onQuantityChange={handleQuantityChange}
+          onRemoveClick={handleRemoveClick}
+          onAdjustToMaxQuantity={handleAdjustToMaxQuantity}
+          onToggleItemSelection={toggleItemSelection}
+        />
+      ))}
 
-        const handleShopSelectAll = (event: React.MouseEvent) => {
-          event.stopPropagation();
-          event.preventDefault();
+      {Object.keys(cartGroups).length > 0 && <CartSummaryBar selectedItems={selectedItems} />}
 
-          if (allShopItemsSelected) {
-            shopSection.items.forEach((item) => {
-              if (selectedItems.find((selected) => selected.productId === item.productId)) {
-                toggleItemSelection(item.productId, item.quantity);
-              }
-            });
-          } else {
-            shopSection.items.forEach((item) => {
-              if (
-                item.productAvailable &&
-                !selectedItems.find((selected) => selected.productId === item.productId)
-              ) {
-                toggleItemSelection(item.productId, item.quantity);
-              }
-            });
-          }
-        };
-
-        const handleAccordionToggle = (event: React.MouseEvent) => {
-          const target = event.target as HTMLElement;
-          if (target.closest('.seller-checkbox')) {
-            return;
-          }
-          toggleShopSection(sellerId);
-        };
-
-        return (
-          <div
-            key={sellerId}
-            className="rounded-xl border border-orange-100 bg-white shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-          >
-            <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-100">
-              {/* Shop Header with separated click areas */}
-              <div className="p-4 md:p-6">
-                <div
-                  className="flex items-center justify-between w-full cursor-pointer group"
-                  onClick={handleAccordionToggle}
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="shop-checkbox flex-shrink-0" onClick={handleShopSelectAll}>
-                      <Checkbox
-                        checked={allShopItemsSelected}
-                        indeterminate={someShopItemsSelected}
-                        onChange={() => {}}
-                        variant="primary"
-                        size="md"
-                        round={true}
-                        className="hover:scale-110 transition-transform"
-                        disabled={shopAvailableCount === 0}
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-base md:text-lg font-bold text-gray-800 group-hover:text-orange-700 transition-colors">
-                          {shopSection.sellerName}
-                        </h3>
-                        <p className="text-xs md:text-sm text-gray-600">
-                          {shopSelectedCount}/{shopAvailableCount} sản phẩm được chọn
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex-shrink-0 ml-3">
-                    <svg
-                      className={`w-5 h-5 text-orange-600 transition-all duration-200 ease-out transform origin-center group-hover:text-orange-700 group-hover:scale-110 ${
-                        shopSection.isOpen ? 'rotate-180' : 'rotate-0'
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className={`grid text-sm overflow-hidden transition-all duration-300 ease-in-out ${
-                  shopSection.isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                }`}
-              >
-                <div className="overflow-hidden">
-                  <div className="p-4 md:p-6 pt-0 space-y-3 md:space-y-4">
-                    {shopSection.items.map((item) => {
-                      const isSoldOut = !item.productAvailable;
-                      const isSelected = selectedItems.find(
-                        (selected) => selected.productId === item.productId,
-                      );
-                      const isRemoving = removingItems.has(item.productId);
-                      const currentQuantity = quantityUpdates[item.productId] || item.quantity;
-
-                      const handleIncrement = () =>
-                        handleQuantityChange(item.productId, currentQuantity + 1);
-                      const handleDecrement = () =>
-                        handleQuantityChange(item.productId, currentQuantity - 1);
-
-                      return (
-                        <div
-                          key={item.productId}
-                          className={`relative rounded-lg border p-4 md:p-6 shadow-sm transition-all duration-200 ${
-                            isRemoving
-                              ? 'bg-red-50 border-red-200 opacity-60 pointer-events-none'
-                              : isSoldOut
-                                ? 'bg-gray-100 opacity-70 cursor-not-allowed'
-                                : isSelected
-                                  ? 'bg-orange-50 border-orange-300 shadow-md cursor-pointer ring-2 ring-orange-200'
-                                  : 'bg-white border-orange-50 hover:bg-orange-25 hover:border-orange-200 hover:shadow-md cursor-pointer'
-                          }`}
-                          onClick={(e) =>
-                            !isSoldOut &&
-                            !isRemoving &&
-                            handleProductSelect(item.productId, item.quantity, e)
-                          }
-                        >
-                          {/* Removing Overlay */}
-                          {isRemoving && (
-                            <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-20 rounded-lg">
-                              <div className="flex items-center gap-2 text-red-600">
-                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-red-600 border-t-transparent"></div>
-                                <span className="font-medium">Đang xóa...</span>
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="absolute top-3 right-3 z-10">
-                            {isSelected && !isSoldOut && !isRemoving ? (
-                              <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-200">
-                                <IconCheck
-                                  size={16}
-                                  className="text-white drop-shadow-sm"
-                                  stroke={3}
-                                />
-                              </div>
-                            ) : !isSoldOut && !isRemoving ? (
-                              <div
-                                onClick={(e) =>
-                                  handleCheckboxClick(item.productId, item.quantity, e)
-                                }
-                              >
-                                <Checkbox
-                                  checked={false}
-                                  onChange={() => {}}
-                                  variant="primary"
-                                  size="md"
-                                  round={true}
-                                  className="opacity-70 hover:opacity-100 transition-opacity"
-                                />
-                              </div>
-                            ) : null}
-                          </div>
-
-                          <div className="flex items-start gap-3 md:hidden pr-8">
-                            <div className="relative rounded-lg overflow-hidden bg-orange-25 p-2 flex-shrink-0">
-                              <Image
-                                width={60}
-                                height={60}
-                                className="h-15 w-15 object-cover rounded"
-                                src={item.productThumbnail}
-                                alt={`${item.productName} hình ảnh`}
-                              />
-                              {isSoldOut && (
-                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
-                                  <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
-                                    Hết hàng
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0 space-y-2">
-                              <h4
-                                className={`text-sm font-semibold transition-colors ${
-                                  isSoldOut || isRemoving ? 'text-gray-500' : 'text-gray-800'
-                                }`}
-                              >
-                                {item.productName}
-                              </h4>
-                              <p className="text-xs text-gray-800 border border-orange-200 bg-orange-100 inline-block px-2 py-1 rounded-lg">
-                                {item.productBrand}
-                              </p>
-                              <ProductDescription
-                                description={item.description}
-                                className="text-xs"
-                                maxLength={50}
-                              />
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={handleDecrement}
-                                  disabled={isRemoving || isSoldOut || currentQuantity <= 1}
-                                  className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                >
-                                  <IconMinus size={14} />
-                                </button>
-                                <span className="text-sm font-medium text-gray-800">
-                                  {currentQuantity}
-                                </span>
-                                <button
-                                  onClick={handleIncrement}
-                                  disabled={isRemoving || isSoldOut}
-                                  className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                >
-                                  <IconPlus size={14} />
-                                </button>
-                              </div>
-                              <p className="text-base font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded inline-block">
-                                {item.totalPrice * currentQuantity}₫
-                              </p>
-                              <div className="mt-2">
-                                <button
-                                  type="button"
-                                  onClick={(e) =>
-                                    handleRemoveClick(item.productId, item.productName, e)
-                                  }
-                                  disabled={isRemoving}
-                                  className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 transition-colors font-medium p-1 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  <IconTrash size={12} />
-                                  Xóa
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Desktop Layout */}
-                          <div className="hidden md:flex md:items-center md:justify-between md:gap-6 w-full pr-10">
-                            <div className="flex items-center gap-4 flex-1">
-                              <div className="relative rounded-lg overflow-hidden bg-orange-25 p-2 flex-shrink-0">
-                                <Image
-                                  width={80}
-                                  height={80}
-                                  className="h-20 w-20 object-cover rounded"
-                                  src={item.productThumbnail}
-                                  alt={`${item.productName} hình ảnh`}
-                                />
-                                {isSoldOut && (
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
-                                    <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
-                                      Hết hàng
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="flex-1 space-y-2 min-w-0">
-                                <h4
-                                  className={`text-base font-semibold transition-colors ${
-                                    isSoldOut || isRemoving ? 'text-gray-500' : 'text-gray-800'
-                                  }`}
-                                >
-                                  {item.productName}
-                                </h4>
-                                <p className="text-sm text-gray-800 border border-orange-200 bg-orange-100 inline-block px-2 py-1 rounded-lg">
-                                  {item.productBrand}
-                                </p>
-                                <ProductDescription
-                                  description={item.description}
-                                  className="text-sm"
-                                  maxLength={80}
-                                />
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={handleDecrement}
-                                    disabled={isRemoving || isSoldOut || currentQuantity <= 1}
-                                    className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                  >
-                                    <IconMinus size={16} />
-                                  </button>
-                                  <span className="text-base font-medium text-gray-800">
-                                    {currentQuantity}
-                                  </span>
-                                  <button
-                                    onClick={handleIncrement}
-                                    disabled={isRemoving || isSoldOut}
-                                    className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center hover:bg-orange-200 disabled:opacity-50"
-                                  >
-                                    <IconPlus size={16} />
-                                  </button>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                  <button
-                                    type="button"
-                                    onClick={(e) =>
-                                      handleRemoveClick(item.productId, item.productName, e)
-                                    }
-                                    disabled={isRemoving}
-                                    className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 transition-colors font-medium p-2 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    <IconTrash size={16} />
-                                    Xóa khỏi giỏ hàng
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="text-right flex-shrink-0">
-                              <p className="text-lg font-bold text-orange-600 bg-orange-100 px-3 py-2 rounded-lg">
-                                {item.totalPrice * currentQuantity}₫
-                              </p>
-                            </div>
-                          </div>
-
-                          {isSelected && !isSoldOut && !isRemoving && (
-                            <div className="absolute inset-0 border-2 border-orange-400 rounded-lg pointer-events-none opacity-60"></div>
-                          )}
-                        </div>
-                      );
-                    })}
-
-                    {shopSection.items.length > 0 && (
-                      <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-                              <svg
-                                className="w-4 h-4 text-white"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zM14 6a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h6zM4 14a2 2 0 002 2h8a2 2 0 002-2v-2H4v2z" />
-                              </svg>
-                            </div>
-                            <span className="font-semibold text-gray-800">
-                              Tổng cộng ({shopSelectedCount} sản phẩm)
-                            </span>
-                          </div>
-                          <span className="text-xl font-bold text-orange-600">
-                            {shopSection.items
-                              .filter((item) =>
-                                selectedItems.find(
-                                  (selected) => selected.productId === item.productId,
-                                ),
-                              )
-                              .reduce(
-                                (total, item) =>
-                                  total +
-                                  item.totalPrice *
-                                    (quantityUpdates[item.productId] || item.quantity),
-                                0,
-                              )
-                              .toLocaleString('vi-VN')}
-                            ₫
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Overall Cart Summary */}
-      {Object.keys(cartGroups).length > 0 && (
-        <div className="sticky bottom-4 bg-white rounded-xl border-2 border-orange-200 p-4 shadow-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                </svg>
-              </div>
-              <div>
-                <span className="font-bold text-gray-800">
-                  Đã chọn {selectedItems.length} sản phẩm
-                </span>
-                <p className="text-sm text-gray-600">Nhấp vào sản phẩm để chọn/bỏ chọn</p>
-              </div>
-            </div>
-
-            {selectedItems.length > 0 && (
-              <button className="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl">
-                Tiếp tục với {selectedItems.length} sản phẩm
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Remove Confirmation Modal */}
       <Modal
         opened={showRemoveModal}
         onClose={cancelRemove}

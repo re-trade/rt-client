@@ -1,5 +1,5 @@
 'use client';
-import { Address } from '@/hooks/use-address-manager';
+import { Address } from '@/hooks/use-address-management';
 import { Edit, MapPin, Phone, Trash2, User } from 'lucide-react';
 
 interface Props {

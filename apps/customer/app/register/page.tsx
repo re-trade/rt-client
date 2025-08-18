@@ -1,7 +1,7 @@
 'use client';
 import { Province, useCustomerRegister } from '@/hooks/use-customer-register';
 import { unAuthApi } from '@retrade/util';
-import { IconUpload, IconUser, IconX } from '@tabler/icons-react';
+
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
@@ -19,40 +19,26 @@ export interface Ward {
 
 export default function Register() {
   const {
-    // Form data
     formData,
     handleInputChange,
 
-    // Validation states
     usernameValidation,
     emailValidation,
+    phoneValidation,
 
-    // Form errors
     errors,
     setErrors,
 
-    // Avatar handling
-    avatarFile,
-    avatarPreview,
-    avatarError,
-    handleAvatarUpload,
-    removeAvatar,
-    triggerFileInput,
-    fileInputRef,
-
-    // Password visibility
     showPassword,
     showConfirmPassword,
     togglePasswordVisibility,
 
-    // Terms and submission
     termsAccepted,
     setTermsAccepted,
     isLoading,
     handleSubmit,
   } = useCustomerRegister();
 
-  // Address selection state
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -61,7 +47,6 @@ export default function Register() {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedWard, setSelectedWard] = useState<string>('');
 
-  // Fetch provinces on component mount
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -78,7 +63,6 @@ export default function Register() {
     fetchProvinces();
   }, [setErrors]);
 
-  // Fetch districts when province changes
   useEffect(() => {
     const fetchDistricts = async () => {
       if (!selectedProvince) {
@@ -102,7 +86,6 @@ export default function Register() {
     fetchDistricts();
   }, [selectedProvince, setErrors]);
 
-  // Fetch wards when district changes
   useEffect(() => {
     const fetchWards = async () => {
       if (!selectedDistrict) {
@@ -124,9 +107,7 @@ export default function Register() {
     fetchWards();
   }, [selectedDistrict, setErrors]);
 
-  // Handle address selection changes
   const handleAddressChange = (type: string, value: string) => {
-    // Only clear address errors when actually selecting a value (not just clicking dropdown)
     if (value) {
       setErrors((prev) => ({ ...prev, address: '' }));
     }
@@ -135,8 +116,6 @@ export default function Register() {
       setSelectedProvince(value);
       setSelectedDistrict('');
       setSelectedWard('');
-
-      // Find the province name for the address
       const province = provinces.find((p) => p.code.toString() === value);
       if (province) {
         handleInputChange({
@@ -146,8 +125,6 @@ export default function Register() {
     } else if (type === 'district') {
       setSelectedDistrict(value);
       setSelectedWard('');
-
-      // Update address with province and district
       const province = provinces.find((p) => p.code.toString() === selectedProvince);
       const district = districts.find((d) => d.code.toString() === value);
       if (province && district) {
@@ -157,40 +134,66 @@ export default function Register() {
       }
     } else if (type === 'ward') {
       setSelectedWard(value);
-
-      // Update full address with ward, district, and province
       const province = provinces.find((p) => p.code.toString() === selectedProvince);
       const district = districts.find((d) => d.code.toString() === selectedDistrict);
       const ward = wards.find((w) => w.code.toString() === value);
 
       if (province && district && ward) {
         const fullAddress = `${ward.name}, ${district.name}, ${province.name}`;
-
-        // Update the form data with the full address string
         handleInputChange({
           target: { name: 'address', value: fullAddress },
         } as React.ChangeEvent<HTMLInputElement>);
-
-        // Set address error to empty immediately when we have a complete address
         setErrors((prev) => ({ ...prev, address: '' }));
       }
     }
   };
 
+  const isFormValid = () => {
+    const requiredFieldsValid =
+      formData.username.trim() !== '' &&
+      formData.email.trim() !== '' &&
+      formData.firstName.trim() !== '' &&
+      formData.lastName.trim() !== '' &&
+      formData.phone.trim() !== '' &&
+      formData.address.trim() !== '' &&
+      formData.password.trim() !== '' &&
+      formData.rePassword.trim() !== '';
+
+    const validationStatesValid =
+      usernameValidation.isValid === true &&
+      emailValidation.isValid === true &&
+      phoneValidation.isValid === true;
+
+    const noValidationInProgress =
+      !usernameValidation.isValidating && !emailValidation.isValidating;
+
+    const passwordsMatch = formData.password === formData.rePassword;
+
+    return (
+      requiredFieldsValid &&
+      validationStatesValid &&
+      noValidationInProgress &&
+      passwordsMatch &&
+      termsAccepted
+    );
+  };
+
   return (
-    <section className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+    <section className="min-h-screen bg-gradient-to-r from-white to-orange-50">
       <div className="container max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold text-amber-900 mb-4">Đăng ký tài khoản</h1>
-          <p className="text-xl text-amber-700 max-w-2xl mx-auto leading-relaxed">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-4">
+            Đăng ký tài khoản
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Bắt đầu hành trình &ldquo;săn đồ&rdquo; thông minh trên ReTrade
           </p>
         </div>
 
-        <div className="bg-white shadow-2xl border-0 rounded-2xl overflow-hidden backdrop-blur-sm">
-          <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-8 py-6">
+        <div className="bg-white shadow-lg border border-orange-200 rounded-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6">
             <h2 className="text-2xl font-bold text-white mb-2">Thông tin cá nhân</h2>
-            <p className="text-amber-100 text-sm">
+            <p className="text-orange-100 text-sm">
               Vui lòng điền đầy đủ thông tin để tạo tài khoản
             </p>
           </div>
@@ -208,68 +211,12 @@ export default function Register() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Avatar Upload Section */}
-              <div className="flex flex-col items-center space-y-4">
-                <div className="relative">
-                  <div className="w-24 h-24 rounded-full border-4 border-amber-200 overflow-hidden bg-gradient-to-br from-amber-100 to-amber-200">
-                    {avatarPreview ? (
-                      <Image
-                        src={avatarPreview}
-                        alt="Avatar preview"
-                        width={96}
-                        height={96}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <IconUser size={32} className="text-amber-600" />
-                      </div>
-                    )}
-                  </div>
-                  {avatarPreview && (
-                    <button
-                      type="button"
-                      onClick={removeAvatar}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                    >
-                      <IconX size={14} />
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={triggerFileInput}
-                    className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors duration-200 text-sm font-medium"
-                  >
-                    <IconUpload size={16} />
-                    {avatarFile ? 'Thay đổi ảnh' : 'Tải ảnh lên'}
-                  </button>
-                </div>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                />
-
-                <p className="text-xs text-gray-500 text-center">
-                  Chọn ảnh đại diện (tùy chọn)
-                  <br />
-                  Định dạng: JPG, PNG. Kích thước tối đa: 5MB
-                </p>
-                {avatarError && <div className="text-red-500 text-sm">{avatarError}</div>}
-              </div>
-
               {/* Main form grid */}
-              <div className="bg-white rounded-xl border border-amber-100 p-6 space-y-6">
+              <div className="bg-white rounded-xl border border-orange-200 p-6 space-y-6">
                 {/* Username + Email */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">Tên đăng nhập *</label>
+                    <label className="text-sm font-medium text-gray-800">Tên đăng nhập *</label>
                     <div className="relative">
                       <input
                         type="text"
@@ -282,13 +229,13 @@ export default function Register() {
                             ? 'border-red-500'
                             : usernameValidation.isValid === true
                               ? 'border-green-500'
-                              : 'border-amber-200 focus:border-amber-500'
+                              : 'border-orange-200 focus:border-orange-400'
                         }`}
                         required
                       />
                       {usernameValidation.isValidating && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-500"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
                         </div>
                       )}
                     </div>
@@ -310,7 +257,7 @@ export default function Register() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">Email *</label>
+                    <label className="text-sm font-medium text-gray-800">Email *</label>
                     <div className="relative">
                       <input
                         type="email"
@@ -323,13 +270,13 @@ export default function Register() {
                             ? 'border-red-500'
                             : emailValidation.isValid === true
                               ? 'border-green-500'
-                              : 'border-amber-200 focus:border-amber-500'
+                              : 'border-orange-200 focus:border-orange-400'
                         }`}
                         required
                       />
                       {emailValidation.isValidating && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-500"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
                         </div>
                       )}
                     </div>
@@ -353,7 +300,7 @@ export default function Register() {
                 {/* First + Last Name */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">Họ *</label>
+                    <label className="text-sm font-medium text-gray-800">Họ *</label>
                     <input
                       type="text"
                       name="firstName"
@@ -363,7 +310,7 @@ export default function Register() {
                       className={`w-full p-3 border-2 rounded-lg bg-white text-gray-900 focus:outline-none transition-colors ${
                         errors.firstName
                           ? 'border-red-500'
-                          : 'border-amber-200 focus:border-amber-500'
+                          : 'border-orange-200 focus:border-orange-400'
                       }`}
                       required
                     />
@@ -372,7 +319,7 @@ export default function Register() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">Tên *</label>
+                    <label className="text-sm font-medium text-gray-800">Tên *</label>
                     <input
                       type="text"
                       name="lastName"
@@ -382,7 +329,7 @@ export default function Register() {
                       className={`w-full p-3 border-2 rounded-lg bg-white text-gray-900 focus:outline-none transition-colors ${
                         errors.lastName
                           ? 'border-red-500'
-                          : 'border-amber-200 focus:border-amber-500'
+                          : 'border-orange-200 focus:border-orange-400'
                       }`}
                       required
                     />
@@ -392,34 +339,52 @@ export default function Register() {
                   </div>
                 </div>
 
-                {/* Phone + Gender */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">Số điện thoại *</label>
+                    <label className="text-sm font-medium text-gray-800">Số điện thoại *</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="Nhập số điện thoại"
+                      placeholder="Nhập số điện thoại (10 chữ số)"
                       inputMode="numeric"
                       pattern="[0-9]*"
                       maxLength={10}
                       className={`w-full p-3 border-2 rounded-lg bg-white text-gray-900 focus:outline-none transition-colors ${
-                        errors.phone ? 'border-red-500' : 'border-amber-200 focus:border-amber-500'
+                        errors.phone || phoneValidation.isValid === false
+                          ? 'border-red-500'
+                          : phoneValidation.isValid === true
+                            ? 'border-green-500'
+                            : 'border-orange-200 focus:border-orange-400'
                       }`}
                       required
                     />
                     {errors.phone && <div className="text-red-500 text-sm">{errors.phone}</div>}
+                    {!errors.phone && phoneValidation.message && (
+                      <div
+                        className={`text-sm ${
+                          phoneValidation.isValid === true
+                            ? 'text-green-600'
+                            : phoneValidation.isValid === false
+                              ? 'text-red-500'
+                              : 'text-gray-500'
+                        }`}
+                      >
+                        {phoneValidation.message}
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">Giới tính</label>
+                    <label className="text-sm font-medium text-gray-800">Giới tính</label>
                     <select
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
                       className={`w-full p-3 border-2 rounded-lg bg-white text-gray-900 focus:outline-none transition-colors ${
-                        errors.gender ? 'border-red-500' : 'border-amber-200 focus:border-amber-500'
+                        errors.gender
+                          ? 'border-red-500'
+                          : 'border-orange-200 focus:border-orange-400'
                       }`}
                     >
                       <option value="">Chọn giới tính</option>
@@ -434,7 +399,7 @@ export default function Register() {
                 {/* Address Section */}
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">
+                    <label className="text-sm font-medium text-gray-800">
                       Tỉnh/Thành phố <span className="text-red-600">*</span>
                     </label>
                     <select
@@ -446,7 +411,7 @@ export default function Register() {
                           ? 'border-green-500'
                           : errors.address
                             ? 'border-red-500'
-                            : 'border-amber-200 focus:border-amber-500'
+                            : 'border-orange-200 focus:border-orange-400'
                       }`}
                       required
                     >
@@ -458,15 +423,15 @@ export default function Register() {
                       ))}
                     </select>
                     {loadingAddress && (
-                      <div className="flex items-center text-amber-600 text-xs mt-1">
-                        <div className="animate-spin w-3 h-3 border border-amber-600 border-t-transparent rounded-full mr-2"></div>
+                      <div className="flex items-center text-orange-600 text-xs mt-1">
+                        <div className="animate-spin w-3 h-3 border border-orange-600 border-t-transparent rounded-full mr-2"></div>
                         Đang tải dữ liệu địa chỉ...
                       </div>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">
+                    <label className="text-sm font-medium text-gray-800">
                       Quận/Huyện <span className="text-red-600">*</span>
                     </label>
                     <select
@@ -478,7 +443,7 @@ export default function Register() {
                           ? 'border-green-500'
                           : errors.address
                             ? 'border-red-500'
-                            : 'border-amber-200 focus:border-amber-500'
+                            : 'border-orange-200 focus:border-orange-400'
                       } ${!selectedProvince ? 'bg-gray-50 text-gray-400' : ''}`}
                       required
                     >
@@ -492,7 +457,7 @@ export default function Register() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">
+                    <label className="text-sm font-medium text-gray-800">
                       Phường/Xã <span className="text-red-600">*</span>
                     </label>
                     <select
@@ -504,7 +469,7 @@ export default function Register() {
                           ? 'border-green-500'
                           : errors.address
                             ? 'border-red-500'
-                            : 'border-amber-200 focus:border-amber-500'
+                            : 'border-orange-200 focus:border-orange-400'
                       } ${!selectedDistrict ? 'bg-gray-50 text-gray-400' : ''}`}
                       required
                     >
@@ -570,7 +535,7 @@ export default function Register() {
                 {/* Password + Confirm Password */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">Mật khẩu *</label>
+                    <label className="text-sm font-medium text-gray-800">Mật khẩu *</label>
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
@@ -581,7 +546,7 @@ export default function Register() {
                         className={`w-full p-3 border-2 rounded-lg bg-white text-gray-900 focus:outline-none transition-colors pr-12 ${
                           errors.password
                             ? 'border-red-500'
-                            : 'border-amber-200 focus:border-amber-500'
+                            : 'border-orange-200 focus:border-orange-400'
                         }`}
                         required
                       />
@@ -603,9 +568,7 @@ export default function Register() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-amber-900">
-                      Xác nhận mật khẩu *
-                    </label>
+                    <label className="text-sm font-medium text-gray-800">Xác nhận mật khẩu *</label>
                     <div className="relative">
                       <input
                         type={showConfirmPassword ? 'text' : 'password'}
@@ -616,7 +579,7 @@ export default function Register() {
                         className={`w-full p-3 border-2 rounded-lg bg-white text-gray-900 focus:outline-none transition-colors pr-12 ${
                           errors.rePassword
                             ? 'border-red-500'
-                            : 'border-amber-200 focus:border-amber-500'
+                            : 'border-orange-200 focus:border-orange-400'
                         }`}
                         required
                       />
@@ -640,21 +603,27 @@ export default function Register() {
               </div>
 
               {/* Terms and Conditions */}
-              <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="flex items-start gap-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
                 <input
                   type="checkbox"
                   id="terms"
-                  className="mt-1 w-5 h-5 text-amber-600 border-2 border-amber-300 rounded focus:ring-amber-500 focus:ring-2"
+                  className="mt-1 w-5 h-5 text-orange-600 border-2 border-orange-300 rounded focus:ring-orange-500 focus:ring-2"
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
                 />
                 <label htmlFor="terms" className="text-sm text-gray-700 leading-relaxed">
                   Bằng cách tạo tài khoản, tôi đồng ý với{' '}
-                  <a href="#" className="text-amber-600 hover:text-amber-700 font-medium underline">
+                  <a
+                    href="#"
+                    className="text-orange-600 hover:text-orange-700 font-medium underline"
+                  >
                     Điều khoản dịch vụ
                   </a>{' '}
                   và{' '}
-                  <a href="#" className="text-amber-600 hover:text-amber-700 font-medium underline">
+                  <a
+                    href="#"
+                    className="text-orange-600 hover:text-orange-700 font-medium underline"
+                  >
                     Chính sách bảo mật
                   </a>{' '}
                   của ReTrade.
@@ -662,25 +631,133 @@ export default function Register() {
               </div>
               {errors.terms && <div className="text-red-500 text-sm">{errors.terms}</div>}
 
+              {/* Validation Summary */}
+              {!isFormValid() && !isLoading && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-bold">!</span>
+                    </div>
+                    <div>
+                      <p className="text-orange-800 font-medium text-sm mb-2">
+                        Vui lòng hoàn thành các thông tin sau để đăng ký:
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                        {!formData.username.trim() && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Tên đăng nhập
+                          </div>
+                        )}
+                        {formData.username.trim() && usernameValidation.isValid === true && (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <span>✓</span> Tên đăng nhập
+                          </div>
+                        )}
+                        {formData.username.trim() && usernameValidation.isValid === false && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Tên đăng nhập (chưa hợp lệ)
+                          </div>
+                        )}
+
+                        {!formData.email.trim() && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Email
+                          </div>
+                        )}
+                        {formData.email.trim() && emailValidation.isValid === true && (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <span>✓</span> Email
+                          </div>
+                        )}
+                        {formData.email.trim() && emailValidation.isValid === false && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Email (chưa hợp lệ)
+                          </div>
+                        )}
+
+                        {!formData.phone.trim() && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Số điện thoại
+                          </div>
+                        )}
+                        {formData.phone.trim() && phoneValidation.isValid === true && (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <span>✓</span> Số điện thoại
+                          </div>
+                        )}
+                        {formData.phone.trim() && phoneValidation.isValid === false && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Số điện thoại (chưa hợp lệ)
+                          </div>
+                        )}
+
+                        {(!formData.firstName.trim() || !formData.lastName.trim()) && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Họ và tên
+                          </div>
+                        )}
+                        {formData.firstName.trim() && formData.lastName.trim() && (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <span>✓</span> Họ và tên
+                          </div>
+                        )}
+
+                        {!formData.address.trim() && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Địa chỉ
+                          </div>
+                        )}
+                        {formData.address.trim() && (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <span>✓</span> Địa chỉ
+                          </div>
+                        )}
+
+                        {(!formData.password.trim() || !formData.rePassword.trim()) && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Mật khẩu
+                          </div>
+                        )}
+                        {formData.password.trim() &&
+                          formData.rePassword.trim() &&
+                          formData.password === formData.rePassword && (
+                            <div className="flex items-center gap-2 text-green-600">
+                              <span>✓</span> Mật khẩu
+                            </div>
+                          )}
+                        {formData.password.trim() &&
+                          formData.rePassword.trim() &&
+                          formData.password !== formData.rePassword && (
+                            <div className="flex items-center gap-2 text-red-600">
+                              <span>✗</span> Mật khẩu (không khớp)
+                            </div>
+                          )}
+
+                        {!termsAccepted && (
+                          <div className="flex items-center gap-2 text-red-600">
+                            <span>✗</span> Đồng ý điều khoản
+                          </div>
+                        )}
+                        {termsAccepted && (
+                          <div className="flex items-center gap-2 text-green-600">
+                            <span>✓</span> Đồng ý điều khoản
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Submit button */}
               <div className="flex justify-center pt-4">
                 <button
                   type="submit"
-                  disabled={
-                    isLoading ||
-                    usernameValidation.isValidating ||
-                    emailValidation.isValidating ||
-                    usernameValidation.isValid === false ||
-                    emailValidation.isValid === false
-                  }
+                  disabled={isLoading || !isFormValid()}
                   className={`px-8 py-3 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 ${
-                    isLoading ||
-                    usernameValidation.isValidating ||
-                    emailValidation.isValidating ||
-                    usernameValidation.isValid === false ||
-                    emailValidation.isValid === false
+                    isLoading || !isFormValid()
                       ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white hover:shadow-xl transform hover:-translate-y-0.5'
+                      : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white hover:shadow-xl transform hover:-translate-y-0.5'
                   }`}
                 >
                   {isLoading ? (
@@ -701,7 +778,7 @@ export default function Register() {
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-amber-200"></div>
+                  <div className="w-full border-t border-orange-200"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-4 bg-white text-gray-500 font-medium">HOẶC</span>
@@ -712,7 +789,7 @@ export default function Register() {
               <div className="space-y-3">
                 <button
                   type="button"
-                  className="w-full border-2 border-amber-200 py-3 rounded-lg flex items-center justify-center gap-3 hover:bg-amber-50 hover:border-amber-300 transition-all duration-200 group"
+                  className="w-full border-2 border-orange-200 py-3 rounded-lg flex items-center justify-center gap-3 hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 group"
                 >
                   <Image src="/Google__G__logo.svg.png" alt="Google" width={20} height={20} />
                   <span className="text-gray-700 font-medium group-hover:text-gray-800">
@@ -721,11 +798,11 @@ export default function Register() {
                 </button>
               </div>
 
-              <div className="text-center pt-4 border-t border-amber-200">
+              <div className="text-center pt-4 border-t border-orange-200">
                 <span className="text-gray-600">Bạn đã có tài khoản? </span>
                 <a
                   href="/login"
-                  className="text-amber-600 hover:text-amber-700 font-bold transition-colors duration-200"
+                  className="text-orange-600 hover:text-orange-700 font-bold transition-colors duration-200"
                 >
                   Đăng nhập ở đây
                 </a>
