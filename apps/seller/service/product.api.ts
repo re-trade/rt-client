@@ -1,4 +1,4 @@
-import { authApi, IResponseObject } from '@retrade/util';
+import { authApi, createResponseObject, IResponseObject } from '@retrade/util';
 
 export enum ProductStatusEnum {
   ACTIVE = 'ACTIVE',
@@ -145,10 +145,15 @@ export const productApi = {
       throw error;
     }
   },
-  async createProduct(product: CreateProductDto): Promise<TProduct> {
+  async createProduct(product: CreateProductDto): Promise<IResponseObject<TProduct>> {
     const response = await authApi.default.post<IResponseObject<TProduct>>('/products', product);
     if (response.data.success) {
-      return response.data.content;
+      return createResponseObject({
+        code: response.data.code,
+        messages: response.data.message,
+        success: response.data.success,
+        content: response.data.content,
+      });
     }
     throw new Error('Failed to create product');
   },
@@ -174,7 +179,7 @@ export const productApi = {
   },
 
   async deleteProduct(id: string): Promise<TProduct> {
-    const response = await authApi.default.delete<IResponseObject<TProduct>>(`/product/${id}`);
+    const response = await authApi.default.delete<IResponseObject<TProduct>>(`/products/${id}`);
     if (response.data.success) {
       return response.data.content;
     }

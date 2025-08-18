@@ -163,6 +163,8 @@ const ProductTable = ({
     setIsUpdateQuantityOpen(true);
   };
 
+
+
   if (loading) {
     return <ProductListSkeleton />;
   }

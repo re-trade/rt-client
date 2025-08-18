@@ -42,11 +42,8 @@ export function SelectBrand({
       setLoading(true);
       try {
         const data = await brandApi.getAllBrandNoPagination();
-        console.log('Fetched brands:', data);
         setBrands(data);
         setFilteredBrands(data);
-
-        // If we have a currentBrandId, try to find and select it in the fetched brands
         if (currentBrandId) {
           const current = data.find((b) => b.id === currentBrandId);
           if (current) {
