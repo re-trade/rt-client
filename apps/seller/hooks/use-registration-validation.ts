@@ -99,9 +99,7 @@ export function useRegistrationValidation() {
         }
       });
 
-      // Additional validations for specific steps
       if (step === 1) {
-        // Validate avatar and background files
         if (!formData.avatarUrl) {
           stepErrors.avatarUrl = 'Ảnh đại diện là bắt buộc';
           isValid = false;
@@ -113,7 +111,6 @@ export function useRegistrationValidation() {
       }
 
       if (step === 3) {
-        // Validate identity images
         if (!formData.identityFrontImage) {
           stepErrors.identityFrontImage = 'Ảnh mặt trước CMND/CCCD là bắt buộc';
           isValid = false;

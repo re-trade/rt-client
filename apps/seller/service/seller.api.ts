@@ -17,7 +17,6 @@ type SellerProfileRegisterRequest = {
 type SellerProfileUpdateRequest = {
   shopName: string;
   description: string;
-  // businessType: number;
   addressLine: string;
   avatarUrl: string;
   background: string;
@@ -69,18 +68,10 @@ export const sellerApi = {
       return undefined;
     }
   },
-  rollbackSellerProfile: async (sellerId: string): Promise<boolean> => {
+  rollbackSellerProfile: async (): Promise<boolean> => {
     try {
-      // Placeholder for rollback API call
-      // This should be implemented when the rollback API endpoint is available
-      console.log('Rollback seller profile API call for ID:', sellerId);
-
-      // TODO: Implement actual rollback API call
-      // Example implementation:
-      // const response = await authApi.default.delete(`/sellers/${sellerId}/rollback`);
-      // return response.data.success;
-
-      return true; // Placeholder return
+      const response = await authApi.default.delete<IResponseObject<void>>('/sellers/profile');
+      return response.data.success;
     } catch {
       return false;
     }
