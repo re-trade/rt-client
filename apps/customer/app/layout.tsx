@@ -18,18 +18,18 @@ const RootLayout = ({ children }: RootLayoutProps) => {
       <body>
         <AuthProvider>
           <CartProvider>
-            <Suspense>
-              <NotificationProvider>
+            <NotificationProvider>
+              <Suspense>
                 <Header />
-              </NotificationProvider>
-            </Suspense>
-            <div className="min-h-screen bg-gray-100">
-              <ToastProvider>
-                <Suspense>{children}</Suspense>
-              </ToastProvider>
-            </div>
-            <Footer />
-            <CookieConsent />
+              </Suspense>
+              <div className="min-h-screen bg-gray-100">
+                <ToastProvider>
+                  <Suspense>{children}</Suspense>
+                </ToastProvider>
+              </div>
+              <Footer />
+              <CookieConsent />
+            </NotificationProvider>
           </CartProvider>
         </AuthProvider>
       </body>

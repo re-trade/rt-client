@@ -23,7 +23,7 @@ const authApi: Record<string, AxiosInstance> & {
     return createAuthApi(EApiService.STORAGE);
   },
   get notification() {
-    return createUnAuthApi(EApiService.NOTIFICATION);
+    return createAuthApi(EApiService.NOTIFICATION);
   },
   get province() {
     return createUnAuthApi(EApiService.PROVINCE);
