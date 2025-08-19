@@ -139,7 +139,7 @@ export default function OrderStatusChangeDialog({
       });
     }
 
-    if (status === 'RETRIEVED') {
+    if (status === 'Retrieved') {
       actions.push(
         {
           key: 'complete' as const,
