@@ -69,6 +69,18 @@ export const createAuthApi = (
     maxRedirects: 5,
   });
 
+  let isRefreshing = false;
+  let refreshSubscribers: ((token: string) => void)[] = [];
+
+  const subscribeTokenRefresh = (cb: (token: string) => void) => {
+    refreshSubscribers.push(cb);
+  };
+
+  const onRefreshed = (token: string) => {
+    refreshSubscribers.forEach((cb) => cb(token));
+    refreshSubscribers = [];
+  };
+
   if (typeof window !== 'undefined') {
     instance.interceptors.request.use(
       async (config) => {
@@ -95,36 +107,37 @@ export const createAuthApi = (
 
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-          try {
-            const response = await createAuthApi().post<
-              IResponseObject<{
-                tokens: {
-                  ACCESS_TOKEN: string;
-                  REFRESH_TOKEN: string;
-                };
-                roles: string[];
-                twoFA: boolean;
-              }>
-            >('/auth/refresh-token');
 
-            const { tokens } = response.data.content;
-            localStorage.setItem(ETokenName.ACCESS_TOKEN, tokens.ACCESS_TOKEN);
+          if (!isRefreshing) {
+            isRefreshing = true;
+            try {
+              const response = await axios.post(createBaseURL() + '/auth/refresh-token', null, {
+                withCredentials: true,
+              });
 
-            originalRequest.headers = {
-              ...originalRequest.headers,
-              Authorization: `Bearer ${tokens.ACCESS_TOKEN}`,
-            };
+              const { tokens } = (response.data as IResponseObject<any>).content;
+              localStorage.setItem(ETokenName.ACCESS_TOKEN, tokens.ACCESS_TOKEN);
 
-            return instance(originalRequest);
-          } catch (err) {
-            return Promise.reject(err);
+              onRefreshed(tokens.ACCESS_TOKEN);
+              isRefreshing = false;
+            } catch (err) {
+              isRefreshing = false;
+              return Promise.reject(err);
+            }
           }
+          return new Promise((resolve) => {
+            subscribeTokenRefresh((token: string) => {
+              if (originalRequest.headers) {
+                originalRequest.headers['Authorization'] = `Bearer ${token}`;
+              }
+              resolve(instance(originalRequest));
+            });
+          });
         }
 
         return Promise.reject(error);
       },
     );
   }
-
   return instance;
 };
