@@ -17,7 +17,6 @@ type SellerProfileRegisterRequest = {
 type SellerProfileUpdateRequest = {
   shopName: string;
   description: string;
-  // businessType: number;
   addressLine: string;
   avatarUrl: string;
   background: string;
@@ -67,6 +66,14 @@ export const sellerApi = {
       return response.data.content;
     } catch {
       return undefined;
+    }
+  },
+  rollbackSellerProfile: async (): Promise<boolean> => {
+    try {
+      const response = await authApi.default.delete<IResponseObject<void>>('/sellers/profile');
+      return response.data.success;
+    } catch {
+      return false;
     }
   },
   updateSellerProfile: async (
