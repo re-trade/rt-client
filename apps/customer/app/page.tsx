@@ -5,7 +5,7 @@ import { CategorySelector } from '@/components/category/CategorySelector';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductHome } from '@/hooks/use-product-home';
 import { useProductList } from '@/hooks/use-product-list';
-import { TProduct } from '@/services/product.api';
+import { TProduct, productApi } from '@/services/product.api';
 import {
   ChevronRight,
   Clock,
@@ -42,6 +42,24 @@ export default function Home() {
       handleSelectedFilterChange('categories', [categoryId]);
       router.push(`/category/${categoryId}`);
     } else {
+      router.push('/product');
+    }
+  };
+
+  const handleStartNow = async () => {
+    try {
+      const randomResponse = await productApi.getProductIdRandom();
+      const randomProductId = randomResponse.selectedProductId;
+
+      if (randomProductId) {
+        router.push(`/product/${randomProductId}`);
+      } else {
+        // Fallback to product listing if no random product is available
+        router.push('/product');
+      }
+    } catch (error) {
+      console.error('Error getting random product:', error);
+      // Fallback to product listing on error
       router.push('/product');
     }
   };
@@ -354,7 +372,7 @@ export default function Home() {
 
           <div className="text-center mt-16">
             <button
-              onClick={() => router.push('/product')}
+              onClick={handleStartNow}
               className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-1 flex items-center gap-3 mx-auto text-lg"
             >
               Bắt đầu ngay

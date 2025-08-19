@@ -25,6 +25,11 @@ export type TProduct = {
   avgVote: number;
 };
 
+export type TProductRandomResponse = {
+  selectedProductId: string;
+  randomProductIds: string[];
+};
+
 export type TProductHistory = {
   productId: string;
   productName: string;
@@ -118,6 +123,7 @@ export const productApi = {
     }
     return response.data.content;
   },
+
   async getProductSimilar(
     productId: string,
     page: number = 0,
@@ -188,5 +194,10 @@ export const productApi = {
       },
     });
     return response.data;
+  },
+  async getProductIdRandom(): Promise<TProductRandomResponse> {
+    const response =
+      await unAuthApi.default.get<IResponseObject<TProductRandomResponse>>('/products/id/random');
+    return response.data.content;
   },
 };

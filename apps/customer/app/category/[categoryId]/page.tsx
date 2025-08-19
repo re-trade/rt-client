@@ -3,6 +3,7 @@ import ProductCard from '@/components/product/ProductCard';
 import { useCategoryProducts } from '@/hooks/use-category-products';
 import Pagination from '@components/common/Pagination';
 import ProductCardSkeleton from '@components/product/ProductCardSkeleton';
+import ProductListEmpty from '@components/product/ProductListEmpty';
 import { IconGridDots, IconList, IconSearch, IconX } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -130,13 +131,13 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           <div className="flex items-center gap-4">
             <div className="btn-group">
               <button
-                className={`btn btn-sm ${viewMode === 'grid' ? 'btn-active bg-orange-500 border-orange-500' : 'btn-outline border-orange-200'}`}
+                className={`btn btn-sm ${viewMode === 'grid' ? 'btn-active bg-orange-500 border-orange-500 text-gray-800' : 'btn-outline border-orange-200 text-gray-500 hover:text-gray-700'}`}
                 onClick={() => setViewMode('grid')}
               >
                 <IconGridDots size={16} />
               </button>
               <button
-                className={`btn btn-sm ${viewMode === 'list' ? 'btn-active bg-orange-500 border-orange-500' : 'btn-outline border-orange-200'}`}
+                className={`btn btn-sm ${viewMode === 'list' ? 'btn-active bg-orange-500 border-orange-500 text-gray-800' : 'btn-outline border-orange-200 text-gray-500 hover:text-gray-700'}`}
                 onClick={() => setViewMode('list')}
               >
                 <IconList size={16} />
@@ -156,28 +157,18 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             ))}
           </div>
         ) : products.length === 0 ? (
-          <motion.div
-            className="text-center py-16 bg-white rounded-xl shadow-lg border border-orange-100"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Không tìm thấy sản phẩm</h3>
-            <p className="text-gray-600 mb-6">
-              {searchTerm
-                ? `Không tìm thấy sản phẩm nào với từ khóa "${searchTerm}" trong ${categoryInfo?.name || 'danh mục này'}`
-                : `Không có sản phẩm nào trong ${categoryInfo?.name || 'danh mục này'}`}
-            </p>
-            {searchTerm && (
-              <button
-                className="btn bg-gradient-to-r from-orange-500 to-orange-600 text-white border-none hover:from-orange-600 hover:to-orange-700"
-                onClick={clearSearch}
-              >
-                Xóa từ khóa tìm kiếm
-              </button>
-            )}
-          </motion.div>
+          <ProductListEmpty
+            title="Không tìm thấy sản phẩm"
+            description={
+              searchTerm
+                ? `Không tìm thấy sản phẩm nào với từ khóa "${searchTerm}" trong ${categoryInfo?.name || 'danh mục này'}.`
+                : `Không có sản phẩm nào trong ${categoryInfo?.name || 'danh mục này'}.`
+            }
+            viewMode={viewMode}
+            showRecommendations={true}
+            onRetry={searchTerm ? clearSearch : undefined}
+            isRetrying={searchLoading}
+          />
         ) : (
           <>
             <div

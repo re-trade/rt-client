@@ -7,7 +7,6 @@ import {
   Eye,
   MapPin,
   Menu,
-  Settings,
   Shield,
   ShoppingBag,
   Star,
@@ -73,11 +72,6 @@ export default function UserLayout({ children }: UserLayoutProps) {
         { name: 'Hồ sơ', icon: <User className="w-4 h-4" />, path: 'profile' },
         { name: 'Địa chỉ', icon: <MapPin className="w-4 h-4" />, path: 'address' },
         { name: 'Bảo mật', icon: <Shield className="w-4 h-4" />, path: 'security' },
-        {
-          name: 'Cài đặt thông báo',
-          icon: <Settings className="w-4 h-4" />,
-          path: 'notification-settings',
-        },
         {
           name: 'Phương thức thanh toán',
           icon: <Eye className="w-4 h-4" />,
