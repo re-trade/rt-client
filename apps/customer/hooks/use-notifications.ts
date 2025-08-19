@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import notificationApi, {
   GetNotificationsParams,
   NotificationResponse,
@@ -51,6 +52,7 @@ export const useNotifications = (
     total: 0,
     totalPages: 0,
   });
+  const toast = useToast();
   const [filters, setFiltersState] = useState<NotificationFilters>(initialFilters);
 
   const fetchNotifications = useCallback(async () => {
@@ -137,7 +139,7 @@ export const useNotifications = (
             notification.id === id ? { ...notification, read: false } : notification,
           ),
         );
-        console.error('Failed to mark notification as read:', error);
+        toast.showToast('Lỗi khi cập nhập đã đọc thông báo', 'error');
       }
     },
     [isAuthenticated],
@@ -152,7 +154,7 @@ export const useNotifications = (
       await notificationApi.markAllAsRead();
     } catch (error) {
       setNotifications(previousNotifications);
-      console.error('Failed to mark all notifications as read:', error);
+      toast.showToast('Lỗi khi cập nhập đã đọc thông báo', 'error');
     }
   }, [notifications, isAuthenticated]);
 
@@ -172,7 +174,7 @@ export const useNotifications = (
             notification.id === id ? { ...notification, read: true } : notification,
           ),
         );
-        console.error('Failed to mark notification as unread:', error);
+        toast.showToast('Lỗi khi cập nhập chưa đọc thông báo', 'error');
       }
     },
     [isAuthenticated],
