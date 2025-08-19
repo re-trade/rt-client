@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { createBaseURL, EApiService } from '@retrade/util';
+import { createBaseURL, EApiService, ETokenName } from '@retrade/util';
 import { Client, StompSubscription } from '@stomp/stompjs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -61,6 +61,9 @@ export const useNotificationSocket = () => {
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
+      connectHeaders: {
+        Authorization: `Bearer ${localStorage.getItem(ETokenName.ACCESS_TOKEN)}`,
+      },
       debug: () => {},
     });
 
@@ -72,17 +75,14 @@ export const useNotificationSocket = () => {
       subscriptionRef.current.forEach((sub) => sub.unsubscribe());
       subscriptionRef.current = [];
 
-      const userNotification = client.subscribe(
-        `/user/${account.id}/queue/notifications`,
-        (message) => {
-          try {
-            const notification = JSON.parse(message.body) as UserNotification;
-            setNotifications((prev) => [notification, ...prev]);
-          } catch (error) {
-            console.error('Failed to process notification:', error);
-          }
-        },
-      );
+      const userNotification = client.subscribe(`/user/queue/notifications`, (message) => {
+        try {
+          const notification = JSON.parse(message.body) as UserNotification;
+          setNotifications((prev) => [notification, ...prev]);
+        } catch (error) {
+          console.error('Failed to process notification:', error);
+        }
+      });
 
       const globalNotification = client.subscribe(`/topic/notifications`, (message) => {
         try {
