@@ -132,9 +132,10 @@ export function useRegistrationSubmission() {
       }
 
       showToast(
-        'Đăng ký thành công! Chúng tôi sẽ xem xét và phê duyệt trong thời gian sớm nhất.',
+        'Chào mừng bạn đến với ReTrade! Đăng ký thành công. Đang chuyển hướng đến bảng điều khiển...',
         'success',
       );
+      console.log('Registration successful, returning true'); // Debug log
       return true;
     } catch (error) {
       let errorMessage = 'Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại.';
@@ -165,8 +166,11 @@ export function useRegistrationSubmission() {
   const handleNextStep = useCallback(async () => {
     if (validateStep(currentStep, formData)) {
       if (currentStep === 4) {
+        console.log('Submitting registration from step 4'); // Debug log
         const success = await submitRegistration();
+        console.log('Registration result:', success); // Debug log
         if (success) {
+          console.log('Moving to next step (step 5)'); // Debug log
           nextStep();
         }
       } else {

@@ -107,8 +107,6 @@ function RegistrationContent() {
                       />
                     ))}
                   </div>
-
-                  {/* Next Button */}
                   <div>
                     {canGoNext || isConfirmationStep ? (
                       <Button
@@ -130,7 +128,7 @@ function RegistrationContent() {
                         )}
                       </Button>
                     ) : (
-                      <div /> // Empty div to maintain layout
+                      <div />
                     )}
                   </div>
                 </div>
@@ -138,8 +136,6 @@ function RegistrationContent() {
             )}
           </CardContent>
         </Card>
-
-        {/* Footer Note */}
         {!isSuccessStep && (
           <div className="text-center mt-8">
             <p className="text-orange-600 text-sm">

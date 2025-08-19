@@ -12,7 +12,6 @@ import {
 import { createContext, ReactNode, useContext, useMemo, useReducer } from 'react';
 
 interface RegistrationContextType extends RegistrationState {
-  // Actions
   setCurrentStep: (step: number) => void;
   updateFormData: (data: Partial<SellerFormData>) => void;
   updateField: (field: keyof SellerFormData, value: any) => void;
@@ -116,13 +115,13 @@ function registrationReducer(
       return { ...initialState };
 
     case 'NEXT_STEP':
-      return { ...state, currentStep: Math.min(state.currentStep + 1, 4) };
+      return { ...state, currentStep: Math.min(state.currentStep + 1, 5) };
 
     case 'PREV_STEP':
       return { ...state, currentStep: Math.max(state.currentStep - 1, 1) };
 
     case 'GO_TO_STEP':
-      return { ...state, currentStep: Math.max(1, Math.min(action.payload, 4)) };
+      return { ...state, currentStep: Math.max(1, Math.min(action.payload, 5)) };
 
     default:
       return state;
