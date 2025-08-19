@@ -81,7 +81,7 @@ const accountMe = async (): Promise<TAccountMeResponse | undefined> => {
 
 const logout = async (): Promise<boolean> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TAccountMeResponse>>('/auth/logout');
+    const result = await authApi.default.post<IResponseObject<TAccountMeResponse>>('/auth/logout');
     if (result.data.success && result.status === 200) {
       return true;
     }
