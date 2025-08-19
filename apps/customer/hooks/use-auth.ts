@@ -40,7 +40,7 @@ function useAuth() {
   const logout = useCallback(async () => {
     localStorage.removeItem(ETokenName.ACCESS_TOKEN);
     await callLogout();
-    window.location.href = '/';
+    // window.location.href = '/';
   }, []);
 
   const login = useCallback(
