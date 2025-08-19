@@ -68,8 +68,7 @@ export function useReportDetail({ id }: UseReportDetailProps) {
         toast.error('Báo cáo không tồn tại hoặc đã bị xóa.');
         router.push('/dashboard/report');
       }
-    } catch (error) {
-      console.error('Error fetching report:', error);
+    } catch {
       toast.error('Không thể tải thông tin báo cáo.');
     } finally {
       setLoading(false);
@@ -83,8 +82,7 @@ export function useReportDetail({ id }: UseReportDetailProps) {
       if (order) {
         setOrderDetails(order);
       }
-    } catch (error) {
-      console.error('Error fetching order details:', error);
+    } catch (_) {
       toast.error('Không thể tải thông tin đơn hàng.');
     } finally {
       setOrderLoading(false);
@@ -106,8 +104,7 @@ export function useReportDetail({ id }: UseReportDetailProps) {
       setEvidences(enhancedEvidences);
       setTotalPages(result.totalPages);
       setTotalItems(result.totalElements);
-    } catch (error) {
-      console.error('Error fetching evidences:', error);
+    } catch {
       toast.error('Không thể tải bằng chứng.');
     } finally {
       setEvidenceLoading(false);
@@ -141,7 +138,7 @@ export function useReportDetail({ id }: UseReportDetailProps) {
       setImages(newImages);
 
       const newUrls = [...imageUrls];
-      URL.revokeObjectURL(newUrls[index]);
+      URL.revokeObjectURL(newUrls[index] ?? '');
       newUrls.splice(index, 1);
       setImageUrls(newUrls);
     },
@@ -152,8 +149,7 @@ export function useReportDetail({ id }: UseReportDetailProps) {
     try {
       const response = await storageApi.fileBulkUpload(files);
       return response.content || [];
-    } catch (error) {
-      console.error('Error uploading images:', error);
+    } catch {
       toast.error('Không thể tải lên hình ảnh. Vui lòng thử lại sau.');
       return [];
     }
@@ -186,8 +182,7 @@ export function useReportDetail({ id }: UseReportDetailProps) {
       } else {
         throw new Error('Failed to send evidence');
       }
-    } catch (error) {
-      console.error('Error sending evidence:', error);
+    } catch {
       toast.error('Không thể gửi phản hồi. Vui lòng thử lại sau.');
     } finally {
       setSubmitting(false);

@@ -69,6 +69,22 @@ export const sellerApi = {
       return undefined;
     }
   },
+  rollbackSellerProfile: async (sellerId: string): Promise<boolean> => {
+    try {
+      // Placeholder for rollback API call
+      // This should be implemented when the rollback API endpoint is available
+      console.log('Rollback seller profile API call for ID:', sellerId);
+
+      // TODO: Implement actual rollback API call
+      // Example implementation:
+      // const response = await authApi.default.delete(`/sellers/${sellerId}/rollback`);
+      // return response.data.success;
+
+      return true; // Placeholder return
+    } catch {
+      return false;
+    }
+  },
   updateSellerProfile: async (
     req: SellerProfileUpdateRequest,
   ): Promise<SellerProfileResponse | undefined> => {

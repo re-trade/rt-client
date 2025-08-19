@@ -118,7 +118,6 @@ export function useMessenger() {
     };
 
     const handleAuthError = (error: any) => {
-      console.error('Seller Chat: Authentication failed:', error);
       setIsAuthenticated(false);
       localStorage.removeItem(ETokenName.ACCESS_TOKEN);
       router.push('/login');
