@@ -109,7 +109,7 @@ const register2FAInternal = async (width: number = 300, height: number = 300): P
 
 const callLogout = async (): Promise<boolean> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TAccountMeResponse>>('/auth/logout');
+    const result = await authApi.default.post<IResponseObject<TAccountMeResponse>>('/auth/logout');
     if (result.data.success && result.status === 200) {
       return true;
     }
