@@ -4,7 +4,7 @@ import Modal from '@/components/reusable/modal';
 import { useCart } from '@/hooks/use-cart';
 import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
-import { TProduct, productApi } from '@/services/product.api';
+import { productApi, TProduct } from '@/services/product.api';
 import { CreateOrderRequest, OrderItem } from '@services/order.api';
 import { AlertTriangle, Check, CreditCard, MapPin, X } from 'lucide-react';
 import Image from 'next/image';
@@ -31,7 +31,6 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
 
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const checkMyproduct = () => {};
   const {
     paymentMethods,
     selectedPaymentMethodId,
@@ -116,15 +115,14 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
     );
   };
 
-  // Calculate order summary for selected products
   const calculateOrderSummary = () => {
     const selectedItems = selectedProducts.filter((p) => p.isSelected);
     const originalPrice = selectedItems.reduce(
       (sum, product) => sum + product.currentPrice * product.selectedQuantity,
       0,
     );
-    const tax = Math.round(originalPrice * 0.1);
-    const total = originalPrice + tax;
+    const tax = 0;
+    const total = originalPrice;
     return { originalPrice, tax, total, itemCount: selectedItems.length };
   };
 
@@ -550,10 +548,6 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
                   <span className="text-gray-800">
                     {orderSummary.originalPrice.toLocaleString('vi-VN')}₫
                   </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Thuế (10%)</span>
-                  <span className="text-gray-800">{orderSummary.tax.toLocaleString('vi-VN')}₫</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
                   <span className="text-gray-900">Tổng cộng</span>
