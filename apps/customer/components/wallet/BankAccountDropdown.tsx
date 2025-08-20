@@ -37,7 +37,13 @@ const BankIcon = ({ account }: { account: BankAccountResponse }) => {
   return (
     <div className="w-10 h-10 mr-3 bg-white rounded-lg border border-orange-200 flex items-center justify-center overflow-hidden">
       {bankInfo?.url ? (
-        <Image src={bankInfo.url} alt={account.bankName} className="w-full h-full object-contain" />
+        <Image
+          src={bankInfo.url}
+          alt={account.bankName}
+          width={40}
+          height={40}
+          className="w-full h-full object-contain"
+        />
       ) : (
         <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-orange-500 rounded flex items-center justify-center">
           <span className="text-white text-xs font-bold">{account.bankName?.charAt(0) || 'B'}</span>

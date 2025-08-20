@@ -66,7 +66,7 @@ const WalletBalanceCard: React.FC<WalletBalanceCardProps> = ({
       <div className="space-y-3">
         <button
           onClick={onWithdraw}
-          className="w-full bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-orange-700 transition-all duration-200 flex items-center justify-center"
+          className="w-full bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-orange-700 transition-all duration-200 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={loading || balance <= 0}
         >
           <Plus className="w-5 h-5 mr-2" />

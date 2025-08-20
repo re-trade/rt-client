@@ -1,6 +1,7 @@
 'use client';
 
 import { BankAccountResponse, BankResponse, getBankByBin } from '@/services/payment-method.api';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 interface BankAccountDropdownProps {
@@ -34,9 +35,11 @@ const BankIcon = ({ account }: { account: BankAccountResponse }) => {
   return (
     <div className="w-10 h-10 rounded-lg overflow-hidden bg-white border border-orange-200 flex items-center justify-center">
       {!imageError && bankInfo?.url ? (
-        <img
+        <Image
           src={bankInfo.url}
           alt={bankInfo.name}
+          width={32}
+          height={32}
           className="w-8 h-8 object-contain p-1"
           onError={() => setImageError(true)}
         />
