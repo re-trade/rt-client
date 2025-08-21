@@ -132,7 +132,7 @@ export function useRegistrationSubmission() {
       }
 
       showToast(
-        'Chào mừng bạn đến với ReTrade! Đăng ký thành công. Đang chuyển hướng đến bảng điều khiển...',
+        'Chào mừng bạn đến với ReTrade! Đăng ký thành công. Đang chuyển hướng về trang chủ...',
         'success',
       );
       console.log('Registration successful, returning true'); // Debug log

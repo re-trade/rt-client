@@ -61,7 +61,7 @@ export const orderStatusConfig = {
     group: 'problem',
   },
   DEFAULT: {
-    label: 'Không xác định',
+    label: 'Khác',
     color: '#6b7280',
     group: 'other',
   },

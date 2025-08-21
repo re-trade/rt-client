@@ -168,7 +168,7 @@ export function OrderTable({
       configs[status.code as keyof typeof configs] || {
         color: 'bg-gray-50 text-gray-700 border-gray-200 shadow-gray-100',
         icon: <AlertCircle className="h-3.5 w-3.5" />,
-        text: 'Không xác định',
+        text: 'Chưa rõ',
         pulse: false,
       }
     );
@@ -217,7 +217,7 @@ export function OrderTable({
     return {
       color: 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100',
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      text: 'Không xác định',
+      text: 'Chưa rõ',
       pulse: false,
     };
   };

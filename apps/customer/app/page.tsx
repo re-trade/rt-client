@@ -5,7 +5,7 @@ import { CategorySelector } from '@/components/category/CategorySelector';
 import ProductCard from '@/components/product/ProductCard';
 import { useProductHome } from '@/hooks/use-product-home';
 import { useProductList } from '@/hooks/use-product-list';
-import { TProduct, productApi } from '@/services/product.api';
+import { productApi, TProduct } from '@/services/product.api';
 import {
   ChevronRight,
   Clock,
@@ -54,12 +54,10 @@ export default function Home() {
       if (randomProductId) {
         router.push(`/product/${randomProductId}`);
       } else {
-        // Fallback to product listing if no random product is available
         router.push('/product');
       }
     } catch (error) {
       console.error('Error getting random product:', error);
-      // Fallback to product listing on error
       router.push('/product');
     }
   };

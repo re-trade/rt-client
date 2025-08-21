@@ -92,7 +92,7 @@ const getStatusBadge = (status: TProductStatus) => {
       return (
         <Badge variant="outline" className="bg-gray-50 text-gray-600">
           <AlertCircle className="w-3 h-3 mr-1" />
-          Không xác định
+          Chưa rõ
         </Badge>
       );
   }

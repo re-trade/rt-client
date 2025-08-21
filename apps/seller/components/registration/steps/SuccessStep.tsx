@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useRegistration } from '@/context/RegistrationContext';
+import { CUSTOMER_ROUTES } from '@/lib/constants';
 import { CheckCircle, Clock, Home, Mail, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -21,10 +22,10 @@ export default function SuccessStep() {
         if (prev <= 1) {
           clearInterval(timer);
           setIsRedirecting(true);
-          // Clean up form state and redirect to seller dashboard
+          // Clean up form state and redirect to customer app
           setTimeout(() => {
             resetForm();
-            router.push('/dashboard');
+            window.location.href = CUSTOMER_ROUTES.HOME;
           }, 500);
           return 0;
         }
@@ -33,13 +34,13 @@ export default function SuccessStep() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router, resetForm]);
+  }, [resetForm]);
 
-  const handleGoToDashboard = () => {
+  const handleGoToCustomerApp = () => {
     setIsRedirecting(true);
     // Clean up form state before redirect
     resetForm();
-    router.push('/dashboard');
+    window.location.href = CUSTOMER_ROUTES.HOME;
   };
 
   return (
@@ -61,11 +62,11 @@ export default function SuccessStep() {
             {isRedirecting ? (
               <div className="flex items-center justify-center gap-3 text-orange-700">
                 <div className="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-                <span className="font-medium">Đang chuyển hướng đến bảng điều khiển...</span>
+                <span className="font-medium">Đang chuyển hướng về trang chủ...</span>
               </div>
             ) : (
               <div className="text-center text-orange-700">
-                <p className="font-medium mb-2">Bạn sẽ được chuyển đến bảng điều khiển trong</p>
+                <p className="font-medium mb-2">Bạn sẽ được chuyển về trang chủ trong</p>
                 <div className="text-2xl font-bold text-orange-600">{countdown}s</div>
               </div>
             )}
@@ -175,7 +176,7 @@ export default function SuccessStep() {
       {/* Action Button */}
       <div className="text-center">
         <Button
-          onClick={handleGoToDashboard}
+          onClick={handleGoToCustomerApp}
           disabled={isRedirecting}
           className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -187,7 +188,7 @@ export default function SuccessStep() {
           ) : (
             <>
               <Home className="w-5 h-5 mr-2" />
-              Đi đến bảng điều khiển ngay
+              Về trang chủ ngay
             </>
           )}
         </Button>

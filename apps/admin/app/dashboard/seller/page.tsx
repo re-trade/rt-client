@@ -495,6 +495,12 @@ const SellerDetailModal = ({
     switch (status) {
       case 'VERIFIED':
         return 'Đã xác minh';
+      case 'WAITING':
+        return 'Chờ xác minh';
+      case 'FAILED':
+        return 'Xác minh thất bại';
+      case 'INIT':
+        return 'Chưa bắt đầu';
       case 'PENDING':
         return 'Đang chờ xác minh';
       case 'REJECTED':
@@ -502,7 +508,7 @@ const SellerDetailModal = ({
       case 'UNVERIFIED':
         return 'Chưa xác minh';
       default:
-        return 'Không xác định';
+        return 'Chưa xác minh';
     }
   };
 

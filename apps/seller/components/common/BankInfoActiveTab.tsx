@@ -23,17 +23,14 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   const [wallet, setWallet] = useState<WalletResponse>();
 
   const [bankAccounts, setBankAccounts] = useState<BankInfor[]>([]);
-  // const [isAddingBank, setIsAddingBank] = useState(false);
   const [editingBank, setEditingBank] = useState<BankInfor | null>(null);
   const [newBankInfo, setNewBankInfo] = useState<CreateBankInfor>({
     bankName: '',
     accountNumber: '',
     bankBin: '',
     userBankName: '',
-    // isDefault: false,
   });
 
-  // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,7 +41,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         ]);
         setListBanks(listBanks);
         setBankAccounts(bankInfo);
-        //setWithdrawHistory(withdraws);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -61,7 +57,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     });
   };
 
-  // Bank info functions
   const handleAddBank = async () => {
     if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
       try {
@@ -75,7 +70,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
               accountNumber: addedBank.accountNumber,
               userBankName: addedBank.userBankName,
               bankBin: addedBank.bankBin,
-              // isDefault: addedBank.isDefault || false,
               addedDate: new Date().toISOString(),
             },
           ]);
@@ -84,7 +78,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
             accountNumber: '',
             userBankName: '',
             bankBin: '',
-            // isDefault: false,
           });
           setIsAddingBank(false);
         } else {
@@ -93,7 +86,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         const newBank: BankInfor = {
           id: Date.now().toString(),
           ...newBankInfo,
-          // isDefault: bankAccounts.length === 0,
           addedDate: new Date().toISOString(),
         };
 
@@ -112,7 +104,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
       bankName: bank.bankName,
       accountNumber: bank.accountNumber,
       userBankName: bank.userBankName,
-      // isDefault: bank.isDefault,
       bankBin: bank.bankBin,
     });
     setIsAddingBank(true);
@@ -237,7 +228,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         </Button>
       </div>
 
-      {/* Add/Edit Bank Form */}
       {isAddingBank && (
         <Card className="border-dashed border-2 border-blue-300 bg-blue-50/50">
           <CardHeader>
@@ -294,18 +284,11 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         </Card>
       )}
 
-      {/* Bank Accounts List */}
       <div className="grid gap-4">
         {bankAccounts
           .filter((bank) => !editingBank || bank.id !== editingBank.id)
           .map((bank) => (
-            <Card
-              key={bank.id}
-              className={`border transition-all hover:shadow-md ${
-                // bank.isDefault ? 'border-blue-500 bg-blue-50/30' : ''
-                ''
-              }`}
-            >
+            <Card key={bank.id} className="border transition-all hover:shadow-md">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
                   <div className="flex items-start gap-4">
@@ -320,11 +303,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <h4 className="text-lg font-semibold text-gray-900">{bank.bankName}</h4>
-                        {/* {bank.isDefault && (
-                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                                      Mặc định
-                                    </span>
-                                  )} */}
                       </div>
                       <div className="space-y-1 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
@@ -336,16 +314,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* {!bank.isDefault && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleSetDefault(bank.id)}
-                                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                                >
-                                  Đặt mặc định
-                                </Button>
-                              )} */}
                     <Button variant="outline" size="sm" onClick={() => handleEditBank(bank)}>
                       <Edit className="h-4 w-4" />
                     </Button>

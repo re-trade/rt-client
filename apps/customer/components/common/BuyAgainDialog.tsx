@@ -48,7 +48,6 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<'details' | 'processing' | 'result'>('details');
 
-  // Load products when dialog opens
   useEffect(() => {
     if (isOpen && items.length > 0) {
       setCurrentStep('details');
@@ -76,8 +75,8 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
             products.push({
               ...product,
               originalQuantity: product.quantity,
-              selectedQuantity: Math.min(item.quantity, product.quantity), // Don't exceed available stock
-              isSelected: true, // Default to selected
+              selectedQuantity: Math.min(item.quantity, product.quantity),
+              isSelected: true,
             });
           }
         } catch (error) {
@@ -93,7 +92,6 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
     }
   };
 
-  // Toggle product selection
   const toggleProductSelection = (productId: string) => {
     setSelectedProducts((prev) =>
       prev.map((product) =>
@@ -102,7 +100,6 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
     );
   };
 
-  // Update selected quantity for a product
   const updateSelectedQuantity = (productId: string, newQuantity: number) => {
     setSelectedProducts((prev) =>
       prev.map((product) => {
@@ -315,7 +312,6 @@ const BuyAgainDialog: React.FC<BuyAgainDialogProps> = ({ isOpen, onClose, items 
                             </div>
                           </div>
 
-                          {/* Product Image */}
                           <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex-shrink-0">
                             <Image
                               width={64}

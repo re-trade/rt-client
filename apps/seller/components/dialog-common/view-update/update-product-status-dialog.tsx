@@ -288,7 +288,7 @@ export function UpdateProductStatusDialog({
                       currentStatusConfig?.color || 'bg-gray-100 text-gray-700 border-gray-300',
                     )}
                   >
-                    {currentStatusConfig?.label || 'Không xác định'}
+                    {currentStatusConfig?.label || 'Chưa rõ'}
                   </Badge>
                 </CardContent>
               </Card>
@@ -378,9 +378,7 @@ export function UpdateProductStatusDialog({
                 <div className="col-span-2 p-4 text-center border rounded-md border-orange-200 bg-orange-50/30">
                   <p className="text-orange-600">
                     Không có trạng thái nào được phép chuyển đổi từ{' '}
-                    <span className="font-semibold">
-                      {currentStatusConfig?.label || 'Không xác định'}
-                    </span>
+                    <span className="font-semibold">{currentStatusConfig?.label || 'Chưa rõ'}</span>
                   </p>
                 </div>
               )}
