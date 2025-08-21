@@ -180,10 +180,6 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                 <h3 className="mb-2 text-xl font-bold text-gray-900">
                   Đơn hàng đã được tạo thành công!
                 </h3>
-                <p className="mb-4 text-gray-600">
-                  Mã đơn hàng:{' '}
-                  <span className="font-mono font-bold text-orange-600">{createdOrderId}</span>
-                </p>
                 <p className="mb-6 text-sm text-gray-600">
                   Bạn sẽ được chuyển đến trang thanh toán trong giây lát...
                 </p>

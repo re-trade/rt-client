@@ -405,6 +405,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                 <SelectBrand
                   value={formData.brandId}
                   onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
+                  disabled={!formData.categorySelected}
                 />
               </div>
               <div className="space-y-2">
