@@ -31,16 +31,19 @@ interface CategoriesResponse {
 interface GetCategoriesParams {
   page?: number;
   size?: number;
-  parentId?: string;
-  sellerId?: string;
-  visible?: boolean;
-  type?: string;
 }
 
 const getCategoriesInternal = async (params?: GetCategoriesParams): Promise<CategoriesResponse> => {
   try {
-    const response = await unAuthApi.default.get('/categories', {
-      params,
+    const qQuery = new URLSearchParams({
+      enabled: 'true',
+      visible: 'true',
+    });
+    const rootQuery = new URLSearchParams();
+    if (params?.page) rootQuery.set('page', params.page.toString());
+    if (params?.size) rootQuery.set('size', params.size.toString());
+    const queryString = `q=${qQuery.toString()}${rootQuery.toString() ? `&${rootQuery}` : ''}`;
+    const response = await unAuthApi.default.get(`/categories?${queryString}`, {
       withCredentials: true,
     });
     return response.data;
