@@ -48,6 +48,10 @@ export function SelectBrand({
           const current = data.find((b) => b.id === currentBrandId);
           if (current) {
             setInputValue(current.name);
+            onChange(current.id); // Đảm bảo value được cập nhật
+          } else {
+            setInputValue('');
+            onChange('');
           }
         }
       } catch (error) {
@@ -107,7 +111,8 @@ export function SelectBrand({
     const newValue = e.target.value;
     setInputValue(newValue);
 
-    if (selectedBrand && newValue !== selectedBrand.name) {
+    // Chỉ reset value nếu input rỗng
+    if (newValue === '') {
       onChange('');
     }
 
@@ -132,7 +137,6 @@ export function SelectBrand({
   const handleSelectBrand = (brand: TBrand) => {
     if (disabled) return;
 
-    // Update the selected brand ID and display name
     onChange(brand.id);
     setInputValue(brand.name);
     setOpen(false);
