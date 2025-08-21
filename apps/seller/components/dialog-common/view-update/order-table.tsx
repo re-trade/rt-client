@@ -223,7 +223,9 @@ export function OrderTable({
   };
 
   const canUpdateStatus = (status: OrderResponse['orderStatus']) => {
-    return !['DELIVERED', 'CANCELLED', 'COMPLETED', 'RETURNED', 'REFUNDED'].includes(status.code);
+    return !['DELIVERED', 'RETRIEVED', 'CANCELLED', 'COMPLETED', 'RETURNED', 'REFUNDED'].includes(
+      status.code,
+    );
   };
 
   const formatCurrency = (amount: number) => {
