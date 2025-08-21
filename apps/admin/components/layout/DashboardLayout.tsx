@@ -20,7 +20,6 @@ import {
   DollarSign,
   FileText,
   LayoutDashboard,
-  LogOut,
   Package,
   Settings,
   Store,
@@ -117,15 +116,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 </SidebarGroup>
               ))}
 
-              {/* Logout button */}
+              {/* Space for future menu items */}
               <div className="mt-auto px-4 py-4">
-                <button
-                  onClick={logout}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Đăng xuất</span>
-                </button>
+                <div className="w-full px-4 py-2.5 text-sm font-medium text-gray-500">
+                  ReTrade Admin Panel
+                </div>
               </div>
             </SidebarContent>
           </Sidebar>
