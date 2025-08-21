@@ -12,14 +12,14 @@ type TAchievementResponse = {
 };
 
 export const achievementApi = {
-  async getMyAchievements(): Promise<{
+  async getSellerAchievements(sellerId: string): Promise<{
     content: TAchievementResponse[];
     totalPages: number;
     totalElements: number;
   }> {
     try {
       const response = await authApi.achievement.get<IResponseObject<TAchievementResponse[]>>(
-        '/seller-achievements/seller/me/completed',
+        `/seller-achievements/seller/${sellerId}/completed`,
       );
       if (response.data.success) {
         return {
