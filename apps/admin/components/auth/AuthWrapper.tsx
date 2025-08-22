@@ -3,6 +3,7 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -12,7 +13,17 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     if (!loading) {
       if (!auth || !checkAdminRole()) {
         if (window.location.pathname !== '/login') {
-          router.replace('/login');
+          toast.error('Bạn không có quyền truy cập. Vui lòng đăng nhập với tài khoản admin.', {
+            duration: 5000,
+            style: {
+              backgroundColor: '#fef2f2',
+              borderColor: '#f87171',
+              borderWidth: '2px',
+              color: '#dc2626',
+            },
+            icon: '🔒',
+          });
+          router.replace('/login?error=unauthorized');
         }
       }
     }

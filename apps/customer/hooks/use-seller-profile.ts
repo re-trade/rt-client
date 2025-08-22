@@ -1,5 +1,6 @@
 'use client';
 
+import { achievementApi, TAchievementResponse } from '@services/achievement.api';
 import {
   getSellerMetric,
   getSellerProfile,
@@ -8,24 +9,13 @@ import {
 } from '@services/seller.api';
 import { useCallback, useEffect, useState } from 'react';
 
-type TAchievement = {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  color: string;
-  achieved: boolean;
-  progress?: number;
-  target?: number;
-};
-
 function useSellerProfile(id: string) {
   const [sellerProfile, setSellerProfile] = useState<TSellerProfile>();
   const [sellerMetrics, setSellerMetrics] = useState<TSellerMetricResponse>();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMetrics, setLoadingMetrics] = useState(false);
-  const [achievements, setAchievements] = useState<TAchievement[]>([]);
+  const [achievements, setAchievements] = useState<TAchievementResponse[]>([]);
   const [loadingAchievements, setLoadingAchievements] = useState(false);
   const fetchSellerProfile = useCallback(async () => {
     setLoading(true);
@@ -55,62 +45,18 @@ function useSellerProfile(id: string) {
 
   const fetchSellerAchievement = useCallback(async () => {
     setLoadingAchievements(true);
+    setError(null);
     try {
-      setTimeout(() => {
-        const mockAchievements: TAchievement[] = [
-          {
-            id: '1',
-            title: 'Người bán mới',
-            description: 'Hoàn thành đăng ký và xác minh tài khoản',
-            icon: '🎯',
-            color: 'bg-green-500',
-            achieved: true,
-          },
-          {
-            id: '2',
-            title: '100 sản phẩm đầu tiên',
-            description: 'Đã bán thành công 100 sản phẩm',
-            icon: '📦',
-            color: 'bg-blue-500',
-            achieved: true,
-          },
-          {
-            id: '3',
-            title: 'Đánh giá 5 sao',
-            description: 'Duy trì đánh giá 4.8+ sao trong 3 tháng',
-            icon: '⭐',
-            color: 'bg-yellow-500',
-            achieved: true,
-          },
-          {
-            id: '4',
-            title: 'Người bán uy tín',
-            description: 'Đạt 1000 đơn hàng thành công',
-            icon: '🏆',
-            color: 'bg-orange-500',
-            achieved: false,
-            progress: 756,
-            target: 1000,
-          },
-          {
-            id: '5',
-            title: 'Siêu người bán',
-            description: 'Đạt doanh thu 100 triệu VNĐ',
-            icon: '💎',
-            color: 'bg-purple-500',
-            achieved: false,
-            progress: 67,
-            target: 100,
-          },
-        ];
-        setAchievements(mockAchievements);
-      });
+      const response = await achievementApi.getSellerAchievements(id);
+      setAchievements(response.content);
     } catch (error: any) {
-      console.error(error);
+      console.error('Achievement fetch error:', error);
       setError(error.message);
+      setAchievements([]);
+    } finally {
+      setLoadingAchievements(false);
     }
-    setLoadingAchievements(false);
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     fetchSellerProfile();

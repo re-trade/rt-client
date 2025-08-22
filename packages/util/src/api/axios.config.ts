@@ -20,7 +20,7 @@ export enum EApiService {
 
 const DEV_PORT_MAP: Record<EApiService, number> = {
   [EApiService.MAIN]: 8080,
-  [EApiService.ACHIEVEMENT]: 8084,
+  [EApiService.ACHIEVEMENT]: 8082,
   [EApiService.IMAGE_SEARCH]: 9090,
   [EApiService.STORAGE]: 8083,
   [EApiService.PROVINCE]: 8000,

@@ -1,4 +1,7 @@
 'use client';
+import AchievementsWidget from '@/components/dashboard/AchievementsWidget';
+import ProfileViewSwitcher from '@/components/dashboard/ProfileViewSwitcher';
+import StatisticsWidget from '@/components/dashboard/StatisticsWidget';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,13 +26,11 @@ import {
   Edit,
   Mail,
   MapPin,
-  Package,
   Phone,
   Save,
   Shield,
   ShieldCheck,
   ShieldX,
-  ShoppingCart,
   Star,
   Upload,
   User,
@@ -89,7 +90,6 @@ export default function ShopInfoManagement() {
     }
   }, [formData?.state, provinces, getProvinceByName, fetchDistricts]);
 
-  // Cancel edit mode when switching to customer profile
   useEffect(() => {
     if (profileView === 'customer' && isEditing) {
       handleCancel();
@@ -339,85 +339,17 @@ export default function ShopInfoManagement() {
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4 sm:mb-6 lg:mb-8">
-          <div className="space-y-3 sm:space-y-4 text-left">
-            <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 border-b-2 border-orange-400 pb-2 inline-block">
-                Thông tin của bạn
-              </h1>
-              <p className="text-sm sm:text-base text-gray-600">
-                Quản lý thông tin và thiết lập trang bán của bạn
-              </p>
-            </div>
-
-            {/* Profile View Switcher */}
-            <div className="flex items-center gap-1 sm:gap-2 bg-white rounded-xl p-1 border border-gray-200 shadow-sm w-full sm:w-fit overflow-hidden">
-              <button
-                onClick={() => setProfileView('seller')}
-                className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
-                  profileView === 'seller'
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
-                }`}
-              >
-                <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Hồ sơ bán hàng</span>
-                <span className="xs:hidden">Bán hàng</span>
-              </button>
-              <button
-                onClick={() => setProfileView('customer')}
-                className={`flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium flex-1 sm:flex-none ${
-                  profileView === 'customer'
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
-                }`}
-              >
-                <User className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Hồ sơ khách hàng</span>
-                <span className="xs:hidden">Khách hàng</span>
-              </button>
-            </div>
+          <div className="space-y-2 text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 border-b-2 border-orange-400 pb-2 inline-block">
+              Thông tin của bạn
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Quản lý thông tin và thiết lập trang bán của bạn
+            </p>
           </div>
 
-          {/* Action Buttons - Only show for seller profile */}
-          {profileView === 'seller' && (
-            <>
-              {!isEditing ? (
-                <Button
-                  onClick={handleEdit}
-                  className="bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300 py-2 sm:py-3 px-4 sm:px-6 text-sm sm:text-base font-semibold w-full sm:w-auto"
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Chỉnh sửa thông tin</span>
-                  <span className="sm:hidden">Chỉnh sửa</span>
-                </Button>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
-                  <Button
-                    onClick={handleSave}
-                    disabled={!hasChanges}
-                    className={`${
-                      hasChanges
-                        ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-md hover:shadow-lg'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    } transition-all duration-300 py-2 sm:py-3 px-4 sm:px-6 text-sm sm:text-base font-semibold flex-1 sm:flex-none`}
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Lưu thay đổi</span>
-                    <span className="sm:hidden">Lưu</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleCancel}
-                    className="border-2 border-gray-300 hover:bg-gray-50 transition-all duration-300 py-2 sm:py-3 px-4 sm:px-6 text-sm sm:text-base font-semibold flex-1 sm:flex-none"
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Hủy bỏ</span>
-                    <span className="sm:hidden">Hủy</span>
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
+          {/* Profile View Switcher - Moved to top-right */}
+          <ProfileViewSwitcher profileView={profileView} onProfileViewChange={setProfileView} />
         </div>
 
         {/* Profile Content */}
@@ -426,124 +358,17 @@ export default function ShopInfoManagement() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {/* Statistics Sidebar */}
             <div className="lg:order-2 space-y-4 sm:space-y-6">
-              <Card className="overflow-hidden shadow border bg-white">
-                <CardHeader className="bg-white border-b">
-                  <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl text-gray-800">
-                    <div className="p-1.5 sm:p-2 bg-gray-100 rounded-xl">
-                      <Star className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />
-                    </div>
-                    <span className="hidden sm:inline">Thống kê tổng quan</span>
-                    <span className="sm:hidden">Thống kê</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 lg:space-y-6">
-                  {statisticsLoading ? (
-                    <div className="flex items-center justify-center py-6 sm:py-8">
-                      <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-orange-500"></div>
-                    </div>
-                  ) : statisticsError ? (
-                    <div className="text-center py-6 sm:py-8">
-                      <div className="text-red-500 mb-2">
-                        <X className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2" />
-                        <p className="text-xs sm:text-sm font-medium">Không thể tải thống kê</p>
-                        <p className="text-xs text-gray-500 mt-1">Vui lòng thử lại sau</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="group relative bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all duration-300">
-                        <div className="flex justify-between items-center">
-                          <div className="space-y-1 flex-1 min-w-0">
-                            <span className="text-xs sm:text-sm font-medium text-blue-700">
-                              Tổng sản phẩm
-                            </span>
-                            <div className="flex items-center gap-1 sm:gap-2">
-                              <Package className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900 truncate">
-                                {statistics.totalProducts.toLocaleString('vi-VN')}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
-                            <Package className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-blue-600" />
-                          </div>
-                        </div>
-                      </div>
+              <StatisticsWidget
+                statistics={statistics}
+                isLoading={statisticsLoading}
+                error={statisticsError}
+                identityVerifiedStatus={formData.identityVerifiedStatus}
+                getVerificationIcon={getVerificationIcon}
+                getVerificationStatusText={getVerificationStatusText}
+              />
 
-                      <div className="group relative bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 border border-gray-200 hover:border-purple-200 hover:shadow-md transition-all duration-300">
-                        <div className="flex justify-between items-center">
-                          <div className="space-y-1 flex-1 min-w-0">
-                            <span className="text-xs sm:text-sm font-medium text-purple-700">
-                              Tổng đơn hàng
-                            </span>
-                            <div className="flex items-center gap-1 sm:gap-2">
-                              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
-                              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-900 truncate">
-                                {statistics.totalOrders.toLocaleString('vi-VN')}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
-                            <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-purple-600" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="group relative bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 border border-gray-200 hover:border-amber-200 hover:shadow-md transition-all duration-300">
-                        <div className="flex justify-between items-center">
-                          <div className="space-y-1 flex-1 min-w-0">
-                            <span className="text-xs sm:text-sm font-medium text-amber-700">
-                              Đánh giá
-                            </span>
-                            <div className="flex items-center gap-1 sm:gap-2">
-                              <Star className="h-4 w-4 sm:h-5 sm:w-5 fill-amber-500 text-amber-500 flex-shrink-0" />
-                              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-amber-900 truncate">
-                                {statistics.rating ? statistics.rating.toFixed(1) : '0.0'}/5.0
-                              </span>
-                            </div>
-                          </div>
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-amber-500/20 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
-                            <Star className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 fill-amber-500 text-amber-500" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="group relative bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 border border-gray-200 hover:border-emerald-200 hover:shadow-md transition-all duration-300">
-                        <div className="flex justify-between items-center">
-                          <div className="space-y-1 flex-1 min-w-0">
-                            <span className="text-xs sm:text-sm font-medium text-emerald-700">
-                              Xác minh CMND
-                            </span>
-                            <div className="flex items-center gap-1 sm:gap-2">
-                              {(() => {
-                                const VerificationIcon = getVerificationIcon(
-                                  formData.identityVerifiedStatus,
-                                );
-                                return (
-                                  <VerificationIcon className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 flex-shrink-0" />
-                                );
-                              })()}
-                              <span className="text-sm sm:text-base lg:text-lg font-bold text-emerald-900 truncate">
-                                {getVerificationStatusText(formData.identityVerifiedStatus)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
-                            {(() => {
-                              const VerificationIcon = getVerificationIcon(
-                                formData.identityVerifiedStatus,
-                              );
-                              return (
-                                <VerificationIcon className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-emerald-600" />
-                              );
-                            })()}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              {/* Achievements Section */}
+              <AchievementsWidget />
             </div>
 
             {/* Main Content */}
@@ -618,19 +443,62 @@ export default function ShopInfoManagement() {
                     </div>
 
                     <div className="flex-1 space-y-4 sm:space-y-6 text-center sm:text-left">
-                      <div className="min-h-[40px] sm:min-h-[60px] flex items-center justify-center sm:justify-start">
-                        {isEditing ? (
-                          <Input
-                            value={formData.shopName || ''}
-                            onChange={(e) => setFormData({ ...formData, shopName: e.target.value })}
-                            className="text-xl sm:text-2xl lg:text-3xl font-bold border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 h-[40px] sm:h-[50px] lg:h-[60px] text-center sm:text-left"
-                            placeholder="Tên cửa hàng"
-                          />
-                        ) : (
-                          <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-800">
-                            {formData.shopName || 'Chưa thiết lập'}
-                          </h2>
-                        )}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="min-h-[40px] sm:min-h-[60px] flex items-center justify-center sm:justify-start">
+                          {isEditing ? (
+                            <Input
+                              value={formData.shopName || ''}
+                              onChange={(e) =>
+                                setFormData({ ...formData, shopName: e.target.value })
+                              }
+                              className="text-xl sm:text-2xl lg:text-3xl font-bold border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 h-[40px] sm:h-[50px] lg:h-[60px] text-center sm:text-left"
+                              placeholder="Tên người bán"
+                            />
+                          ) : (
+                            <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-800">
+                              {formData.shopName || 'Chưa thiết lập'}
+                            </h2>
+                          )}
+                        </div>
+
+                        {/* Edit Buttons - Moved inside profile */}
+                        <div className="flex justify-center sm:justify-end">
+                          {!isEditing ? (
+                            <Button
+                              onClick={handleEdit}
+                              className="bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300 py-2 px-4 text-sm font-semibold"
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              <span className="hidden sm:inline">Thay đổi thông tin</span>
+                              <span className="sm:hidden">Thay đổi</span>
+                            </Button>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={handleSave}
+                                disabled={!hasChanges}
+                                className={`${
+                                  hasChanges
+                                    ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-md hover:shadow-lg'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                } transition-all duration-300 py-2 px-4 text-sm font-semibold`}
+                              >
+                                <Save className="h-4 w-4 mr-2" />
+                                <span className="hidden sm:inline">Lưu thay đổi</span>
+                                <span className="sm:hidden">Lưu</span>
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={handleCancel}
+                                className="border-2 border-gray-300 hover:bg-gray-50 transition-all duration-300 py-2 px-4 text-sm font-semibold"
+                              >
+                                <X className="h-4 w-4 mr-2" />
+                                <span className="hidden sm:inline">Hủy bỏ</span>
+                                <span className="sm:hidden">Hủy</span>
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-3 lg:gap-4">
@@ -680,7 +548,7 @@ export default function ShopInfoManagement() {
                         value={formData.description || ''}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         className="min-h-[100px] sm:min-h-[120px] lg:min-h-[140px] max-h-[200px] border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-sm sm:text-base lg:text-lg p-3 sm:p-4 resize-none"
-                        placeholder="Mô tả về cửa hàng của bạn..."
+                        placeholder="Mô tả về bạn..."
                       />
                     ) : (
                       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 min-h-[100px] sm:min-h-[120px] lg:min-h-[140px] flex items-start">

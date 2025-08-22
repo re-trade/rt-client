@@ -17,6 +17,7 @@ import Joi from 'joi';
 import { EyeIcon, EyeOffIcon, KeyIcon, LoaderIcon, UserIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useState } from 'react';
+import { toast } from 'sonner';
 
 interface LoginForm {
   username: string;
@@ -61,6 +62,19 @@ export default function LoginPage() {
         }
       });
       setValidationErrors(errors);
+
+      // Display warning toast for validation errors
+      toast.warning('Vui lòng điền đầy đủ thông tin đăng nhập!', {
+        duration: 4000,
+        style: {
+          backgroundColor: '#fffbeb',
+          borderColor: '#fbbf24',
+          borderWidth: '2px',
+          color: '#b45309',
+          fontWeight: 'bold',
+        },
+        icon: '⚠️',
+      });
       return false;
     }
     setValidationErrors({});
@@ -89,13 +103,46 @@ export default function LoginPage() {
       return;
     }
 
+    toast.info(`Đang đăng nhập với tài khoản ${formData.username}...`, {
+      duration: 2000,
+      style: {
+        backgroundColor: '#eff6ff',
+        borderColor: '#93c5fd',
+        borderWidth: '2px',
+        color: '#2563eb',
+      },
+      icon: '🔄',
+    });
+
     setIsLoading(true);
     try {
       await loginInternal(formData);
       await isAuth();
+      toast.success('Đăng nhập thành công! Chào mừng bạn quay trở lại.', {
+        duration: 3000,
+        icon: '🎉',
+        style: {
+          backgroundColor: '#ecfdf5',
+          borderColor: '#34d399',
+          borderWidth: '2px',
+          color: '#047857',
+          fontWeight: 'bold',
+        },
+      });
       router.push('/dashboard');
     } catch (err) {
       setError('Tên đăng nhập hoặc mật khẩu không đúng');
+      toast.error('Đăng nhập thất bại! Tên đăng nhập hoặc mật khẩu không chính xác.', {
+        duration: 5000,
+        style: {
+          backgroundColor: '#fef2f2',
+          borderColor: '#f87171',
+          borderWidth: '2px',
+          color: '#dc2626',
+          fontWeight: 'bold',
+        },
+        icon: '❌',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -112,8 +159,13 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {errorParam === 'unauthorized' && (
-                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-500 text-center">
+                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600 text-center border-l-4 border-red-500">
                   Bạn không có quyền truy cập. Vui lòng đăng nhập với tài khoản admin.
+                </div>
+              )}
+              {errorParam === 'session-expired' && (
+                <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-600 text-center border-l-4 border-amber-500">
+                  Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.
                 </div>
               )}
               <div className="space-y-2">
@@ -161,7 +213,9 @@ export default function LoginPage() {
                 )}
               </div>
               {error && (
-                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-500">{error}</div>
+                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600 border-l-4 border-red-500 font-medium">
+                  {error}
+                </div>
               )}
             </CardContent>
             <CardFooter>
