@@ -27,11 +27,11 @@ const validationSchemas = {
       'any.required': 'Email là bắt buộc',
     }),
   phoneNumber: Joi.string()
-    .pattern(/^[0-9]{10,11}$/)
+    .pattern(/^[0-9]{10}$/)
     .required()
     .messages({
       'string.empty': 'Số điện thoại là bắt buộc',
-      'string.pattern.base': 'Số điện thoại phải có 10-11 chữ số',
+      'string.pattern.base': 'Số điện thoại phải có đúng 10 chữ số',
       'any.required': 'Số điện thoại là bắt buộc',
     }),
   addressLine: Joi.string().min(5).max(200).required().messages({

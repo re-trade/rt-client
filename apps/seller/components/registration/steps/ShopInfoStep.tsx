@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useFileUpload } from '@/hooks/use-file-upload';
 import { useRegistrationValidation } from '@/hooks/use-registration-validation';
+import { createNumericInputHandler, preventNonNumericInput } from '@/utils/input-helpers';
 import { Camera, CheckCircle2, Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
@@ -26,12 +27,22 @@ export default function ShopInfoStep() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
     updateField(name as keyof typeof formData, value);
 
     if (touched[name]) {
       validateField(name as keyof typeof formData, value);
     }
   };
+
+  const handlePhoneInputChange = createNumericInputHandler((e) => {
+    const { value } = e.target;
+    updateField('phoneNumber', value);
+
+    if (touched.phoneNumber) {
+      validateField('phoneNumber', value);
+    }
+  }, 10);
 
   const handleInputBlur = (name: string) => {
     setTouched(name, true);
@@ -301,8 +312,13 @@ export default function ShopInfoStep() {
             <Input
               id="phoneNumber"
               name="phoneNumber"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={10}
               value={formData.phoneNumber}
-              onChange={handleInputChange}
+              onChange={handlePhoneInputChange}
+              onKeyDown={preventNonNumericInput}
               onBlur={() => handleInputBlur('phoneNumber')}
               placeholder="0123456789"
               className={`h-12 border-2 transition-all duration-200 ${
@@ -316,6 +332,9 @@ export default function ShopInfoStep() {
                 <X className="w-4 h-4" />
                 {errors.phoneNumber}
               </p>
+            )}
+            {!errors.phoneNumber && (
+              <p className="mt-2 text-gray-500 text-sm">Chỉ nhập số, tối đa 10 chữ số</p>
             )}
           </div>
         </div>
