@@ -38,21 +38,25 @@ type TRegister = {
 };
 const loginInternal = async (loginForm: TLocalLogin): Promise<void> => {
   const deviceInfo = await getDeviceInfo();
-  const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
-    '/auth/local',
-    { ...loginForm },
-    {
-      headers: {
-        'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
-        'x-device-name': encodeURIComponent(deviceInfo.deviceName),
-        'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
-        'x-location': encodeURIComponent(deviceInfo.location),
+  try {
+    const result = await unAuthApi.default.post<IResponseObject<TTokenResponse>>(
+      '/auth/local',
+      { ...loginForm },
+      {
+        headers: {
+          'x-device-fingerprint': encodeURIComponent(deviceInfo.deviceFingerprint),
+          'x-device-name': encodeURIComponent(deviceInfo.deviceName),
+          'x-ip-address': encodeURIComponent(deviceInfo.ipAddress),
+          'x-location': encodeURIComponent(deviceInfo.location),
+        },
       },
-    },
-  );
-  if (result.data.success && result.status === 200) {
-    const { ACCESS_TOKEN } = result.data.content.tokens;
-    localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
+    );
+    if (result.data.success && result.status === 200) {
+      const { ACCESS_TOKEN } = result.data.content.tokens;
+      localStorage.setItem(ETokenName.ACCESS_TOKEN, ACCESS_TOKEN);
+    }
+  } catch {
+    throw new Error('Đăng nhập thất bại. Xin hãy kiểm tra tên đăng nhập và mật khẩu.');
   }
 };
 
@@ -109,7 +113,7 @@ const register2FAInternal = async (width: number = 300, height: number = 300): P
 
 const callLogout = async (): Promise<boolean> => {
   try {
-    const result = await authApi.default.get<IResponseObject<TAccountMeResponse>>('/auth/logout');
+    const result = await authApi.default.post<IResponseObject<TAccountMeResponse>>('/auth/logout');
     if (result.data.success && result.status === 200) {
       return true;
     }

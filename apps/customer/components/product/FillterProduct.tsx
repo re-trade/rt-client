@@ -1,5 +1,7 @@
 'use client';
 
+import FilterSearch from '@/components/ui/FilterSearch';
+import PriceRangeSlider from '@/components/ui/PriceRangeSlider';
 import { TFilterSelected } from '@/hooks/use-product-list';
 import { TProductFilter } from '@services/product.api';
 import {
@@ -10,7 +12,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 const FilterChip = ({
   children,
@@ -55,11 +57,17 @@ const FilterSection = ({
   icon,
   children,
   delay = 0,
+  showSearch = false,
+  onSearch,
+  searchPlaceholder,
 }: {
   title: string;
   icon: React.ReactNode;
   children: React.ReactNode;
   delay?: number;
+  showSearch?: boolean;
+  onSearch?: (query: string) => void;
+  searchPlaceholder?: string;
 }) => (
   <motion.div
     className="space-y-3"
@@ -71,6 +79,13 @@ const FilterSection = ({
       {icon}
       <label className="font-semibold text-sm">{title}</label>
     </div>
+    {showSearch && onSearch && (
+      <FilterSearch
+        placeholder={searchPlaceholder || `Tìm kiếm ${title.toLowerCase()}...`}
+        onSearch={onSearch}
+        className="mb-2"
+      />
+    )}
     <div className="flex flex-wrap gap-2">{children}</div>
   </motion.div>
 );
@@ -93,6 +108,8 @@ export default function ProductFilter({
   handleFilterReset,
   handleSelectedFilterChange,
 }: ProductFilterProps) {
+  const [globalSearch, setGlobalSearch] = useState('');
+
   const handleSelectChange = useCallback(
     (key: keyof typeof selectedFilter, value: string) => {
       handleSelectedFilterChange(key, value);
@@ -100,12 +117,49 @@ export default function ProductFilter({
     [handleSelectedFilterChange],
   );
 
-  console.log('selectedFilter', selectedFilter);
+  const handlePriceRangeChange = useCallback(
+    (value: [number, number]) => {
+      handleSelectedFilterChange('minPrice', value[0]);
+      handleSelectedFilterChange('maxPrice', value[1]);
+    },
+    [handleSelectedFilterChange],
+  );
+
+  const filteredCategories = useMemo(() => {
+    if (!globalSearch) return filter.categoriesAdvanceSearch;
+    return filter.categoriesAdvanceSearch.filter((category) =>
+      category.name.toLowerCase().includes(globalSearch.toLowerCase()),
+    );
+  }, [filter.categoriesAdvanceSearch, globalSearch]);
+
+  const filteredBrands = useMemo(() => {
+    if (!globalSearch) return filter.brands;
+    return filter.brands.filter((brand) =>
+      brand.name.toLowerCase().includes(globalSearch.toLowerCase()),
+    );
+  }, [filter.brands, globalSearch]);
+
+  const filteredStates = useMemo(() => {
+    if (!globalSearch) return filter.states;
+    return filter.states.filter((state) =>
+      state.toLowerCase().includes(globalSearch.toLowerCase()),
+    );
+  }, [filter.states, globalSearch]);
+
+  const filteredSellers = useMemo(() => {
+    if (!globalSearch) return filter.sellers;
+    return filter.sellers.filter((seller) =>
+      seller.sellerName.toLowerCase().includes(globalSearch.toLowerCase()),
+    );
+  }, [filter.sellers, globalSearch]);
+
   const hasActiveFilters =
     selectedFilter.categories.length > 0 ||
     selectedFilter.brands.length > 0 ||
     selectedFilter.states.length > 0 ||
-    selectedFilter.seller;
+    selectedFilter.seller ||
+    (selectedFilter.minPrice && selectedFilter.minPrice > filter.minPrice) ||
+    (selectedFilter.maxPrice && selectedFilter.maxPrice < filter.maxPrice);
 
   if (filterLoading) {
     return (
@@ -122,13 +176,34 @@ export default function ProductFilter({
   return (
     <div className="bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden transition-all duration-300 ease-in-out">
       <div className="p-6 space-y-6">
+        <motion.div
+          className="space-y-3"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="flex items-center gap-2 text-gray-700 pb-2 border-b border-orange-100">
+            <span className="text-orange-500 font-bold">🔍</span>
+            <label className="font-semibold text-sm">Tìm kiếm trong bộ lọc</label>
+          </div>
+          <FilterSearch
+            placeholder="Tìm kiếm danh mục, thương hiệu, địa điểm, người bán..."
+            onSearch={setGlobalSearch}
+            className="w-full"
+          />
+          {globalSearch && (
+            <p className="text-xs text-gray-500">
+              Đang lọc theo: "<span className="font-medium text-orange-600">{globalSearch}</span>"
+            </p>
+          )}
+        </motion.div>
         {filter.categoriesAdvanceSearch.length > 0 && (
           <FilterSection
             title="Danh mục"
             icon={<IconCategory size={16} className="text-orange-500" />}
             delay={0.1}
           >
-            {filter.categoriesAdvanceSearch.map((item) => {
+            {filteredCategories.map((item) => {
               const isCategorySelected = selectedFilter.categories.includes(item.id);
               return (
                 <FilterChip
@@ -141,6 +216,9 @@ export default function ProductFilter({
                 </FilterChip>
               );
             })}
+            {filteredCategories.length === 0 && globalSearch && (
+              <p className="text-sm text-gray-500 italic">Không tìm thấy danh mục nào</p>
+            )}
           </FilterSection>
         )}
 
@@ -150,7 +228,7 @@ export default function ProductFilter({
             icon={<IconBuildingStore size={16} className="text-orange-500" />}
             delay={0.2}
           >
-            {filter.brands.map((brand) => {
+            {filteredBrands.map((brand) => {
               const isBrandSelected = selectedFilter.brands.includes(brand.id);
               return (
                 <FilterChip
@@ -171,6 +249,9 @@ export default function ProductFilter({
                 </FilterChip>
               );
             })}
+            {filteredBrands.length === 0 && globalSearch && (
+              <p className="text-sm text-gray-500 italic">Không tìm thấy thương hiệu nào</p>
+            )}
           </FilterSection>
         )}
 
@@ -180,7 +261,7 @@ export default function ProductFilter({
             icon={<IconMapPin size={16} className="text-orange-500" />}
             delay={0.3}
           >
-            {filter.states.map((state) => (
+            {filteredStates.map((state) => (
               <FilterChip
                 key={state}
                 isSelected={selectedFilter.states.includes(state)}
@@ -190,6 +271,9 @@ export default function ProductFilter({
                 {state}
               </FilterChip>
             ))}
+            {filteredStates.length === 0 && globalSearch && (
+              <p className="text-sm text-gray-500 italic">Không tìm thấy tỉnh/thành phố nào</p>
+            )}
           </FilterSection>
         )}
 
@@ -199,7 +283,7 @@ export default function ProductFilter({
             icon={<IconUser size={16} className="text-orange-500" />}
             delay={0.4}
           >
-            {filter.sellers.map((seller) => {
+            {filteredSellers.map((seller) => {
               const isSellerSelected =
                 selectedFilter.seller !== null && selectedFilter.seller === seller.sellerId;
               return (
@@ -213,6 +297,9 @@ export default function ProductFilter({
                 </FilterChip>
               );
             })}
+            {filteredSellers.length === 0 && globalSearch && (
+              <p className="text-sm text-gray-500 italic">Không tìm thấy người bán nào</p>
+            )}
           </FilterSection>
         )}
 
@@ -222,35 +309,18 @@ export default function ProductFilter({
             icon={<span className="text-orange-500 font-bold">₫</span>}
             delay={0.5}
           >
-            <div className="w-full flex gap-2">
-              <input
-                type="number"
-                className="input input-sm w-full border border-orange-300 text-gray-700 bg-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
-                placeholder="Giá thấp nhất"
-                min={filter.minPrice}
-                max={selectedFilter.maxPrice || '0'}
-                value={selectedFilter.minPrice || '0'}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value || '0');
-                  if (value < 0) return;
-                  handleSelectedFilterChange('minPrice', value);
-                }}
-              />
-              <span className="px-2 py-1 text-sm font-medium text-gray-600">–</span>
-              <input
-                type="number"
-                className="input input-sm w-full border border-orange-300 text-gray-700 bg-white px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
-                placeholder="Giá cao nhất"
-                min={selectedFilter.minPrice || '0'}
-                value={selectedFilter.maxPrice || ''}
-                max={filter.maxPrice || '0'}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value || '0');
-                  if (value < 0) return;
-                  handleSelectedFilterChange('maxPrice', value);
-                }}
-              />
-            </div>
+            <PriceRangeSlider
+              min={filter.minPrice}
+              max={filter.maxPrice}
+              value={[
+                selectedFilter.minPrice || filter.minPrice,
+                selectedFilter.maxPrice || filter.maxPrice,
+              ]}
+              onChange={handlePriceRangeChange}
+              step={10000}
+              formatValue={(value) => `${value.toLocaleString('vi-VN')}đ`}
+              className="w-full"
+            />
           </FilterSection>
         )}
 

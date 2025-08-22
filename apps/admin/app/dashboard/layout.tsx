@@ -1,20 +1,9 @@
 'use client';
 
 import AuthWrapper from '@/components/auth/AuthWrapper';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
-  useSidebar,
-} from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 import {
   Banknote,
   FileText,
@@ -85,69 +74,101 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
       {state === 'expanded' && (
-        <div className="w-64 shrink-0 transition-all duration-300">
-          <Sidebar>
-            <SidebarContent>
-              <div className="px-4 py-6">
-                <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-500 mt-1">Quản lý hệ thống</p>
-              </div>
+        <div className="w-64 shrink-0 transition-all duration-300 hidden md:block">
+          <div className="h-full bg-gradient-to-r from-white to-orange-50 border-r border-orange-200 shadow-sm">
+            <div className="p-6">
+              <h2 className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent mb-4">
+                Admin Dashboard
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">Quản lý hệ thống</p>
 
-              {menuItems.map((group, index) => (
-                <SidebarGroup key={index}>
-                  <SidebarGroupLabel className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {group.group}
-                  </SidebarGroupLabel>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
+              <div className="space-y-4 mt-6">
+                {menuItems.map((group, groupIndex) => (
+                  <div key={groupIndex} className="space-y-2">
+                    <h3 className="text-xs font-semibold text-orange-600 uppercase tracking-wider px-2">
+                      {group.group}
+                    </h3>
+                    <div className="space-y-1">
                       {group.items.map((item) => (
-                        <SidebarMenuItem key={item.href}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={pathname === item.href}
-                            className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-colors"
-                          >
-                            <Link href={item.href} className="flex items-center gap-3">
-                              <item.icon className="h-5 w-5 text-gray-500" />
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                            'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                            pathname === item.href
+                              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
+                              : 'text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600',
+                          )}
+                        >
+                          <item.icon
+                            className={cn(
+                              'h-4 w-4',
+                              pathname === item.href ? 'text-white' : 'text-gray-600',
+                            )}
+                          />
+                          {item.title}
+                        </Link>
                       ))}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-              ))}
-            </SidebarContent>
-          </Sidebar>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      <main className="flex-grow p-8 transition-all duration-300">
-        <div className="flex items-center justify-between mb-8">
+      <main className="flex-grow p-6 transition-all duration-300 pb-24 md:pb-6 overflow-auto bg-gray-50">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <SidebarTrigger className="bg-white shadow-sm hover:bg-gray-50" />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {menuItems.flatMap((g) => g.items).find((item) => item.href === pathname)?.title ||
-                  'Dashboard'}
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                {pathname === '/dashboard' ? 'Tổng quan hệ thống' : 'Quản lý và giám sát'}
-              </p>
-            </div>
+            <SidebarTrigger className="md:flex hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md border-none" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+              {menuItems.flatMap((g) => g.items).find((item) => item.href === pathname)?.title ||
+                'Dashboard'}
+            </h1>
           </div>
 
           <button
             onClick={logout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md"
           >
             <LogOut className="h-4 w-4" />
             Đăng xuất
           </button>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">{children}</div>
+        {children}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 md:hidden z-30">
+        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-200 shadow-lg">
+          <nav className="flex justify-around items-center h-16 px-2">
+            {menuItems
+              .flatMap((group) => group.items)
+              .slice(0, 5)
+              .map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex flex-col items-center justify-center px-2 py-2 rounded-lg transition-all duration-200',
+                    pathname === item.href
+                      ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600 shadow-md'
+                      : 'text-gray-700 hover:bg-white hover:shadow-sm hover:text-orange-600',
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      'h-5 w-5',
+                      pathname === item.href ? 'text-white' : 'text-gray-600',
+                    )}
+                  />
+                  <span className="text-xs mt-1 font-medium">{item.title.split(' ')[0]}</span>
+                </Link>
+              ))}
+          </nav>
+        </div>
+      </div>
     </div>
   );
 }

@@ -45,10 +45,8 @@ function useAuth() {
 
   const login = useCallback(
     async (data: TLocalLogin) => {
-      try {
-        await loginInternal(data);
-        await isAuth();
-      } catch {}
+      await loginInternal(data);
+      await isAuth();
     },
     [isAuth],
   );

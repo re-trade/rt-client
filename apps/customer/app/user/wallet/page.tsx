@@ -53,7 +53,6 @@ export default function WalletPage() {
     formatDate,
   } = useWalletManager();
 
-  // Calculate statistics
   const pendingWithdrawals = withdrawals.filter((w) => w.status === 'PENDING').length;
   const completedWithdrawals = withdrawals.filter((w) => w.status === 'COMPLETED').length;
   const totalWithdrawn = withdrawals

@@ -1,86 +1,61 @@
 'use client';
 
-import { useDashboardStats } from '@/hooks/use-dashboard-stats';
-import { Package, ShoppingCart, Store, Tag, Users } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import React from 'react';
+import { AdminProductChart, AdminRevenueChart } from '@/components/dashboard/AdminChart';
+import MetricCard from '@/components/dashboard/MetricCard';
+import { useDashboardMetric } from '@/hooks/use-dashboard-stats';
+import {
+  DollarSign,
+  Flag,
+  Package,
+  RefreshCw,
+  ShoppingCart,
+  Store,
+  Tag,
+  Users,
+} from 'lucide-react';
+import { useCallback, useState } from 'react';
 
-const StatCard = ({
-  title,
-  value,
-  icon: Icon,
-}: {
-  title: string;
-  value: string;
-  icon: React.ElementType;
-}) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-    <div className="flex items-center justify-center mb-4">
-      <div className="p-2 bg-blue-100 rounded-lg">
-        <Icon className="h-6 w-6 text-blue-600" />
-      </div>
-    </div>
-    <div className="text-center">
-      <div className="text-3xl font-bold text-gray-800 mb-1">{value}</div>
-      <div className="text-sm text-gray-600">{title}</div>
-    </div>
-  </div>
-);
+const AdminDashboard = () => {
+  const { stats, loading, error } = useDashboardMetric();
+  const [selectedPeriod, setSelectedPeriod] = useState('30 ngày qua');
 
-const quickActions = [
-  { href: '/dashboard/customer', label: 'Người dùng', icon: Users },
-  { href: '/dashboard/seller', label: 'Người bán', icon: Store },
-  { href: '/dashboard/product', label: 'Sản phẩm', icon: Package },
-  { href: '/dashboard/order', label: 'Đơn hàng', icon: ShoppingCart },
-];
+  const formatNumber = useCallback((num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  }, []);
 
-function QuickActions() {
-  const pathname = usePathname();
+  const formatMetricChange = useCallback((value: number) => {
+    return `+${value.toFixed(2)}% so với tháng trước`;
+  }, []);
 
-  return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Thao tác nhanh</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {quickActions.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname.startsWith(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              prefetch
-              className={`flex flex-col items-center gap-2 p-4 border rounded-lg transition-colors ${
-                isActive
-                  ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm'
-                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <Icon className={`h-6 w-6 ${isActive ? 'text-blue-600' : 'text-gray-600'}`} />
-              <span className="text-sm font-medium">{label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-export default function AdminPage() {
-  const { stats, loading, error } = useDashboardStats();
+  const getMetricTrend = useCallback((value: number) => {
+    return value > 0 ? 'up' : value < 0 ? 'down' : 'neutral';
+  }, []);
 
   if (loading) {
     return (
       <div className="p-6 space-y-6">
-        <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
-          <p className="text-lg opacity-90">Đang tải dữ liệu...</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Tổng quan Dashboard</h1>
+            <p className="text-gray-600 mt-1">Xem tổng quan về hoạt động kinh doanh của bạn</p>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded mb-2"></div>
-              <div className="h-8 bg-gray-200 rounded mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+              </div>
             </div>
           ))}
         </div>
@@ -92,15 +67,7 @@ export default function AdminPage() {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">!</span>
-            </div>
-            <div>
-              <h3 className="font-semibold text-red-800">Lỗi!</h3>
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          </div>
+          <p className="text-red-600">Có lỗi xảy ra khi tải dữ liệu: {error}</p>
         </div>
       </div>
     );
@@ -108,10 +75,10 @@ export default function AdminPage() {
 
   if (!stats) {
     return (
-      <div className="p-6">
-        <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-8 text-center shadow-lg">
           <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
-          <p className="text-lg">Không có dữ liệu</p>
+          <p className="text-lg opacity-90">Không có dữ liệu</p>
         </div>
       </div>
     );
@@ -119,84 +86,104 @@ export default function AdminPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="bg-blue-500 text-white rounded-lg p-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Tổng quan hệ thống</h1>
-        <p className="text-lg opacity-90">Xem tổng quan về hoạt động của hệ thống admin</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatCard
-          title="Tổng số người dùng"
-          value={stats.totalCustomers.toLocaleString()}
-          icon={Users}
-        />
-        <StatCard
-          title="Người bán đang hoạt động"
-          value={stats.totalSellers.toLocaleString()}
-          icon={Store}
-        />
-        <StatCard
-          title="Sản phẩm đang bán"
-          value={stats.totalProducts.toLocaleString()}
-          icon={Package}
-        />
-        <StatCard
-          title="Tổng đơn hàng"
-          value={stats.totalOrders.toLocaleString()}
-          icon={ShoppingCart}
-        />
-        <StatCard
-          title="Danh mục sản phẩm"
-          value={stats.totalCategories.toLocaleString()}
-          icon={Tag}
-        />
-      </div>
-
-      {/* <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-4">
-          Hoạt động gần đây
-        </h2>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="w-2 h-2 rounded-full mt-2 bg-green-500"></div>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-800 text-sm">
-                Hệ thống hoạt động bình thường
-              </p>
-              <p className="text-xs text-gray-500">
-                Tất cả các dịch vụ đang hoạt động ổn định
-              </p>
-              <p className="text-xs text-gray-400">2 phút trước</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="w-2 h-2 rounded-full mt-2 bg-green-500"></div>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-800 text-sm">
-                Cập nhật dữ liệu thành công
-              </p>
-              <p className="text-xs text-gray-500">
-                Đã cập nhật thống kê dashboard từ API
-              </p>
-              <p className="text-xs text-gray-400">5 phút trước</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="w-2 h-2 rounded-full mt-2 bg-blue-500"></div>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-800 text-sm">
-                Hệ thống admin online
-              </p>
-              <p className="text-xs text-gray-500">
-                Admin dashboard đang hoạt động bình thường
-              </p>
-              <p className="text-xs text-gray-400">10 phút trước</p>
-            </div>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Tổng quan Dashboard</h1>
+          <p className="text-gray-600 mt-1">Xem tổng quan về hoạt động của hệ thống ReTrade</p>
         </div>
-      </div> */}
+        <div className="flex items-center gap-4">
+          <select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
+          >
+            <option value="30 ngày qua">30 ngày qua</option>
+            <option value="7 ngày qua">7 ngày qua</option>
+            <option value="90 ngày qua">90 ngày qua</option>
+          </select>
+          <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Làm mới
+          </button>
+        </div>
+      </div>
 
-      <QuickActions />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <MetricCard
+          title="Tổng sản phẩm"
+          value={formatNumber(stats.totalProducts)}
+          change={formatMetricChange(0.0)}
+          icon={Package}
+          color="from-blue-500 to-blue-600"
+          trend={getMetricTrend(0)}
+        />
+        <MetricCard
+          title="Tổng người dùng"
+          value={formatNumber(stats.totalUsers)}
+          change={formatMetricChange(0.0)}
+          icon={Users}
+          color="from-green-500 to-green-600"
+          trend={getMetricTrend(0)}
+        />
+        <MetricCard
+          title="Người dùng mới trong tháng"
+          value={formatNumber(stats.newUsersThisMonth)}
+          change={formatMetricChange(0.0)}
+          icon={Users}
+          color="from-teal-500 to-teal-600"
+          trend={getMetricTrend(0)}
+        />
+        <MetricCard
+          title="Tổng đơn hàng"
+          value={formatNumber(stats.totalOrders)}
+          change={formatMetricChange(0.0)}
+          icon={ShoppingCart}
+          color="from-purple-500 to-purple-600"
+          trend={getMetricTrend(0)}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+        <MetricCard
+          title="Doanh thu tháng này"
+          value={`${formatNumber(stats.revenueThisMonth)}đ`}
+          change={formatMetricChange(0.0)}
+          icon={DollarSign}
+          color="from-green-500 to-green-600"
+          trend={getMetricTrend(0)}
+        />
+        <MetricCard
+          title="Tổng danh mục"
+          value={formatNumber(stats.totalCategories)}
+          change={formatMetricChange(0.0)}
+          icon={Tag}
+          color="from-orange-500 to-orange-600"
+          trend={getMetricTrend(0)}
+        />
+        <MetricCard
+          title="Tổng người bán"
+          value={formatNumber(stats.totalSellers)}
+          change={formatMetricChange(0.0)}
+          icon={Store}
+          color="from-indigo-500 to-indigo-600"
+          trend={getMetricTrend(0)}
+        />
+        <MetricCard
+          title="Báo cáo"
+          value={formatNumber(stats.totalReport)}
+          change={formatMetricChange(0.0)}
+          icon={Flag}
+          color="from-red-500 to-red-600"
+          trend={getMetricTrend(0)}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <AdminRevenueChart />
+        <AdminProductChart />
+      </div>
     </div>
   );
-}
+};
+
+export default AdminDashboard;

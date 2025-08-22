@@ -2,6 +2,7 @@
 import SellerProductsSection from '@/components/seller/SellerProductsSection';
 import { useAuth } from '@/context/AuthContext';
 import { useSellerProfile } from '@/hooks/use-seller-profile';
+import { getAchievementBgColor, getAchievementIcon } from '@/utils/achievement-icons';
 import {
   IconCalendar,
   IconClock,
@@ -17,14 +18,22 @@ import {
   IconTrophy,
   IconUser,
 } from '@tabler/icons-react';
+import { Award } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export default function SellerDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
 
-  const { sellerProfile, sellerMetrics, achievements, loading, loadingMetrics, error } =
-    useSellerProfile(id);
+  const {
+    sellerProfile,
+    sellerMetrics,
+    achievements,
+    loading,
+    loadingMetrics,
+    loadingAchievements,
+    error,
+  } = useSellerProfile(id);
   const { sellerProfile: currentUserSellerProfile } = useAuth();
 
   const router = useRouter();
@@ -218,60 +227,67 @@ export default function SellerDetailPage({ params }: { params: { id: string } })
                 <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded"></div>
                 Thành tích đạt được
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {achievements.map((achievement) => (
-                  <div
-                    key={achievement.id}
-                    className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-                      achievement.achieved
-                        ? 'border-green-200 bg-green-50'
-                        : 'border-gray-200 bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
+              {loadingAchievements ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                </div>
+              ) : achievements.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {achievements.map((achievement) => {
+                    const Icon = getAchievementIcon(achievement.code);
+                    const bgColor = getAchievementBgColor(achievement.code);
+
+                    return (
                       <div
-                        className={`w-10 h-10 ${achievement.color} rounded-xl flex items-center justify-center text-white text-lg font-bold flex-shrink-0`}
+                        key={achievement.id}
+                        className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                          achievement.achieved
+                            ? 'border-green-200 bg-green-50'
+                            : 'border-gray-200 bg-gray-50'
+                        }`}
                       >
-                        {achievement.achieved ? <IconTrophy size={20} /> : achievement.icon}
-                      </div>
-                      <div className="flex-1">
-                        <h3
-                          className={`font-semibold mb-1 ${achievement.achieved ? 'text-green-800' : 'text-gray-700'}`}
-                        >
-                          {achievement.title}
-                        </h3>
-                        <p
-                          className={`text-sm mb-2 ${achievement.achieved ? 'text-green-600' : 'text-gray-600'}`}
-                        >
-                          {achievement.description}
-                        </p>
-                        {!achievement.achieved && achievement.progress && achievement.target && (
-                          <div className="mt-2">
-                            <div className="flex justify-between text-xs text-gray-600 mb-1">
-                              <span>{achievement.progress}</span>
-                              <span>{achievement.target}</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div
-                                className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-                                style={{
-                                  width: `${(achievement.progress / achievement.target) * 100}%`,
-                                }}
-                              ></div>
-                            </div>
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`w-10 h-10 ${bgColor} rounded-xl flex items-center justify-center flex-shrink-0`}
+                          >
+                            {achievement.achieved ? (
+                              <IconTrophy size={20} className="text-orange-600" />
+                            ) : (
+                              <Icon size={20} className="text-orange-600" />
+                            )}
                           </div>
-                        )}
-                        {achievement.achieved && (
-                          <div className="flex items-center gap-1 text-green-600 text-sm">
-                            <IconMedal size={14} />
-                            <span>Đã đạt được</span>
+                          <div className="flex-1">
+                            <h3
+                              className={`font-semibold mb-1 ${achievement.achieved ? 'text-green-800' : 'text-gray-700'}`}
+                            >
+                              {achievement.name}
+                            </h3>
+                            <p
+                              className={`text-sm mb-2 ${achievement.achieved ? 'text-green-600' : 'text-gray-600'}`}
+                            >
+                              {achievement.description}
+                            </p>
+                            {achievement.achieved && achievement.achievedAt && (
+                              <div className="flex items-center gap-1 text-green-600 text-sm">
+                                <IconMedal size={14} />
+                                <span>Đạt được: {formatDate(achievement.achievedAt)}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
-                    </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                    <Award className="w-8 h-8 text-gray-400" />
                   </div>
-                ))}
-              </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Chưa có thành tích</h3>
+                  <p className="text-gray-500">Người bán này chưa đạt được thành tích nào.</p>
+                </div>
+              )}
             </div>
 
             {/* Recent Updates */}

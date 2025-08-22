@@ -118,7 +118,7 @@ export default function OrderDetailPage() {
       status === 'Pending' ||
       status === 'Payment Confirmation' ||
       status === 'Delivered' ||
-      status === 'RETRIEVED'
+      status === 'Retrieved'
     );
   };
 
@@ -142,7 +142,6 @@ export default function OrderDetailPage() {
     }
 
     try {
-      // Get seller profile to get accountId
       const sellerProfile = await getSellerProfile(currentOrder.sellerId);
       if (sellerProfile?.accountId) {
         router.push(`/chat/${sellerProfile.accountId}`);

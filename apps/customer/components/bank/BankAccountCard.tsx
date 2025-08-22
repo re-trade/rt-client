@@ -2,6 +2,7 @@ import { useBankGradient } from '@/hooks/use-bank-gradient';
 import { BankAccountResponse, BankResponse } from '@services/payment-method.api';
 import { format } from 'date-fns';
 import { Calendar, CreditCard, Edit3, Trash2, User } from 'lucide-react';
+import Image from 'next/image';
 
 interface ModalProps {
   account: BankAccountResponse;
@@ -35,7 +36,13 @@ const BankAccountCard = ({ account, banks, openEditModal, handleDelete }: ModalP
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center space-x-3">
             {bank && (
-              <img src={bank.url} alt={bank.name} className="w-8 h-8 rounded-md bg-white/20 p-1" />
+              <Image
+                src={bank.url}
+                alt={bank.name}
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-md bg-white/20 p-1"
+              />
             )}
             <div className="text-lg font-bold">{account.bankName}</div>
           </div>

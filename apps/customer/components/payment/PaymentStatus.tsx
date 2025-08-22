@@ -4,6 +4,7 @@ import { useToast } from '@/context/ToastContext';
 import { usePayment } from '@/hooks/use-payment';
 import { paymentApi, PaymentMethod, PaymentStatusResponse } from '@/services/payment.api';
 import { AlertTriangle, Clock, CreditCard, Eye, RefreshCw, X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -310,7 +311,13 @@ const PaymentMethodModal = ({
             className="w-full flex items-center gap-3 p-3 text-left hover:bg-orange-50 rounded-lg border border-gray-200 hover:border-orange-200 transition-colors"
           >
             {method.imgUrl && (
-              <img src={method.imgUrl} alt={method.name} className="w-8 h-8 object-contain" />
+              <Image
+                src={method.imgUrl}
+                alt={method.name}
+                width={32}
+                height={32}
+                className="w-8 h-8 object-contain"
+              />
             )}
             <div>
               <p className="font-medium text-gray-800">{method.name}</p>

@@ -1,10 +1,12 @@
 'use client';
 
+import BellNotification from '@/components/notification/BellNotification';
 import { SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import {
   AlertCircle,
+  Bell,
   ChevronDown,
   DollarSign,
   LayoutDashboard,
@@ -74,6 +76,11 @@ const menuItems = [
   {
     group: 'Liên hệ & Hỗ trợ',
     items: [
+      {
+        title: 'Thông báo',
+        icon: Bell,
+        href: '/dashboard/notifications',
+      },
       {
         title: 'Chat với khách hàng',
         icon: MessageCircle,
@@ -241,12 +248,19 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       )}
 
       <main className="flex-grow p-6 transition-all duration-300 pb-24 md:pb-6 overflow-auto bg-gray-50">
-        <div className="flex items-center gap-4 mb-6">
-          <SidebarTrigger className="md:flex hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md border-none" />
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-            {menuItems.flatMap((group) => group.items).find((item) => item.href === pathname)
-              ?.title || 'Dashboard'}
-          </h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger className="md:flex hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md border-none" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+              {menuItems.flatMap((group) => group.items).find((item) => item.href === pathname)
+                ?.title || 'Dashboard'}
+            </h1>
+          </div>
+
+          {/* Notification Bell */}
+          <div className="flex items-center gap-4">
+            <BellNotification />
+          </div>
         </div>
         {children}
       </main>

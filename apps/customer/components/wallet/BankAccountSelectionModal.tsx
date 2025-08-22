@@ -1,6 +1,7 @@
 'use client';
 
 import { BankAccountResponse, BankResponse, getBankByBin } from '@/services/payment-method.api';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 interface BankAccountSelectionModalProps {
@@ -33,9 +34,11 @@ const BankIcon = ({ account }: { account: BankAccountResponse }) => {
   return (
     <div className="w-12 h-12 rounded-lg overflow-hidden bg-white border border-[#525252]/20 flex items-center justify-center">
       {!imageError && bankInfo?.url ? (
-        <img
+        <Image
           src={bankInfo.url}
           alt={bankInfo.name}
+          width={40}
+          height={40}
           className="w-10 h-10 object-contain p-1"
           onError={() => setImageError(true)}
         />

@@ -35,6 +35,7 @@ services:
         - API_BASE_URL=${API_BASE_URL}
         - SOCKET_URL=${SOCKET_URL}
         - NODE_ENV=production
+        - CUSTOMER_PORTAL_URL=${CUSTOMER_PORTAL_URL}
     profiles:
       - seller
       - build

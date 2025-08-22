@@ -2,15 +2,18 @@
 
 import { BankResponse, getBanks } from '@services/payment-method.api';
 import { ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const BankIcon = ({ bank }: { bank: BankResponse }) => {
   return (
     <div className="w-10 h-10 mr-3 bg-white rounded-lg border border-orange-200 flex items-center justify-center overflow-hidden shadow-sm">
       {bank.url ? (
-        <img
+        <Image
           src={bank.url}
           alt={bank.name}
+          width={40}
+          height={40}
           className="w-full h-full object-contain"
           onError={(e) => {
             const target = e.target as HTMLImageElement;

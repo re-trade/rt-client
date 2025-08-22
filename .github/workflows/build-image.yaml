@@ -18,6 +18,7 @@ jobs:
       API_BASE_URL: ${{ secrets.DEV_API_BASE_URL }}
       SOCKET_URL: ${{ secrets.DEV_SOCKET_URL }}
       SELLER_PORTAL_URL: ${{ secrets.DEV_SELLER_PORTAL_URL }}
+      CUSTOMER_PORTAL_URL: ${{ secrets.DEV_CUSTOMER_PORTAL_URL }}
     continue-on-error: true
     permissions:
       contents: read
@@ -49,6 +50,7 @@ jobs:
       API_BASE_URL: ${{ secrets.API_BASE_URL }}
       SOCKET_URL: ${{ secrets.SOCKET_URL }}
       SELLER_PORTAL_URL: ${{ secrets.SELLER_PORTAL_URL }}
+      CUSTOMER_PORTAL_URL: ${{ secrets.CUSTOMER_PORTAL_URL }}
     permissions:
       contents: read
       packages: write

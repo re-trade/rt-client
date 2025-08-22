@@ -47,7 +47,7 @@ const WithdrawalModal = ({
 
     // Validate amount
     const amount = parseFloat(withdrawAmount);
-    if (isNaN(amount) || amount <= 0 || amount > balance) {
+    if (isNaN(amount) || amount < 3000 || amount > balance) {
       return;
     }
 
@@ -152,8 +152,8 @@ const WithdrawalModal = ({
             {withdrawAmount && parseFloat(withdrawAmount) > Math.min(balance, 3000000) && (
               <p className="text-red-500 text-sm mt-1">Số tiền vượt quá giới hạn cho phép</p>
             )}
-            {withdrawAmount && parseFloat(withdrawAmount) < 50000 && (
-              <p className="text-red-500 text-sm mt-1">Số tiền tối thiểu là 50,000 VND</p>
+            {withdrawAmount && parseFloat(withdrawAmount) < 3000 && (
+              <p className="text-red-500 text-sm mt-1">Số tiền tối thiểu là 3,000 VND</p>
             )}
           </div>
 
@@ -224,12 +224,12 @@ const WithdrawalModal = ({
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl disabled:shadow-none"
               disabled={
                 !selectedBankAccount ||
                 !withdrawAmount ||
                 !withdrawContent ||
-                parseFloat(withdrawAmount) <= 0 ||
+                parseFloat(withdrawAmount) < 3000 ||
                 parseFloat(withdrawAmount) > balance ||
                 isNaN(parseFloat(withdrawAmount)) ||
                 processingWithdrawal

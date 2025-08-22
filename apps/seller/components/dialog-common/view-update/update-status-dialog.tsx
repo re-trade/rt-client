@@ -213,7 +213,7 @@ export function UpdateStatusDialog({
       configs[status.code] || {
         color: 'bg-gray-50 text-gray-700 border-gray-200',
         icon: <AlertCircle className="h-4 w-4" />,
-        text: 'Không xác định',
+        text: 'Chưa rõ',
         bgColor: 'bg-gray-500',
       }
     );

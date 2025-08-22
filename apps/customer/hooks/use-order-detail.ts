@@ -243,10 +243,10 @@ export function useOrderDetail(orderId: string) {
   const getStatusDisplay = (id: string) => {
     return (
       orderState.orderStatusRecord[id]?.config || {
-        label: 'Không xác định',
+        label: 'Chưa rõ',
         color: 'bg-gray-100 text-gray-800 border-gray-200',
         icon: Package,
-        description: 'Không xác định',
+        description: 'Chưa rõ',
       }
     );
   };

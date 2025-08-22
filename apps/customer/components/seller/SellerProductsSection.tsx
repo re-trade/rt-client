@@ -295,8 +295,8 @@ const SellerProductsSection = ({ sellerId, sellerName }: SellerProductsSectionPr
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === 'grid'
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-orange-500 text-gray-800'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
               }`}
             >
               <IconGridDots className="w-5 h-5" />
@@ -305,8 +305,8 @@ const SellerProductsSection = ({ sellerId, sellerName }: SellerProductsSectionPr
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-orange-500 text-gray-800'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
               }`}
             >
               <IconList className="w-5 h-5" />
