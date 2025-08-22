@@ -17,6 +17,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 interface CreateProductDialogProps {
@@ -69,7 +70,6 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
         ...prev,
         [field]: value,
         categorySelected: true,
-        brandId: '',
       }));
     } else {
       setFormData((prev) => ({ ...prev, [field]: value }));
