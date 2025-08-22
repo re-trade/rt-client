@@ -10,7 +10,6 @@ import { textModApi } from '@/service/textmod.api';
 import { CheckCircle, MessageSquare, Sparkles, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-
 interface ReplyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

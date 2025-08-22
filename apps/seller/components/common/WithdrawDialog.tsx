@@ -1,29 +1,20 @@
-// components/dialog-common/add/WithdrawDialog.tsx
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { walletApi, WithdrawCreate } from '@/service/wallet.api';
-import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Smartphone, Wallet } from 'lucide-react';
+import { BankInfor, walletApi, WithdrawCreate } from '@/service/wallet.api';
+import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { SelectBankInfo } from './SelectBankInfo';
-
 interface WithdrawDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   availableBalance: number;
-  onWithdraw: (amount: number, method: string, bankInfo?: string) => void;
+  onWithdraw: (amount: number, bankInfo?: string) => void;
   onOpenAddBankForm: () => void;
 }
 
@@ -34,53 +25,56 @@ export function WithdrawDialog({
   onWithdraw,
   onOpenAddBankForm,
 }: WithdrawDialogProps) {
-  const [withdrawMethod, setWithdrawMethod] = useState('');
-
-  const [bankInfo, setBankInfo] = useState('');
-  const [selectedBank, setSelectedBank] = useState<any>(null);
-
+  const [selectedBank, setSelectedBank] = useState<BankInfor | null>(null);
   const [withdrawData, setWithdrawData] = useState<WithdrawCreate>({
     amount: 0,
     bankProfileId: '',
     content: '',
   });
-  const MIN_WITHDRAW = 100000;
+  const MIN_WITHDRAW = 3000;
   const MAX_WITHDRAW = availableBalance;
-  const TRANSACTION_FEE = 5000; // Phí giao dịch cố định
+  const MAX_CONTENT_LENGTH = 50; // Giới hạn nội dung giao dịch
 
-  // Tính toán số tiền thực nhận
-  const actualAmount = Math.max(0, Number(withdrawData.amount) - TRANSACTION_FEE);
-
-  // Kiểm tra tính hợp lệ của form
   const isValidAmount =
     Number(withdrawData.amount) >= MIN_WITHDRAW && Number(withdrawData.amount) <= MAX_WITHDRAW;
 
-  const isFormValid =
-    withdrawData.amount &&
-    withdrawMethod &&
-    isValidAmount &&
-    (withdrawMethod !== 'bank' || selectedBank);
+  const isFormValid = withdrawData.amount && selectedBank;
 
   // Định dạng số tiền
   const formatCurrency = (amount: number) => {
-    return amount.toLocaleString('vi-VN') + '₫';
+    return amount.toLocaleString('vi-VN') + ' VND';
   };
 
   // Xử lý nhập số tiền với định dạng
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d]/g, '');
-    setWithdrawData((prev) => ({
-      ...prev,
-      amount: Number(value),
-    }));
+
+    if (value === '') {
+      setWithdrawData((prev) => ({
+        ...prev,
+        amount: 0,
+      }));
+      return;
+    }
+
+    const numericValue = parseInt(value, 10);
+    if (numericValue <= MAX_WITHDRAW) {
+      setWithdrawData((prev) => ({
+        ...prev,
+        amount: numericValue,
+      }));
+    }
   };
 
+  // Xử lý nhập nội dung giao dịch - SỬA LẠI
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^a-zA-Z0-9À-ỹà-ỹ\s]/g, '');
-    setWithdrawData((prev) => ({
-      ...prev,
-      content: value.slice(0, 140),
-    }));
+    const value = e.target.value;
+    if (value.length <= MAX_CONTENT_LENGTH) {
+      setWithdrawData((prev) => ({
+        ...prev,
+        content: value,
+      }));
+    }
   };
 
   // Chọn số tiền nhanh
@@ -95,34 +89,33 @@ export function WithdrawDialog({
     }
   };
 
+  // Ẩn số tài khoản (chỉ hiện 4 số cuối)
+  // const maskAccountNumber = (accountNumber: string) => {
+  //   if (accountNumber.length <= 4) return accountNumber;
+  //   return '*'.repeat(accountNumber.length - 4) + accountNumber.slice(-4);
+  // };
+
   const handleConfirm = () => {
-    if (!selectedBank) return;
+    if (!selectedBank) {
+      toast.error('Vui lòng chọn tài khoản để nhận');
+      return;
+    }
+    if (withdrawData.amount < MIN_WITHDRAW || withdrawData.amount > MAX_WITHDRAW) {
+      toast.error(
+        `Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`,
+      );
+      return;
+    }
+
     const newData = {
       ...withdrawData,
       bankProfileId: selectedBank.id,
     };
     const response = walletApi.createWithdraw(newData);
-    console.log('Xác nhận rút tiền:', newData);
-    console.log('Rút tiền thành công:', response);
-    onWithdraw(withdrawData.amount, withdrawMethod, bankInfo);
-    setWithdrawMethod('');
-    setBankInfo('');
+    onWithdraw(withdrawData.amount, selectedBank.bankName);
     setSelectedBank(null);
+    setWithdrawData({ amount: 0, bankProfileId: '', content: '' });
     onOpenChange(false);
-  };
-
-  // Lấy icon cho phương thức thanh toán
-  const getMethodIcon = (method: string) => {
-    switch (method) {
-      case 'bank':
-        return <CreditCard className="w-4 h-4" />;
-      case 'momo':
-        return <Smartphone className="w-4 h-4" />;
-      case 'zalopay':
-        return <Smartphone className="w-4 h-4" />;
-      default:
-        return <Wallet className="w-4 h-4" />;
-    }
   };
 
   return (
@@ -153,7 +146,7 @@ export function WithdrawDialog({
             </div>
           </div>
 
-          {/* Nhập số tiền */}
+          {/* Nhập số tiền - SỬA LẠI */}
           <div className="space-y-4">
             <Label htmlFor="amount" className="text-base font-semibold text-gray-900">
               Số tiền muốn rút
@@ -162,17 +155,27 @@ export function WithdrawDialog({
             <div className="relative">
               <Input
                 id="amount"
-                placeholder="0"
-                value={
-                  withdrawData.amount ? Number(withdrawData.amount).toLocaleString('vi-VN') : ''
-                }
+                type="text"
+                placeholder="Nhập số tiền"
+                value={withdrawData.amount > 0 ? withdrawData.amount.toString() : ''}
                 onChange={handleAmountChange}
-                className="text-xl font-bold text-right pr-12 h-14"
+                className="h-14 pr-12 border border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                maxLength={10}
               />
-              <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
-                ₫
-              </span>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                VND
+              </div>
             </div>
+
+            {/* Validation messages */}
+            {withdrawData.amount > 0 && withdrawData.amount < MIN_WITHDRAW && (
+              <p className="text-red-600 text-xs">
+                Số tiền tối thiểu là {formatCurrency(MIN_WITHDRAW)}
+              </p>
+            )}
+            {withdrawData.amount > MAX_WITHDRAW && (
+              <p className="text-red-600 text-xs">Số tiền vượt quá số dư khả dụng</p>
+            )}
 
             {/* Chọn nhanh số tiền */}
             <div className="space-y-2">
@@ -180,7 +183,6 @@ export function WithdrawDialog({
               <div className="grid grid-cols-2 gap-2">
                 {quickAmounts.map((amount) => (
                   <Button
-                    value={withdrawData?.amount || 0}
                     key={amount}
                     variant="outline"
                     size="sm"
@@ -206,70 +208,40 @@ export function WithdrawDialog({
             </div>
           </div>
 
-          {/* Phương thức rút tiền */}
+          {/* Chọn tài khoản ngân hàng */}
           <div className="space-y-4">
-            <Label className="text-base font-semibold text-gray-900">Phương thức rút tiền</Label>
-
-            <Select value={withdrawMethod} onValueChange={setWithdrawMethod}>
-              <SelectTrigger className="h-14">
-                <SelectValue placeholder="Chọn phương thức thanh toán" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bank" className="py-3">
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium">Chuyển khoản ngân hàng</p>
-                      <p className="text-xs text-gray-500">Miễn phí - 1-3 ngày làm việc</p>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="momo" className="py-3">
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="w-5 h-5 text-pink-600" />
-                    <div>
-                      <p className="font-medium">Ví MoMo</p>
-                      <p className="text-xs text-gray-500">Phí 5,000₫ - Tức thì</p>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="zalopay" className="py-3">
-                  <div className="flex items-center gap-3">
-                    <Smartphone className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium">ZaloPay</p>
-                      <p className="text-xs text-gray-500">Phí 5,000₫ - Tức thì</p>
-                    </div>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <Label className="text-base font-semibold text-gray-900">
+              Chọn tài khoản ngân hàng
+            </Label>
+            <SelectBankInfo
+              selectedBank={selectedBank}
+              onCloseWithdrawDialog={() => onOpenChange(false)}
+              onOpenAddBankForm={onOpenAddBankForm}
+              onSelectBank={setSelectedBank}
+            />
           </div>
 
-          {/* Chọn tài khoản ngân hàng */}
-          {withdrawMethod === 'bank' && (
-            <div className="space-y-4">
-              <Label className="text-base font-semibold text-gray-900">
-                Chọn tài khoản ngân hàng
-              </Label>
-              <SelectBankInfo
-                onCloseWithdrawDialog={() => onOpenChange(false)}
-                onOpenAddBankForm={onOpenAddBankForm}
-                onSelectBank={setSelectedBank}
-              />
+          {/* Nhập nội dung giao dịch - SỬA LẠI */}
+          <div className="space-y-2">
+            <Label htmlFor="content" className="text-base font-semibold text-gray-900">
+              Nội dung giao dịch
+            </Label>
+            <Input
+              id="content"
+              type="text"
+              placeholder="Nhập nội dung giao dịch"
+              value={withdrawData.content}
+              onChange={handleContentChange}
+              className="h-14 border border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+              maxLength={MAX_CONTENT_LENGTH}
+            />
+            <div className="text-right text-xs text-gray-500">
+              {withdrawData.content.length}/{MAX_CONTENT_LENGTH}
             </div>
-          )}
-
-          <Label className="text-base font-semibold text-gray-900">Nội dung giao dịch</Label>
-          <Input
-            placeholder="Nhập nội dung giao dịch"
-            value={withdrawData.content}
-            onChange={handleContentChange}
-            className="h-14 truncate overflow-hidden whitespace-nowrap"
-          />
+          </div>
 
           {/* Tóm tắt giao dịch */}
-          {withdrawData.amount && withdrawMethod && (
+          {withdrawData.amount !== 0 && selectedBank && (
             <>
               <Separator />
               <div className="bg-gray-50 p-4 rounded-xl space-y-3">
@@ -294,24 +266,11 @@ export function WithdrawDialog({
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Phí giao dịch:</span>
-                    <span className="font-medium">
-                      {withdrawMethod === 'bank' ? 'Miễn phí' : formatCurrency(TRANSACTION_FEE)}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Phương thức:</span>
+                    <span className="text-gray-600">Ngân hàng:</span>
                     <div className="flex items-center gap-2">
-                      {getMethodIcon(withdrawMethod)}
-                      <span className="font-medium capitalize">
-                        {withdrawMethod === 'bank'
-                          ? 'Ngân hàng'
-                          : withdrawMethod === 'momo'
-                            ? 'MoMo'
-                            : withdrawMethod === 'zalopay'
-                              ? 'ZaloPay'
-                              : withdrawMethod}
+                      <CreditCard className="w-4 h-4" />
+                      <span className="font-medium">
+                        {selectedBank.bankName} ({selectedBank.accountNumber})
                       </span>
                     </div>
                   </div>
@@ -321,9 +280,7 @@ export function WithdrawDialog({
                   <div className="flex justify-between items-center pt-2">
                     <span className="font-semibold text-gray-900">Số tiền thực nhận:</span>
                     <span className="text-xl font-bold text-green-600">
-                      {formatCurrency(
-                        withdrawMethod === 'bank' ? Number(withdrawData.amount) : actualAmount,
-                      )}
+                      {formatCurrency(Number(withdrawData.amount))}
                     </span>
                   </div>
                 </div>
@@ -353,7 +310,7 @@ export function WithdrawDialog({
             <p className="font-medium mb-1">Lưu ý quan trọng:</p>
             <ul className="space-y-1 list-disc list-inside">
               <li>Giao dịch rút tiền không thể hoàn tác sau khi xác nhận</li>
-              <li>Thời gian xử lý có thể thay đổi tùy theo phương thức thanh toán</li>
+              <li>Thời gian xử lý có thể mất 1-3 ngày làm việc</li>
               <li>Vui lòng kiểm tra kỹ thông tin trước khi xác nhận</li>
             </ul>
           </div>

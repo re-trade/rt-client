@@ -244,6 +244,8 @@ export function EditProductDialog({
     return false;
   };
 
+  // ...existing code...
+
   const handleSubmit = async () => {
     if (!isEdit) return;
     if (!isFormChanged()) {
@@ -276,7 +278,9 @@ export function EditProductDialog({
 
     try {
       setIsSubmitting(true);
-      toast.info('Đang cập nhật sản phẩm...');
+
+      // Tạo loading toast với ID để có thể dismiss specific toast này
+      const loadingToastId = toast.loading('Đang cập nhật sản phẩm...');
 
       let thumbnailUrl = formData.thumbnail;
       if (selectedThumbnail) {
@@ -330,6 +334,8 @@ export function EditProductDialog({
         }
 
         if (validationErrors.length > 0) {
+          // Dismiss loading toast trước khi hiện error
+          toast.dismiss(loadingToastId);
           toast.error(validationErrors[0]);
           return;
         }
@@ -337,7 +343,16 @@ export function EditProductDialog({
 
       if (product?.id) {
         const response = await productApi.updateProduct(product.id, productData);
-        onUpdateProduct(response);
+
+        // Dismiss loading toast trước khi hiện result
+        toast.dismiss(loadingToastId);
+
+        if (!response.success) {
+          toast.error(response.message || 'Không thể cập nhật sản phẩm');
+          return;
+        }
+
+        onUpdateProduct(response.content);
         toast.success('Cập nhật sản phẩm thành công');
         onOpenChange(false);
       }
@@ -346,9 +361,11 @@ export function EditProductDialog({
       toast.error('Không thể cập nhật sản phẩm. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
-      toast.dismiss();
+      // Bỏ toast.dismiss() ở đây vì nó sẽ dismiss cả success toast
     }
   };
+
+  // ...existing code...
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

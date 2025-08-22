@@ -13,6 +13,7 @@ import {
 } from '@/service/wallet.api';
 import { Building2, CheckCircle, CreditCard, Edit, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 interface BankInfoActiveTabProps {
   isAddingBank: boolean;
   setIsAddingBank: (value: boolean) => void;
@@ -57,10 +58,18 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     });
   };
 
+  // ...existing code...
+
   const handleAddBank = async () => {
     if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
       try {
-        const addedBank = await walletApi.createBankInfor(newBankInfo);
+        const data = await walletApi.createBankInfor(newBankInfo);
+        if (!data.success) {
+          toast.error(data.messages || 'Không thể thêm tài khoản ngân hàng');
+          return;
+        }
+        toast.success('Thêm tài khoản ngân hàng thành công');
+        const addedBank = data.content;
         if (addedBank) {
           setBankAccounts((prev) => [
             ...prev,
@@ -79,25 +88,17 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
             userBankName: '',
             bankBin: '',
           });
-          setIsAddingBank(false);
-        } else {
-          console.error('Failed to add bank information');
-        }
-        const newBank: BankInfor = {
-          id: Date.now().toString(),
-          ...newBankInfo,
-          addedDate: new Date().toISOString(),
-        };
 
-        setBankAccounts([...bankAccounts, newBank]);
-        setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
-        setIsAddingBank(false);
+          setIsAddingBank(false);
+        }
       } catch (error) {
         console.error('Error adding bank:', error);
+        toast.error('Có lỗi xảy ra khi thêm tài khoản ngân hàng');
       }
     }
   };
 
+  // ...existing code...
   const handleEditBank = (bank: BankInfor) => {
     setEditingBank(bank);
     setNewBankInfo({
@@ -108,7 +109,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     });
     setIsAddingBank(true);
   };
-
   const handleUpdateBank = async () => {
     if (
       editingBank &&
@@ -117,6 +117,12 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
       newBankInfo.userBankName
     ) {
       try {
+        const response = await walletApi.updateBankInfor(editingBank.id, newBankInfo);
+        if (!response.success) {
+          toast.error(response.messages || 'Không thể cập nhật tài khoản ngân hàng');
+          return;
+        }
+        toast.success('Cập nhật tài khoản ngân hàng thành công');
         setBankAccounts(
           bankAccounts.map((bank) =>
             bank.id === editingBank.id ? { ...bank, ...newBankInfo } : bank,
@@ -127,24 +133,31 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         setIsAddingBank(false);
       } catch (error) {
         console.error('Error updating bank:', error);
+        toast.error('Có lỗi xảy ra khi cập nhật tài khoản ngân hàng');
       }
     }
   };
 
   const handleDeleteBank = async (bankId: string) => {
+    // Thêm confirmation
+    if (!confirm('Bạn có chắc chắn muốn xóa tài khoản ngân hàng này?')) {
+      return;
+    }
+
     try {
       const response = await walletApi.deleteBankInfor(bankId);
-      if (!response) {
-        console.error('Failed to delete bank information');
+      if (!response || !response.success) {
+        toast.error('Không thể xóa tài khoản ngân hàng');
         return;
       }
-      console.log('Bank deleted successfully:', response);
+
       setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankId));
+      toast.success('Xóa tài khoản ngân hàng thành công');
     } catch (error) {
       console.error('Error deleting bank:', error);
+      toast.error('Có lỗi xảy ra khi xóa tài khoản ngân hàng');
     }
   };
-
   const handleSetDefault = async (bankId: string) => {
     try {
       setBankAccounts(
@@ -222,7 +235,10 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     <div>
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Thông tin ngân hàng</h3>
-        <Button onClick={() => setIsAddingBank(true)} className="flex items-center gap-2">
+        <Button
+          onClick={() => setIsAddingBank(true)}
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
+        >
           <Plus className="h-4 w-4" />
           Thêm tài khoản
         </Button>
@@ -271,7 +287,7 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
             <div className="flex gap-3 pt-4">
               <Button
                 onClick={editingBank ? handleUpdateBank : handleAddBank}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
               >
                 <CheckCircle className="h-4 w-4" />
                 {editingBank ? 'Cập nhật' : 'Thêm tài khoản'}

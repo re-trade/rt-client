@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { reviewApi, ReviewResponse, StatsReViewResponse } from '@/service/review.api';
 import { BarChart3, MessageSquare, Star, TrendingUp, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
+import { toast } from 'sonner';
 interface ReviewStatsProps {
   reviews: ReviewResponse[];
 }
@@ -16,7 +16,11 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
       try {
         setLoading(true);
         const response = await reviewApi.getStatsReviewsSeller();
-        setStats(response);
+        if (!response.success) {
+          toast.error(response.messages);
+          return;
+        }
+        setStats(response.content);
       } catch (error) {
         console.error('Failed to fetch review stats:', error);
       } finally {

@@ -1,11 +1,11 @@
 'use client';
 import { BankInfoActiveTab } from '@/components/common/BankInfoActiveTab';
 import { RevenueTableActiveTab } from '@/components/common/RevenueTableActiveTab';
-import WithdrawalModal from '@/components/common/WithdrawalModal';
+import { WithdrawDialog } from '@/components/common/WithdrawDialog';
 import { WithdrawHistoryActiveTab } from '@/components/common/WithdrawHistoryActivetab';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { revenueApi, RevenueStatsResponse } from '@/service/revenue.api';
 import { walletApi, WalletResponse } from '@/service/wallet.api';
 import {
@@ -19,6 +19,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function RevenueManagement() {
   const [revenueStats, setRevenueStats] = useState<RevenueStatsResponse>({
@@ -39,7 +40,11 @@ export default function RevenueManagement() {
           revenueApi.getRevenuStatsBySeller(),
           walletApi.getWalletBySeller(),
         ]);
-        setWallet(wallet);
+        if (!wallet.success) {
+          toast.error(wallet.messages);
+          return;
+        }
+        setWallet(wallet.content);
         setRevenueStats(stats);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -49,24 +54,14 @@ export default function RevenueManagement() {
     fetchData();
   }, []);
 
-  const handleWithdrawSuccess = () => {
-    // Refresh wallet balance after successful withdrawal
-    const fetchWallet = async () => {
-      try {
-        const walletData = await walletApi.getWalletBySeller();
-        setWallet(walletData);
-      } catch (error) {
-        console.error('Error fetching wallet:', error);
-      }
-    };
-    fetchWallet();
+  const handleWithdraw = (amount: number, method: string, bankInfo?: string) => {
+    setIsWithdrawOpen(false);
   };
-
   const [isAddingBank, setIsAddingBank] = useState(false);
   const handleOpenAddBankForm = () => {
-    setIsWithdrawOpen(false); // Close withdrawal modal
-    setActiveTab('bank'); // Switch to bank info tab
-    setIsAddingBank(true); // Open add bank form
+    setIsWithdrawOpen(false); // Đóng WithdrawDialog
+    setActiveTab('bank'); // Chuyển sang tab "Thông tin ngân hàng"
+    setIsAddingBank(true); // Mở form thêm tài khoản
   };
 
   return (
@@ -85,14 +80,14 @@ export default function RevenueManagement() {
               <Download className="h-4 w-4" />
               Xuất báo cáo
             </Button>
-            <Button
-              onClick={() => setIsWithdrawOpen(true)}
-              disabled={!wallet?.balance || wallet.balance === 0}
-              className="bg-green-600 hover:bg-green-700 flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-70 disabled:shadow-none"
-            >
-              <Wallet className="h-4 w-4" />
-              Rút tiền
-            </Button>
+            <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-green-600 hover:bg-green-700 flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-300">
+                  <Wallet className="h-4 w-4" />
+                  Rút tiền
+                </Button>
+              </DialogTrigger>
+            </Dialog>
           </div>
         </div>
 
@@ -121,7 +116,7 @@ export default function RevenueManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {wallet?.balance?.toLocaleString('vi-VN') || '0'}₫
+                {wallet?.balance.toLocaleString('vi-VN')}₫
               </div>
               <p className="text-xs text-gray-500 mt-1">Có thể rút ngay</p>
             </CardContent>
@@ -232,11 +227,12 @@ export default function RevenueManagement() {
           </div>
         </div>
 
-        <WithdrawalModal
-          isModalOpen={isWithdrawOpen}
-          setIsModalOpen={setIsWithdrawOpen}
+        <WithdrawDialog
+          open={isWithdrawOpen}
+          onOpenChange={setIsWithdrawOpen}
           availableBalance={wallet?.balance || 0}
-          onWithdrawSuccess={handleWithdrawSuccess}
+          onWithdraw={handleWithdraw}
+          onOpenAddBankForm={handleOpenAddBankForm}
         />
       </div>
     </div>
