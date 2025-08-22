@@ -19,6 +19,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function RevenueManagement() {
   const [revenueStats, setRevenueStats] = useState<RevenueStatsResponse>({
@@ -39,7 +40,11 @@ export default function RevenueManagement() {
           revenueApi.getRevenuStatsBySeller(),
           walletApi.getWalletBySeller(),
         ]);
-        setWallet(wallet);
+          if (!wallet.success) {
+          toast.error(wallet.messages);
+          return;
+        }
+        setWallet(wallet.content);
         setRevenueStats(stats);
       } catch (error) {
         console.error('Error fetching data:', error);

@@ -18,7 +18,7 @@ import {
 import { ReviewResponse, reviewApi } from '@/service/review.api';
 import { Filter, MessageSquare, RotateCcw, Search, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
+import { toast } from 'sonner';
 export default function ReviewsPage() {
   const [selectedReview, setSelectedReview] = useState<ReviewResponse | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -145,20 +145,29 @@ export default function ReviewsPage() {
     setIsReplyOpen(true);
   };
 
-  const handleSubmitReply = (reviewId: string, replyContent: string) => {
-    reviewApi
-      .replyReview(reviewId, replyContent)
-      .then((updatedReview) => {
-        setProductReviews((prevReviews) =>
-          prevReviews.map((r) => (r.id === updatedReview.id ? updatedReview : r)),
-        );
-        setIsReplyOpen(false);
-      })
-      .catch((error) => {
-        console.error('Failed to submit reply:', error);
-      });
+
+const handleSubmitReply = async (reviewId: string, replyContent: string) => {
+  try {
+    const response = await reviewApi.replyReview(reviewId, replyContent);
+    
+    if (!response.success) {
+      toast.error(response.messages || 'Không thể gửi phản hồi. Vui lòng thử lại.');
+      return;
+    }
+
+    // Cập nhật danh sách reviews với phản hồi mới
+    setProductReviews((prevReviews) =>
+      prevReviews.map((r) => (r.id === response.content.id ? response.content : r)),
+    );
+    
+    toast.success('Phản hồi đã được gửi thành công!');
+    setIsReplyOpen(false);
     setSelectedReview(null);
-  };
+  } catch (error) {
+    console.error('Failed to submit reply:', error);
+    toast.error('Đã xảy ra lỗi khi gửi phản hồi. Vui lòng thử lại.');
+  }
+};
 
   const activeFiltersCount = [
     searchTerm ? 1 : 0,

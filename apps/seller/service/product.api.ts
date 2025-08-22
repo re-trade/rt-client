@@ -147,32 +147,19 @@ export const productApi = {
   },
   async createProduct(product: CreateProductDto): Promise<IResponseObject<TProduct>> {
     const response = await authApi.default.post<IResponseObject<TProduct>>('/products', product);
-    return createResponseObject({
-      code: response.data.code,
-      messages: response.data.message,
-      success: response.data.success,
-      content: response.data.content,
-    });
+    return response.data;
   },
   async deleteProduct(id: string): Promise<IResponseObject<TProduct>> {
     const response = await authApi.default.delete<IResponseObject<TProduct>>(`/products/${id}`);
-    return createResponseObject({
-      code: response.data.code,
-      messages: response.data.message,
-      success: response.data.success,
-      content: response.data.content,
-    });
+    return response.data;
   },
 
-  async updateProduct(id: string, product: UpdateProductDto): Promise<TProduct> {
+  async updateProduct(id: string, product: UpdateProductDto): Promise<IResponseObject<TProduct>> {
     const response = await authApi.default.put<IResponseObject<TProduct>>(
       `/products/${id}`,
       product,
     );
-    if (response.data.success) {
-      return response.data.content;
-    }
-    throw new Error('Failed to update product');
+    return response.data;
   },
 
   async getProductFilter(): Promise<ProductFilterResponse | undefined> {

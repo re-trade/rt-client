@@ -23,8 +23,6 @@ const OrderStatusDropdown = ({ statusFilter, setStatusFilter }: Props) => {
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'PENDING':
-        return { label: 'Chờ xác nhận', color: 'bg-yellow-50 text-yellow-700 border-yellow-200' };
       case 'PREPARING':
         return { label: 'Đang chuẩn bị', color: 'bg-blue-50 text-blue-700 border-blue-200' };
       case 'DELIVERING':

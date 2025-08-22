@@ -1,4 +1,4 @@
-import { authApi, IResponseObject } from '@retrade/util';
+import { authApi, createResponseObject, IResponseObject } from '@retrade/util';
 
 export type WalletResponse = {
   accountId: string;
@@ -42,10 +42,10 @@ export type WithdrawCreate = {
   content: string;
 };
 export const walletApi = {
-  async getWalletBySeller(): Promise<WalletResponse> {
+  async getWalletBySeller(): Promise<IResponseObject<WalletResponse>> {
     const response =
       await authApi.default.get<IResponseObject<WalletResponse>>(`/wallets/me/balance`);
-    return response.data.content;
+    return response.data;
   },
   async getTheBanks(page: number = 0, size: number = 100, query?: string): Promise<BankResponse[]> {
     const response = await authApi.default.get<IResponseObject<BankResponse[]>>(`/wallets/banks`, {
@@ -74,33 +74,19 @@ export const walletApi = {
     );
     return response.data.success ? response.data.content : [];
   },
-  async createWithdraw(withdraw: WithdrawCreate): Promise<WithdrawHistoryResponse> {
+  async createWithdraw(withdraw: WithdrawCreate): Promise<IResponseObject<WithdrawHistoryResponse>> {
     const response = await authApi.default.post<IResponseObject<WithdrawHistoryResponse>>(
       `wallets/withdraw`,
       withdraw,
     );
-    try {
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Withdraw not created');
-    } catch (error) {
-      throw error;
-    }
+    return response.data;
   },
-  async createBankInfor(bankInfor: CreateBankInfor): Promise<BankInfor> {
+  async createBankInfor(bankInfor: CreateBankInfor): Promise<IResponseObject<BankInfor>> {
     const response = await authApi.default.post<IResponseObject<BankInfor>>(
       `/customers/me/bank-info`,
       bankInfor,
     );
-    try {
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Product not found');
-    } catch (error) {
-      throw error;
-    }
+    return response.data;
   },
   async getBankInfos(page: number = 0, size: number = 15, query?: string): Promise<BankInfor[]> {
     const response = await authApi.default.get<IResponseObject<BankInfor[]>>(
@@ -122,45 +108,24 @@ export const walletApi = {
       throw error;
     }
   },
-  async updateBankInfor(id: string, bankInfor: CreateBankInfor): Promise<BankInfor> {
+  async updateBankInfor(id: string, bankInfor: CreateBankInfor): Promise<IResponseObject<BankInfor>> {
     const response = await authApi.default.put<IResponseObject<BankInfor>>(
       `/customers/me/bank-info/${id}`,
       bankInfor,
     );
-    try {
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Product not found');
-    } catch (error) {
-      throw error;
-    }
+    return response.data;
   },
-  async deleteBankInfor(id: string): Promise<BankInfor> {
+  async deleteBankInfor(id: string): Promise<IResponseObject<BankInfor>> {
     const response = await authApi.default.delete<IResponseObject<BankInfor>>(
       `/customers/me/bank-info/${id}`,
     );
-    try {
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Product not found');
-    } catch (error) {
-      throw error;
-    }
+    return response.data;
   },
-  async setIsDefaultBankInfor(id: string, isDefault: boolean): Promise<BankInfor> {
+  async setIsDefaultBankInfor(id: string, isDefault: boolean): Promise<IResponseObject<BankInfor>> {
     const response = await authApi.default.put<IResponseObject<BankInfor>>(
       `/customers/me/bank-info/${id}/default`,
       { isDefault },
     );
-    try {
-      if (response.data.success) {
-        return response.data.content;
-      }
-      throw new Error('Product not found');
-    } catch (error) {
-      throw error;
-    }
+    return response.data;
   },
 };

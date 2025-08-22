@@ -71,16 +71,13 @@ export const sellerApi = {
   },
   updateSellerProfile: async (
     req: SellerProfileUpdateRequest,
-  ): Promise<SellerProfileResponse | undefined> => {
-    try {
+  ): Promise<IResponseObject<SellerProfileResponse>> => {
+   
       const response = await authApi.default.put<IResponseObject<SellerProfileResponse>>(
         '/sellers/profile',
         req,
       );
-      return response.data.content;
-    } catch {
-      return undefined;
-    }
+      return response.data;
   },
   sellerVerification: async (req: {
     frontIdentity: File;

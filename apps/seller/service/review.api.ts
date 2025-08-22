@@ -1,4 +1,4 @@
-import { authApi, IResponseObject } from '@retrade/util';
+import { authApi, IResponseObject, createResponseObject } from '@retrade/util';
 
 type ReviewResponse = {
   id: string;
@@ -60,11 +60,11 @@ export const reviewApi = {
     return response.data.content;
   },
 
-  getReview: async (reviewId: string): Promise<ReviewResponse> => {
+  getReview: async (reviewId: string): Promise<IResponseObject<ReviewResponse>> => {
     const response = await authApi.default.get<IResponseObject<ReviewResponse>>(
       `/reviews/${reviewId}`,
     );
-    return response.data.content;
+    return response.data;
   },
 
   getAllReviewsBySeller: async (
@@ -103,19 +103,19 @@ export const reviewApi = {
     };
   },
 
-  getStatsReviewsSeller: async (): Promise<StatsReViewResponse> => {
+  getStatsReviewsSeller: async (): Promise<IResponseObject<StatsReViewResponse>> => {
     const response =
       await authApi.default.get<IResponseObject<StatsReViewResponse>>(`/product-review/stats`);
-    return response.data.content;
+    return response.data;
   },
-  replyReview: async (reviewId: string, content: string): Promise<ReviewResponse> => {
+  replyReview: async (reviewId: string, content: string): Promise<IResponseObject<ReviewResponse>> => {
     const response = await authApi.default.patch<IResponseObject<ReviewResponse>>(
       `/product-review/${reviewId}/create-reply`,
       {
         content,
       },
     );
-    return response.data.content;
+    return response.data;
   },
 };
 
