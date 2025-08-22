@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -22,7 +24,7 @@ export function UpdateProductQuantityDialog({
   product,
   onSuccess,
 }: UpdateProductQuantityDialogProps) {
-  const [quantity, setQuantity] = useState<number>(product?.quantity || 0);
+  const [quantity, setQuantity] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,10 +69,12 @@ export function UpdateProductQuantityDialog({
     }
   };
 
-  // Reset quantity when product changes
-  if (product && product.quantity !== quantity && !isSubmitting) {
-    setQuantity(product.quantity);
-  }
+  // Only set the initial quantity when the product changes or dialog opens
+  useEffect(() => {
+    if (product) {
+      setQuantity(product.quantity);
+    }
+  }, [product, open]);
 
   if (!product) return null;
 
