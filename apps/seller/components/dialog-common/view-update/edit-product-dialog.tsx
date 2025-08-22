@@ -244,128 +244,128 @@ export function EditProductDialog({
     return false;
   };
 
-// ...existing code...
+  // ...existing code...
 
-const handleSubmit = async () => {
-  if (!isEdit) return;
-  if (!isFormChanged()) {
-    toast.info('Không có thay đổi để cập nhật');
-    return;
-  }
-
-  if (formData.hasWarranty) {
-    if (!formData.warrantyExpiryDate) {
-      toast.error('Vui lòng chọn ngày hết hạn bảo hành');
+  const handleSubmit = async () => {
+    if (!isEdit) return;
+    if (!isFormChanged()) {
+      toast.info('Không có thay đổi để cập nhật');
       return;
     }
 
-    const today = new Date();
-    const warrantyDate = new Date(formData.warrantyExpiryDate);
+    if (formData.hasWarranty) {
+      if (!formData.warrantyExpiryDate) {
+        toast.error('Vui lòng chọn ngày hết hạn bảo hành');
+        return;
+      }
 
-    today.setHours(0, 0, 0, 0);
-    warrantyDate.setHours(0, 0, 0, 0);
+      const today = new Date();
+      const warrantyDate = new Date(formData.warrantyExpiryDate);
 
-    if (warrantyDate <= today) {
-      toast.error('Ngày hết hạn bảo hành phải là ngày trong tương lai');
+      today.setHours(0, 0, 0, 0);
+      warrantyDate.setHours(0, 0, 0, 0);
+
+      if (warrantyDate <= today) {
+        toast.error('Ngày hết hạn bảo hành phải là ngày trong tương lai');
+        return;
+      }
+    }
+
+    if (warrantyDateError) {
+      toast.error(warrantyDateError);
       return;
     }
-  }
 
-  if (warrantyDateError) {
-    toast.error(warrantyDateError);
-    return;
-  }
+    try {
+      setIsSubmitting(true);
 
-  try {
-    setIsSubmitting(true);
-    
-    // Tạo loading toast với ID để có thể dismiss specific toast này
-    const loadingToastId = toast.loading('Đang cập nhật sản phẩm...');
+      // Tạo loading toast với ID để có thể dismiss specific toast này
+      const loadingToastId = toast.loading('Đang cập nhật sản phẩm...');
 
-    let thumbnailUrl = formData.thumbnail;
-    if (selectedThumbnail) {
-      thumbnailUrl = await storageApi.fileUpload(selectedThumbnail);
-    }
-
-    let productImages = [...imagePreviews];
-    if (selectedFiles.length > 0) {
-      const existingImages = imagePreviews.filter((url) => !url.startsWith('blob:'));
-      const result = await storageApi.fileBulkUpload(selectedFiles);
-      const uploadedUrls = result.content || [];
-      productImages = [...existingImages, ...uploadedUrls];
-    }
-
-    const productData: UpdateProductDto = {
-      name: formData.name,
-      shortDescription: formData.shortDescription,
-      description: formData.description,
-      thumbnail: thumbnailUrl,
-      productImages,
-      brandId: formData.brandId,
-      model: formData.model,
-      currentPrice: Number(formData.currentPrice) || 0,
-      categoryIds: formData.categoryIds,
-      quantity: formData.quantity,
-      warrantyExpiryDate: formData.hasWarranty ? formData.warrantyExpiryDate : '',
-      condition: formData.condition,
-      tags: formData.tags.filter(Boolean),
-    };
-
-    if (product?.retraded) {
-      const validationErrors = [];
-
-      if (product.name !== formData.name) {
-        validationErrors.push('Không thể thay đổi tên sản phẩm bán lại');
-      }
-      if (product.brandId !== formData.brandId) {
-        validationErrors.push('Không thể thay đổi thương hiệu cho sản phẩm bán lại');
-      }
-      if (product.model !== formData.model) {
-        validationErrors.push('Không thể thay đổi model cho sản phẩm bán lại');
-      }
-      if (
-        JSON.stringify(product.categories.map((c) => c.id).sort()) !==
-        JSON.stringify(formData.categoryIds.sort())
-      ) {
-        validationErrors.push('Không thể thay đổi danh mục cho sản phẩm bán lại');
-      }
-      if (product.quantity !== formData.quantity) {
-        validationErrors.push('Không thể thay đổi số lượng cho sản phẩm bán lại');
+      let thumbnailUrl = formData.thumbnail;
+      if (selectedThumbnail) {
+        thumbnailUrl = await storageApi.fileUpload(selectedThumbnail);
       }
 
-      if (validationErrors.length > 0) {
-        // Dismiss loading toast trước khi hiện error
+      let productImages = [...imagePreviews];
+      if (selectedFiles.length > 0) {
+        const existingImages = imagePreviews.filter((url) => !url.startsWith('blob:'));
+        const result = await storageApi.fileBulkUpload(selectedFiles);
+        const uploadedUrls = result.content || [];
+        productImages = [...existingImages, ...uploadedUrls];
+      }
+
+      const productData: UpdateProductDto = {
+        name: formData.name,
+        shortDescription: formData.shortDescription,
+        description: formData.description,
+        thumbnail: thumbnailUrl,
+        productImages,
+        brandId: formData.brandId,
+        model: formData.model,
+        currentPrice: Number(formData.currentPrice) || 0,
+        categoryIds: formData.categoryIds,
+        quantity: formData.quantity,
+        warrantyExpiryDate: formData.hasWarranty ? formData.warrantyExpiryDate : '',
+        condition: formData.condition,
+        tags: formData.tags.filter(Boolean),
+      };
+
+      if (product?.retraded) {
+        const validationErrors = [];
+
+        if (product.name !== formData.name) {
+          validationErrors.push('Không thể thay đổi tên sản phẩm bán lại');
+        }
+        if (product.brandId !== formData.brandId) {
+          validationErrors.push('Không thể thay đổi thương hiệu cho sản phẩm bán lại');
+        }
+        if (product.model !== formData.model) {
+          validationErrors.push('Không thể thay đổi model cho sản phẩm bán lại');
+        }
+        if (
+          JSON.stringify(product.categories.map((c) => c.id).sort()) !==
+          JSON.stringify(formData.categoryIds.sort())
+        ) {
+          validationErrors.push('Không thể thay đổi danh mục cho sản phẩm bán lại');
+        }
+        if (product.quantity !== formData.quantity) {
+          validationErrors.push('Không thể thay đổi số lượng cho sản phẩm bán lại');
+        }
+
+        if (validationErrors.length > 0) {
+          // Dismiss loading toast trước khi hiện error
+          toast.dismiss(loadingToastId);
+          toast.error(validationErrors[0]);
+          return;
+        }
+      }
+
+      if (product?.id) {
+        const response = await productApi.updateProduct(product.id, productData);
+
+        // Dismiss loading toast trước khi hiện result
         toast.dismiss(loadingToastId);
-        toast.error(validationErrors[0]);
-        return;
-      }
-    }
 
-    if (product?.id) {
-      const response = await productApi.updateProduct(product.id, productData);
-      
-      // Dismiss loading toast trước khi hiện result
-      toast.dismiss(loadingToastId);
-      
-      if (!response.success) {
-        toast.error(response.message || 'Không thể cập nhật sản phẩm');
-        return;
-      }
-      
-      onUpdateProduct(response.content);
-      toast.success('Cập nhật sản phẩm thành công');
-      onOpenChange(false);
-    }
-  } catch (error) {
-    console.error('Error updating product:', error);
-    toast.error('Không thể cập nhật sản phẩm. Vui lòng thử lại.');
-  } finally {
-    setIsSubmitting(false);
-    // Bỏ toast.dismiss() ở đây vì nó sẽ dismiss cả success toast
-  }
-};
+        if (!response.success) {
+          toast.error(response.message || 'Không thể cập nhật sản phẩm');
+          return;
+        }
 
-// ...existing code...
+        onUpdateProduct(response.content);
+        toast.success('Cập nhật sản phẩm thành công');
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error('Error updating product:', error);
+      toast.error('Không thể cập nhật sản phẩm. Vui lòng thử lại.');
+    } finally {
+      setIsSubmitting(false);
+      // Bỏ toast.dismiss() ở đây vì nó sẽ dismiss cả success toast
+    }
+  };
+
+  // ...existing code...
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

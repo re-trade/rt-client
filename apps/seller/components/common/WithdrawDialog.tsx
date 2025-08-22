@@ -5,11 +5,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { walletApi, WithdrawCreate, BankInfor } from '@/service/wallet.api';
+import { BankInfor, walletApi, WithdrawCreate } from '@/service/wallet.api';
 import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
-import { SelectBankInfo } from './SelectBankInfo';
 import { toast } from 'sonner';
+import { SelectBankInfo } from './SelectBankInfo';
 interface WithdrawDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -86,8 +86,10 @@ export function WithdrawDialog({
       toast.error('Vui lòng chọn tài khoản để nhận');
       return;
     }
-    if( withdrawData.amount < MIN_WITHDRAW || withdrawData.amount > MAX_WITHDRAW) {
-      toast.error(`Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`);
+    if (withdrawData.amount < MIN_WITHDRAW || withdrawData.amount > MAX_WITHDRAW) {
+      toast.error(
+        `Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`,
+      );
       return;
     }
 
@@ -205,9 +207,7 @@ export function WithdrawDialog({
               className="h-14 truncate overflow-hidden whitespace-nowrap"
               maxLength={MAX_CONTENT_LENGTH}
             />
-            <p className="text-xs text-gray-500">
-              Tối đa {MAX_CONTENT_LENGTH} ký tự
-            </p>
+            <p className="text-xs text-gray-500">Tối đa {MAX_CONTENT_LENGTH} ký tự</p>
           </div>
 
           {/* Tóm tắt giao dịch */}

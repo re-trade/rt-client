@@ -16,7 +16,7 @@ export function ReviewStats({ reviews }: ReviewStatsProps) {
       try {
         setLoading(true);
         const response = await reviewApi.getStatsReviewsSeller();
-        if(!response.success) {
+        if (!response.success) {
           toast.error(response.messages);
           return;
         }

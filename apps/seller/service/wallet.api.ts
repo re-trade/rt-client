@@ -1,4 +1,4 @@
-import { authApi, createResponseObject, IResponseObject } from '@retrade/util';
+import { authApi, IResponseObject } from '@retrade/util';
 
 export type WalletResponse = {
   accountId: string;
@@ -74,7 +74,9 @@ export const walletApi = {
     );
     return response.data.success ? response.data.content : [];
   },
-  async createWithdraw(withdraw: WithdrawCreate): Promise<IResponseObject<WithdrawHistoryResponse>> {
+  async createWithdraw(
+    withdraw: WithdrawCreate,
+  ): Promise<IResponseObject<WithdrawHistoryResponse>> {
     const response = await authApi.default.post<IResponseObject<WithdrawHistoryResponse>>(
       `wallets/withdraw`,
       withdraw,
@@ -108,7 +110,10 @@ export const walletApi = {
       throw error;
     }
   },
-  async updateBankInfor(id: string, bankInfor: CreateBankInfor): Promise<IResponseObject<BankInfor>> {
+  async updateBankInfor(
+    id: string,
+    bankInfor: CreateBankInfor,
+  ): Promise<IResponseObject<BankInfor>> {
     const response = await authApi.default.put<IResponseObject<BankInfor>>(
       `/customers/me/bank-info/${id}`,
       bankInfor,

@@ -62,47 +62,47 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     });
   };
 
-// ...existing code...
+  // ...existing code...
 
-const handleAddBank = async () => {
-  if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
-    try {
-      const data = await walletApi.createBankInfor(newBankInfo);
-      if (!data.success) {
-        toast.error(data.messages || 'Không thể thêm tài khoản ngân hàng');
-        return;
-      } 
-       toast.success('Thêm tài khoản ngân hàng thành công');
-      const addedBank = data.content;
-      if (addedBank) {
-        setBankAccounts((prev) => [
-          ...prev,
-          {
-            id: addedBank.id,
-            bankName: addedBank.bankName,
-            accountNumber: addedBank.accountNumber,
-            userBankName: addedBank.userBankName,
-            bankBin: addedBank.bankBin,
-            addedDate: new Date().toISOString(),
-          },
-        ]);
-        setNewBankInfo({
-          bankName: '',
-          accountNumber: '',
-          userBankName: '',
-          bankBin: '',
-        });
+  const handleAddBank = async () => {
+    if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
+      try {
+        const data = await walletApi.createBankInfor(newBankInfo);
+        if (!data.success) {
+          toast.error(data.messages || 'Không thể thêm tài khoản ngân hàng');
+          return;
+        }
+        toast.success('Thêm tài khoản ngân hàng thành công');
+        const addedBank = data.content;
+        if (addedBank) {
+          setBankAccounts((prev) => [
+            ...prev,
+            {
+              id: addedBank.id,
+              bankName: addedBank.bankName,
+              accountNumber: addedBank.accountNumber,
+              userBankName: addedBank.userBankName,
+              bankBin: addedBank.bankBin,
+              addedDate: new Date().toISOString(),
+            },
+          ]);
+          setNewBankInfo({
+            bankName: '',
+            accountNumber: '',
+            userBankName: '',
+            bankBin: '',
+          });
 
-        setIsAddingBank(false);
-      }   
-    } catch (error) {
-      console.error('Error adding bank:', error);
-      toast.error('Có lỗi xảy ra khi thêm tài khoản ngân hàng');
+          setIsAddingBank(false);
+        }
+      } catch (error) {
+        console.error('Error adding bank:', error);
+        toast.error('Có lỗi xảy ra khi thêm tài khoản ngân hàng');
+      }
     }
-  }
-};
+  };
 
-// ...existing code...
+  // ...existing code...
   const handleEditBank = (bank: BankInfor) => {
     setEditingBank(bank);
     setNewBankInfo({
@@ -114,56 +114,55 @@ const handleAddBank = async () => {
     });
     setIsAddingBank(true);
   };
-const handleUpdateBank = async () => {
-  if (
-    editingBank &&
-    newBankInfo.bankName &&
-    newBankInfo.accountNumber &&
-    newBankInfo.userBankName
-  ) {
-    try {
-      const response = await walletApi.updateBankInfor(editingBank.id, newBankInfo);
-      if (!response.success) {
-        toast.error(response.messages || 'Không thể cập nhật tài khoản ngân hàng');
-        return;
+  const handleUpdateBank = async () => {
+    if (
+      editingBank &&
+      newBankInfo.bankName &&
+      newBankInfo.accountNumber &&
+      newBankInfo.userBankName
+    ) {
+      try {
+        const response = await walletApi.updateBankInfor(editingBank.id, newBankInfo);
+        if (!response.success) {
+          toast.error(response.messages || 'Không thể cập nhật tài khoản ngân hàng');
+          return;
+        }
+        toast.success('Cập nhật tài khoản ngân hàng thành công');
+        setBankAccounts(
+          bankAccounts.map((bank) =>
+            bank.id === editingBank.id ? { ...bank, ...newBankInfo } : bank,
+          ),
+        );
+        setEditingBank(null);
+        setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
+        setIsAddingBank(false);
+      } catch (error) {
+        console.error('Error updating bank:', error);
+        toast.error('Có lỗi xảy ra khi cập nhật tài khoản ngân hàng');
       }
-            toast.success('Cập nhật tài khoản ngân hàng thành công');
-      setBankAccounts(
-        bankAccounts.map((bank) =>
-          bank.id === editingBank.id ? { ...bank, ...newBankInfo } : bank,
-        ),
-      );
-      setEditingBank(null);
-      setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
-      setIsAddingBank(false);
-    } catch (error) {
-      console.error('Error updating bank:', error);
-      toast.error('Có lỗi xảy ra khi cập nhật tài khoản ngân hàng');
     }
-  }
-};
+  };
 
-
-const handleDeleteBank = async (bankId: string) => {
-  // Thêm confirmation
-  if (!confirm('Bạn có chắc chắn muốn xóa tài khoản ngân hàng này?')) {
-    return;
-  }
-  
-  try {
-    const response = await walletApi.deleteBankInfor(bankId);
-    if (!response || !response.success) {
-      toast.error('Không thể xóa tài khoản ngân hàng');
+  const handleDeleteBank = async (bankId: string) => {
+    // Thêm confirmation
+    if (!confirm('Bạn có chắc chắn muốn xóa tài khoản ngân hàng này?')) {
       return;
     }
-    
-    setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankId));
-    toast.success('Xóa tài khoản ngân hàng thành công');
-  } catch (error) {
-    console.error('Error deleting bank:', error);
-    toast.error('Có lỗi xảy ra khi xóa tài khoản ngân hàng');
-  }
-};
+
+    try {
+      const response = await walletApi.deleteBankInfor(bankId);
+      if (!response || !response.success) {
+        toast.error('Không thể xóa tài khoản ngân hàng');
+        return;
+      }
+
+      setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankId));
+      toast.success('Xóa tài khoản ngân hàng thành công');
+    } catch (error) {
+      console.error('Error deleting bank:', error);
+      toast.error('Có lỗi xảy ra khi xóa tài khoản ngân hàng');
+    }
+  };
   const handleSetDefault = async (bankId: string) => {
     try {
       setBankAccounts(
@@ -241,7 +240,10 @@ const handleDeleteBank = async (bankId: string) => {
     <div>
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Thông tin ngân hàng</h3>
-        <Button onClick={() => setIsAddingBank(true)} className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300">
+        <Button
+          onClick={() => setIsAddingBank(true)}
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
+        >
           <Plus className="h-4 w-4" />
           Thêm tài khoản
         </Button>

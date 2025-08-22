@@ -145,29 +145,28 @@ export default function ReviewsPage() {
     setIsReplyOpen(true);
   };
 
+  const handleSubmitReply = async (reviewId: string, replyContent: string) => {
+    try {
+      const response = await reviewApi.replyReview(reviewId, replyContent);
 
-const handleSubmitReply = async (reviewId: string, replyContent: string) => {
-  try {
-    const response = await reviewApi.replyReview(reviewId, replyContent);
-    
-    if (!response.success) {
-      toast.error(response.messages || 'Không thể gửi phản hồi. Vui lòng thử lại.');
-      return;
+      if (!response.success) {
+        toast.error(response.messages || 'Không thể gửi phản hồi. Vui lòng thử lại.');
+        return;
+      }
+
+      // Cập nhật danh sách reviews với phản hồi mới
+      setProductReviews((prevReviews) =>
+        prevReviews.map((r) => (r.id === response.content.id ? response.content : r)),
+      );
+
+      toast.success('Phản hồi đã được gửi thành công!');
+      setIsReplyOpen(false);
+      setSelectedReview(null);
+    } catch (error) {
+      console.error('Failed to submit reply:', error);
+      toast.error('Đã xảy ra lỗi khi gửi phản hồi. Vui lòng thử lại.');
     }
-
-    // Cập nhật danh sách reviews với phản hồi mới
-    setProductReviews((prevReviews) =>
-      prevReviews.map((r) => (r.id === response.content.id ? response.content : r)),
-    );
-    
-    toast.success('Phản hồi đã được gửi thành công!');
-    setIsReplyOpen(false);
-    setSelectedReview(null);
-  } catch (error) {
-    console.error('Failed to submit reply:', error);
-    toast.error('Đã xảy ra lỗi khi gửi phản hồi. Vui lòng thử lại.');
-  }
-};
+  };
 
   const activeFiltersCount = [
     searchTerm ? 1 : 0,

@@ -40,7 +40,7 @@ export default function RevenueManagement() {
           revenueApi.getRevenuStatsBySeller(),
           walletApi.getWalletBySeller(),
         ]);
-          if (!wallet.success) {
+        if (!wallet.success) {
           toast.error(wallet.messages);
           return;
         }

@@ -1,7 +1,6 @@
 'use client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { BankInfor, BankResponse, walletApi } from '@/service/wallet.api';
 import { Building2, ChevronDown, CreditCard, Plus, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -48,8 +47,12 @@ export function SelectBankInfo({
   };
 
   // Component hiển thị logo ngân hàng
-  const BankIcon = ({ bankUrl, bankName, size = 'default' }: { 
-    bankUrl?: string; 
+  const BankIcon = ({
+    bankUrl,
+    bankName,
+    size = 'default',
+  }: {
+    bankUrl?: string;
     bankName: string;
     size?: 'default' | 'small';
   }) => {
@@ -58,7 +61,9 @@ export function SelectBankInfo({
     const iconSize = size === 'small' ? 'w-4 h-4' : 'w-6 h-6';
 
     return (
-      <div className={`${sizeClass} rounded overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border`}>
+      <div
+        className={`${sizeClass} rounded overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border`}
+      >
         {!imageError && bankUrl ? (
           <img
             src={bankUrl}
@@ -110,21 +115,15 @@ export function SelectBankInfo({
                 size="small"
               />
               <div className="text-left flex-1">
-                <div className="font-medium text-gray-900">
-                  {selectedBank.bankName}
-                </div>
+                <div className="font-medium text-gray-900">{selectedBank.bankName}</div>
                 <div className="text-sm text-gray-500 flex items-center gap-2">
                   <CreditCard className="h-3 w-3" />
-                  <span className="font-mono">
-                    {selectedBank.accountNumber}
-                  </span>
+                  <span className="font-mono">{selectedBank.accountNumber}</span>
                 </div>
               </div>
             </>
           ) : (
-            <div className="text-gray-500 text-left">
-              Chọn tài khoản ngân hàng
-            </div>
+            <div className="text-gray-500 text-left">Chọn tài khoản ngân hàng</div>
           )}
         </div>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -155,9 +154,7 @@ export function SelectBankInfo({
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-gray-900 text-sm">
-                          {bank.bankName}
-                        </span>
+                        <span className="font-medium text-gray-900 text-sm">{bank.bankName}</span>
                         {index === 0 && (
                           <Badge variant="secondary" className="text-xs px-1.5 py-0">
                             <Star className="w-2.5 h-2.5 mr-1" />
@@ -167,13 +164,9 @@ export function SelectBankInfo({
                       </div>
                       <div className="flex items-center gap-2 text-xs text-gray-600">
                         <CreditCard className="h-3 w-3" />
-                        <span className="font-mono">
-                          {bank.accountNumber}
-                        </span>
+                        <span className="font-mono">{bank.accountNumber}</span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {bank.userBankName}
-                      </div>
+                      <div className="text-xs text-gray-500 mt-1">{bank.userBankName}</div>
                     </div>
                   </div>
                 </div>
@@ -182,9 +175,7 @@ export function SelectBankInfo({
           )}
 
           {/* Divider */}
-          {bankAccounts.length > 0 && (
-            <div className="border-t border-gray-200"></div>
-          )}
+          {bankAccounts.length > 0 && <div className="border-t border-gray-200"></div>}
 
           {/* Thêm tài khoản ngân hàng */}
           <div className="p-2">
@@ -197,9 +188,7 @@ export function SelectBankInfo({
                   <Plus className="h-3 w-3 text-gray-400" />
                 </div>
                 <div>
-                  <div className="font-medium text-gray-900 text-sm">
-                    Thêm tài khoản ngân hàng
-                  </div>
+                  <div className="font-medium text-gray-900 text-sm">Thêm tài khoản ngân hàng</div>
                   <div className="text-xs text-gray-500">
                     Liên kết thêm tài khoản để có nhiều lựa chọn
                   </div>
@@ -226,12 +215,7 @@ export function SelectBankInfo({
       )}
 
       {/* Overlay để đóng dropdown khi click bên ngoài */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
     </div>
   );
 }

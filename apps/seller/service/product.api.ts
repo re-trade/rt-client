@@ -1,4 +1,4 @@
-import { authApi, createResponseObject, IResponseObject } from '@retrade/util';
+import { authApi, IResponseObject } from '@retrade/util';
 
 export enum ProductStatusEnum {
   ACTIVE = 'ACTIVE',
