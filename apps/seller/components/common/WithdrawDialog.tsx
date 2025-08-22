@@ -31,7 +31,7 @@ export function WithdrawDialog({
     bankProfileId: '',
     content: '',
   });
-  const MIN_WITHDRAW = 1000;
+  const MIN_WITHDRAW = 3000;
   const MAX_WITHDRAW = availableBalance;
   const MAX_CONTENT_LENGTH = 50; // Giới hạn nội dung giao dịch
 
@@ -42,25 +42,39 @@ export function WithdrawDialog({
 
   // Định dạng số tiền
   const formatCurrency = (amount: number) => {
-    return amount.toLocaleString('vi-VN') + '₫';
+    return amount.toLocaleString('vi-VN') + ' VND';
   };
 
   // Xử lý nhập số tiền với định dạng
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d]/g, '');
-    setWithdrawData((prev) => ({
-      ...prev,
-      amount: Number(value),
-    }));
+
+    if (value === '') {
+      setWithdrawData((prev) => ({
+        ...prev,
+        amount: 0,
+      }));
+      return;
+    }
+
+    const numericValue = parseInt(value, 10);
+    if (numericValue <= MAX_WITHDRAW) {
+      setWithdrawData((prev) => ({
+        ...prev,
+        amount: numericValue,
+      }));
+    }
   };
 
-  // Xử lý nhập nội dung giao dịch
+  // Xử lý nhập nội dung giao dịch - SỬA LẠI
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^a-zA-Z0-9À-ỹà-ỹ\s]/g, '');
-    setWithdrawData((prev) => ({
-      ...prev,
-      content: value.slice(0, MAX_CONTENT_LENGTH),
-    }));
+    const value = e.target.value;
+    if (value.length <= MAX_CONTENT_LENGTH) {
+      setWithdrawData((prev) => ({
+        ...prev,
+        content: value,
+      }));
+    }
   };
 
   // Chọn số tiền nhanh
@@ -132,7 +146,7 @@ export function WithdrawDialog({
             </div>
           </div>
 
-          {/* Nhập số tiền */}
+          {/* Nhập số tiền - SỬA LẠI */}
           <div className="space-y-4">
             <Label htmlFor="amount" className="text-base font-semibold text-gray-900">
               Số tiền muốn rút
@@ -141,17 +155,27 @@ export function WithdrawDialog({
             <div className="relative">
               <Input
                 id="amount"
-                placeholder="0"
-                value={
-                  withdrawData.amount ? Number(withdrawData.amount).toLocaleString('vi-VN') : ''
-                }
+                type="text"
+                placeholder="Nhập số tiền"
+                value={withdrawData.amount > 0 ? withdrawData.amount.toString() : ''}
                 onChange={handleAmountChange}
-                className="text-xl font-bold text-right pr-12 h-14"
+                className="h-14 pr-12 border border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                maxLength={10}
               />
-              <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
-                ₫
-              </span>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                VND
+              </div>
             </div>
+
+            {/* Validation messages */}
+            {withdrawData.amount > 0 && withdrawData.amount < MIN_WITHDRAW && (
+              <p className="text-red-600 text-xs">
+                Số tiền tối thiểu là {formatCurrency(MIN_WITHDRAW)}
+              </p>
+            )}
+            {withdrawData.amount > MAX_WITHDRAW && (
+              <p className="text-red-600 text-xs">Số tiền vượt quá số dư khả dụng</p>
+            )}
 
             {/* Chọn nhanh số tiền */}
             <div className="space-y-2">
@@ -197,17 +221,23 @@ export function WithdrawDialog({
             />
           </div>
 
-          {/* Nhập nội dung giao dịch */}
+          {/* Nhập nội dung giao dịch - SỬA LẠI */}
           <div className="space-y-2">
-            <Label className="text-base font-semibold text-gray-900">Nội dung giao dịch</Label>
+            <Label htmlFor="content" className="text-base font-semibold text-gray-900">
+              Nội dung giao dịch
+            </Label>
             <Input
+              id="content"
+              type="text"
               placeholder="Nhập nội dung giao dịch"
               value={withdrawData.content}
               onChange={handleContentChange}
-              className="h-14 truncate overflow-hidden whitespace-nowrap"
+              className="h-14 border border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-500"
               maxLength={MAX_CONTENT_LENGTH}
             />
-            <p className="text-xs text-gray-500">Tối đa {MAX_CONTENT_LENGTH} ký tự</p>
+            <div className="text-right text-xs text-gray-500">
+              {withdrawData.content.length}/{MAX_CONTENT_LENGTH}
+            </div>
           </div>
 
           {/* Tóm tắt giao dịch */}

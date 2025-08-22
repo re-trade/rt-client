@@ -45,12 +45,16 @@ const OrderStatusDropdown = ({ statusFilter, setStatusFilter }: Props) => {
         return { label: 'Đang hoàn trả', color: 'bg-amber-50 text-amber-700 border-amber-200' };
       case 'RETURNED':
         return { label: 'Đã trả hàng', color: 'bg-slate-50 text-slate-700 border-slate-200' };
-      default:
-        return { label: 'Tất cả trạng thái', color: '' };
+     default:
+        return { label: 'tất cả trạng thái', color: 'bg-gray-50 text-gray-700 border-gray-200' };
     }
   };
 
-  const selectedStatus = statusFilter !== 'all' ? getStatusConfig(statusFilter) : null;
+const validStatuses = ['PREPARING', 'DELIVERING', 'DELIVERED', 'RETRIEVED', 'COMPLETED', 'CANCELLED', 'RETURNING', 'RETURNED'];
+
+const selectedStatus = statusFilter !== 'all' && validStatuses.includes(statusFilter) 
+  ? getStatusConfig(statusFilter) 
+  : null;
 
   return (
     <div className="relative w-full sm:w-48" ref={dropdownRef}>
@@ -96,7 +100,6 @@ const OrderStatusDropdown = ({ statusFilter, setStatusFilter }: Props) => {
           </button>
 
           {[
-            'PENDING',
             'PREPARING',
             'DELIVERING',
             'DELIVERED',
