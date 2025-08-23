@@ -34,8 +34,6 @@ export default function ReviewsPage() {
           reviewApi.getProductBuyNoReview(),
           reviewApi.getMyReviews(),
         ]);
-        console.log('Fetched products:', productsResponse);
-        console.log('Fetched reviews:', reviewsResponse);
         setProductsNoReview(productsResponse);
         setMyReviews(reviewsResponse);
       } catch (error) {
@@ -97,8 +95,8 @@ export default function ReviewsPage() {
       isVerifiedPurchase: true,
       content: reviewData.comment,
       author: {
-        authId: 'current-user', // Thay bằng authId thực tế
-        name: 'Current User', // Thay bằng tên người dùng thực tế
+        authId: 'current-user',
+        name: 'Current User',
         avatarUrl: undefined,
       },
       vote: reviewData.rating,
