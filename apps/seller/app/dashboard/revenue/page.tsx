@@ -12,7 +12,6 @@ import {
   ArrowUpRight,
   Banknote,
   DollarSign,
-  Download,
   Package,
   ShoppingCart,
   TrendingUp,
@@ -54,14 +53,14 @@ export default function RevenueManagement() {
     fetchData();
   }, []);
 
-  const handleWithdraw = (amount: number, method: string, bankInfo?: string) => {
+  const handleWithdraw = (amount: number, bankInfo?: string) => {
     setIsWithdrawOpen(false);
   };
   const [isAddingBank, setIsAddingBank] = useState(false);
   const handleOpenAddBankForm = () => {
-    setIsWithdrawOpen(false); // Đóng WithdrawDialog
-    setActiveTab('bank'); // Chuyển sang tab "Thông tin ngân hàng"
-    setIsAddingBank(true); // Mở form thêm tài khoản
+    setIsWithdrawOpen(false);
+    setActiveTab('bank');
+    setIsAddingBank(true);
   };
 
   return (
@@ -76,7 +75,6 @@ export default function RevenueManagement() {
             <p className="text-gray-600 mt-1">Theo dõi và quản lý doanh thu từ việc bán đồ cũ</p>
           </div>
           <div className="flex gap-3">
-
             <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-green-600 hover:bg-green-700 flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-300">

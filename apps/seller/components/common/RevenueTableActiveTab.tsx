@@ -2,6 +2,8 @@
 import { RevenueDetailDialog } from '@/components/dialog-common/view-update/revenue-detail-dialog';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
@@ -17,30 +19,32 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { revenueApi, RevenueResponse } from '@/service/revenue.api';
+import { useRevenuePagination } from '@/hooks/use-revenue-pagination';
+import { RevenueResponse } from '@/service/revenue.api';
 import { snipppetCode } from '@/service/snippetCode';
-import { CheckCircle, Clock, Eye, Filter, Package, XCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CheckCircle, Clock, Eye, Filter, Package, Search, XCircle } from 'lucide-react';
+import { useState } from 'react';
 
 export function RevenueTableActiveTab() {
-  const [revenueData, setRevenueData] = useState<RevenueResponse[]>([]);
+  const {
+    revenues,
+    isLoading,
+    error,
+    page,
+    pageSize,
+    total,
+    totalPage,
+    searchTerm,
+    statusFilter,
+    setPage,
+    setPageSize,
+    setSearchTerm,
+    setStatusFilter,
+    handleKeyPress,
+  } = useRevenuePagination();
+
   const [selectedRevenue, setSelectedRevenue] = useState<RevenueResponse | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const revenue = await revenueApi.getRevenueBySeller();
-        setRevenueData(revenue);
-        //setWithdrawHistory(withdraws);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const getCustomerInitials = (name: string) => {
     return name
@@ -94,19 +98,33 @@ export function RevenueTableActiveTab() {
     });
   };
 
-  const filteredRevenue =
-    filterStatus === 'all'
-      ? revenueData
-      : revenueData.filter((item) => item.status.code === filterStatus);
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setPage(1);
+  };
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-1">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Tìm kiếm theo mã đơn hàng, tên khách hàng..."
+              className="pl-10 border-gray-200 focus:border-orange-300 focus:ring-orange-200"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyUp={handleKeyPress}
+            />
+          </div>
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-500" />
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue />
               </SelectTrigger>
@@ -120,9 +138,15 @@ export function RevenueTableActiveTab() {
           </div>
         </div>
         <div className="text-sm text-gray-500">
-          Hiển thị {filteredRevenue.length} trên {revenueData.length} giao dịch
+          Hiển thị {revenues.length} trên {total} giao dịch
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
 
       {/* Revenue Table */}
       <div className="border rounded-lg overflow-hidden">
@@ -142,82 +166,150 @@ export function RevenueTableActiveTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredRevenue.map((revenue) => (
-              <TableRow key={revenue.orderComboId} className="hover:bg-gray-50">
-                <TableCell>{formatDate(revenue.createdDate)}</TableCell>
-                <TableCell className="font-medium text-blue-600">
-                  {snipppetCode.cutCode(revenue.orderComboId)}
-                </TableCell>
-                <TableCell className="py-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm font-medium">{revenue.items.length} sản phẩm</span>
-                    </div>
-                    <div className="text-xs text-gray-500 max-w-[190px] line-clamp-2">
-                      {revenue.items[0]?.itemName || 'Không có tên sản phẩm'}
-                      {revenue.items.length > 1 && (
-                        <span className="ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-xs">
-                          +{revenue.items.length - 1} khác
-                        </span>
-                      )}
-                    </div>
+            {isLoading ? (
+              // Loading skeleton
+              Array.from({ length: pageSize }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : revenues.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center py-8">
+                  <div className="text-gray-500">
+                    {searchTerm || statusFilter !== 'all'
+                      ? 'Không tìm thấy giao dịch nào'
+                      : 'Chưa có giao dịch nào'}
                   </div>
-                </TableCell>
-                <TableCell className="py-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
-                      <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
-                        {getCustomerInitials(revenue.destination.customerName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {revenue.destination.customerName}
-                      </div>
-                      <div className="text-sm text-gray-500">{revenue.destination.phone}</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {revenue.totalPrice.toLocaleString('vi-VN')}₫
-                </TableCell>
-                <TableCell className="text-right text-red-600">
-                  {revenue.feePercent.toFixed(2)}%
-                </TableCell>
-                <TableCell className="text-right text-red-600">
-                  -{revenue.feeAmount.toLocaleString('vi-VN')}₫
-                </TableCell>
-                <TableCell className="text-right font-bold text-green-600">
-                  {revenue.netAmount.toLocaleString('vi-VN')}₫
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(revenue.status.code)}`}
-                    >
-                      <span className="flex items-center gap-1">
-                        {getStatusIcon(revenue.status.code)}
-                        <span>{revenue.status.name}</span>
-                      </span>
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <Button variant="outline" size="sm" onClick={() => openDetailDialog(revenue)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              revenues.map((revenue) => (
+                <TableRow key={revenue.orderComboId} className="hover:bg-gray-50">
+                  <TableCell>{formatDate(revenue.createdDate)}</TableCell>
+                  <TableCell className="font-medium text-blue-600">
+                    {snipppetCode.cutCode(revenue.orderComboId)}
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm font-medium">{revenue.items.length} sản phẩm</span>
+                      </div>
+                      <div className="text-xs text-gray-500 max-w-[190px] line-clamp-2">
+                        {revenue.items[0]?.itemName || 'Không có tên sản phẩm'}
+                        {revenue.items.length > 1 && (
+                          <span className="ml-1 px-1.5 py-0.5 bg-gray-100 rounded text-xs">
+                            +{revenue.items.length - 1} khác
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8 border-2 border-white shadow-sm">
+                        <AvatarFallback className="text-xs font-medium bg-orange-500 text-white">
+                          {getCustomerInitials(revenue.destination.customerName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {revenue.destination.customerName}
+                        </div>
+                        <div className="text-sm text-gray-500">{revenue.destination.phone}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {revenue.totalPrice.toLocaleString('vi-VN')}₫
+                  </TableCell>
+                  <TableCell className="text-right text-red-600">
+                    {revenue.feePercent.toFixed(2)}%
+                  </TableCell>
+                  <TableCell className="text-right text-red-600">
+                    -{revenue.feeAmount.toLocaleString('vi-VN')}₫
+                  </TableCell>
+                  <TableCell className="text-right font-bold text-green-600">
+                    {revenue.netAmount.toLocaleString('vi-VN')}₫
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(revenue.status.code)}`}
+                      >
+                        <span className="flex items-center gap-1">
+                          {getStatusIcon(revenue.status.code)}
+                          <span>{revenue.status.name}</span>
+                        </span>
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button variant="outline" size="sm" onClick={() => openDetailDialog(revenue)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
-        <RevenueDetailDialog
-          open={isDetailOpen}
-          onOpenChange={setIsDetailOpen}
-          revenue={selectedRevenue}
-        />
       </div>
+
+      {/* Pagination */}
+      {!isLoading && revenues.length > 0 && (
+        <div className="border rounded-lg bg-white">
+          <div className="p-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              loading={isLoading}
+              pageSizeOptions={[10, 20, 50]}
+              className="text-gray-600"
+            />
+          </div>
+        </div>
+      )}
+
+      <RevenueDetailDialog
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+        revenue={selectedRevenue}
+      />
     </div>
   );
 }
