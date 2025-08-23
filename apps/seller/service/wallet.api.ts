@@ -18,7 +18,9 @@ export type WithdrawHistoryResponse = {
   bankName?: string;
   bankBin?: string;
   status: string;
+  accountNumber: string;
   processedDate: string;
+  createdDate: string;
 };
 export type CreateBankInfor = {
   bankName: string;
