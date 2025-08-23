@@ -1,4 +1,5 @@
 import { authApi, IResponseObject } from '@retrade/util';
+
 export type RevenueResponse = {
   orderComboId: string;
   feeAmount: number;
@@ -53,16 +54,21 @@ export const revenueApi = {
     query?: string,
     statusFilter?: string,
   ): Promise<PaginatedRevenueResponse> {
+    const queryBuilder = new URLSearchParams();
+    queryBuilder.set('page', page.toString());
+    queryBuilder.set('size', size.toString());
+    if (query || statusFilter !== 'all') {
+      const subQuery = new URLSearchParams();
+      if (query) {
+        subQuery.set('keyword', query);
+      }
+      if (statusFilter && statusFilter !== 'all') {
+        subQuery.set('orderStatus', statusFilter.toUpperCase());
+      }
+      queryBuilder.set('q', subQuery.toString());
+    }
     const response = await authApi.default.get<IResponseObject<RevenueResponse[]>>(
-      `/revenue/my-revenue`,
-      {
-        params: {
-          page,
-          size,
-          ...(query ? { q: query } : {}),
-          ...(statusFilter && statusFilter !== 'all' ? { status: statusFilter } : {}),
-        },
-      },
+      `/revenue/my-revenue${queryBuilder.toString() ? `?${queryBuilder.toString()}` : ''}`,
     );
 
     const defaultResponse = {
