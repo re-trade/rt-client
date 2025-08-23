@@ -153,8 +153,6 @@ export default function ReviewsPage() {
         toast.error(response.messages || 'Không thể gửi phản hồi. Vui lòng thử lại.');
         return;
       }
-
-      // Cập nhật danh sách reviews với phản hồi mới
       setProductReviews((prevReviews) =>
         prevReviews.map((r) => (r.id === response.content.id ? response.content : r)),
       );
@@ -163,7 +161,6 @@ export default function ReviewsPage() {
       setIsReplyOpen(false);
       setSelectedReview(null);
     } catch (error) {
-      console.error('Failed to submit reply:', error);
       toast.error('Đã xảy ra lỗi khi gửi phản hồi. Vui lòng thử lại.');
     }
   };

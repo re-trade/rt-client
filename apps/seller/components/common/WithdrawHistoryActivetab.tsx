@@ -16,11 +16,9 @@ import {
   Calendar,
   CheckCircle,
   Clock,
-  CreditCard,
   Eye,
   Hash,
   TrendingDown,
-  User,
   Wallet,
   XCircle,
 } from 'lucide-react';
@@ -160,16 +158,12 @@ export function WithdrawHistoryActiveTab() {
             </div>
             Lịch sử rút tiền
           </h3>
-          <p className="text-gray-600 mt-2">
-            Quản lý và theo dõi các giao dịch rút tiền của bạn
-          </p>
+          <p className="text-gray-600 mt-2">Quản lý và theo dõi các giao dịch rút tiền của bạn</p>
         </div>
         <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
           <strong>{withdrawHistory.length}</strong> giao dịch
         </div>
       </div>
-
-
 
       {/* Table */}
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
@@ -191,8 +185,9 @@ export function WithdrawHistoryActiveTab() {
               return (
                 <TableRow
                   key={withdraw.id}
-                  className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${index === withdrawHistory.length - 1 ? 'border-b-0' : ''
-                    }`}
+                  className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${
+                    index === withdrawHistory.length - 1 ? 'border-b-0' : ''
+                  }`}
                 >
                   <TableCell className="py-5">
                     <div className="flex items-center gap-3">
@@ -242,7 +237,7 @@ export function WithdrawHistoryActiveTab() {
                     </div>
                   </TableCell>
 
-                <TableCell className="py-5">
+                  <TableCell className="py-5">
                     <div className="flex items-center gap-2">
                       {withdraw.processedDate && withdraw.processedDate !== '' ? (
                         <>
@@ -257,9 +252,7 @@ export function WithdrawHistoryActiveTab() {
                         <>
                           <Clock className="h-4 w-4 text-amber-600" />
                           <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium text-amber-600">
-                              Đang xử lý...
-                            </div>
+                            <div className="text-sm font-medium text-amber-600">Đang xử lý...</div>
                             <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
                           </div>
                         </>
@@ -272,7 +265,9 @@ export function WithdrawHistoryActiveTab() {
                       <span
                         className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border shadow-sm ${statusConfig.color}`}
                       >
-                        <div className={`w-2 h-2 rounded-full ${statusConfig.dotColor} animate-pulse`}></div>
+                        <div
+                          className={`w-2 h-2 rounded-full ${statusConfig.dotColor} animate-pulse`}
+                        ></div>
                         {statusConfig.text}
                       </span>
                     </div>
@@ -303,7 +298,8 @@ export function WithdrawHistoryActiveTab() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-3">Chưa có lịch sử rút tiền</h3>
             <p className="text-gray-600 leading-relaxed">
-              Các giao dịch rút tiền của bạn sẽ được hiển thị ở đây.<br />
+              Các giao dịch rút tiền của bạn sẽ được hiển thị ở đây.
+              <br />
               Bạn có thể theo dõi trạng thái và chi tiết từng giao dịch một cách dễ dàng.
             </p>
           </div>

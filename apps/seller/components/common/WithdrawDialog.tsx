@@ -5,11 +5,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { BankInfor, walletApi, WithdrawCreate } from '@/service/wallet.api';
+import { walletApi, WithdrawCreate, BankInfor } from '@/service/wallet.api';
 import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { SelectBankInfo } from './SelectBankInfo';
+import { toast } from 'sonner';
 interface WithdrawDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -41,14 +41,14 @@ export function WithdrawDialog({
   const isFormValid = withdrawData.amount && selectedBank;
 
   // Định dạng số tiền
-  const formatCurrency = (amount: number) => {
+    const formatCurrency = (amount: number) => {
     return amount.toLocaleString('vi-VN') + ' VND';
   };
 
   // Xử lý nhập số tiền với định dạng
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d]/g, '');
-
+    
     if (value === '') {
       setWithdrawData((prev) => ({
         ...prev,
@@ -89,21 +89,13 @@ export function WithdrawDialog({
     }
   };
 
-  // Ẩn số tài khoản (chỉ hiện 4 số cuối)
-  // const maskAccountNumber = (accountNumber: string) => {
-  //   if (accountNumber.length <= 4) return accountNumber;
-  //   return '*'.repeat(accountNumber.length - 4) + accountNumber.slice(-4);
-  // };
-
   const handleConfirm = () => {
     if (!selectedBank) {
       toast.error('Vui lòng chọn tài khoản để nhận');
       return;
     }
     if (withdrawData.amount < MIN_WITHDRAW || withdrawData.amount > MAX_WITHDRAW) {
-      toast.error(
-        `Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`,
-      );
+      toast.error(`Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`);
       return;
     }
 

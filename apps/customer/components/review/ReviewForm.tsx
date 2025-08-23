@@ -4,7 +4,7 @@ import { fileApi } from '@services/file.api';
 import { CreateReview, ProductNoReview, reviewApi } from '@services/product-review.api';
 import { Send, Star, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
+import { useToast } from '@/context/ToastContext';
 interface ReviewFormProps {
   product: ProductNoReview;
   onSubmit: (reviewData: { rating: number; comment: string; images: string[] }) => void;
@@ -12,6 +12,7 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormProps) {
+  const toast = useToast();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -55,11 +56,11 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0) {
-      alert('Vui lòng chọn số sao');
+      toast.showToast('Vui lòng chọn số sao', 'warning');
       return;
     }
     if (comment.trim().length < 10) {
-      alert('Vui lòng viết đánh giá ít nhất 10 ký tự');
+      toast.showToast('Vui lòng viết đánh giá ít nhất 10 ký tự', 'warning');
       return;
     }
 
@@ -78,14 +79,15 @@ export default function ReviewForm({ product, onSubmit, onCancel }: ReviewFormPr
         productId: product.product.id,
       };
       const response = await reviewApi.createReview(request);
-      if (response === null) {
-        console.log('lỗi');
+      if (!response.success) {
+        toast.showToast(response.message, 'error');
       }
       await onSubmit({
         rating,
         comment: comment.trim(),
         images,
       });
+      toast.showToast('Gửi đánh giá thành công', 'success');
     } catch (error) {
       console.error('Failed to submit review:', error);
       alert('Gửi đánh giá thất bại. Vui lòng thử lại.');
