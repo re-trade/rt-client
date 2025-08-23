@@ -53,14 +53,14 @@ export default function RevenueManagement() {
     fetchData();
   }, []);
 
-  const handleWithdraw = (amount: number, method: string, bankInfo?: string) => {
+  const handleWithdraw = (amount: number, bankInfo?: string) => {
     setIsWithdrawOpen(false);
   };
   const [isAddingBank, setIsAddingBank] = useState(false);
   const handleOpenAddBankForm = () => {
-    setIsWithdrawOpen(false); // Đóng WithdrawDialog
-    setActiveTab('bank'); // Chuyển sang tab "Thông tin ngân hàng"
-    setIsAddingBank(true); // Mở form thêm tài khoản
+    setIsWithdrawOpen(false);
+    setActiveTab('bank');
+    setIsAddingBank(true);
   };
 
   return (

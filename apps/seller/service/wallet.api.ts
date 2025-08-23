@@ -22,6 +22,22 @@ export type WithdrawHistoryResponse = {
   processedDate: string;
   createdDate: string;
 };
+
+export type PaginatedWithdrawHistoryResponse = {
+  withdrawHistory: WithdrawHistoryResponse[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+};
+
+export type PaginatedBankInfoResponse = {
+  bankInfos: BankInfor[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+};
 export type CreateBankInfor = {
   bankName: string;
   userBankName: string;
@@ -76,6 +92,48 @@ export const walletApi = {
     );
     return response.data.success ? response.data.content : [];
   },
+  async getWithdrawHistoryPaginated(
+    page: number = 0,
+    size: number = 15,
+    query?: string,
+  ): Promise<PaginatedWithdrawHistoryResponse> {
+    const response = await authApi.default.get<IResponseObject<WithdrawHistoryResponse[]>>(
+      `/wallets/me/withdraw`,
+      {
+        params: {
+          page,
+          size,
+          ...(query ? { query } : {}),
+        },
+      },
+    );
+
+    const defaultResponse = {
+      withdrawHistory: [] as WithdrawHistoryResponse[],
+      totalPages: 1,
+      totalElements: 0,
+      currentPage: 1,
+      pageSize: size,
+    };
+
+    if (!response.data) {
+      return defaultResponse;
+    }
+
+    const withdrawHistory =
+      response.data.success && response.data.content ? response.data.content : [];
+    const pagination = response.data.pagination;
+
+    return {
+      withdrawHistory,
+      totalPages: pagination ? pagination.totalPages || 1 : 1,
+      totalElements: pagination
+        ? pagination.totalElements || withdrawHistory.length
+        : withdrawHistory.length,
+      currentPage: pagination ? (pagination.page || 0) + 1 : 1,
+      pageSize: pagination ? pagination.size || size : size,
+    };
+  },
   async createWithdraw(
     withdraw: WithdrawCreate,
   ): Promise<IResponseObject<WithdrawHistoryResponse>> {
@@ -110,6 +168,49 @@ export const walletApi = {
       throw new Error('Product not found');
     } catch (error) {
       throw error;
+    }
+  },
+  async getBankInfosPaginated(
+    page: number = 0,
+    size: number = 15,
+    query?: string,
+  ): Promise<PaginatedBankInfoResponse> {
+    const response = await authApi.default.get<IResponseObject<BankInfor[]>>(
+      `customers/me/bank-info`,
+      {
+        params: {
+          page,
+          size,
+          ...(query ? { query } : {}),
+        },
+      },
+    );
+
+    const defaultResponse = {
+      bankInfos: [] as BankInfor[],
+      totalPages: 1,
+      totalElements: 0,
+      currentPage: 1,
+      pageSize: size,
+    };
+
+    try {
+      if (!response.data) {
+        return defaultResponse;
+      }
+
+      const bankInfos = response.data.success && response.data.content ? response.data.content : [];
+      const pagination = response.data.pagination;
+
+      return {
+        bankInfos,
+        totalPages: pagination ? pagination.totalPages || 1 : 1,
+        totalElements: pagination ? pagination.totalElements || bankInfos.length : bankInfos.length,
+        currentPage: pagination ? (pagination.page || 0) + 1 : 1,
+        pageSize: pagination ? pagination.size || size : size,
+      };
+    } catch (error) {
+      return defaultResponse;
     }
   },
   async updateBankInfor(
