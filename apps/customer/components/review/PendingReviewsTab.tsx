@@ -4,7 +4,7 @@ import ReviewForm from '@components/review/ReviewForm';
 import { ProductNoReview } from '@services/product-review.api';
 import { Calendar, Package } from 'lucide-react';
 import { useState } from 'react';
-
+import { useToast } from '@/context/ToastContext';
 interface PendingReviewsTabProps {
   products: ProductNoReview[];
   formatPrice: (price: number) => string;
@@ -20,6 +20,7 @@ export function PendingReviewsTab({
 }: PendingReviewsTabProps) {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
+  const toast = useToast();
   if (products.length === 0) {
     return (
       <div className="text-center py-12">
@@ -60,7 +61,7 @@ export function PendingReviewsTab({
                 </span>
               </div>
 
-              {selectedProduct === product.product.id ? (
+              {selectedProduct === `${product.orderId}-${product.product.id}` ? (
                 <ReviewForm
                   product={product}
                   onSubmit={(reviewData) => {
@@ -71,7 +72,7 @@ export function PendingReviewsTab({
                 />
               ) : (
                 <button
-                  onClick={() => setSelectedProduct(product.product.id)}
+                  onClick={() => setSelectedProduct(`${product.orderId}-${product.product.id}`)}
                   className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Viết đánh giá

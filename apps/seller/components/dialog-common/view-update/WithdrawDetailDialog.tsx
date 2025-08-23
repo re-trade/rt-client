@@ -2,17 +2,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { WithdrawHistoryResponse } from '@/service/wallet.api';
 import {
   AlertCircle,
+  Banknote,
   Building2,
   Calendar,
   CheckCircle,
   Clock,
   CreditCard,
-  Hash,
-  User,
-  XCircle,
-  Banknote,
+  ShieldCheck,
   Timer,
-  ShieldCheck
+  XCircle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -71,7 +69,6 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
     });
   };
 
-
   const statusConfig = getStatusConfig(withdraw.status);
 
   const BankIcon = ({ bankUrl, bankName }: { bankUrl?: string; bankName: string }) => {
@@ -119,15 +116,19 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
     >
       <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 max-w-4xl w-full max-h-[95vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-bottom-4 duration-500">
         {/* Header với glassmorphism effect */}
-        <div className={`px-8 py-6 bg-gradient-to-br ${statusConfig.bgGradient} border-b border-white/20 backdrop-blur-sm rounded-t-3xl relative overflow-hidden`}>
+        <div
+          className={`px-8 py-6 bg-gradient-to-br ${statusConfig.bgGradient} border-b border-white/20 backdrop-blur-sm rounded-t-3xl relative overflow-hidden`}
+        >
           {/* Decorative background elements */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-2xl"></div>
           <div className="absolute -bottom-5 -left-5 w-24 h-24 bg-gradient-to-tr from-white/5 to-transparent rounded-full blur-xl"></div>
-          
+
           <div className="flex items-center justify-between relative z-10">
             <div className="space-y-2">
-              <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Chi tiết giao dịch</h3>
+              <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
+                Chi tiết giao dịch
+              </h3>
               <p className="text-sm text-gray-600/80 flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-blue-500" />
                 Thông tin chi tiết và bảo mật về giao dịch rút tiền
@@ -146,13 +147,18 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
         <div className="p-1 space-y-6">
           {/* Status và Amount - Hero Section */}
           <div className="relative">
-            <div className={`text-center  bg-gradient-to-br ${statusConfig.bgGradient} rounded-3xl border border-white/20 backdrop-blur-sm shadow-lg ${statusConfig.glowColor} relative overflow-hidden`}>
-
+            <div
+              className={`text-center  bg-gradient-to-br ${statusConfig.bgGradient} rounded-3xl border border-white/20 backdrop-blur-sm shadow-lg ${statusConfig.glowColor} relative overflow-hidden`}
+            >
               <div className="relative z-10 space-y-6">
                 {/* Status Badge */}
                 <div className="space-y-3">
-                  <div className="text-sm font-medium text-gray-500/80 uppercase tracking-wider">Trạng thái giao dịch</div>
-                  <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl border-2 shadow-lg backdrop-blur-sm ${statusConfig.color} ${statusConfig.glowColor} transition-all duration-300 hover:scale-105`}>
+                  <div className="text-sm font-medium text-gray-500/80 uppercase tracking-wider">
+                    Trạng thái giao dịch
+                  </div>
+                  <div
+                    className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl border-2 shadow-lg backdrop-blur-sm ${statusConfig.color} ${statusConfig.glowColor} transition-all duration-300 hover:scale-105`}
+                  >
                     <div className="relative">
                       {statusConfig.icon}
                       {withdraw.status.toLowerCase() === 'pending' && (
@@ -165,7 +171,9 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
 
                 {/* Amount */}
                 <div className="space-y-3">
-                  <div className="text-sm font-medium text-gray-500/80 uppercase tracking-wider">Số tiền rút</div>
+                  <div className="text-sm font-medium text-gray-500/80 uppercase tracking-wider">
+                    Số tiền rút
+                  </div>
                   <div className="space-y-2">
                     <div className="text-6xl font-black text-gray-900 tracking-tight">
                       {withdraw.amount.toLocaleString('vi-VN')}
@@ -254,16 +262,20 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
 
                     {/* Completed Date */}
                     <div className="relative">
-                      <div className={`flex items-center gap-4 p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 ${
-                        withdraw.processedDate
-                          ? 'bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-emerald-500/10 border-emerald-200/30'
-                          : 'bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-amber-200/30'
-                      }`}>
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-xl shadow-lg flex-shrink-0 ${
+                      <div
+                        className={`flex items-center gap-4 p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 ${
                           withdraw.processedDate
-                            ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white'
-                            : 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white'
-                        }`}>
+                            ? 'bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-emerald-500/10 border-emerald-200/30'
+                            : 'bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-amber-200/30'
+                        }`}
+                      >
+                        <div
+                          className={`flex items-center justify-center w-10 h-10 rounded-xl shadow-lg flex-shrink-0 ${
+                            withdraw.processedDate
+                              ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white'
+                              : 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white'
+                          }`}
+                        >
                           {withdraw.processedDate ? (
                             <CheckCircle className="h-5 w-5" />
                           ) : (
@@ -271,24 +283,31 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className={`text-xs font-semibold mb-1 uppercase tracking-wider ${
-                            withdraw.processedDate ? 'text-emerald-600' : 'text-amber-600'
-                          }`}>
+                          <div
+                            className={`text-xs font-semibold mb-1 uppercase tracking-wider ${
+                              withdraw.processedDate ? 'text-emerald-600' : 'text-amber-600'
+                            }`}
+                          >
                             Ngày hoàn thành
                           </div>
                           <div className="text-sm font-bold text-gray-900">
                             {withdraw.processedDate && withdraw.processedDate !== ''
                               ? formatDate(withdraw.processedDate)
-                              : 'Đang xử lý...'
-                            }
+                              : 'Đang xử lý...'}
                           </div>
                         </div>
                         {!withdraw.processedDate && (
                           <div className="flex items-center gap-2">
                             <div className="flex space-x-1">
                               <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
-                              <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                              <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                              <div
+                                className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"
+                                style={{ animationDelay: '0.2s' }}
+                              ></div>
+                              <div
+                                className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"
+                                style={{ animationDelay: '0.4s' }}
+                              ></div>
                             </div>
                           </div>
                         )}
