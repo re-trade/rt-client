@@ -14,6 +14,17 @@ import {
 import { Building2, CheckCircle, CreditCard, Edit, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { error } from 'console';
 interface BankInfoActiveTabProps {
   isAddingBank: boolean;
   setIsAddingBank: (value: boolean) => void;
@@ -21,7 +32,15 @@ interface BankInfoActiveTabProps {
 
 export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoActiveTabProps) {
   const [listBanks, setListBanks] = useState<BankResponse[]>([]);
-  const [wallet, setWallet] = useState<WalletResponse>();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [bankToDelete, setBankToDelete] = useState<BankInfor | null>(null);
+
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [bankToConfirm, setBankToConfirm] = useState<BankInfor | null>(null);
+
+  const [isUpdateOrCreate, setIsUpdateOrCreate] = useState(false);
+  const [bankToUpdate, setBankToUpdate] = useState<BankInfor | null>(null);
+  const [bankToCreate, setBankToCreate] = useState<CreateBankInfor | null>(null);
 
   const [bankAccounts, setBankAccounts] = useState<BankInfor[]>([]);
   const [editingBank, setEditingBank] = useState<BankInfor | null>(null);
@@ -138,25 +157,32 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     }
   };
 
-  const handleDeleteBank = async (bankId: string) => {
-    // Thêm confirmation
-    if (!confirm('Bạn có chắc chắn muốn xóa tài khoản ngân hàng này?')) {
-      return;
-    }
+  const handleDeleteBank = async () => {
+    if (!bankToDelete) return;
 
     try {
-      const response = await walletApi.deleteBankInfor(bankId);
+      const response = await walletApi.deleteBankInfor(bankToDelete.id);
       if (!response || !response.success) {
-        toast.error('Không thể xóa tài khoản ngân hàng');
+        toast.error(response.messages || 'Không thể xóa tài khoản ngân hàng');
         return;
       }
-
-      setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankId));
+      setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankToDelete.id));
       toast.success('Xóa tài khoản ngân hàng thành công');
+      setIsDeleteDialogOpen(false);
+      setBankToDelete(null);
     } catch (error) {
       console.error('Error deleting bank:', error);
       toast.error('Có lỗi xảy ra khi xóa tài khoản ngân hàng');
     }
+  };
+  const handleConfirm = () => {
+    (isUpdateOrCreate ? handleUpdateBank() : handleAddBank());
+    setIsConfirmDialogOpen(true);
+  };
+
+  const confirmDeleteBank = (bank: BankInfor) => {
+    setBankToDelete(bank);
+    setIsDeleteDialogOpen(true);
   };
   const handleSetDefault = async (bankId: string) => {
     try {
@@ -336,7 +362,7 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDeleteBank(bank.id)}
+                      onClick={() => confirmDeleteBank(bank)}
                       className="text-red-600 border-red-200 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -346,6 +372,72 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
               </CardContent>
             </Card>
           ))}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Xác nhận xóa tài khoản</AlertDialogTitle>
+              <AlertDialogDescription>
+                Bạn có chắc chắn muốn xóa tài khoản ngân hàng <strong>{bankToDelete?.bankName}</strong> với số tài khoản <strong>"{bankToDelete?.accountNumber}"</strong>?
+                <br />
+                <span className="text-red-600 font-medium">Hành động này không thể hoàn tác.</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setBankToDelete(null);
+                }}
+              >
+                Hủy
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteBank}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Xóa
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+
+        </AlertDialog>
+        <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              {isUpdateOrCreate ? (
+                <AlertDialogTitle>Xác nhận cập nhật tài khoản</AlertDialogTitle>
+              ) : (
+                <AlertDialogTitle>Xác nhận tạo tài khoản</AlertDialogTitle>
+              )}
+
+              <AlertDialogDescription>
+                {isUpdateOrCreate ? (
+                  <>Bạn có chắc chắn muốn cập nhật tài khoản ngân hàng <strong>{bankToUpdate?.bankName}</strong> với số tài khoản <strong>"{bankToUpdate?.accountNumber}"</strong>?</>
+                ) : (
+                  <>Bạn có chắc chắn muốn tạo tài khoản ngân hàng <strong>{bankToCreate?.bankName}</strong> với số tài khoản <strong>"{bankToCreate?.accountNumber}"</strong>?</>
+                )}
+                <br />
+                <span className="text-red-600 font-medium">Hành động này không thể hoàn tác.</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setBankToDelete(null);
+                }}
+              >
+                Hủy
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteBank}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Xác nhận
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {bankAccounts.length === 0 && !isAddingBank && (
           <Card className="border-dashed border-2 border-gray-300">

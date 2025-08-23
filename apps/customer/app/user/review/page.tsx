@@ -95,8 +95,8 @@ export default function ReviewsPage() {
       isVerifiedPurchase: true,
       content: reviewData.comment,
       author: {
-        authId: 'current-user', 
-        name: 'Current User', 
+        authId: 'current-user',
+        name: 'Current User',
         avatarUrl: undefined,
       },
       vote: reviewData.rating,
