@@ -5,14 +5,13 @@ import WalletBalanceCard from '@/components/wallet/WalletBalanceCard';
 import WithdrawalHistoryTable from '@/components/wallet/WithdrawalHistoryTable';
 import WithdrawalModal from '@/components/wallet/WithdrawalModal';
 import { useWalletManager } from '@/hooks/use-wallet-manager';
-import { AlertCircle, Clock, Download, Shield, TrendingUp, Wallet } from 'lucide-react';
+import { Clock, Download, Shield, TrendingUp, Wallet } from 'lucide-react';
 
 export default function WalletPage() {
   const {
     balance,
     withdrawals,
     loading,
-    error,
     page,
     totalItems,
     size,
@@ -27,14 +26,11 @@ export default function WalletPage() {
     setSelectedBankAccount,
     processingWithdrawal,
 
-    bankAccountModalOpen,
-    setBankAccountModalOpen,
     userBankAccounts,
     loadingBankAccounts,
     fetchUserBankAccounts,
 
     bankAccountCreationModalOpen,
-    setBankAccountCreationModalOpen,
     banks,
     bankAccountForm,
     setBankAccountForm,
@@ -76,15 +72,6 @@ export default function WalletPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-            <div className="flex items-center">
-              <AlertCircle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0" />
-              <p className="text-red-700">{error}</p>
-            </div>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">

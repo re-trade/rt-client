@@ -1,6 +1,6 @@
 'use client';
 
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/context/ToastContext';
 import { useWallet } from '@/hooks/use-wallet';
 import {
   BankAccountResponse,
@@ -18,7 +18,6 @@ export const useWalletManager = () => {
     balance,
     withdrawals,
     loading,
-    error,
     page,
     setPage,
     totalItems,
@@ -70,9 +69,23 @@ export const useWalletManager = () => {
       const response = await getUserBankAccounts(0, 100);
       if (response?.success) {
         setUserBankAccounts(response.content || []);
+      } else if (response) {
+        // Show API error message in toast
+        const errorMessage =
+          response.message ||
+          (response.messages && response.messages.length > 0
+            ? response.messages[0]
+            : 'Không thể lấy danh sách tài khoản ngân hàng');
+        showToast(errorMessage, 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching user bank accounts:', error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.messages?.[0] ||
+        error.message ||
+        'Không thể lấy danh sách tài khoản ngân hàng';
+      showToast(errorMessage, 'error');
     } finally {
       setLoadingBankAccounts(false);
     }
@@ -83,9 +96,23 @@ export const useWalletManager = () => {
       const response = await getBanks();
       if (response?.success) {
         setBanks(response.content || []);
+      } else if (response) {
+        // Show API error message in toast
+        const errorMessage =
+          response.message ||
+          (response.messages && response.messages.length > 0
+            ? response.messages[0]
+            : 'Không thể lấy danh sách ngân hàng');
+        showToast(errorMessage, 'error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching banks:', error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.messages?.[0] ||
+        error.message ||
+        'Không thể lấy danh sách ngân hàng';
+      showToast(errorMessage, 'error');
     }
   }, []);
 
@@ -120,11 +147,23 @@ export const useWalletManager = () => {
         setBankAccountForm({ selectedBankBin: '', accountNumber: '', userBankName: '' });
         showToast('Thêm tài khoản ngân hàng thành công', 'success');
       } else {
-        showToast('Thêm tài khoản ngân hàng thất bại', 'warning');
+        // Display specific error message from API if available
+        const errorMessage =
+          response?.message ||
+          (response?.messages?.length > 0
+            ? response.messages[0]
+            : 'Thêm tài khoản ngân hàng thất bại');
+        showToast(errorMessage, 'warning');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating bank account:', error);
-      showToast('Thêm tài khoản ngân hàng thất bại', 'warning');
+      // Extract error message from the error object if available
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.messages?.[0] ||
+        error.message ||
+        'Thêm tài khoản ngân hàng thất bại';
+      showToast(errorMessage, 'warning');
     } finally {
       setCreatingBankAccount(false);
     }
@@ -148,8 +187,15 @@ export const useWalletManager = () => {
     }
   }, [bankAccountCreationModalOpen, fetchBanks]);
 
+  const resetForm = useCallback(() => {
+    setWithdrawAmount('');
+    setWithdrawContent('');
+    setSelectedBankAccount(null);
+  }, []);
+
   const handleWithdrawalSubmit = useCallback(async () => {
     if (!selectedBankAccount || !withdrawAmount || !withdrawContent) {
+      showToast('Vui lòng điền đầy đủ thông tin', 'warning');
       return false;
     }
 
@@ -160,15 +206,27 @@ export const useWalletManager = () => {
         bankProfileId: selectedBankAccount.id,
         content: withdrawContent,
       };
-      const success = await requestWithdrawal(data);
-      if (success) {
+      const result = await requestWithdrawal(data);
+      if (result.success) {
         resetForm();
+        setIsModalOpen(false);
+        return true;
       }
-      return success;
+      return false;
     } finally {
       setProcessingWithdrawal(false);
     }
-  }, [selectedBankAccount, withdrawAmount, withdrawContent, requestWithdrawal]);
+  }, [
+    selectedBankAccount,
+    withdrawAmount,
+    withdrawContent,
+    requestWithdrawal,
+    setIsModalOpen,
+    resetForm,
+  ]);
+
+  // Use the cancelWithdrawal function directly from useWallet
+  // It now handles error messages with toast internally
 
   const openWithdrawalModal = useCallback(() => {
     setIsModalOpen(true);
@@ -183,18 +241,13 @@ export const useWalletManager = () => {
     setBankAccountForm({ selectedBankBin: '', accountNumber: '', userBankName: '' });
   }, []);
 
-  const resetForm = useCallback(() => {
-    setWithdrawAmount('');
-    setWithdrawContent('');
-    setSelectedBankAccount(null);
-  }, []);
+  // resetForm function moved above
 
   return {
     // Data
     balance,
     withdrawals,
     loading,
-    error,
     page,
     totalItems,
     size,

@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const images = [
-  { src: '/image_4.png', alt: 'Khám phá đồ cũ chất lượng cao' },
-  { src: '/image_2.jpeg', alt: 'Mua bán an toàn, tiện lợi' },
-  { src: '/image_login.jpg', alt: 'Cộng đồng yêu thích đồ cũ' },
-  { src: '/image_3.jpeg', alt: 'Giá cả hợp lý, chất lượng đảm bảo' },
-  { src: '/image_4.png', alt: 'Giao dịch nhanh chóng' },
+  { src: '/image_4.png', alt: 'Mua sắm thông minh, lựa chọn hợp lý' },
+  { src: '/image_5.jpg', alt: 'Mua bán an toàn, tiện lợi' },
+  { src: '/image_6.png', alt: 'Cho cộng đồng yêu thích đồ cũ' },
+  { src: '/image_7.png', alt: 'Giá cả hợp lý, giao dịch an toàn' },
+  { src: '/image_8.png', alt: 'Giao dịch nhanh chóng' },
 ];
 
 export default function CarouselComponent() {
@@ -121,9 +121,9 @@ export default function CarouselComponent() {
       {/* Content Overlay */}
       <div className="absolute bottom-8 left-6 right-6 z-20 text-white">
         <div className="max-w-md">
-          <h3 className="text-xl sm:text-2xl font-bold mb-2">{images[currentIndex].alt}</h3>
+          <h3 className="text-xl sm:text-2xl font-bold mb-2">{images[currentIndex]?.alt || ''}</h3>
           <p className="text-sm sm:text-base opacity-90">
-            Khám phá ngay hàng ngàn sản phẩm chất lượng
+            Khám phá ngay đa dạng các sản phẩm khác nhau
           </p>
         </div>
       </div>

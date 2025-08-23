@@ -1,6 +1,6 @@
 import BankAccountDropdown from '@/components/wallet/BankAccountDropdown';
 import { BankAccountResponse } from '@services/payment-method.api';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect } from 'react';
 
 interface WithdrawalModalProps {
   isModalOpen: boolean;
@@ -45,7 +45,6 @@ const WithdrawalModal = ({
       return;
     }
 
-    // Validate amount
     const amount = parseFloat(withdrawAmount);
     if (isNaN(amount) || amount < 3000 || amount > balance) {
       return;
@@ -57,6 +56,17 @@ const WithdrawalModal = ({
       resetForm();
     }
   };
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const amountInput = document.getElementById('withdrawAmount');
+      if (amountInput) {
+        setTimeout(() => {
+          amountInput.focus();
+        }, 100);
+      }
+    }
+  }, [isModalOpen]);
 
   const resetForm = () => {
     setWithdrawAmount('');
@@ -73,7 +83,7 @@ const WithdrawalModal = ({
     }
 
     const numericValue = parseInt(cleanValue, 10);
-    const maxAmount = Math.min(balance, 3000000);
+    const maxAmount = Math.min(balance, 2000000);
 
     if (numericValue <= maxAmount) {
       setWithdrawAmount(cleanValue);
@@ -146,7 +156,7 @@ const WithdrawalModal = ({
                 <span className="font-semibold text-gray-800">{formatCurrency(balance)}</span>
               </p>
               <p className="text-gray-600 font-medium">
-                Tối đa: {formatCurrency(Math.min(balance, 3000000))}
+                Tối đa: {formatCurrency(Math.min(balance, 2000000))}
               </p>
             </div>
             {withdrawAmount && parseFloat(withdrawAmount) > Math.min(balance, 3000000) && (
