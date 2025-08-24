@@ -57,23 +57,23 @@ type SellerStatusResponse = {
 export const sellerApi = {
   registerSeller: async (
     req: SellerProfileRegisterRequest,
-  ): Promise<SellerProfileResponse | undefined> => {
+  ): Promise<IResponseObject<SellerProfileResponse> | undefined> => {
     try {
       const response = await authApi.default.post<IResponseObject<SellerProfileResponse>>(
         '/sellers/register',
         req,
       );
-      return response.data.content;
+      return response.data;
     } catch {
       return undefined;
     }
   },
-  rollbackSellerProfile: async (): Promise<boolean> => {
+  rollbackSellerProfile: async (sellerId?: string): Promise<IResponseObject<void> | undefined> => {
     try {
       const response = await authApi.default.delete<IResponseObject<void>>('/sellers/profile');
-      return response.data.success;
+      return response.data;
     } catch {
-      return false;
+      return undefined;
     }
   },
   updateSellerProfile: async (
@@ -88,7 +88,7 @@ export const sellerApi = {
   sellerVerification: async (req: {
     frontIdentity: File;
     backIdentity: File;
-  }): Promise<SellerProfileResponse | undefined> => {
+  }): Promise<IResponseObject<SellerProfileResponse> | undefined> => {
     try {
       const formData = new FormData();
       formData.append('frontSideIdentityCard', req.frontIdentity);
@@ -102,7 +102,7 @@ export const sellerApi = {
           },
         },
       );
-      return response.data.content;
+      return response.data;
     } catch {
       return undefined;
     }
