@@ -2,6 +2,7 @@
 
 import LoadingSpinner from '@/components/common/Loading';
 import Pagination from '@/components/common/Pagination';
+import { useToast } from '@/context/ToastContext';
 import {
   customerReportApi,
   type CustomerReportEvidenceResponse,
@@ -33,6 +34,7 @@ export default function ReportDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const toast = useToast();
 
   const fetchReport = async () => {
     try {
@@ -42,7 +44,6 @@ export default function ReportDetailPage() {
       setReport(reportData);
     } catch (err) {
       setError('Không thể tải thông tin báo cáo. Vui lòng thử lại.');
-      console.error('Error fetching report:', err);
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,6 @@ export default function ReportDetailPage() {
       setCurrentPage(evidenceData.page);
       setTotalPages(evidenceData.totalPages);
     } catch (err) {
-      console.error('Error fetching evidences:', err);
     } finally {
       setEvidenceLoading(false);
     }
@@ -74,9 +74,7 @@ export default function ReportDetailPage() {
         try {
           const sellerData = await getSellerProfile(report.sellerId);
           setSeller(sellerData);
-        } catch (err) {
-          console.error('Error fetching seller profile:', err);
-        }
+        } catch (err) {}
       };
 
       fetchSellerProfile();
