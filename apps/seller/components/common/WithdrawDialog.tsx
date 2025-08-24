@@ -1,5 +1,6 @@
 'use client';
 
+import { SelectBankInfo } from '@/components/common/SelectBankInfo';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,7 +10,7 @@ import { BankInfor, walletApi, WithdrawCreate } from '@/service/wallet.api';
 import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { SelectBankInfo } from './SelectBankInfo';
+
 interface WithdrawDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -33,21 +34,16 @@ export function WithdrawDialog({
   });
   const MIN_WITHDRAW = 3000;
   const MAX_WITHDRAW = availableBalance;
-  const MAX_CONTENT_LENGTH = 50; // Giới hạn nội dung giao dịch
-
-  const isValidAmount =
-    Number(withdrawData.amount) >= MIN_WITHDRAW && Number(withdrawData.amount) <= MAX_WITHDRAW;
+  const MAX_CONTENT_LENGTH = 50;
 
   const isFormValid = withdrawData.amount && selectedBank;
 
-  // Định dạng số tiền
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString('vi-VN') + ' VND';
   };
 
-  // Xử lý nhập số tiền với định dạng
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^\d]/g, '');
+    const value = e.target.value.replace(/\D/g, '');
 
     if (value === '') {
       setWithdrawData((prev) => ({
@@ -66,7 +62,6 @@ export function WithdrawDialog({
     }
   };
 
-  // Xử lý nhập nội dung giao dịch - SỬA LẠI
   const handleContentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value.length <= MAX_CONTENT_LENGTH) {
@@ -77,7 +72,6 @@ export function WithdrawDialog({
     }
   };
 
-  // Chọn số tiền nhanh
   const quickAmounts = [500000, 1000000, 2000000, 5000000];
 
   const handleQuickAmount = (amount: number) => {
@@ -89,12 +83,15 @@ export function WithdrawDialog({
     }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedBank) {
       toast.error('Vui lòng chọn tài khoản để nhận');
       return;
     }
     if (withdrawData.amount < MIN_WITHDRAW || withdrawData.amount > MAX_WITHDRAW) {
+      toast.error(
+        `Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`,
+      );
       toast.error(
         `Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`,
       );
@@ -105,11 +102,18 @@ export function WithdrawDialog({
       ...withdrawData,
       bankProfileId: selectedBank.id,
     };
-    const response = walletApi.createWithdraw(newData);
-    onWithdraw(withdrawData.amount, selectedBank.bankName);
-    setSelectedBank(null);
-    setWithdrawData({ amount: 0, bankProfileId: '', content: '' });
-    onOpenChange(false);
+    const response = await walletApi.createWithdraw(newData);
+    if (response.success) {
+      onWithdraw(withdrawData.amount, selectedBank.bankName);
+      setSelectedBank(null);
+      setWithdrawData({ amount: 0, bankProfileId: '', content: '' });
+      onOpenChange(false);
+      toast.success(response.messages[0] || 'Tạo đơn rút tiền thành công');
+    } else {
+      response.messages.forEach((message: string) => {
+        toast.error(message);
+      });
+    }
   };
 
   return (

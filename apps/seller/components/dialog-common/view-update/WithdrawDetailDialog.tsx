@@ -38,12 +38,12 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
           bgGradient: 'from-amber-500/5 via-yellow-500/5 to-orange-500/5',
           glowColor: 'shadow-amber-500/20',
         };
-      case 'cancelled':
+      case 'rejected':
       case 'failed':
         return {
           color: 'bg-red-500/10 text-red-700 border-red-200/50',
           icon: <XCircle className="h-5 w-5" />,
-          text: 'Thất bại',
+          text: 'Từ chối',
           bgGradient: 'from-red-500/5 via-rose-500/5 to-pink-500/5',
           glowColor: 'shadow-red-500/20',
         };

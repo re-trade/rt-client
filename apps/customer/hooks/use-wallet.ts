@@ -1,5 +1,6 @@
 'use client';
 
+import { useToast } from '@/context/ToastContext';
 import {
   cancelWithdrawal,
   createWithdrawal,
@@ -19,29 +20,28 @@ export const useWallet = () => {
     createWithdrawal: false,
     cancelWithdrawal: false,
   });
-  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
   const [page, setPage] = useState(0);
   const [size] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
 
   const fetchBalance = useCallback(async () => {
     setLoading((prev) => ({ ...prev, balance: true }));
-    setError(null);
     try {
       const data = await getWalletBalance();
       if (data) {
         setBalance(data.balance);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch wallet balance');
+      const errorMessage = err instanceof Error ? err.message : 'Không thể lấy số dư ví';
+      showToast(errorMessage, 'error');
     } finally {
       setLoading((prev) => ({ ...prev, balance: false }));
     }
-  }, []);
+  }, [showToast]);
 
   const fetchWithdrawals = useCallback(async () => {
     setLoading((prev) => ({ ...prev, withdrawals: true }));
-    setError(null);
     try {
       const response = await getWithdrawals(page, size);
       if (response?.success) {
@@ -50,60 +50,93 @@ export const useWallet = () => {
       } else {
         setWithdrawals([]);
         setTotalItems(0);
+        const errorMessage =
+          response?.message ||
+          (response?.messages && response.messages.length > 0
+            ? response.messages[0]
+            : 'Không thể lấy lịch sử rút tiền');
+        showToast(errorMessage, 'error');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch withdrawal history');
+      const errorMessage = err instanceof Error ? err.message : 'Không thể lấy lịch sử rút tiền';
+      showToast(errorMessage, 'error');
       setWithdrawals([]);
       setTotalItems(0);
     } finally {
       setLoading((prev) => ({ ...prev, withdrawals: false }));
     }
-  }, [page, size]);
+  }, [page, size, showToast]);
 
   const requestWithdrawal = useCallback(
     async (data: CreateWithdrawalRequest) => {
       setLoading((prev) => ({ ...prev, createWithdrawal: true }));
-      setError(null);
       try {
         const response = await createWithdrawal(data);
         if (response?.success) {
           await Promise.all([fetchBalance(), fetchWithdrawals()]);
-          return true;
+          showToast('Yêu cầu rút tiền đã được tạo thành công', 'success');
+          return { success: true };
         } else {
-          setError(response?.message || 'Failed to create withdrawal request');
-          return false;
+          const errorMessage =
+            response?.message ||
+            (response?.messages && response.messages.length > 0
+              ? response.messages[0]
+              : 'Lỗi khi tạo yêu cầu rút tiền');
+          showToast(errorMessage, response?.code === '400' ? 'warning' : 'error');
+          return {
+            success: false,
+            message: errorMessage,
+            code: response?.code,
+          };
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to create withdrawal request');
-        return false;
+        const errorMessage = err instanceof Error ? err.message : 'Lỗi khi tạo yêu cầu rút tiền';
+        showToast(errorMessage, 'error');
+        return {
+          success: false,
+          message: errorMessage,
+        };
       } finally {
         setLoading((prev) => ({ ...prev, createWithdrawal: false }));
       }
     },
-    [fetchBalance, fetchWithdrawals],
+    [fetchBalance, fetchWithdrawals, showToast],
   );
 
   const handleCancelWithdrawal = useCallback(
     async (id: string) => {
       setLoading((prev) => ({ ...prev, cancelWithdrawal: true }));
-      setError(null);
       try {
         const response = await cancelWithdrawal(id);
         if (response?.success) {
           await fetchWithdrawals();
-          return true;
+          showToast('Đã hủy yêu cầu rút tiền thành công', 'success');
+          return { success: true };
         } else {
-          setError(response?.message || 'Failed to cancel withdrawal request');
-          return false;
+          const errorMessage =
+            response?.message ||
+            (response?.messages && response.messages.length > 0
+              ? response.messages[0]
+              : 'Không thể hủy yêu cầu rút tiền');
+          showToast(errorMessage, response?.code === '400' ? 'warning' : 'error');
+          return {
+            success: false,
+            message: errorMessage,
+            code: response?.code,
+          };
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to cancel withdrawal request');
-        return false;
+        const errorMessage = err instanceof Error ? err.message : 'Không thể hủy yêu cầu rút tiền';
+        showToast(errorMessage, 'error');
+        return {
+          success: false,
+          message: errorMessage,
+        };
       } finally {
         setLoading((prev) => ({ ...prev, cancelWithdrawal: false }));
       }
     },
-    [fetchWithdrawals],
+    [fetchWithdrawals, showToast],
   );
 
   useEffect(() => {
@@ -118,7 +151,6 @@ export const useWallet = () => {
     withdrawals,
     loading,
     isLoading,
-    error,
     page,
     setPage,
     totalItems,

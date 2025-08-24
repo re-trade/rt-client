@@ -14,8 +14,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pagination } from '@/components/ui/pagination';
+import { useBankInfoPagination } from '@/hooks/use-bank-info-pagination';
 import { BankInfor, BankResponse, CreateBankInfor, walletApi } from '@/service/wallet.api';
-import { Building2, CheckCircle, CreditCard, Edit, Plus, Trash2 } from 'lucide-react';
+import { Building2, CheckCircle, CreditCard, Edit, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -25,10 +27,27 @@ interface BankInfoActiveTabProps {
 }
 
 export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoActiveTabProps) {
+  const {
+    bankInfos,
+    isLoading,
+    error,
+    page,
+    pageSize,
+    total,
+    totalPage,
+    searchTerm,
+    setPage,
+    setPageSize,
+    setSearchTerm,
+    setBankInfos,
+    refreshBankInfos,
+    handleKeyPress,
+  } = useBankInfoPagination();
+
   const [listBanks, setListBanks] = useState<BankResponse[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [bankToDelete, setBankToDelete] = useState<BankInfor | null>(null);
-  const [bankAccounts, setBankAccounts] = useState<BankInfor[]>([]);
+
   const [editingBank, setEditingBank] = useState<BankInfor | null>(null);
   const [newBankInfo, setNewBankInfo] = useState<CreateBankInfor>({
     bankName: '',
@@ -40,13 +59,8 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [wallet, listBanks, bankInfo] = await Promise.all([
-          walletApi.getWalletBySeller(),
-          walletApi.getTheBanks(),
-          walletApi.getBankInfos(),
-        ]);
+        const listBanks = await walletApi.getTheBanks();
         setListBanks(listBanks);
-        setBankAccounts(bankInfo);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -54,6 +68,15 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
 
     fetchData();
   }, []);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setPage(1);
+  };
 
   const handleAddBank = async () => {
     if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
@@ -66,7 +89,7 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         toast.success('Thêm tài khoản ngân hàng thành công');
         const addedBank = data.content;
         if (addedBank) {
-          setBankAccounts((prev) => [
+          setBankInfos((prev) => [
             ...prev,
             {
               id: addedBank.id,
@@ -85,6 +108,7 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
           });
 
           setIsAddingBank(false);
+          refreshBankInfos();
         }
       } catch (error) {
         console.error('Error adding bank:', error);
@@ -93,7 +117,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     }
   };
 
-  // ...existing code...
   const handleEditBank = (bank: BankInfor) => {
     setEditingBank(bank);
     setNewBankInfo({
@@ -118,14 +141,15 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
           return;
         }
         toast.success('Cập nhật tài khoản ngân hàng thành công');
-        setBankAccounts(
-          bankAccounts.map((bank) =>
+        setBankInfos(
+          bankInfos.map((bank) =>
             bank.id === editingBank.id ? { ...bank, ...newBankInfo } : bank,
           ),
         );
         setEditingBank(null);
         setNewBankInfo({ bankName: '', accountNumber: '', userBankName: '', bankBin: '' });
         setIsAddingBank(false);
+        refreshBankInfos();
       } catch (error) {
         console.error('Error updating bank:', error);
         toast.error('Có lỗi xảy ra khi cập nhật tài khoản ngân hàng');
@@ -142,10 +166,11 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
         toast.error(response.messages || 'Không thể xóa tài khoản ngân hàng');
         return;
       }
-      setBankAccounts(bankAccounts.filter((bank) => bank.id !== bankToDelete.id));
+      setBankInfos(bankInfos.filter((bank) => bank.id !== bankToDelete.id));
       toast.success('Xóa tài khoản ngân hàng thành công');
       setIsDeleteDialogOpen(false);
       setBankToDelete(null);
+      refreshBankInfos();
     } catch (error) {
       console.error('Error deleting bank:', error);
       toast.error('Có lỗi xảy ra khi xóa tài khoản ngân hàng');
@@ -206,9 +231,12 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Thông tin ngân hàng</h3>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h3 className="text-lg font-semibold">Thông tin ngân hàng</h3>
+          <p className="text-sm text-gray-500 mt-1">Quản lý tài khoản ngân hàng để rút tiền</p>
+        </div>
         <Button
           onClick={() => setIsAddingBank(true)}
           className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300"
@@ -217,6 +245,29 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
           Thêm tài khoản
         </Button>
       </div>
+
+      {/* Search */}
+      <div className="flex justify-between items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Tìm kiếm theo tên ngân hàng, số tài khoản..."
+            className="pl-10 border-gray-200 focus:border-orange-300 focus:ring-orange-200"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyUp={handleKeyPress}
+          />
+        </div>
+        <div className="text-sm text-gray-500 ml-4">
+          <strong>{total}</strong> tài khoản
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
 
       {isAddingBank && (
         <Card className="border-dashed border-2 border-blue-300 bg-blue-50/50">
@@ -275,51 +326,90 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
       )}
 
       <div className="grid gap-4">
-        {bankAccounts
-          .filter((bank) => !editingBank || bank.id !== editingBank.id)
-          .map((bank) => (
-            <Card key={bank.id} className="border transition-all hover:shadow-md">
+        {isLoading ? (
+          Array.from({ length: pageSize }).map((_, index) => (
+            <Card key={`skeleton-${index}`} className="border">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-[140px] h-[84px]">
-                        <BankIcon
-                          bankUrl={getBankIconUrl(bank.bankName)}
-                          bankName={bank.bankName}
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-lg font-semibold text-gray-900">{bank.bankName}</h4>
-                      </div>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="h-4 w-4" />
-                          <span className="font-mono">{bank.accountNumber}</span>
-                        </div>
-                        <div className="font-medium text-gray-900">{bank.userBankName}</div>
-                      </div>
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className="w-[140px] h-[84px] bg-gray-200 rounded animate-pulse"></div>
+                    <div className="space-y-2 flex-1">
+                      <div className="h-6 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditBank(bank)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => confirmDeleteBank(bank)}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <div className="flex gap-2">
+                    <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
+          ))
+        ) : bankInfos.length === 0 ? (
+          <Card className="border-dashed border-2 border-gray-300">
+            <CardContent className="p-12 text-center">
+              <Building2 className="h-35 w-21 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {searchTerm ? 'Không tìm thấy tài khoản nào' : 'Chưa có tài khoản ngân hàng'}
+              </h3>
+              <p className="text-gray-500 mb-4">
+                {searchTerm
+                  ? 'Thử tìm kiếm với từ khóa khác'
+                  : 'Thêm tài khoản ngân hàng để có thể rút tiền dễ dàng hơn'}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {bankInfos
+              .filter((bank) => !editingBank || bank.id !== editingBank.id)
+              .map((bank) => (
+                <Card key={bank.id} className="border transition-all hover:shadow-md">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-[140px] h-[84px]">
+                            <BankIcon
+                              bankUrl={getBankIconUrl(bank.bankName)}
+                              bankName={bank.bankName}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-lg font-semibold text-gray-900">{bank.bankName}</h4>
+                          </div>
+                          <div className="space-y-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-2">
+                              <CreditCard className="h-4 w-4" />
+                              <span className="font-mono">{bank.accountNumber}</span>
+                            </div>
+                            <div className="font-medium text-gray-900">{bank.userBankName}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEditBank(bank)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => confirmDeleteBank(bank)}
+                          className="text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+          </>
+        )}
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -347,21 +437,26 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
-        {bankAccounts.length === 0 && !isAddingBank && (
-          <Card className="border-dashed border-2 border-gray-300">
-            <CardContent className="p-12 text-center">
-              <Building2 className="h-35 w-21 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Chưa có tài khoản ngân hàng
-              </h3>
-              <p className="text-gray-500 mb-4">
-                Thêm tài khoản ngân hàng để có thể rút tiền dễ dàng hơn
-              </p>
-            </CardContent>
-          </Card>
-        )}
       </div>
+
+      {/* Pagination */}
+      {!isLoading && bankInfos.length > 0 && (
+        <div className="border rounded-lg bg-white">
+          <div className="p-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              loading={isLoading}
+              pageSizeOptions={[6, 12, 24]}
+              className="text-gray-600"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

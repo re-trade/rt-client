@@ -1,4 +1,5 @@
 'use client';
+import { useAuth } from '@/context/AuthContext';
 import { cartApi, CartGroupResponse, CartResponse } from '@/services/cart.api';
 import { contactApi, TAddress } from '@/services/contact.api';
 import { productApi, TProduct } from '@/services/product.api';
@@ -12,6 +13,7 @@ type TCartSummary = {
 };
 
 function useCart() {
+  const { auth } = useAuth();
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [cartGroups, setCartGroups] = useState<
     Record<string, CartGroupResponse & { isOpen: boolean }>
@@ -235,7 +237,6 @@ function useCart() {
           (selected) => selected.productId === item.productId,
         );
         if (selectedItem) {
-          // Use the current quantity from selectedItems, which should be updated when quantity changes
           const itemTotal = item.totalPrice * selectedItem.quantity;
           originalPrice += itemTotal;
           total += itemTotal;
@@ -245,16 +246,22 @@ function useCart() {
 
     setCartSummary({
       originalPrice,
-      tax: 0, // Tax removed as requested
-      total: total, // Total without tax
+      tax: 0,
+      total: total,
     });
   }, [selectedItems, cart]);
 
   useEffect(() => {
-    fetchCart();
-    fetchAddresses();
-    fetchRecommendProduct();
-  }, [fetchCart, fetchAddresses, fetchRecommendProduct]);
+    if (auth) {
+      fetchCart();
+      fetchAddresses();
+      fetchRecommendProduct();
+    } else {
+      setLoading(false);
+      setProductsLoading(false);
+      setError(null);
+    }
+  }, [auth, fetchCart, fetchAddresses, fetchRecommendProduct]);
 
   return {
     cart,

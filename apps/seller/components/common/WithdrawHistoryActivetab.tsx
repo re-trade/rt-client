@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Table,
   TableBody,
@@ -14,7 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { WithdrawHistoryResponse, walletApi } from '@/service/wallet.api';
+import { useWithdrawHistoryPagination } from '@/hooks/use-withdraw-history-pagination';
+import { snipppetCode } from '@/service/snippetCode';
+import { WithdrawHistoryResponse } from '@/service/wallet.api';
 import {
   AlertCircle,
   Building2,
@@ -22,12 +25,12 @@ import {
   CheckCircle,
   Clock,
   Eye,
+  Hash,
   MoreVertical,
   TrendingDown,
-  Wallet,
   XCircle,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const getStatusConfig = (status: string) => {
   switch (status.toLowerCase()) {
@@ -35,7 +38,7 @@ const getStatusConfig = (status: string) => {
       return {
         color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
         icon: <CheckCircle className="h-4 w-4" />,
-        text: 'Hoàn thành',
+        text: 'Phê duyệt',
         dotColor: 'bg-emerald-500',
       };
     case 'pending':
@@ -45,12 +48,12 @@ const getStatusConfig = (status: string) => {
         text: 'Đang xử lý',
         dotColor: 'bg-amber-500',
       };
-    case 'cancelled':
+    case 'rejected':
     case 'failed':
       return {
         color: 'bg-red-50 text-red-700 border-red-200',
         icon: <XCircle className="h-4 w-4" />,
-        text: 'Thất bại',
+        text: 'Từ chối',
         dotColor: 'bg-red-500',
       };
     default:
@@ -77,34 +80,32 @@ const formatCurrency = (amount: number) => {
   return amount.toLocaleString('vi-VN');
 };
 
-const maskAccountNumber = (accountNumber: string) => {
-  if (!accountNumber || accountNumber.length <= 6) return accountNumber;
-  const start = accountNumber.slice(0, 3);
-  const end = accountNumber.slice(-3);
-  const middle = '*'.repeat(Math.min(4, accountNumber.length - 6));
-  return `${start}${middle}${end}`;
-};
-
 export function WithdrawHistoryActiveTab() {
-  const [withdrawHistory, setWithdrawHistory] = useState<WithdrawHistoryResponse[]>([]);
+  const {
+    withdrawHistory,
+    isLoading,
+    error,
+    page,
+    pageSize,
+    total,
+    totalPage,
+    searchTerm,
+    setPage,
+    setPageSize,
+    setSearchTerm,
+    handleKeyPress,
+  } = useWithdrawHistoryPagination();
+
   const [selectedWithdraw, setSelectedWithdraw] = useState<WithdrawHistoryResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchWithdrawHistory = async () => {
-      try {
-        setIsLoading(true);
-        const history = await walletApi.getWithdrawHistory();
-        setWithdrawHistory(history);
-      } catch (error) {
-        console.error('Error fetching withdraw history:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
-    fetchWithdrawHistory();
-  }, []);
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setPage(1);
+  };
 
   const BankIcon = ({ bankUrl, bankName }: { bankUrl?: string; bankName: string }) => {
     const [imageError, setImageError] = useState(false);
@@ -164,10 +165,13 @@ export function WithdrawHistoryActiveTab() {
           </h3>
           <p className="text-gray-600 mt-2">Quản lý và theo dõi các giao dịch rút tiền của bạn</p>
         </div>
-        {/* <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
-          <strong>{withdrawHistory.length}</strong> giao dịch
-        </div> */}
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
@@ -177,145 +181,196 @@ export function WithdrawHistoryActiveTab() {
               <TableHead className="font-bold text-gray-800">Thông tin tài khoản</TableHead>
               <TableHead className="font-bold text-gray-800 text-right">Số tiền rút</TableHead>
               <TableHead className="font-bold text-gray-800">Ngày thực hiện</TableHead>
-              <TableHead className="font-bold text-gray-800">Ngày sử lý</TableHead>
+              <TableHead className="font-bold text-gray-800">Ngày xử lý</TableHead>
               <TableHead className="font-bold text-gray-800 text-center">Trạng thái</TableHead>
               <TableHead className="font-bold text-gray-800 text-center">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {withdrawHistory.map((withdraw, index) => {
-              const statusConfig = getStatusConfig(withdraw.status);
-              return (
-                <TableRow
-                  key={withdraw.id}
-                  className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${
-                    index === withdrawHistory.length - 1 ? 'border-b-0' : ''
-                  }`}
-                >
-                  <TableCell className="py-5">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 h-12 rounded-lg overflow-hidden border border-gray-200">
-                          <BankIcon bankUrl={withdraw.bankUrl} bankName={withdraw.bankName || ''} />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-900 text-sm">
-                            {withdraw.bankName || 'N/A'}
-                          </div>
-                          <div className="text-2xs text-black font-bold">
-                            {withdraw.accountNumber || 'N/A'}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+            {isLoading ? (
+              Array.from({ length: pageSize }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                   </TableCell>
-                  <TableCell className="text-right py-5">
-                    <div className="text-right">
-                      <div className="font-bold text-lg text-gray-900">
-                        {formatCurrency(withdraw.amount)}₫
-                      </div>
-                    </div>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                   </TableCell>
-                  <TableCell className="py-5">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatDate(withdraw.createdDate).split(', ')[0]}
-                        </div>
-                      </div>
-                    </div>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                   </TableCell>
-
-                  <TableCell className="py-5">
-                    <div className="flex items-center gap-2">
-                      {withdraw.processedDate && withdraw.processedDate !== '' ? (
-                        <>
-                          <Calendar className="h-4 w-4 text-gray-400" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {formatDate(withdraw.processedDate).split(', ')[0]}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="h-4 w-4 text-amber-600" />
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium text-amber-600">Đang xử lý...</div>
-                            <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
-                          </div>
-                        </>
-                      )}
-                    </div>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                   </TableCell>
-
-                  <TableCell className="text-center py-5">
-                    <div className="flex justify-center">
-                      <span
-                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border shadow-sm ${statusConfig.color}`}
-                      >
-                        <div
-                          className={`w-2 h-2 rounded-full ${statusConfig.dotColor} animate-pulse`}
-                        ></div>
-                        {statusConfig.text}
-                      </span>
-                    </div>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                   </TableCell>
-
-                  <TableCell className="text-center py-5">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition">
-                          <MoreVertical className="h-5 w-5" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem
-                          onClick={() => setSelectedWithdraw(withdraw)}
-                          className="cursor-pointer"
-                        >
-                          <Eye className="h-4 w-4 mr-2 text-blue-600" />
-                          Xem chi tiết
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            // TODO: viết hàm hủy ở đây
-                            console.log('Hủy giao dịch:', withdraw.id);
-                          }}
-                          className="cursor-pointer text-red-600 focus:text-red-700"
-                        >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Huỷ giao dịch
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                   </TableCell>
                 </TableRow>
-              );
-            })}
+              ))
+            ) : withdrawHistory.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8">
+                  <div className="text-gray-500">
+                    {searchTerm ? 'Không tìm thấy giao dịch nào' : 'Chưa có lịch sử rút tiền'}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              withdrawHistory.map((withdraw, index) => {
+                const statusConfig = getStatusConfig(withdraw.status);
+                return (
+                  <TableRow
+                    key={withdraw.id}
+                    className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${
+                      index === withdrawHistory.length - 1 ? 'border-b-0' : ''
+                    }`}
+                  >
+                    <TableCell className="py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-blue-100 transition-colors">
+                          <Hash className="h-4 w-4 text-gray-500 group-hover:text-blue-600" />
+                        </div>
+                        <span className="font-mono text-sm font-semibold text-blue-600 hover:text-blue-700">
+                          {snipppetCode.cutCode(withdraw.id)}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="text-right py-5">
+                      <div className="text-right">
+                        <div className="font-bold text-lg text-gray-900">
+                          {formatCurrency(withdraw.amount)}₫
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="py-5">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 h-12 rounded-lg overflow-hidden border border-gray-200">
+                            <BankIcon
+                              bankUrl={withdraw.bankUrl}
+                              bankName={withdraw.bankName || ''}
+                            />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900 text-sm">
+                              {withdraw.bankName || 'N/A'}
+                            </div>
+                            <div className="text-2xs text-black font-bold">
+                              {withdraw.accountNumber || 'N/A'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="py-5">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {formatDate(withdraw.createdDate).split(', ')[0]}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="py-5">
+                      <div className="flex items-center gap-2">
+                        {withdraw.processedDate && withdraw.processedDate !== '' ? (
+                          <>
+                            <Calendar className="h-4 w-4 text-gray-400" />
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {formatDate(withdraw.processedDate).split(', ')[0]}
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="h-4 w-4 text-amber-600" />
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-medium text-amber-600">
+                                Đang xử lý...
+                              </div>
+                              <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="text-center py-5">
+                      <div className="flex justify-center">
+                        <span
+                          className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border shadow-sm ${statusConfig.color}`}
+                        >
+                          <div
+                            className={`w-2 h-2 rounded-full ${statusConfig.dotColor} animate-pulse`}
+                          ></div>
+                          {statusConfig.text}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="text-center py-5">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition">
+                            <MoreVertical className="h-5 w-5" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem
+                            onClick={() => setSelectedWithdraw(withdraw)}
+                            className="cursor-pointer"
+                          >
+                            <Eye className="h-4 w-4 mr-2 text-blue-600" />
+                            Xem chi tiết
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              console.log('Hủy giao dịch:', withdraw.id);
+                            }}
+                            className="cursor-pointer text-red-600 focus:text-red-700"
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Huỷ giao dịch
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </div>
-
-      {/* Empty State */}
-      {withdrawHistory.length === 0 && (
-        <div className="text-center py-20 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200">
-          <div className="max-w-sm mx-auto">
-            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-              <Wallet className="h-10 w-10 text-blue-500" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Chưa có lịch sử rút tiền</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Các giao dịch rút tiền của bạn sẽ được hiển thị ở đây.
-              <br />
-              Bạn có thể theo dõi trạng thái và chi tiết từng giao dịch một cách dễ dàng.
-            </p>
+      {!isLoading && withdrawHistory.length > 0 && (
+        <div className="border rounded-lg bg-white">
+          <div className="p-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPage}
+              totalItems={total}
+              itemsPerPage={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              loading={isLoading}
+              pageSizeOptions={[10, 20, 50]}
+              className="text-gray-600"
+            />
           </div>
         </div>
       )}
-
-      {/* Detail Dialog */}
       {selectedWithdraw && (
         <WithdrawDetailDialog
           withdraw={selectedWithdraw}
