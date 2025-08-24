@@ -67,24 +67,12 @@ export type ReportFormErrors = {
   general?: string;
 };
 
-export type ReportSearchFilters = {
-  query?: string;
-  sellerId?: string;
-  dateFrom?: string;
-  dateTo?: string;
-};
-
 export type ReportListFilters = {
   status?: ReportStatus;
   typeReport?: ReportType;
   dateFrom?: string;
   dateTo?: string;
   query?: string;
-};
-
-export type SortOption = {
-  field: 'createdAt' | 'resolutionStatus' | 'typeReport';
-  direction: 'asc' | 'desc';
 };
 
 export type PaginatedResponse<T> = {
@@ -234,7 +222,6 @@ export const customerReportApi = {
         'Khác',
       ];
     } catch (error) {
-      console.error('Error fetching report types:', error);
       return ['Khác'];
     }
   },

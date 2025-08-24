@@ -102,8 +102,7 @@ export default function CreateReportPage() {
       setTimeout(() => {
         router.push('/user/reports');
       }, 2000);
-    } catch (error) {
-      console.error('Error creating report:', error);
+    } catch {
       setErrors({
         general: 'Không thể tạo báo cáo. Vui lòng thử lại sau.',
       });
