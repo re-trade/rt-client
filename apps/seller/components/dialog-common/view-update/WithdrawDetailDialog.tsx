@@ -263,16 +263,18 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
                     {/* Completed Date */}
                     <div className="relative">
                       <div
-                        className={`flex items-center gap-4 p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 ${withdraw.processedDate
+                        className={`flex items-center gap-4 p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 ${
+                          withdraw.processedDate
                             ? 'bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-emerald-500/10 border-emerald-200/30'
                             : 'bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-amber-200/30'
-                          }`}
+                        }`}
                       >
                         <div
-                          className={`flex items-center justify-center w-10 h-10 rounded-xl shadow-lg flex-shrink-0 ${withdraw.processedDate
+                          className={`flex items-center justify-center w-10 h-10 rounded-xl shadow-lg flex-shrink-0 ${
+                            withdraw.processedDate
                               ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white'
                               : 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white'
-                            }`}
+                          }`}
                         >
                           {withdraw.processedDate ? (
                             <CheckCircle className="h-5 w-5" />
@@ -282,8 +284,9 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
                         </div>
                         <div className="flex-1 min-w-0">
                           <div
-                            className={`text-xs font-semibold mb-1 uppercase tracking-wider ${withdraw.processedDate ? 'text-emerald-600' : 'text-amber-600'
-                              }`}
+                            className={`text-xs font-semibold mb-1 uppercase tracking-wider ${
+                              withdraw.processedDate ? 'text-emerald-600' : 'text-amber-600'
+                            }`}
                           >
                             Ngày hoàn thành
                           </div>

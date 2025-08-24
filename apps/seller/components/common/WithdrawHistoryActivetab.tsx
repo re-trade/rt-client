@@ -1,6 +1,12 @@
 'use client';
 import { WithdrawDetailDialog } from '@/components/dialog-common/view-update/WithdrawDetailDialog';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Table,
   TableBody,
   TableCell,
@@ -8,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { snipppetCode } from '@/service/snippetCode';
 import { WithdrawHistoryResponse, walletApi } from '@/service/wallet.api';
 import {
   AlertCircle,
@@ -17,18 +22,11 @@ import {
   CheckCircle,
   Clock,
   Eye,
-  Hash,
+  MoreVertical,
   TrendingDown,
   Wallet,
   XCircle,
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
 import { useEffect, useState } from 'react';
 
 const getStatusConfig = (status: string) => {
@@ -190,8 +188,9 @@ export function WithdrawHistoryActiveTab() {
               return (
                 <TableRow
                   key={withdraw.id}
-                  className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${index === withdrawHistory.length - 1 ? 'border-b-0' : ''
-                    }`}
+                  className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${
+                    index === withdrawHistory.length - 1 ? 'border-b-0' : ''
+                  }`}
                 >
                   <TableCell className="py-5">
                     <div className="space-y-2">
@@ -282,7 +281,7 @@ export function WithdrawHistoryActiveTab() {
                         <DropdownMenuItem
                           onClick={() => {
                             // TODO: viết hàm hủy ở đây
-                            console.log("Hủy giao dịch:", withdraw.id);
+                            console.log('Hủy giao dịch:', withdraw.id);
                           }}
                           className="cursor-pointer text-red-600 focus:text-red-700"
                         >
@@ -292,7 +291,6 @@ export function WithdrawHistoryActiveTab() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-
                 </TableRow>
               );
             })}
