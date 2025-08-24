@@ -193,7 +193,7 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
             {/* Bank Information Card */}
             <div className="group">
               <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                <CardContent className="p-6">
+                <CardContent className="p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl border border-green-200/30">
                       <Building2 className="h-5 w-5 text-green-600" />
@@ -206,17 +206,17 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
 
                   <div className="bg-gradient-to-br from-gray-50/50 to-white p-6 rounded-xl border border-gray-200/50 backdrop-blur-sm">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
+                      <div className="w-25 h-21 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
                         <BankIcon bankUrl={withdraw.bankUrl} bankName={withdraw.bankName || ''} />
                       </div>
                       <div className="flex-1 min-w-0 space-y-2">
-                        <h5 className="font-bold text-gray-900 text-base truncate">
+                        <h5 className="font-bold text-gray-900 text-base break-words">
                           {withdraw.bankName}
                         </h5>
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-2 text-gray-600">
-                            <CreditCard className="h-4 w-4 flex-shrink-0 text-blue-500" />
-                            <span className="font-mono text-sm bg-gray-100/50 px-2 py-1 rounded-lg">
+                            <CreditCard className="h-6 w-6 flex-shrink-0 text-blue-500" />
+                            <span className="font-bold text-xl bg-gray-100/50 px-2 py-1 rounded-lg">
                               {withdraw.accountNumber}
                             </span>
                           </div>
@@ -263,18 +263,16 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
                     {/* Completed Date */}
                     <div className="relative">
                       <div
-                        className={`flex items-center gap-4 p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 ${
-                          withdraw.processedDate
+                        className={`flex items-center gap-4 p-4 rounded-xl border backdrop-blur-sm transition-all duration-300 ${withdraw.processedDate
                             ? 'bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-emerald-500/10 border-emerald-200/30'
                             : 'bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-amber-200/30'
-                        }`}
+                          }`}
                       >
                         <div
-                          className={`flex items-center justify-center w-10 h-10 rounded-xl shadow-lg flex-shrink-0 ${
-                            withdraw.processedDate
+                          className={`flex items-center justify-center w-10 h-10 rounded-xl shadow-lg flex-shrink-0 ${withdraw.processedDate
                               ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white'
                               : 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white'
-                          }`}
+                            }`}
                         >
                           {withdraw.processedDate ? (
                             <CheckCircle className="h-5 w-5" />
@@ -284,9 +282,8 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
                         </div>
                         <div className="flex-1 min-w-0">
                           <div
-                            className={`text-xs font-semibold mb-1 uppercase tracking-wider ${
-                              withdraw.processedDate ? 'text-emerald-600' : 'text-amber-600'
-                            }`}
+                            className={`text-xs font-semibold mb-1 uppercase tracking-wider ${withdraw.processedDate ? 'text-emerald-600' : 'text-amber-600'
+                              }`}
                           >
                             Ngày hoàn thành
                           </div>

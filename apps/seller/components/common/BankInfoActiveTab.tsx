@@ -1,19 +1,5 @@
 'use client';
 import { SelectBank } from '@/components/common/SelectBank';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  BankInfor,
-  BankResponse,
-  CreateBankInfor,
-  walletApi,
-  WalletResponse,
-} from '@/service/wallet.api';
-import { Building2, CheckCircle, CreditCard, Edit, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +10,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { error } from 'console';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { BankInfor, BankResponse, CreateBankInfor, walletApi } from '@/service/wallet.api';
+import { Building2, CheckCircle, CreditCard, Edit, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
 interface BankInfoActiveTabProps {
   isAddingBank: boolean;
   setIsAddingBank: (value: boolean) => void;
@@ -34,14 +28,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   const [listBanks, setListBanks] = useState<BankResponse[]>([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [bankToDelete, setBankToDelete] = useState<BankInfor | null>(null);
-
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [bankToConfirm, setBankToConfirm] = useState<BankInfor | null>(null);
-
-  const [isUpdateOrCreate, setIsUpdateOrCreate] = useState(false);
-  const [bankToUpdate, setBankToUpdate] = useState<BankInfor | null>(null);
-  const [bankToCreate, setBankToCreate] = useState<CreateBankInfor | null>(null);
-
   const [bankAccounts, setBankAccounts] = useState<BankInfor[]>([]);
   const [editingBank, setEditingBank] = useState<BankInfor | null>(null);
   const [newBankInfo, setNewBankInfo] = useState<CreateBankInfor>({
@@ -68,16 +54,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
 
     fetchData();
   }, []);
-
-  const formatDate = (createdDate: string) => {
-    return new Date(createdDate).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
-  // ...existing code...
 
   const handleAddBank = async () => {
     if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
@@ -175,25 +151,10 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
       toast.error('Có lỗi xảy ra khi xóa tài khoản ngân hàng');
     }
   };
-  const handleConfirm = () => {
-    (isUpdateOrCreate ? handleUpdateBank() : handleAddBank());
-    setIsConfirmDialogOpen(true);
-  };
 
   const confirmDeleteBank = (bank: BankInfor) => {
     setBankToDelete(bank);
     setIsDeleteDialogOpen(true);
-  };
-  const handleSetDefault = async (bankId: string) => {
-    try {
-      setBankAccounts(
-        bankAccounts.map((bank) => ({
-          ...bank,
-        })),
-      );
-    } catch (error) {
-      console.error('Error setting default bank:', error);
-    }
   };
 
   const cancelBankForm = () => {
@@ -222,19 +183,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   const getBankIconUrl = (bankName: string) => {
     const bank = listBanks.find((b) => b.name === bankName);
     return bank ? bank.url : '';
-  };
-
-  const getStatusDisplayName = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'Hoàn thành';
-      case 'pending':
-        return 'Đang xử lý';
-      case 'failed':
-        return 'Thất bại';
-      default:
-        return status;
-    }
   };
 
   const BankIcon = ({ bankUrl, bankName }: { bankUrl?: string; bankName: string }) => {
@@ -377,7 +325,9 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
             <AlertDialogHeader>
               <AlertDialogTitle>Xác nhận xóa tài khoản</AlertDialogTitle>
               <AlertDialogDescription>
-                Bạn có chắc chắn muốn xóa tài khoản ngân hàng <strong>{bankToDelete?.bankName}</strong> với số tài khoản <strong>"{bankToDelete?.accountNumber}"</strong>?
+                Bạn có chắc chắn muốn xóa tài khoản ngân hàng{' '}
+                <strong>{bankToDelete?.bankName}</strong> với số tài khoản{' '}
+                <strong>"{bankToDelete?.accountNumber}"</strong>?
                 <br />
                 <span className="text-red-600 font-medium">Hành động này không thể hoàn tác.</span>
               </AlertDialogDescription>
@@ -391,49 +341,8 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
               >
                 Hủy
               </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteBank}
-                className="bg-red-600 hover:bg-red-700"
-              >
+              <AlertDialogAction onClick={handleDeleteBank} className="bg-red-600 hover:bg-red-700">
                 Xóa
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-
-        </AlertDialog>
-        <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              {isUpdateOrCreate ? (
-                <AlertDialogTitle>Xác nhận cập nhật tài khoản</AlertDialogTitle>
-              ) : (
-                <AlertDialogTitle>Xác nhận tạo tài khoản</AlertDialogTitle>
-              )}
-
-              <AlertDialogDescription>
-                {isUpdateOrCreate ? (
-                  <>Bạn có chắc chắn muốn cập nhật tài khoản ngân hàng <strong>{bankToUpdate?.bankName}</strong> với số tài khoản <strong>"{bankToUpdate?.accountNumber}"</strong>?</>
-                ) : (
-                  <>Bạn có chắc chắn muốn tạo tài khoản ngân hàng <strong>{bankToCreate?.bankName}</strong> với số tài khoản <strong>"{bankToCreate?.accountNumber}"</strong>?</>
-                )}
-                <br />
-                <span className="text-red-600 font-medium">Hành động này không thể hoàn tác.</span>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel
-                onClick={() => {
-                  setIsDeleteDialogOpen(false);
-                  setBankToDelete(null);
-                }}
-              >
-                Hủy
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteBank}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                Xác nhận
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

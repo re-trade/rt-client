@@ -22,6 +22,13 @@ import {
   Wallet,
   XCircle,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 import { useEffect, useState } from 'react';
 
 const getStatusConfig = (status: string) => {
@@ -90,7 +97,6 @@ export function WithdrawHistoryActiveTab() {
       try {
         setIsLoading(true);
         const history = await walletApi.getWithdrawHistory();
-        console.log('Withdraw history:', history);
         setWithdrawHistory(history);
       } catch (error) {
         console.error('Error fetching withdraw history:', error);
@@ -160,9 +166,9 @@ export function WithdrawHistoryActiveTab() {
           </h3>
           <p className="text-gray-600 mt-2">Quản lý và theo dõi các giao dịch rút tiền của bạn</p>
         </div>
-        <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+        {/* <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
           <strong>{withdrawHistory.length}</strong> giao dịch
-        </div>
+        </div> */}
       </div>
 
       {/* Table */}
@@ -170,11 +176,10 @@ export function WithdrawHistoryActiveTab() {
         <Table>
           <TableHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
             <TableRow className="border-b border-gray-200 hover:bg-transparent">
-              <TableHead className="font-bold text-gray-800 py-5">Mã giao dịch</TableHead>
-              <TableHead className="font-bold text-gray-800 text-right">Số tiền rút</TableHead>
               <TableHead className="font-bold text-gray-800">Thông tin tài khoản</TableHead>
-              <TableHead className="font-bold text-gray-800">Ngày rút</TableHead>
-              <TableHead className="font-bold text-gray-800">Ngày hoàn thành</TableHead>
+              <TableHead className="font-bold text-gray-800 text-right">Số tiền rút</TableHead>
+              <TableHead className="font-bold text-gray-800">Ngày thực hiện</TableHead>
+              <TableHead className="font-bold text-gray-800">Ngày sử lý</TableHead>
               <TableHead className="font-bold text-gray-800 text-center">Trạng thái</TableHead>
               <TableHead className="font-bold text-gray-800 text-center">Thao tác</TableHead>
             </TableRow>
@@ -185,29 +190,9 @@ export function WithdrawHistoryActiveTab() {
               return (
                 <TableRow
                   key={withdraw.id}
-                  className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${
-                    index === withdrawHistory.length - 1 ? 'border-b-0' : ''
-                  }`}
+                  className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${index === withdrawHistory.length - 1 ? 'border-b-0' : ''
+                    }`}
                 >
-                  <TableCell className="py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-                        <Hash className="h-4 w-4 text-gray-500 group-hover:text-blue-600" />
-                      </div>
-                      <span className="font-mono text-sm font-semibold text-blue-600 hover:text-blue-700">
-                        {snipppetCode.cutCode(withdraw.id)}
-                      </span>
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="text-right py-5">
-                    <div className="text-right">
-                      <div className="font-bold text-lg text-gray-900">
-                        {formatCurrency(withdraw.amount)}₫
-                      </div>
-                    </div>
-                  </TableCell>
-
                   <TableCell className="py-5">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -225,7 +210,13 @@ export function WithdrawHistoryActiveTab() {
                       </div>
                     </div>
                   </TableCell>
-
+                  <TableCell className="text-right py-5">
+                    <div className="text-right">
+                      <div className="font-bold text-lg text-gray-900">
+                        {formatCurrency(withdraw.amount)}₫
+                      </div>
+                    </div>
+                  </TableCell>
                   <TableCell className="py-5">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-gray-400" />
@@ -274,14 +265,34 @@ export function WithdrawHistoryActiveTab() {
                   </TableCell>
 
                   <TableCell className="text-center py-5">
-                    <button
-                      onClick={() => setSelectedWithdraw(withdraw)}
-                      className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-200 hover:border-blue-600 rounded-xl transition-all duration-200 hover:shadow-md transform hover:scale-105"
-                    >
-                      <Eye className="h-4 w-4" />
-                      Chi tiết
-                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition">
+                          <MoreVertical className="h-5 w-5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={() => setSelectedWithdraw(withdraw)}
+                          className="cursor-pointer"
+                        >
+                          <Eye className="h-4 w-4 mr-2 text-blue-600" />
+                          Xem chi tiết
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            // TODO: viết hàm hủy ở đây
+                            console.log("Hủy giao dịch:", withdraw.id);
+                          }}
+                          className="cursor-pointer text-red-600 focus:text-red-700"
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Huỷ giao dịch
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
+
                 </TableRow>
               );
             })}
