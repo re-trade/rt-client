@@ -116,7 +116,6 @@ export const customerReportApi = {
         totalPages: data.pagination?.totalPages || 0,
       };
     } catch (error) {
-      console.error('Error fetching reports:', error);
       throw error;
     }
   },

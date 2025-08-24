@@ -6,47 +6,69 @@ interface ReportSkeletonProps {
 
 export function ReportCardSkeleton() {
   return (
-    <div className="bg-white rounded-lg border border-orange-200 p-6 animate-pulse">
+    <div className="bg-white rounded-2xl border border-gray-200 p-8 animate-pulse">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-          <div>
-            <div className="h-4 bg-gray-200 rounded w-24 mb-1"></div>
-            <div className="h-3 bg-gray-200 rounded w-16"></div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-300 rounded-full"></div>
+          </div>
+          <div className="space-y-1">
+            <div className="h-5 bg-gray-200 rounded w-32 mb-1"></div>
+            <div className="h-4 bg-gray-200 rounded w-20"></div>
           </div>
         </div>
-        <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+        <div className="h-8 bg-gray-200 rounded-xl w-24"></div>
       </div>
 
       {/* Report Type */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-4 h-4 bg-gray-200 rounded"></div>
-        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-gray-100 rounded-lg">
+          <div className="w-5 h-5 bg-gray-200 rounded"></div>
+        </div>
+        <div>
+          <div className="h-3 bg-gray-200 rounded w-20 mb-1"></div>
+          <div className="h-4 bg-gray-200 rounded w-32"></div>
+        </div>
       </div>
 
       {/* Content Preview */}
-      <div className="mb-4 space-y-2">
-        <div className="h-3 bg-gray-200 rounded w-full"></div>
-        <div className="h-3 bg-gray-200 rounded w-4/5"></div>
-        <div className="h-3 bg-gray-200 rounded w-3/5"></div>
+      <div className="mb-6">
+        <div className="bg-gray-50 rounded-xl p-4 border-l-4 border-gray-200">
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/5"></div>
+          </div>
+        </div>
       </div>
 
       {/* Meta Information */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-gray-200 rounded"></div>
-          <div className="h-3 bg-gray-200 rounded w-20"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+          <div className="p-2 bg-gray-100 rounded-lg">
+            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+          </div>
+          <div>
+            <div className="h-3 bg-gray-200 rounded w-16 mb-1"></div>
+            <div className="h-4 bg-gray-200 rounded w-20"></div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-gray-200 rounded"></div>
-          <div className="h-3 bg-gray-200 rounded w-16"></div>
+        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+          <div className="p-2 bg-gray-100 rounded-lg">
+            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+          </div>
+          <div>
+            <div className="h-3 bg-gray-200 rounded w-16 mb-1"></div>
+            <div className="h-4 bg-gray-200 rounded w-20"></div>
+          </div>
         </div>
       </div>
 
       {/* Action Button */}
-      <div className="flex justify-end">
-        <div className="h-8 bg-gray-200 rounded w-24"></div>
+      <div className="flex justify-end pt-4 border-t border-gray-200">
+        <div className="h-10 bg-gray-200 rounded-xl w-32"></div>
       </div>
     </div>
   );
@@ -54,9 +76,15 @@ export function ReportCardSkeleton() {
 
 export function ReportListSkeleton({ count = 6 }: ReportSkeletonProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {Array.from({ length: count }).map((_, index) => (
-        <ReportCardSkeleton key={index} />
+        <div
+          key={index}
+          className="transform transition-all duration-300"
+          style={{ animationDelay: `${index * 100}ms` }}
+        >
+          <ReportCardSkeleton />
+        </div>
       ))}
     </div>
   );
