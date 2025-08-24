@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Edit3,
   Eye,
+  FileText,
   MapPin,
   Menu,
   Shield,
@@ -88,6 +89,11 @@ export default function UserLayout({ children }: UserLayoutProps) {
         { name: 'Đơn mua của tôi', icon: <ShoppingBag className="w-4 h-4" />, path: 'purchase' },
         { name: 'Đánh giá sản phẩm', icon: <Star className="w-4 h-4" />, path: 'review' },
       ],
+    },
+    {
+      name: 'Quản lý báo cáo',
+      icon: <FileText className="w-5 h-5" />,
+      path: 'reports',
     },
     {
       name: 'Ví của tôi',

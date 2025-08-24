@@ -11,6 +11,7 @@ import {
 import { IconAlertCircle, IconCheck, IconUpload, IconX } from '@tabler/icons-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { storageApi } from '../../../../../seller/service/storage.api';
 
 export default function CreateReportPage() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function CreateReportPage() {
     sellerId: sellerId || '',
     typeReport: '' as ReportType,
     content: '',
-    evidenceUrls: [],
+    evidenceFiles: [],
   });
 
   const [errors, setErrors] = useState<ReportFormErrors>({});
@@ -33,6 +34,8 @@ export default function CreateReportPage() {
   const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
   const [comboDetails, setComboDetails] = useState<OrderCombo | null>(null);
   const [isFetchingCombo, setIsFetchingCombo] = useState(true);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (!comboId || !sellerId) {
@@ -85,9 +88,21 @@ export default function CreateReportPage() {
 
     if (!validateForm()) return;
 
+    setLoading(true);
+    setErrors({});
+
     try {
-      setLoading(true);
-      setErrors({});
+      let uploadedUrls: string[] = [];
+      if (formData.evidenceFiles.length > 0) {
+        setIsUploading(true);
+        const response = await storageApi.fileBulkUpload(formData.evidenceFiles);
+        if (response.success && response.content) {
+          uploadedUrls = response.content;
+        } else {
+          throw new Error(response.messages?.[0] || 'File upload failed');
+        }
+        setIsUploading(false);
+      }
 
       await customerReportApi.createReport({
         sellerId: formData.sellerId,
@@ -95,18 +110,20 @@ export default function CreateReportPage() {
         content: formData.content.trim(),
         orderId: formData.comboId,
         productId: formData.productId,
-        evidenceUrls: formData.evidenceUrls,
+        evidenceUrls: uploadedUrls,
       });
 
       setSuccess(true);
       setTimeout(() => {
         router.push('/user/reports');
       }, 2000);
-    } catch {
+    } catch (error) {
+      console.error('Failed to create report:', error);
       setErrors({
         general: 'Không thể tạo báo cáo. Vui lòng thử lại sau.',
       });
     } finally {
+      setIsUploading(false);
       setLoading(false);
     }
   };
@@ -114,18 +131,23 @@ export default function CreateReportPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const newUrls = Array.from(files).map((file) => URL.createObjectURL(file));
+
+    const newFiles = Array.from(files);
     setFormData((prev) => ({
       ...prev,
-      evidenceUrls: [...prev.evidenceUrls, ...newUrls],
+      evidenceFiles: [...prev.evidenceFiles, ...newFiles],
     }));
+
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    setPreviews((prev) => [...prev, ...newPreviews]);
   };
 
   const removeEvidence = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      evidenceUrls: prev.evidenceUrls.filter((_, i) => i !== index),
+      evidenceFiles: prev.evidenceFiles.filter((_, i) => i !== index),
     }));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   if (success) {
@@ -315,9 +337,9 @@ export default function CreateReportPage() {
                 </div>
 
                 {/* Evidence Preview */}
-                {formData.evidenceUrls.length > 0 && (
+                {previews.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
-                    {formData.evidenceUrls.map((url, index) => (
+                    {previews.map((url, index) => (
                       <div key={index} className="relative group">
                         <img
                           src={url}
@@ -345,17 +367,17 @@ export default function CreateReportPage() {
               type="button"
               onClick={() => router.back()}
               className="px-8 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-100 transition-all duration-300 font-semibold"
-              disabled={loading}
+              disabled={loading || isUploading}
             >
               Hủy
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isUploading}
               className="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl hover:from-orange-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold"
             >
-              {loading && <LoadingSpinner className="w-5 h-5" />}
-              {loading ? 'Đang gửi...' : 'Gửi báo cáo'}
+              {(loading || isUploading) && <LoadingSpinner className="w-5 h-5" />}
+              {isUploading ? 'Đang tải lên...' : loading ? 'Đang gửi...' : 'Gửi báo cáo'}
             </button>
           </div>
         </form>

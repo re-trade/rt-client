@@ -112,45 +112,36 @@ function ReportsPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 mb-8">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="space-y-3">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 bg-clip-text text-transparent">
-                Quản lý báo cáo
-              </h1>
-              <p className="text-gray-600 text-lg">
+        <div className="bg-orange-50 rounded-2xl shadow-xl border border-orange-200 p-6 mb-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Quản lý báo cáo</h1>
+              <p className="text-gray-500 mt-1">
                 Theo dõi và quản lý các báo cáo của bạn một cách hiệu quả
               </p>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                <span>Cập nhật thời gian thực</span>
-              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-orange-200 rounded-xl hover:bg-orange-50 transition-all duration-300 text-gray-700 font-medium group"
+                className="flex items-center justify-center gap-2 px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-gray-700 font-medium group"
               >
-                <IconFilter
-                  size={20}
-                  className="group-hover:scale-110 transition-transform duration-200"
-                />
+                <IconFilter size={18} />
                 Bộ lọc
                 <IconChevronDown
-                  size={18}
-                  className={`transition-all duration-300 group-hover:scale-110 ${showFilters ? 'rotate-180' : ''}`}
+                  size={16}
+                  className={`transition-all duration-300 ${showFilters ? 'rotate-180' : ''}`}
                 />
               </button>
 
               <button
                 onClick={() => router.push('/user/reports/search')}
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 text-white px-8 py-3 rounded-xl hover:from-orange-600 hover:via-orange-700 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-5 py-2 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg font-semibold"
               >
-                <IconPlus size={20} />
+                <IconPlus size={18} />
                 Tạo báo cáo mới
               </button>
             </div>
@@ -159,7 +150,7 @@ function ReportsPageContent() {
 
         {/* Filters */}
         {showFilters && (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 mb-8 backdrop-blur-sm">
+          <div className="bg-orange-50 rounded-2xl shadow-lg border border-orange-200 p-8 mb-8 backdrop-blur-sm">
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Bộ lọc tìm kiếm</h3>
               <p className="text-sm text-gray-600">
@@ -295,10 +286,10 @@ function ReportsPageContent() {
         ) : (
           <div className="space-y-8">
             {/* Results Summary */}
-            <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="bg-orange-50 rounded-xl shadow-md border border-orange-200 p-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
                   <p className="text-gray-700 font-medium">
                     Hiển thị <span className="font-bold text-orange-600">{reports.length}</span>{' '}
                     trong tổng số <span className="font-bold text-orange-600">{totalElements}</span>{' '}

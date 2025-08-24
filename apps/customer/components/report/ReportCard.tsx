@@ -101,7 +101,9 @@ export default function ReportCard({
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
               Mã đơn hàng
             </span>
-            <p className="text-sm font-semibold text-gray-900">{report.orderId}</p>
+            <p className="text-sm font-semibold text-gray-900 font-mono">
+              {report.orderId.substring(0, 8)}...
+            </p>
           </div>
         </div>
       </div>

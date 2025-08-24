@@ -2,85 +2,40 @@
 
 import LoadingSpinner from '@/components/common/Loading';
 import Pagination from '@/components/common/Pagination';
+import AddEvidenceModal from '@/components/report/AddEvidenceModal';
 import { useToast } from '@/context/ToastContext';
-import {
-  customerReportApi,
-  type CustomerReportEvidenceResponse,
-  type CustomerReportResponse,
-  type ReportStatus,
-} from '@services/report.api';
-import { getSellerProfile, TSellerProfile } from '@services/seller.api';
+import { useReportDetail } from '@/hooks/use-report-detail';
+import { type ReportStatus } from '@services/report.api';
 import {
   IconArrowLeft,
   IconCalendar,
   IconFileText,
   IconMessageCircle,
   IconPhoto,
+  IconPlus,
   IconUser,
 } from '@tabler/icons-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function ReportDetailPage() {
+export default function ReportDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const params = useParams();
-  const reportId = params.id as string;
-
-  const [report, setReport] = useState<CustomerReportResponse | null>(null);
-  const [evidences, setEvidences] = useState<CustomerReportEvidenceResponse[]>([]);
-  const [seller, setSeller] = useState<TSellerProfile | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
-  const [evidenceLoading, setEvidenceLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const { id } = params;
+  const {
+    loading,
+    report,
+    evidenceLoading,
+    evidences,
+    isEvidenceModalOpen,
+    setIsEvidenceModalOpen,
+    fetchEvidences,
+    fetchReport,
+    totalPages,
+    currentPage,
+    setCurrentPage,
+    seller,
+    error,
+  } = useReportDetail(id);
   const toast = useToast();
-
-  const fetchReport = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const reportData = await customerReportApi.getReportById(reportId);
-      setReport(reportData);
-    } catch (err) {
-      setError('Không thể tải thông tin báo cáo. Vui lòng thử lại.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchEvidences = async (page: number = 0) => {
-    try {
-      setEvidenceLoading(true);
-      const evidenceData = await customerReportApi.getReportEvidences(reportId, page, 10);
-      setEvidences(evidenceData.content);
-      setCurrentPage(evidenceData.page);
-      setTotalPages(evidenceData.totalPages);
-    } catch (err) {
-    } finally {
-      setEvidenceLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (reportId) {
-      fetchReport();
-      fetchEvidences();
-    }
-  }, [reportId]);
-  useEffect(() => {
-    if (report?.sellerId) {
-      const fetchSellerProfile = async () => {
-        try {
-          const sellerData = await getSellerProfile(report.sellerId);
-          setSeller(sellerData);
-        } catch (err) {}
-      };
-
-      fetchSellerProfile();
-    }
-  }, [report]);
-
   const getStatusColor = (status: ReportStatus) => {
     switch (status) {
       case 'PENDING':
@@ -197,24 +152,27 @@ export default function ReportDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Chi tiết báo cáo</h1>
+            <p className="text-gray-500 mt-1 font-mono text-sm">
+              ID: {report.id.substring(0, 8)}...
+            </p>
+          </div>
           <button
             onClick={() => router.back()}
-            className="p-3 bg-white rounded-xl shadow-md hover:bg-gray-100 transition-colors duration-200 border border-gray-200"
+            className="flex items-center gap-2 px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-all duration-200 text-gray-700 font-medium group"
           >
-            <IconArrowLeft size={22} className="text-gray-700" />
+            <IconArrowLeft size={18} />
+            Quay lại
           </button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900">Chi tiết báo cáo</h1>
-            <p className="text-gray-500 mt-1 font-mono text-sm">ID: {report.id}</p>
-          </div>
         </div>
 
         {/* Report Info */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
             <div className="flex items-center gap-4">
               {seller ? (
@@ -268,7 +226,9 @@ export default function ReportDetailPage() {
               <IconUser size={24} className="text-orange-500" />
               <div>
                 <p className="text-sm text-gray-600">Mã đơn hàng</p>
-                <p className="font-semibold text-gray-900 font-mono">{report.orderId}</p>
+                <p className="font-semibold text-gray-900 font-mono">
+                  {report.orderId.substring(0, 8)}...
+                </p>
               </div>
             </div>
           </div>
@@ -301,13 +261,23 @@ export default function ReportDetailPage() {
           </div>
         </div>
 
-        {/* Evidence Section */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 sm:p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-orange-100 rounded-xl">
-              <IconMessageCircle size={24} className="text-orange-600" />
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <IconMessageCircle size={24} className="text-orange-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">Trao đổi & Bằng chứng</h3>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900">Trao đổi & Bằng chứng</h3>
+            {report.resolutionStatus === 'PENDING' && (
+              <button
+                onClick={() => setIsEvidenceModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 font-semibold"
+              >
+                <IconPlus size={18} />
+                Bổ sung bằng chứng
+              </button>
+            )}
           </div>
 
           {evidenceLoading ? (
@@ -417,6 +387,15 @@ export default function ReportDetailPage() {
           )}
         </div>
       </div>
+      <AddEvidenceModal
+        reportId={id}
+        isOpen={isEvidenceModalOpen}
+        onClose={() => setIsEvidenceModalOpen(false)}
+        onEvidenceAdded={() => {
+          fetchEvidences();
+          toast.showToast('Bằng chứng đã được cập nhật.', 'success');
+        }}
+      />
     </div>
   );
 }

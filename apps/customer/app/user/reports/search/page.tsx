@@ -49,12 +49,12 @@ function ReportSearchPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 p-6">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Tìm kiếm đơn hàng để báo cáo</h1>
-          <p className="text-gray-500 mt-2">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6">
+          <h1 className="text-2xl font-bold text-gray-800">Tìm kiếm đơn hàng để báo cáo</h1>
+          <p className="text-gray-500 mt-1">
             Chỉ các đơn hàng đã hoàn thành mới có thể được báo cáo. Chọn một đơn hàng để bắt đầu.
           </p>
         </div>
@@ -115,11 +115,12 @@ function ReportSearchPageContent() {
                             className="w-12 h-12 rounded-full object-cover ring-2 ring-orange-100"
                           />
                           <div>
+                            <span className="text-sm text-gray-500">Người bán</span>
                             <h3 className="font-semibold text-gray-900 text-lg">
                               {combo.sellerName}
                             </h3>
                             <p className="text-sm text-gray-500 font-mono">
-                              Mã đơn: {combo.comboId}
+                              Mã đơn: {combo.comboId.substring(0, 8)}...
                             </p>
                           </div>
                         </div>

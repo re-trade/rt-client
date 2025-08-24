@@ -55,7 +55,7 @@ export type ReportFormData = {
   productId: string;
   typeReport: ReportType;
   content: string;
-  evidenceUrls: string[];
+  evidenceFiles: File[];
 };
 
 export type ReportFormErrors = {
@@ -63,7 +63,7 @@ export type ReportFormErrors = {
   productId?: string;
   typeReport?: string;
   content?: string;
-  evidenceUrls?: string;
+  evidenceFiles?: string;
   general?: string;
 };
 
