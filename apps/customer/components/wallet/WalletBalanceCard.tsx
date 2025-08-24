@@ -25,7 +25,7 @@ const WalletBalanceCard: React.FC<WalletBalanceCardProps> = ({
           <div className="p-2 bg-orange-100 rounded-lg">
             <Wallet className="w-6 h-6 text-orange-600" />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">Số dư ví</h2>
+          {/* <h2 className="text-lg font-semibold text-gray-900">Số dư ví</h2> */}
         </div>
         <div className="flex items-center space-x-2">
           <button
@@ -55,7 +55,7 @@ const WalletBalanceCard: React.FC<WalletBalanceCardProps> = ({
           <div className="animate-pulse h-12 w-48 bg-gray-200 rounded-lg"></div>
         ) : (
           <div className="space-y-1">
-            <div className="text-3xl font-bold text-gray-900">
+            <div className="text-xl font-bold text-gray-900">
               {showBalance ? formatCurrency(balance) : '••••••••'}
             </div>
             <p className="text-gray-600 text-sm">Số dư khả dụng</p>

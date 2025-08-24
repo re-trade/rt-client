@@ -25,8 +25,8 @@ interface Props {
 const fields = [
   { key: 'customerName', label: 'Họ và tên', type: 'input' },
   { key: 'phoneNumber', label: 'Số điện thoại', type: 'input' },
-  { key: 'name', label: 'Tên địa chỉ', type: 'input' },
-  { key: 'addressLine', label: 'Địa chỉ chi tiết', type: 'input' },
+  { key: 'name', label: 'Tên địa chỉ (Nhà riêng, Công ty, etc)', type: 'input' },
+  { key: 'addressLine', label: 'Địa chỉ chi tiết (Tên đường, số nhà, etc)', type: 'input' },
   { key: 'country', label: 'Tỉnh/Thành phố', type: 'dropdown' },
   { key: 'district', label: 'Quận/Huyện', type: 'dropdown' },
   { key: 'ward', label: 'Phường/Xã', type: 'dropdown' },
@@ -171,7 +171,7 @@ export default function AddressCreateDialog({
               />
             ))}
 
-            <div className="form-control col-span-1 md:col-span-2 flex flex-col gap-4 mt-2 border-t border-orange-200 pt-4">
+            <div className="form-control col-span-1 md:col-span-2 flex flex-col gap-2 border-t border-orange-200">
               <div className="flex items-center">
                 <input
                   type="checkbox"

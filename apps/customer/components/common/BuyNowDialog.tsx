@@ -6,10 +6,28 @@ import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
 import { TProduct } from '@/services/product.api';
 import { CreateOrderRequest } from '@services/order.api';
-import { AlertTriangle, Check, CreditCard, MapPin, X } from 'lucide-react';
+import AddressCreateDialog from '@/components/address/AddressCreateDialog';
+import { AlertTriangle, Check, CreditCard, MapPin, X, Plus, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { useCheckoutAddressManager } from '@/hooks/use-checkout-address-manager';
+import { set } from 'date-fns';
+
+// Updated TAddress type with additional fields
+export type TAddress = {
+  id: string;
+  customerName: string;
+  phone: string;
+  state: string;
+  country: string;
+  district: string;
+  ward: string;
+  addressLine: string;
+  name: string;
+  defaulted: boolean;
+  type: number;
+};
 
 interface BuyNowDialogProps {
   isOpen: boolean;
@@ -41,11 +59,39 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
     clearError: clearPaymentError,
   } = usePayment();
 
+  const {
+    addresses,
+    selectedAddress: addressManagerSelectedAddress,
+    isCreateOpen,
+    isSelectionOpen,
+    openSelectionDialog,
+    openCreateFromSelection,
+    closeDialogs,
+    selectAddress: addressManagerSelectAddress,
+    createAddress,
+    formData,
+    errors,
+    touched,
+    provinces,
+    districts,
+    wards,
+    loading: addressLoading,
+    submitting,
+    addressesLoading,
+    handleFieldChange,
+    handleFieldBlur,
+
+  } = useCheckoutAddressManager();
+
   const [quantity, setQuantity] = useState(initialQuantity);
   const [showResult, setShowResult] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<'details' | 'processing' | 'result'>('details');
+
+  // Address selection states
+  const [showAddressDropdown, setShowAddressDropdown] = useState(false);
+  const [showCreateAddressDialog, setShowCreateAddressDialog] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -54,12 +100,30 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
       setShowResult(false);
       setOrderSuccess(false);
       setCreatedOrderId(null);
+      setShowAddressDropdown(false);
+      setShowCreateAddressDialog(false);
       clearError();
       clearPaymentError();
 
       getPaymentMethods().catch(console.error);
     }
-  }, [isOpen, initialQuantity, product.quantity, getPaymentMethods, clearError, clearPaymentError]);
+  }, [
+    isOpen, 
+    initialQuantity, 
+    product.quantity, 
+    getPaymentMethods, 
+    clearError, 
+    clearPaymentError,
+  ]);
+
+  // Debug logs để kiểm tra dữ liệu
+  useEffect(() => {
+    if (isOpen) {
+      console.log('BuyNowDialog - Provinces loaded:', provinces?.length);
+      console.log('BuyNowDialog - Address loading:', addressLoading);
+      console.log('BuyNowDialog - Form data:', formData);
+    }
+  }, [isOpen, provinces, addressLoading, formData]);
 
   const calculateOrderSummary = () => {
     const originalPrice = product.currentPrice * quantity;
@@ -81,6 +145,30 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
   const handleQuantityChange = (newQuantity: number) => {
     const validQuantity = Math.max(1, Math.min(newQuantity, product.quantity));
     setQuantity(validQuantity);
+  };
+
+  const handleAddressSelect = (addressId: string) => {
+    selectAddress(addressId);
+    setShowAddressDropdown(false);
+  };
+
+  const handleCreateAddressClick = () => {
+    setShowAddressDropdown(false);
+    setShowCreateAddressDialog(true);
+  };
+
+  const handleCreateAddressSuccess = async () => {
+    try {
+      const success = await createAddress();
+      if (success) {
+        setShowCreateAddressDialog(false);
+        setShowAddressDropdown(false);
+      }
+      return false;
+    } catch (error) {
+      console.error('Error creating address:', error);
+      return false;
+    }
   };
 
   const handleBuyNow = async () => {
@@ -143,11 +231,109 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
       router.push(`/orders/${createdOrderId}`);
     }
 
+    // Đóng tất cả dialogs
+    closeDialogs();
     onClose();
   };
 
   const isProcessing = isCreating || isInitializingPayment;
   const canPurchase = selectedAddressId && selectedPaymentMethodId && !isProcessing && quantity > 0;
+
+  const renderAddressSelector = () => {
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setShowAddressDropdown(!showAddressDropdown)}
+          className={`w-full rounded-lg border bg-white px-4 py-3 text-left flex items-center justify-between transition-all duration-200 ${showAddressDropdown
+              ? 'border-orange-600 ring-2 ring-orange-200'
+              : 'border-gray-300 hover:border-orange-400'
+            }`}
+        >
+          <div className="flex-1">
+            {selectedAddress ? (
+              <div>
+                <div className="font-medium text-gray-900">{selectedAddress.name}</div>
+                <div className="text-sm text-gray-600">
+                  {selectedAddress.customerName} 
+                </div>
+                <div className="text-gray-600"> Số điện thoại:  {selectedAddress.phone} </div>
+                <div className="text-sm text-gray-500 mt-1">
+                Địa chỉ:  {selectedAddress.addressLine}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.state}, {selectedAddress.country}
+                </div>
+              </div>
+            ) : (
+              <span className="text-gray-500">-- Chọn địa chỉ giao hàng --</span>
+            )}
+          </div>
+          <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showAddressDropdown ? 'rotate-180' : ''
+            }`} />
+        </button>
+
+        {showAddressDropdown && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+            {contacts && contacts.length > 0 ? (
+              contacts.map((address) => (
+                <button
+                  key={address.id}
+                  onClick={() => handleAddressSelect(address.id)}
+                  className={`w-full text-left px-4 py-3 hover:bg-orange-50 transition-colors duration-200 border-b border-gray-100 last:border-b-0 ${selectedAddressId === address.id ? 'bg-orange-50 border-orange-200' : ''
+                    }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 mt-1">
+                      <div className={`w-3 h-3 rounded-full ${address.defaulted ? 'bg-green-500' : 'bg-gray-300'
+                        }`}></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-gray-900">{address.name}</span>
+                        {address.defaulted && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                            Mặc định
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-700 mb-1">
+                        {address.customerName} - {address.phone}
+                      </div>
+                      <div className="text-xs text-gray-500 line-clamp-2">
+                        {address.addressLine}, {address.ward}, {address.district}, {address.state}, {address.country}
+                      </div>
+                    </div>
+                    {selectedAddressId === address.id && (
+                      <Check className="w-4 h-4 text-orange-600 flex-shrink-0 mt-1" />
+                    )}
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="px-4 py-6 text-center text-gray-500">
+                <MapPin className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm">Chưa có địa chỉ nào</p>
+              </div>
+            )}
+
+            {/* Add New Address Button */}
+            <button
+              onClick={handleCreateAddressClick}
+              className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-200 border-t border-gray-200 flex items-center gap-3 text-orange-600 hover:text-orange-700"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="font-medium">Thêm địa chỉ mới</span>
+            </button>
+          </div>
+        )}
+
+        {/* Overlay to close dropdown */}
+        {showAddressDropdown && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowAddressDropdown(false)}
+          />
+        )}
+      </div>
+    );
+  };
 
   const renderContent = () => {
     switch (currentStep) {
@@ -308,32 +494,29 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                 Địa chỉ giao hàng
               </h4>
 
-              <select
-                value={selectedAddressId ?? ''}
-                onChange={(e) => selectAddress(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 focus:border-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition-all duration-200"
-              >
-                <option value="" disabled>
-                  -- Chọn địa chỉ --
-                </option>
-                {contacts?.map((address) => (
-                  <option key={address.id} value={address.id}>
-                    {address.customerName} - {address.phone} - {address.name}
-                  </option>
-                ))}
-              </select>
+              {renderAddressSelector()}
 
               {selectedAddress && (
-                <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-start gap-2">
+                <div className="mt-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                  <div className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
                     <div className="text-sm">
-                      <p className="font-semibold text-gray-800">{selectedAddress.name}</p>
-                      <p className="text-gray-600">
-                        {selectedAddress.customerName} - {selectedAddress.phone}
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold text-gray-800">{selectedAddress.name}</p>
+                        {selectedAddress.defaulted && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                            Mặc định
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-gray-700 mb-1">
+                        {selectedAddress.customerName} 
                       </p>
                       <p className="text-gray-600">
-                        {selectedAddress.addressLine}, {selectedAddress.ward},{' '}
+                         Số điện thoại: {selectedAddress.phone}
+                        </p>
+                      <p className="text-gray-600">
+                       Địa chỉ:  {selectedAddress.addressLine}, {selectedAddress.ward},{' '}
                         {selectedAddress.district}, {selectedAddress.state},{' '}
                         {selectedAddress.country}
                       </p>
@@ -370,11 +553,10 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                   {paymentMethods.map((method) => (
                     <div
                       key={method.id}
-                      className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 ${
-                        selectedPaymentMethodId === method.id
+                      className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 ${selectedPaymentMethodId === method.id
                           ? 'border-orange-600 bg-orange-50 ring-2 ring-orange-200'
                           : 'border-gray-200 hover:border-orange-400 bg-white hover:shadow-md'
-                      }`}
+                        }`}
                       onClick={() => selectPaymentMethod(method.id)}
                     >
                       <div className="flex items-center gap-3">
@@ -418,11 +600,10 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
               <button
                 onClick={handleBuyNow}
                 disabled={!canPurchase}
-                className={`w-full font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
-                  canPurchase
+                className={`w-full font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${canPurchase
                     ? 'bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white shadow-lg hover:shadow-xl'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
-                }`}
+                  }`}
               >
                 {isProcessing ? (
                   <>
@@ -454,26 +635,45 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
   };
 
   return (
-    <Modal
-      opened={isOpen}
-      onClose={handleClose}
-      title={currentStep === 'details' ? 'Mua ngay' : ''}
-      size="lg"
-      centered
-      closeOnClickOutside={currentStep !== 'processing'}
-      closeOnEscape={currentStep !== 'processing'}
-    >
-      {currentStep === 'details' && (
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors z-10"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      )}
+    <>
+      <Modal
+        opened={isOpen}
+        onClose={handleClose}
+        title={currentStep === 'details' ? 'Mua ngay' : ''}
+        size="lg"
+        centered
+        closeOnClickOutside={currentStep !== 'processing'}
+        closeOnEscape={currentStep !== 'processing'}
+      >
+        {currentStep === 'details' && (
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors z-10"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
 
-      {renderContent()}
-    </Modal>
+        {renderContent()}
+      </Modal>
+
+      {/* Address Create Dialog */}
+      <AddressCreateDialog
+        open={showCreateAddressDialog}
+        onCreate={handleCreateAddressSuccess}
+        onClose={() => setShowCreateAddressDialog(false)}
+        formData={formData}
+        errors={errors}
+        touched={touched}
+        provinces={provinces}
+        districts={districts}
+        wards={wards}
+        loading={addressLoading}
+        submitting={submitting}
+        onFieldChange={handleFieldChange}
+        onFieldBlur={handleFieldBlur}
+      />
+    </>
   );
 };
 

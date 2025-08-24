@@ -1,21 +1,26 @@
 'use client';
 import { SelectBank } from '@/components/common/SelectBank';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pagination } from '@/components/ui/pagination';
 import { useBankInfoPagination } from '@/hooks/use-bank-info-pagination';
-import {
-  BankInfor,
-  BankResponse,
-  CreateBankInfor,
-  walletApi,
-  WalletResponse,
-} from '@/service/wallet.api';
+import { BankInfor, BankResponse, CreateBankInfor, walletApi } from '@/service/wallet.api';
 import { Building2, CheckCircle, CreditCard, Edit, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
 interface BankInfoActiveTabProps {
   isAddingBank: boolean;
   setIsAddingBank: (value: boolean) => void;
@@ -40,7 +45,9 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   } = useBankInfoPagination();
 
   const [listBanks, setListBanks] = useState<BankResponse[]>([]);
-  const [wallet, setWallet] = useState<WalletResponse>();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [bankToDelete, setBankToDelete] = useState<BankInfor | null>(null);
+
   const [editingBank, setEditingBank] = useState<BankInfor | null>(null);
   const [newBankInfo, setNewBankInfo] = useState<CreateBankInfor>({
     bankName: '',
@@ -52,10 +59,7 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [wallet, listBanks] = await Promise.all([
-          walletApi.getWalletBySeller(),
-          walletApi.getTheBanks(),
-        ]);
+        const listBanks = await walletApi.getTheBanks();
         setListBanks(listBanks);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -73,16 +77,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     setPageSize(size);
     setPage(1);
   };
-
-  const formatDate = (createdDate: string) => {
-    return new Date(createdDate).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
-  // ...existing code...
 
   const handleAddBank = async () => {
     if (newBankInfo.bankName && newBankInfo.accountNumber && newBankInfo.userBankName) {
@@ -123,7 +117,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     }
   };
 
-  // ...existing code...
   const handleEditBank = (bank: BankInfor) => {
     setEditingBank(bank);
     setNewBankInfo({
@@ -164,37 +157,29 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
     }
   };
 
-  const handleDeleteBank = async (bankId: string) => {
-    // Thêm confirmation
-    if (!confirm('Bạn có chắc chắn muốn xóa tài khoản ngân hàng này?')) {
-      return;
-    }
+  const handleDeleteBank = async () => {
+    if (!bankToDelete) return;
 
     try {
-      const response = await walletApi.deleteBankInfor(bankId);
+      const response = await walletApi.deleteBankInfor(bankToDelete.id);
       if (!response || !response.success) {
-        toast.error('Không thể xóa tài khoản ngân hàng');
+        toast.error(response.messages || 'Không thể xóa tài khoản ngân hàng');
         return;
       }
-
-      setBankInfos(bankInfos.filter((bank) => bank.id !== bankId));
+      setBankInfos(bankInfos.filter((bank) => bank.id !== bankToDelete.id));
       toast.success('Xóa tài khoản ngân hàng thành công');
+      setIsDeleteDialogOpen(false);
+      setBankToDelete(null);
       refreshBankInfos();
     } catch (error) {
       console.error('Error deleting bank:', error);
       toast.error('Có lỗi xảy ra khi xóa tài khoản ngân hàng');
     }
   };
-  const handleSetDefault = async (bankId: string) => {
-    try {
-      setBankInfos(
-        bankInfos.map((bank) => ({
-          ...bank,
-        })),
-      );
-    } catch (error) {
-      console.error('Error setting default bank:', error);
-    }
+
+  const confirmDeleteBank = (bank: BankInfor) => {
+    setBankToDelete(bank);
+    setIsDeleteDialogOpen(true);
   };
 
   const cancelBankForm = () => {
@@ -223,19 +208,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
   const getBankIconUrl = (bankName: string) => {
     const bank = listBanks.find((b) => b.name === bankName);
     return bank ? bank.url : '';
-  };
-
-  const getStatusDisplayName = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'Hoàn thành';
-      case 'pending':
-        return 'Đang xử lý';
-      case 'failed':
-        return 'Thất bại';
-      default:
-        return status;
-    }
   };
 
   const BankIcon = ({ bankUrl, bankName }: { bankUrl?: string; bankName: string }) => {
@@ -355,7 +327,6 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
 
       <div className="grid gap-4">
         {isLoading ? (
-          // Loading skeleton
           Array.from({ length: pageSize }).map((_, index) => (
             <Card key={`skeleton-${index}`} className="border">
               <CardContent className="p-6">
@@ -391,52 +362,81 @@ export function BankInfoActiveTab({ isAddingBank, setIsAddingBank }: BankInfoAct
             </CardContent>
           </Card>
         ) : (
-          bankInfos
-            .filter((bank) => !editingBank || bank.id !== editingBank.id)
-            .map((bank) => (
-              <Card key={bank.id} className="border transition-all hover:shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-[140px] h-[84px]">
-                          <BankIcon
-                            bankUrl={getBankIconUrl(bank.bankName)}
-                            bankName={bank.bankName}
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-lg font-semibold text-gray-900">{bank.bankName}</h4>
-                        </div>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="h-4 w-4" />
-                            <span className="font-mono">{bank.accountNumber}</span>
+          <>
+            {bankInfos
+              .filter((bank) => !editingBank || bank.id !== editingBank.id)
+              .map((bank) => (
+                <Card key={bank.id} className="border transition-all hover:shadow-md">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-[140px] h-[84px]">
+                            <BankIcon
+                              bankUrl={getBankIconUrl(bank.bankName)}
+                              bankName={bank.bankName}
+                            />
                           </div>
-                          <div className="font-medium text-gray-900">{bank.userBankName}</div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-lg font-semibold text-gray-900">{bank.bankName}</h4>
+                          </div>
+                          <div className="space-y-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-2">
+                              <CreditCard className="h-4 w-4" />
+                              <span className="font-mono">{bank.accountNumber}</span>
+                            </div>
+                            <div className="font-medium text-gray-900">{bank.userBankName}</div>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEditBank(bank)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => confirmDeleteBank(bank)}
+                          className="text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEditBank(bank)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteBank(bank.id)}
-                        className="text-red-600 border-red-200 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                  </CardContent>
+                </Card>
+              ))}
+          </>
         )}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Xác nhận xóa tài khoản</AlertDialogTitle>
+              <AlertDialogDescription>
+                Bạn có chắc chắn muốn xóa tài khoản ngân hàng{' '}
+                <strong>{bankToDelete?.bankName}</strong> với số tài khoản{' '}
+                <strong>"{bankToDelete?.accountNumber}"</strong>?
+                <br />
+                <span className="text-red-600 font-medium">Hành động này không thể hoàn tác.</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setBankToDelete(null);
+                }}
+              >
+                Hủy
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteBank} className="bg-red-600 hover:bg-red-700">
+                Xóa
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       {/* Pagination */}
