@@ -43,7 +43,6 @@ export interface OrderCombo {
   updateDate?: string;
 }
 
-// Response for order detail endpoint
 export interface OrderDetailResponse {
   content: OrderCombo;
   messages: string[];
@@ -193,6 +192,52 @@ export const orderApi = {
       throw new Error('Failed to confirm retrieved status');
     } catch (error) {
       throw error;
+    }
+  },
+
+  async getCustomerOrderComboCanReport(
+    page: number = 0,
+    size: number = 10,
+  ): Promise<{
+    content: OrderCombo[];
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+  }> {
+    try {
+      const response = await authApi.default.get<IResponseObject<OrderCombo[]>>(
+        '/orders/customer/combo/can-report',
+        {
+          params: { page, size },
+        },
+      );
+      const data = response.data;
+      if (data.success) {
+        return {
+          content: data.content,
+          page: data.pagination?.page || 0,
+          size: data.pagination?.size || 0,
+          totalPages: data.pagination?.totalPages || 0,
+          totalElements: data.pagination?.totalElements || 0,
+        };
+      } else {
+        return {
+          content: [],
+          page: 0,
+          size: 10,
+          totalElements: 0,
+          totalPages: 0,
+        };
+      }
+    } catch {
+      return {
+        content: [],
+        page: 0,
+        size: 10,
+        totalElements: 0,
+        totalPages: 0,
+      };
     }
   },
 };
