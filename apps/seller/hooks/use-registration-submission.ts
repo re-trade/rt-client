@@ -14,7 +14,7 @@ export function useRegistrationSubmission() {
   const { validateStep } = useRegistrationValidation();
   const { getSelectedProvince, getSelectedDistrict, getSelectedWard } =
     useRegistrationAddressData();
-  const { showToast } = useToast();
+  const { showToast, showToastFromResponse } = useToast();
 
   const rollbackSellerProfile = useCallback(
     async (sellerId?: string) => {
@@ -25,10 +25,12 @@ export function useRegistrationSubmission() {
 
       try {
         showToast('Đang thực hiện rollback...', 'info');
-        const success = await sellerApi.rollbackSellerProfile(sellerId);
+        const response = await sellerApi.rollbackSellerProfile(sellerId);
 
-        if (success) {
-          showToast('Đã rollback thành công', 'success');
+        if (response?.success) {
+          showToastFromResponse(response, 'success', 'Đã rollback thành công');
+        } else if (response) {
+          showToastFromResponse(response, 'error', 'Rollback thất bại');
         } else {
           showToast('Rollback thất bại', 'error');
         }
@@ -36,7 +38,7 @@ export function useRegistrationSubmission() {
         showToast('Rollback thất bại', 'error');
       }
     },
-    [showToast],
+    [showToast, showToastFromResponse],
   );
 
   const submitRegistration = useCallback(async (): Promise<boolean> => {
@@ -95,8 +97,16 @@ export function useRegistrationSubmission() {
       };
 
       const sellerResult = await sellerApi.registerSeller(requestBody);
-      if (!sellerResult) {
-        showToast('Đăng ký không thành công! Vui lòng kiểm tra thông tin và thử lại.', 'error');
+      if (!sellerResult?.success) {
+        if (sellerResult) {
+          showToastFromResponse(
+            sellerResult,
+            'error',
+            'Đăng ký không thành công! Vui lòng kiểm tra thông tin và thử lại.',
+          );
+        } else {
+          showToast('Đăng ký không thành công! Vui lòng kiểm tra thông tin và thử lại.', 'error');
+        }
         return false;
       }
 
@@ -110,7 +120,7 @@ export function useRegistrationSubmission() {
             : {}),
         });
 
-        await rollbackSellerProfile(sellerResult.id);
+        await rollbackSellerProfile(sellerResult.content?.id);
         return false;
       }
 
@@ -120,14 +130,22 @@ export function useRegistrationSubmission() {
           frontIdentity: formData.identityFrontImage,
         });
 
-        if (!verificationResult) {
-          showToast('Tải lên giấy tờ xác minh không thành công!', 'error');
-          await rollbackSellerProfile(sellerResult.id);
+        if (!verificationResult?.success) {
+          if (verificationResult) {
+            showToastFromResponse(
+              verificationResult,
+              'error',
+              'Tải lên giấy tờ xác minh không thành công!',
+            );
+          } else {
+            showToast('Tải lên giấy tờ xác minh không thành công!', 'error');
+          }
+          await rollbackSellerProfile(sellerResult.content?.id);
           return false;
         }
       } catch (error) {
         showToast('Tải lên giấy tờ xác minh không thành công!', 'error');
-        await rollbackSellerProfile(sellerResult.id);
+        await rollbackSellerProfile(sellerResult.content?.id);
         return false;
       }
 

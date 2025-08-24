@@ -1,6 +1,7 @@
 'use client';
 
 import LoadingSpinner from '@/components/common/Loading';
+import { fileApi } from '@services/file.api';
 import { orderApi, type OrderCombo, OrderItem } from '@services/order.api';
 import {
   customerReportApi,
@@ -11,7 +12,6 @@ import {
 import { IconAlertCircle, IconCheck, IconUpload, IconX } from '@tabler/icons-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { storageApi } from '../../../../../seller/service/storage.api';
 
 export default function CreateReportPage() {
   const router = useRouter();
@@ -95,7 +95,7 @@ export default function CreateReportPage() {
       let uploadedUrls: string[] = [];
       if (formData.evidenceFiles.length > 0) {
         setIsUploading(true);
-        const response = await storageApi.fileBulkUpload(formData.evidenceFiles);
+        const response = await fileApi.fileBulkUpload(formData.evidenceFiles);
         if (response.success && response.content) {
           uploadedUrls = response.content;
         } else {
