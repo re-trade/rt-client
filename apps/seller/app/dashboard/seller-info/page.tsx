@@ -37,7 +37,7 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-
+import { toast } from 'sonner';
 export default function ShopInfoManagement() {
   const [sellerInfo, setSellerInfo] = useState<SellerProfileResponse>();
   const [formData, setFormData] = useState<SellerProfileResponse>();
@@ -195,7 +195,12 @@ export default function ShopInfoManagement() {
       phoneNumber: formData.phoneNumber || '',
     };
 
-    await sellerApi.updateSellerProfile(payload);
+    const response = await sellerApi.updateSellerProfile(payload);
+    if (!response.success) {
+      toast.error(response.messages || 'Cập nhật thông tin không thành công');
+      return;
+    }
+    toast.success('Cập nhật thông tin thành công');
     const updated = { ...formData, avatarUrl, background };
     setSellerInfo(updated);
     setFormData(updated);
@@ -206,7 +211,12 @@ export default function ShopInfoManagement() {
 
   const handleEmailSave = async () => {
     if (!formData) return;
-
+    const email = formData.email || "";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Email không hợp lệ!");
+      return;
+    }
     const payload: SellerProfileUpdateRequest = {
       shopName: formData.shopName || '',
       avatarUrl: formData.avatarUrl,
@@ -220,14 +230,24 @@ export default function ShopInfoManagement() {
       phoneNumber: formData.phoneNumber || '',
     };
 
-    await sellerApi.updateSellerProfile(payload);
+    const response = await sellerApi.updateSellerProfile(payload);
+    if (!response.success) {
+      toast.error(response.messages || 'Cập nhật email không thành công');
+      return;
+    }
+    toast.success('Cập nhật email thành công');
     setSellerInfo(formData);
     setIsEditingEmail(false);
   };
 
   const handlePhoneSave = async () => {
     if (!formData) return;
-
+    const phone = formData.phoneNumber || "";
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+      toast.error("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0!");
+      return;
+    }
     const payload: SellerProfileUpdateRequest = {
       shopName: formData.shopName || '',
       avatarUrl: formData.avatarUrl,
@@ -241,7 +261,13 @@ export default function ShopInfoManagement() {
       phoneNumber: formData.phoneNumber || '',
     };
 
-    await sellerApi.updateSellerProfile(payload);
+    const response = await sellerApi.updateSellerProfile(payload);
+    if (!response.success) {
+      toast.error(response.messages || 'Cập nhật số điện thoại không thành công');
+      return;
+    }
+    toast.success('Cập nhật số điện thoại thành công');
+    setSellerInfo(formData);
     setSellerInfo(formData);
     setIsEditingPhone(false);
   };
@@ -477,11 +503,10 @@ export default function ShopInfoManagement() {
                               <Button
                                 onClick={handleSave}
                                 disabled={!hasChanges}
-                                className={`${
-                                  hasChanges
-                                    ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-md hover:shadow-lg'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                } transition-all duration-300 py-2 px-4 text-sm font-semibold`}
+                                className={`${hasChanges
+                                  ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-md hover:shadow-lg'
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                  } transition-all duration-300 py-2 px-4 text-sm font-semibold`}
                               >
                                 <Save className="h-4 w-4 mr-2" />
                                 <span className="hidden sm:inline">Lưu thay đổi</span>
@@ -631,9 +656,11 @@ export default function ShopInfoManagement() {
                             <div className="flex gap-2">
                               <Input
                                 value={formData.phoneNumber || ''}
-                                onChange={(e) =>
-                                  setFormData({ ...formData, phoneNumber: e.target.value })
-                                }
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/\D/g, ""); // chỉ giữ số
+                                  setFormData({ ...formData, phoneNumber: value });
+                                }}
+                                maxLength={10} // giới hạn 10 ký tự
                                 className="border-2 border-gray-300 focus:border-blue-500 transition-colors duration-300 text-lg h-[56px]"
                                 placeholder="0123456789"
                               />

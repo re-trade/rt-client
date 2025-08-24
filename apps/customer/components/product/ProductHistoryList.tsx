@@ -193,14 +193,6 @@ export function ProductHistoryList({ history, loading = false }: ProductHistoryL
               </div>
             ))}
           </div>
-          <div className="mt-8 flex justify-center">
-            <div className="flex items-center gap-2 text-gray-400">
-              <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
-              <span className="text-sm" style={{ color: '#9ca3af' }}>
-                Bắt đầu lịch sử sản phẩm
-              </span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

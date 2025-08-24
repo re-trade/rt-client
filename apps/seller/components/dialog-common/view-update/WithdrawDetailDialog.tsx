@@ -238,7 +238,7 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
                     </div>
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900">Tiến trình xử lý</h4>
-                      <p className="text-sm text-gray-500">Timeline của giao dịch</p>
+                      <p className="text-sm text-gray-500">Tiến trình của giao dịch</p>
                     </div>
                   </div>
 

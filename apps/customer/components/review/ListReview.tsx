@@ -46,6 +46,7 @@ const ReviewsList = ({ productId, totalReviews = 0 }: ReviewProps) => {
       const pageSize = 4;
       const data = await reviewApi.getReviews(productId, page, pageSize);
 
+      console.log('Fetched reviews:', data);
       const validatedData = data.map((review) => ({
         ...review,
         author: {
