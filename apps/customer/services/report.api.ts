@@ -45,13 +45,14 @@ export type CreateReportRequest = {
   typeReport: string;
   content: string;
   orderId?: string;
-  productId?: string;
+  productId: string;
   evidenceUrls?: string[];
 };
 
 export type ReportFormData = {
   comboId: string;
   sellerId: string;
+  productId: string;
   typeReport: ReportType;
   content: string;
   evidenceUrls: string[];
@@ -59,6 +60,7 @@ export type ReportFormData = {
 
 export type ReportFormErrors = {
   comboId?: string;
+  productId?: string;
   typeReport?: string;
   content?: string;
   evidenceUrls?: string;
@@ -85,7 +87,6 @@ export type SortOption = {
   direction: 'asc' | 'desc';
 };
 
-// Pagination types
 export type PaginatedResponse<T> = {
   content: T[];
   page: number;
@@ -237,6 +238,4 @@ export const customerReportApi = {
       return ['Khác'];
     }
   },
-
-  // Import OrderCombo type from order.api.ts
 };

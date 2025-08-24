@@ -1,6 +1,7 @@
 'use client';
 
 import LoadingSpinner from '@/components/common/Loading';
+import { orderApi, type OrderCombo } from '@services/order.api';
 import {
   customerReportApi,
   type ReportFormData,
@@ -18,6 +19,7 @@ export default function CreateReportPage() {
   const sellerId = searchParams.get('sellerId');
 
   const [formData, setFormData] = useState<ReportFormData>({
+    productId: '',
     comboId: comboId || '',
     sellerId: sellerId || '',
     typeReport: '' as ReportType,
@@ -29,6 +31,8 @@ export default function CreateReportPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
+  const [comboDetails, setComboDetails] = useState<OrderCombo | null>(null);
+  const [isFetchingCombo, setIsFetchingCombo] = useState(true);
 
   useEffect(() => {
     if (!comboId || !sellerId) {
@@ -36,20 +40,33 @@ export default function CreateReportPage() {
       return;
     }
 
-    const fetchReportTypes = async () => {
+    const fetchInitialData = async () => {
       try {
-        const types = await customerReportApi.getReportTypes();
+        setIsFetchingCombo(true);
+        const [types, combo] = await Promise.all([
+          customerReportApi.getReportTypes(),
+          orderApi.getOrderById(comboId),
+        ]);
         setReportTypes(types);
+        setComboDetails(combo);
       } catch (error) {
-        console.error('Error fetching report types:', error);
+        console.error('Error fetching initial data for report creation:', error);
+        // Redirect or show an error message if fetching fails
+        setErrors((prev) => ({ ...prev, general: 'Không thể tải thông tin đơn hàng.' }));
+      } finally {
+        setIsFetchingCombo(false);
       }
     };
 
-    fetchReportTypes();
+    fetchInitialData();
   }, [comboId, sellerId, router]);
 
   const validateForm = (): boolean => {
     const newErrors: ReportFormErrors = {};
+
+    if (!formData.productId) {
+      newErrors.productId = 'Vui lòng chọn một sản phẩm để báo cáo';
+    }
 
     if (!formData.typeReport) {
       newErrors.typeReport = 'Vui lòng chọn loại báo cáo';
@@ -79,6 +96,7 @@ export default function CreateReportPage() {
         typeReport: formData.typeReport,
         content: formData.content.trim(),
         orderId: formData.comboId,
+        productId: formData.productId,
         evidenceUrls: formData.evidenceUrls,
       });
 
@@ -165,6 +183,62 @@ export default function CreateReportPage() {
                 <p className="font-medium">{formData.sellerId}</p>
               </div>
             </div>
+            {isFetchingCombo ? (
+              <div className="space-y-4">
+                <div className="h-5 bg-gray-200 rounded w-32 animate-pulse"></div>
+                <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                      <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div className="w-16 h-16 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              comboDetails && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Chọn sản phẩm để báo cáo <span className="text-red-500">*</span>
+                  </label>
+                  <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                    {comboDetails.products.map((product: OrderProduct) => (
+                      <label
+                        key={product.productId}
+                        className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      >
+                        <input
+                          type="radio"
+                          name="product-selection"
+                          value={product.productId}
+                          checked={formData.productId === product.productId}
+                          onChange={(e) =>
+                            setFormData((prev) => ({ ...prev, productId: e.target.value }))
+                          }
+                          className="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500"
+                        />
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{product.name}</p>
+                          <p className="text-sm text-gray-600">Số lượng: {product.quantity}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  {errors.productId && (
+                    <p className="text-red-500 text-sm mt-1">{errors.productId}</p>
+                  )}
+                </div>
+              )
+            )}
           </div>
 
           <div>

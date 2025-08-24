@@ -1,8 +1,5 @@
 'use client';
 
-import { IconChevronDown, IconFilter, IconPlus, IconSearch } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import Pagination from '@/components/common/Pagination';
 import ReportCard from '@/components/report/ReportCard';
 import ReportErrorBoundary from '@/components/report/ReportErrorBoundary';
@@ -14,6 +11,9 @@ import {
   type ReportStatus,
   type ReportType,
 } from '@services/report.api';
+import { IconChevronDown, IconFilter, IconPlus, IconSearch } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 function ReportsPageContent() {
   const router = useRouter();

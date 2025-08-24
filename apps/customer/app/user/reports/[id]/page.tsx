@@ -1,5 +1,14 @@
 'use client';
 
+import LoadingSpinner from '@/components/common/Loading';
+import Pagination from '@/components/common/Pagination';
+import {
+  customerReportApi,
+  type CustomerReportEvidenceResponse,
+  type CustomerReportResponse,
+  type ReportStatus,
+} from '@services/report.api';
+import { getSellerProfile, TSellerProfile } from '@services/seller.api';
 import {
   IconArrowLeft,
   IconCalendar,
@@ -10,14 +19,6 @@ import {
 } from '@tabler/icons-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import LoadingSpinner from '../../../../components/common/Loading';
-import Pagination from '../../../../components/common/Pagination';
-import {
-  customerReportApi,
-  type CustomerReportEvidenceResponse,
-  type CustomerReportResponse,
-  type ReportStatus,
-} from '../../../../services/report.api';
 
 export default function ReportDetailPage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function ReportDetailPage() {
 
   const [report, setReport] = useState<CustomerReportResponse | null>(null);
   const [evidences, setEvidences] = useState<CustomerReportEvidenceResponse[]>([]);
+  const [seller, setSeller] = useState<TSellerProfile | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [evidenceLoading, setEvidenceLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +68,20 @@ export default function ReportDetailPage() {
       fetchEvidences();
     }
   }, [reportId]);
+  useEffect(() => {
+    if (report?.sellerId) {
+      const fetchSellerProfile = async () => {
+        try {
+          const sellerData = await getSellerProfile(report.sellerId);
+          setSeller(sellerData);
+        } catch (err) {
+          console.error('Error fetching seller profile:', err);
+        }
+      };
+
+      fetchSellerProfile();
+    }
+  }, [report]);
 
   const getStatusColor = (status: ReportStatus) => {
     switch (status) {
@@ -187,17 +203,27 @@ export default function ReportDetailPage() {
       <div className="bg-white rounded-lg border border-orange-200 p-6 mb-6">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div className="flex items-center gap-3">
-            {report.sellerAvatarUrl && (
-              <img
-                src={report.sellerAvatarUrl}
-                alt={report.sellerName}
-                className="w-12 h-12 rounded-full object-cover"
-              />
+            {seller ? (
+              <>
+                <img
+                  src={seller.avatarUrl || ''}
+                  alt={seller.shopName}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">{seller.shopName}</h2>
+                  <p className="text-gray-600">Người bán</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
+                <div>
+                  <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </>
             )}
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">{report.sellerName}</h2>
-              <p className="text-gray-600">Người bán</p>
-            </div>
           </div>
 
           <div className={`px-4 py-2 rounded-lg border ${getStatusColor(report.resolutionStatus)}`}>
@@ -234,7 +260,7 @@ export default function ReportDetailPage() {
         <div>
           <h3 className="font-semibold text-gray-900 mb-3">Nội dung báo cáo</h3>
           <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-gray-700 leading-relaxed">{report.content}</p>
+            <p className="text-gray-900 leading-relaxed">{report.content}</p>
           </div>
         </div>
 
@@ -242,7 +268,7 @@ export default function ReportDetailPage() {
           <div className="mt-6">
             <h3 className="font-semibold text-gray-900 mb-3">Kết quả xử lý</h3>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 leading-relaxed">{report.resolutionDetail}</p>
+              <p className="text-gray-900 leading-relaxed">{report.resolutionDetail}</p>
               {report.resolutionDate && (
                 <p className="text-sm text-blue-600 mt-2">
                   Ngày xử lý: {formatDate(report.resolutionDate)}
