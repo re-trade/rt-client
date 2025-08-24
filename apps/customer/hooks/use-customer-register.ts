@@ -68,13 +68,13 @@ const registerSchema = Joi.object({
     .required()
     .min(3)
     .max(30)
-    .pattern(/^[a-z]+$/)
+    .pattern(/^[a-z][a-z0-9]*$/)
     .messages({
       'string.empty': 'Tên đăng nhập không được để trống',
       'string.min': 'Tên đăng nhập phải có ít nhất 3 ký tự',
       'string.max': 'Tên đăng nhập không được vượt quá 30 ký tự',
       'string.pattern.base':
-        'Tên đăng nhập chỉ được chứa chữ cái thường, không có số, ký tự đặc biệt hoặc khoảng trắng',
+        'Tên đăng nhập phải bắt đầu bằng chữ cái thường và chỉ chứa chữ cái thường và số',
     }),
   email: Joi.string()
     .email({ tlds: { allow: false } })
@@ -208,26 +208,26 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
       setUsernameValidation({
         isValid: false,
         isValidating: false,
-        message: 'Tên đăng nhập chỉ được chứa chữ cái thường',
+        message: 'Tên đăng nhập chỉ được chứa chữ cái thường và số',
       });
       return;
     }
 
-    if (/[0-9]/.test(username)) {
+    if (/^[0-9]/.test(username)) {
       setUsernameValidation({
         isValid: false,
         isValidating: false,
-        message: 'Tên đăng nhập không được chứa số',
+        message: 'Tên đăng nhập không được bắt đầu bằng số',
       });
       return;
     }
 
-    if (/[^a-z]/.test(username)) {
+    if (/[^a-z0-9]/.test(username)) {
       setUsernameValidation({
         isValid: false,
         isValidating: false,
         message:
-          'Tên đăng nhập chỉ được chứa chữ cái thường, không có ký tự đặc biệt hoặc khoảng trắng',
+          'Tên đăng nhập chỉ được chứa chữ cái thường và số, không có ký tự đặc biệt hoặc khoảng trắng',
       });
       return;
     }
@@ -382,7 +382,7 @@ export const useCustomerRegister = (): CustomerRegisterHookReturn => {
 
       if (name === 'username') {
         value = value.toLowerCase();
-        value = value.replace(/[^a-z]/g, '');
+        value = value.replace(/[^a-z0-9]/g, '');
         if (value.length > 30) {
           value = value.substring(0, 30);
         }
