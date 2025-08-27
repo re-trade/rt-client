@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +11,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ImageIcon, Upload, X } from 'lucide-react';
+import { Check, ImageIcon, Upload, X, Package } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-
+import { Checkbox } from '@/components/ui/checkbox';
 interface RetradeModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,6 +32,8 @@ interface RetradeModalProps {
   onSubmit: (thumbnailFile?: File) => void;
   isSubmitting: boolean;
   formatPrice: (price: number) => string;
+  status: 'INIT' | 'DRAFT';
+  setStatus: (status: 'INIT' | 'DRAFT') => void;
 }
 
 export function RetradeModal({
@@ -49,12 +52,13 @@ export function RetradeModal({
   setThumbnail,
   onSubmit,
   isSubmitting,
+  setStatus,
   formatPrice,
 }: RetradeModalProps) {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   const [thumbnailFile, setThumbnailFile] = useState<File | undefined>();
-
+  const [tick, setTick] = useState(false);
   useEffect(() => {
     return () => {
       if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
@@ -63,6 +67,10 @@ export function RetradeModal({
 
   const handleChooseThumbnail = () => {
     thumbnailInputRef.current?.click();
+  };
+  const handleTickChange = (checked: boolean) => {
+    setTick(checked);
+    setStatus(checked ? 'DRAFT' : 'INIT');
   };
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -261,6 +269,28 @@ export function RetradeModal({
                 </div>
               </div>
             </div>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="draft-checkbox"
+                checked={tick}
+                onCheckedChange={(checked) => handleTickChange(checked as boolean)}
+                className="h-5 w-5 rounded border-2 border-orange-500 bg-white data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500 data-[state=checked]:text-white focus:ring-orange-500 focus:ring-offset-0"
+              />
+              <Label
+                htmlFor="draft-checkbox"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2 cursor-pointer"
+              >
+                <Package className="w-4 h-4 text-orange-500" />
+                Lưu dưới dạng bản nháp
+              </Label>
+            </div>
+            <p className="text-xs text-gray-500">
+              {tick
+                ? 'Sản phẩm sẽ được lưu dưới dạng bản nháp và không được duyệt cho đến khi chuyển sang trạng thái khởi tạo.'
+                : 'Sản phẩm sẽ được lưu và gửi để duyệt ngay lập tức.'}
+            </p>
           </div>
         </div>
         <DialogFooter className="border-t pt-4 flex flex-col sm:flex-row gap-3">

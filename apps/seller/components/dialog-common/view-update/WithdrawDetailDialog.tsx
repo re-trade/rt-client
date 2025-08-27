@@ -206,7 +206,7 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
 
                   <div className="bg-gradient-to-br from-gray-50/50 to-white p-6 rounded-xl border border-gray-200/50 backdrop-blur-sm">
                     <div className="flex items-center gap-4">
-                      <div className="w-25 h-21 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
+                      <div className="w-25 h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
                         <BankIcon bankUrl={withdraw.bankUrl} bankName={withdraw.bankName || ''} />
                       </div>
                       <div className="flex-1 min-w-0 space-y-2">
@@ -313,43 +313,6 @@ export function WithdrawDetailDialog({ withdraw, onClose }: WithdrawDetailDialog
                         )}
                       </div>
                     </div>
-
-                    {/* Processing Duration */}
-                    {withdraw.processedDate && withdraw.processedDate !== '' && (
-                      <>
-                        <div className="flex justify-center">
-                          <div className="w-0.5 h-4 bg-gradient-to-b from-emerald-500 to-gray-300 rounded-full"></div>
-                        </div>
-                        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50/50 to-slate-50/50 rounded-xl border border-gray-200/50 backdrop-blur-sm">
-                          <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gray-500 to-slate-600 text-white rounded-xl shadow-lg flex-shrink-0">
-                            <Timer className="h-5 w-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wider">
-                              Thời gian xử lý
-                            </div>
-                            <div className="text-sm font-bold text-gray-900">
-                              {(() => {
-                                const created = new Date(withdraw.createdDate);
-                                const processed = new Date(withdraw.processedDate);
-                                const diffInMs = processed.getTime() - created.getTime();
-                                const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-                                const diffInHours = Math.floor(diffInMinutes / 60);
-                                const diffInDays = Math.floor(diffInHours / 24);
-
-                                if (diffInDays > 0) {
-                                  return `${diffInDays} ngày ${diffInHours % 24} giờ`;
-                                } else if (diffInHours > 0) {
-                                  return `${diffInHours} giờ ${diffInMinutes % 60} phút`;
-                                } else {
-                                  return `${diffInMinutes} phút`;
-                                }
-                              })()}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
                   </div>
                 </CardContent>
               </Card>

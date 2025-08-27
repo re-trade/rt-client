@@ -38,7 +38,7 @@ const getStatusConfig = (status: string) => {
       return {
         color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
         icon: <CheckCircle className="h-4 w-4" />,
-        text: 'Phê duyệt',
+        text: 'Đã hoàn thành',
         dotColor: 'bg-emerald-500',
       };
     case 'pending':
@@ -227,28 +227,12 @@ export function WithdrawHistoryActiveTab() {
                 return (
                   <TableRow
                     key={withdraw.id}
-                    className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${
-                      index === withdrawHistory.length - 1 ? 'border-b-0' : ''
-                    }`}
+                    className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${index === withdrawHistory.length - 1 ? 'border-b-0' : ''
+                      }`}
                   >
-                    <TableCell className="py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-                          <Hash className="h-4 w-4 text-gray-500 group-hover:text-blue-600" />
-                        </div>
-                        <span className="font-mono text-sm font-semibold text-blue-600 hover:text-blue-700">
-                          {snipppetCode.cutCode(withdraw.id)}
-                        </span>
-                      </div>
-                    </TableCell>
 
-                    <TableCell className="text-right py-5">
-                      <div className="text-right">
-                        <div className="font-bold text-lg text-gray-900">
-                          {formatCurrency(withdraw.amount)}₫
-                        </div>
-                      </div>
-                    </TableCell>
+
+
 
                     <TableCell className="py-5">
                       <div className="space-y-2">
@@ -270,7 +254,13 @@ export function WithdrawHistoryActiveTab() {
                         </div>
                       </div>
                     </TableCell>
-
+                    <TableCell className="text-right py-5">
+                      <div className="text-right">
+                        <div className="font-bold text-lg text-gray-900">
+                          {formatCurrency(withdraw.amount)}₫
+                        </div>
+                      </div>
+                    </TableCell>
                     <TableCell className="py-5">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-gray-400" />
