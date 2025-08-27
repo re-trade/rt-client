@@ -1,5 +1,6 @@
 'use client';
 
+import { SelectBankInfo } from '@/components/common/SelectBankInfo';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,7 +10,6 @@ import { BankInfor, walletApi, WithdrawCreate } from '@/service/wallet.api';
 import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { SelectBankInfo } from './SelectBankInfo';
 
 interface WithdrawDialogProps {
   open: boolean;
@@ -89,6 +89,9 @@ export function WithdrawDialog({
       return;
     }
     if (withdrawData.amount < MIN_WITHDRAW || withdrawData.amount > MAX_WITHDRAW) {
+      toast.error(
+        `Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`,
+      );
       toast.error(
         `Số tiền rút phải từ ${formatCurrency(MIN_WITHDRAW)} đến ${formatCurrency(MAX_WITHDRAW)}`,
       );

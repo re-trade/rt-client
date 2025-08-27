@@ -67,6 +67,7 @@ export default function OrderDetailPage() {
         shortDescription: shortDescription,
         description: description,
         thumbnail: thumbnailUrl,
+        status: 'INIT',
       };
       await retradeApi.createRetrade(request);
       toast.success('Yêu cầu retrade đã được gửi thành công!');
