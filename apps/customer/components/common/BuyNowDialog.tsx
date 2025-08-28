@@ -1,18 +1,17 @@
 'use client';
 
+import AddressCreateDialog from '@/components/address/AddressCreateDialog';
 import Modal from '@/components/reusable/modal';
 import { useCart } from '@/hooks/use-cart';
+import { useCheckoutAddressManager } from '@/hooks/use-checkout-address-manager';
 import { useOrder } from '@/hooks/use-order';
 import { usePayment } from '@/hooks/use-payment';
 import { TProduct } from '@/services/product.api';
 import { CreateOrderRequest } from '@services/order.api';
-import AddressCreateDialog from '@/components/address/AddressCreateDialog';
-import { AlertTriangle, Check, CreditCard, MapPin, X, Plus, ChevronDown } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, CreditCard, MapPin, Plus, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { useCheckoutAddressManager } from '@/hooks/use-checkout-address-manager';
-import { set } from 'date-fns';
 
 // Updated TAddress type with additional fields
 export type TAddress = {
@@ -80,7 +79,6 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
     addressesLoading,
     handleFieldChange,
     handleFieldBlur,
-
   } = useCheckoutAddressManager();
 
   const [quantity, setQuantity] = useState(initialQuantity);
@@ -107,14 +105,7 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
 
       getPaymentMethods().catch(console.error);
     }
-  }, [
-    isOpen, 
-    initialQuantity, 
-    product.quantity, 
-    getPaymentMethods, 
-    clearError, 
-    clearPaymentError,
-  ]);
+  }, [isOpen, initialQuantity, product.quantity, getPaymentMethods, clearError, clearPaymentError]);
 
   // Debug logs để kiểm tra dữ liệu
   useEffect(() => {
@@ -244,29 +235,32 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
       <div className="relative">
         <button
           onClick={() => setShowAddressDropdown(!showAddressDropdown)}
-          className={`w-full rounded-lg border bg-white px-4 py-3 text-left flex items-center justify-between transition-all duration-200 ${showAddressDropdown
+          className={`w-full rounded-lg border bg-white px-4 py-3 text-left flex items-center justify-between transition-all duration-200 ${
+            showAddressDropdown
               ? 'border-orange-600 ring-2 ring-orange-200'
               : 'border-gray-300 hover:border-orange-400'
-            }`}
+          }`}
         >
           <div className="flex-1">
             {selectedAddress ? (
               <div>
                 <div className="font-medium text-gray-900">{selectedAddress.name}</div>
-                <div className="text-sm text-gray-600">
-                  {selectedAddress.customerName} 
-                </div>
-                <div className="text-gray-600"> Số điện thoại:  {selectedAddress.phone} </div>
+                <div className="text-sm text-gray-600">{selectedAddress.customerName}</div>
+                <div className="text-gray-600"> Số điện thoại: {selectedAddress.phone} </div>
                 <div className="text-sm text-gray-500 mt-1">
-                Địa chỉ:  {selectedAddress.addressLine}, {selectedAddress.ward}, {selectedAddress.district}, {selectedAddress.state}, {selectedAddress.country}
+                  Địa chỉ: {selectedAddress.addressLine}, {selectedAddress.ward},{' '}
+                  {selectedAddress.district}, {selectedAddress.state}, {selectedAddress.country}
                 </div>
               </div>
             ) : (
               <span className="text-gray-500">-- Chọn địa chỉ giao hàng --</span>
             )}
           </div>
-          <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showAddressDropdown ? 'rotate-180' : ''
-            }`} />
+          <ChevronDown
+            className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+              showAddressDropdown ? 'rotate-180' : ''
+            }`}
+          />
         </button>
 
         {showAddressDropdown && (
@@ -276,13 +270,17 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                 <button
                   key={address.id}
                   onClick={() => handleAddressSelect(address.id)}
-                  className={`w-full text-left px-4 py-3 hover:bg-orange-50 transition-colors duration-200 border-b border-gray-100 last:border-b-0 ${selectedAddressId === address.id ? 'bg-orange-50 border-orange-200' : ''
-                    }`}
+                  className={`w-full text-left px-4 py-3 hover:bg-orange-50 transition-colors duration-200 border-b border-gray-100 last:border-b-0 ${
+                    selectedAddressId === address.id ? 'bg-orange-50 border-orange-200' : ''
+                  }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 mt-1">
-                      <div className={`w-3 h-3 rounded-full ${address.defaulted ? 'bg-green-500' : 'bg-gray-300'
-                        }`}></div>
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          address.defaulted ? 'bg-green-500' : 'bg-gray-300'
+                        }`}
+                      ></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -297,7 +295,8 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                         {address.customerName} - {address.phone}
                       </div>
                       <div className="text-xs text-gray-500 line-clamp-2">
-                        {address.addressLine}, {address.ward}, {address.district}, {address.state}, {address.country}
+                        {address.addressLine}, {address.ward}, {address.district}, {address.state},{' '}
+                        {address.country}
                       </div>
                     </div>
                     {selectedAddressId === address.id && (
@@ -326,10 +325,7 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
 
         {/* Overlay to close dropdown */}
         {showAddressDropdown && (
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setShowAddressDropdown(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setShowAddressDropdown(false)} />
         )}
       </div>
     );
@@ -509,14 +505,10 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-700 mb-1">
-                        {selectedAddress.customerName} 
-                      </p>
+                      <p className="text-gray-700 mb-1">{selectedAddress.customerName}</p>
+                      <p className="text-gray-600">Số điện thoại: {selectedAddress.phone}</p>
                       <p className="text-gray-600">
-                         Số điện thoại: {selectedAddress.phone}
-                        </p>
-                      <p className="text-gray-600">
-                       Địa chỉ:  {selectedAddress.addressLine}, {selectedAddress.ward},{' '}
+                        Địa chỉ: {selectedAddress.addressLine}, {selectedAddress.ward},{' '}
                         {selectedAddress.district}, {selectedAddress.state},{' '}
                         {selectedAddress.country}
                       </p>
@@ -553,10 +545,11 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
                   {paymentMethods.map((method) => (
                     <div
                       key={method.id}
-                      className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 ${selectedPaymentMethodId === method.id
+                      className={`p-3 border rounded-lg cursor-pointer transition-all duration-200 ${
+                        selectedPaymentMethodId === method.id
                           ? 'border-orange-600 bg-orange-50 ring-2 ring-orange-200'
                           : 'border-gray-200 hover:border-orange-400 bg-white hover:shadow-md'
-                        }`}
+                      }`}
                       onClick={() => selectPaymentMethod(method.id)}
                     >
                       <div className="flex items-center gap-3">
@@ -600,10 +593,11 @@ const BuyNowDialog: React.FC<BuyNowDialogProps> = ({
               <button
                 onClick={handleBuyNow}
                 disabled={!canPurchase}
-                className={`w-full font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${canPurchase
+                className={`w-full font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
+                  canPurchase
                     ? 'bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white shadow-lg hover:shadow-xl'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
-                  }`}
+                }`}
               >
                 {isProcessing ? (
                   <>

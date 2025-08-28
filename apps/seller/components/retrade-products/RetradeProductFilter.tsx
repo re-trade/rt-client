@@ -19,10 +19,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { Slider } from '@/components/ui/slider';
 import { RetradeFilterState } from '@/hooks/use-retrade-product';
 import { Filter } from 'lucide-react';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { Slider } from '../ui/slider';
 
 interface RetradeProductFilterProps {
   filter: RetradeFilterState;
