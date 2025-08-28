@@ -39,6 +39,42 @@ export type TProduct = {
   updatedAt: string;
 };
 
+export type RetradeOrderItem = {
+  id: string;
+  productId: string;
+  quantity: number;
+  retradeQuantity: number;
+  sellerId: string;
+  sellerName: string;
+  sellerAvatarUrl: string;
+};
+
+export type RetradeProductDetail = {
+  id: string;
+  name: string;
+  sellerId: string;
+  sellerShopName: string;
+  shortDescription: string;
+  description: string;
+  thumbnail: string;
+  productImages: string[];
+  brandId: string;
+  brand: string;
+  warrantyExpiryDate: string | null;
+  model: string;
+  currentPrice: number;
+  categories: {
+    id: string;
+    name: string;
+  }[];
+  condition: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  retradeQuantity: number;
+  orderItemRetrades: RetradeOrderItem[];
+};
+
 export type CreateProductDto = {
   name: string;
   shortDescription: string;
@@ -190,6 +226,66 @@ export const productApi = {
       return response.data.success;
     } catch {
       return false;
+    }
+  },
+
+  async getRetradeProducts(
+    page = 0,
+    size = 15,
+    sort: { field: string; direction: 'asc' | 'desc' | null }[],
+    query?: string,
+  ): Promise<{
+    products: TProduct[];
+    totalPages: number;
+    totalElements: number;
+    currentPage: number;
+    pageSize: number;
+  }> {
+    const params: Record<string, string | number> = {
+      page,
+      size,
+    };
+
+    if (query) {
+      params.q = query;
+    }
+
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.append(key, value.toString());
+    });
+
+    sort.forEach((s) => {
+      if (s.field && s.direction) {
+        searchParams.append('sort', `${s.field},${s.direction}`);
+      }
+    });
+
+    const response = await authApi.default.get<IResponseObject<TProduct[]>>(
+      `/products/seller/can-retrade?${searchParams.toString()}`,
+    );
+
+    const products = response.data.success ? response.data.content : [];
+
+    return {
+      products,
+      totalPages: response.data.pagination?.totalPages || 1,
+      totalElements: response.data.pagination?.totalElements || products.length,
+      currentPage: (response.data.pagination?.page || 0) + 1,
+      pageSize: response.data.pagination?.size || size,
+    };
+  },
+
+  async getRetradeProductDetail(id: string): Promise<any> {
+    try {
+      const response = await authApi.default.get<IResponseObject<any>>(`/products/${id}/retrade`);
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Retrade product not found');
+    } catch (error) {
+      throw error;
     }
   },
 };
