@@ -1,5 +1,6 @@
 import { authApi, IResponseObject } from '@retrade/util';
 
+export type TProductStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED' | 'INIT' | 'DRAFT';
 export interface RetradeRequest {
   orderItemId: string;
   quantity: number;
@@ -7,6 +8,7 @@ export interface RetradeRequest {
   shortDescription: string;
   description: string;
   thumbnail: string;
+  status: TProductStatus;
 }
 
 export interface RetradeResponse {
