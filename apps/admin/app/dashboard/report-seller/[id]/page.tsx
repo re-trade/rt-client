@@ -543,8 +543,8 @@ export default function ReportDetailPage() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     {seller.avatarUrl &&
-                      typeof seller.avatarUrl === 'string' &&
-                      seller.avatarUrl.startsWith('http') ? (
+                    typeof seller.avatarUrl === 'string' &&
+                    seller.avatarUrl.startsWith('http') ? (
                       <Image
                         src={seller.avatarUrl}
                         alt={seller.shopName}
@@ -712,8 +712,8 @@ export default function ReportDetailPage() {
                           <div className="bg-gray-50 p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               {item.senderAvatarUrl &&
-                                typeof item.senderAvatarUrl === 'string' &&
-                                item.senderAvatarUrl.startsWith('http') ? (
+                              typeof item.senderAvatarUrl === 'string' &&
+                              item.senderAvatarUrl.startsWith('http') ? (
                                 <Image
                                   src={item.senderAvatarUrl}
                                   alt={item.senderName}
@@ -825,8 +825,8 @@ export default function ReportDetailPage() {
                         <div className="md:w-1/3">
                           <div className="relative aspect-square rounded-md border overflow-hidden">
                             {product.thumbnail &&
-                              typeof product.thumbnail === 'string' &&
-                              product.thumbnail.startsWith('http') ? (
+                            typeof product.thumbnail === 'string' &&
+                            product.thumbnail.startsWith('http') ? (
                               <Image
                                 src={product.thumbnail}
                                 alt={product.name}
@@ -1173,8 +1173,9 @@ export default function ReportDetailPage() {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
-                    className={`h-2.5 rounded-full transition-all duration-300 ${uploadStatus === 'success' ? 'bg-green-500' : 'bg-orange-500'
-                      }`}
+                    className={`h-2.5 rounded-full transition-all duration-300 ${
+                      uploadStatus === 'success' ? 'bg-green-500' : 'bg-orange-500'
+                    }`}
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>
