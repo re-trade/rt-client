@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LogOut,
   Package,
+  Settings,
   ShoppingCart,
   Store,
   Tag,
@@ -47,13 +48,13 @@ const menuItems = [
       { title: 'Yêu cầu rút tiền', icon: Banknote, href: '/dashboard/withdraw' },
     ],
   },
-  /* {
+  {
     group: 'Hệ thống',
     items: [
-      //{ title: 'Cài đặt hệ thống', icon: Settings, href: '/dashboard/settings' },
+      { title: 'Cài đặt phí nền tảng', icon: Settings, href: '/dashboard/platform-fee' },
       //{ title: 'Quản lý cảnh báo', icon: AlertCircle, href: '/dashboard/alerts' },
     ],
-  }, */
+  },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
