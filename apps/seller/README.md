@@ -1,415 +1,349 @@
 # 🏪 Retrade Seller Dashboard
 
-The **Retrade Seller Dashboard** is a comprehensive business management platform designed for sellers to efficiently manage their online stores on the Retrade marketplace. This application provides powerful tools for product management, order processing, revenue tracking, and business analytics.
+Welcome to the **Retrade Seller Dashboard** - a comprehensive seller management platform built with Next.js 15 and modern web technologies. This application empowers sellers with powerful tools to manage their business, track performance, and grow their sales on the Retrade marketplace.
 
-## 📋 Overview
+## 📋 Table of Contents
 
-The Seller Dashboard empowers merchants with:
+- [🏪 Retrade Seller Dashboard](#-retrade-seller-dashboard)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [🎯 Overview](#-overview)
+  - [✨ Key Features](#-key-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [🏗️ Project Structure](#️-project-structure)
+  - [⚡ Quick Start](#-quick-start)
+  - [🔧 Configuration](#-configuration)
+  - [📊 Dashboard Features](#-dashboard-features)
+  - [💬 Communication Tools](#-communication-tools)
+  - [🚀 Deployment](#-deployment)
+  - [📚 Development Guidelines](#-development-guidelines)
 
-- Complete product catalog management
-- Real-time order processing and fulfillment
-- Comprehensive revenue and analytics tracking
-- Customer communication and support tools
-- Business performance insights and reporting
-- Multi-channel inventory management
+## 🎯 Overview
+
+The Seller Dashboard is designed to provide sellers with everything they need to succeed on the Retrade platform. From product management to customer communication, analytics to order fulfillment, this comprehensive tool helps sellers optimize their business operations and maximize their revenue.
+
+**Application Details:**
+
+- **Package Name**: `@retrade/rt-client-seller`
+- **Port**: 3002 (development)
+- **Framework**: Next.js 15 with App Router
+- **Build Tool**: Turbopack for fast development
 
 ## ✨ Key Features
 
 ### 📦 Product Management
 
-- **Product Catalog**: Create, edit, and organize product listings
-- **Inventory Control**: Track stock levels and manage variants
-- **Bulk Operations**: Mass upload and edit products
-- **Product Analytics**: Performance metrics for each product
-- **Category Management**: Organize products into categories
-- **Image Management**: Upload and manage product images
+- **Product Catalog**: Complete product lifecycle management
+- **Inventory Tracking**: Real-time stock monitoring and alerts
+- **Product Analytics**: Performance metrics and insights
+- **Bulk Operations**: Efficient mass product management
+- **Image Management**: Multi-image upload and optimization
 
-### 📊 Dashboard & Analytics
+### 📋 Order Management
 
-- **Business Overview**: Key performance indicators and metrics
-- **Sales Analytics**: Revenue trends and sales performance
-- **Customer Insights**: Buyer behavior and demographics
-- **Product Performance**: Best-selling and underperforming items
-- **Financial Reports**: Profit margins and expense tracking
-- **Growth Metrics**: Business growth and expansion insights
+- **Order Processing**: Streamlined order fulfillment workflow
+- **Order Tracking**: Real-time order status updates
+- **Shipping Integration**: Logistics and shipping management
+- **Return Handling**: Customer return and refund processing
+- **Order Analytics**: Sales performance analysis
 
-### 🚚 Order & Shipping Management
+### 💰 Financial Management
 
-- **Order Processing**: Manage incoming orders and fulfillment
-- **Shipping Integration**: Connect with shipping providers
-- **Tracking Management**: Provide customers with tracking information
-- **Return Handling**: Process returns and refunds
-- **Shipping Rates**: Configure shipping costs and zones
-- **Delivery Analytics**: Monitor shipping performance
+- **Revenue Tracking**: Comprehensive financial analytics
+- **Sales Reports**: Detailed sales performance metrics
+- **Withdrawal Management**: Easy payout request system
+- **Transaction History**: Complete financial transaction records
+- **Profit Analysis**: Margin and profitability insights
 
-### 💰 Revenue Management
+### 📊 Analytics & Reporting
 
-- **Sales Tracking**: Monitor daily, weekly, and monthly sales
-- **Revenue Analytics**: Detailed financial performance reports
-- **Commission Tracking**: Platform fees and commission management
-- **Payout Management**: Track earnings and payment schedules
-- **Tax Reporting**: Generate tax-related reports
-- **Financial Forecasting**: Predict future revenue trends
+- **Performance Dashboard**: Key business metrics and KPIs
+- **Sales Analytics**: Revenue trends and forecasting
+- **Customer Insights**: Buyer behavior and preferences
+- **Product Performance**: Best-selling products and trends
+- **Interactive Charts**: Visual data representation
 
-### 🏪 Shop Management
+### 💬 Customer Communication
 
-- **Shop Profile**: Customize shop appearance and branding
-- **Business Information**: Manage shop details and policies
-- **Shop Analytics**: Monitor shop performance and visitor metrics
-- **Brand Management**: Build and maintain brand identity
-- **Customer Reviews**: Manage and respond to customer feedback
-- **Shop Policies**: Set return, shipping, and privacy policies
+- **Real-time Chat**: Direct customer communication
+- **Video Calls**: WebRTC-powered video communication
+- **Message Management**: Organized conversation history
+- **Customer Support**: Integrated support ticket system
+- **Notification System**: Real-time alerts and updates
 
-### 🎟️ Voucher & Promotions
+### 🎫 Marketing Tools
 
-- **Discount Management**: Create and manage promotional campaigns
-- **Voucher Creation**: Generate discount codes and coupons
-- **Campaign Analytics**: Track promotion performance
-- **Customer Targeting**: Target specific customer segments
-- **Seasonal Promotions**: Plan and execute seasonal campaigns
-- **A/B Testing**: Test different promotional strategies
+- **Voucher Management**: Create and manage promotional codes
+- **Campaign Analytics**: Marketing campaign performance
+- **Customer Segmentation**: Targeted marketing capabilities
+- **Promotion Scheduling**: Automated promotional campaigns
 
-### 📍 Address Management
+## 🛠️ Tech Stack
 
-- **Business Addresses**: Manage pickup and return addresses
-- **Warehouse Locations**: Configure multiple fulfillment centers
-- **Shipping Origins**: Set up shipping origin points
-- **Address Validation**: Ensure accurate address information
-- **Location Analytics**: Track performance by location
+### Core Framework
 
-## 🛠️ Technology Stack
+- **Next.js 15**: React framework with App Router and Turbopack
+- **TypeScript 5**: Strict type checking and enhanced developer experience
+- **React 19**: Latest React features with concurrent rendering
 
-### Frontend Framework
+### UI & Styling
 
-- **Next.js 15.1.6** - React framework with App Router
-- **React 19.0.0** - Latest React with concurrent features
-- **TypeScript 5** - Type-safe development
+- **Tailwind CSS 4.1**: Utility-first CSS framework
+- **Radix UI**: Accessible, unstyled UI primitives
+- **Framer Motion 12**: Smooth animations and transitions
+- **Lucide React**: Beautiful, customizable icons
+- **Tabler Icons**: Additional icon library
 
-### UI Components & Styling
+### Data Visualization
 
-- **Radix UI** - Accessible component primitives
-  - Avatar, Dialog, Label, Select, Separator, Slot, Switch, Tooltip
-- **Tailwind CSS 4.1.7** - Utility-first CSS framework
-- **Tailwind Animate** - Animation utilities
-- **Class Variance Authority** - Component variant management
-- **Lucide React** - Beautiful icon library
-- **React Icons 5.5.0** - Comprehensive icon collection
+- **Recharts 2.15**: Composable charting library for React
+- **Custom Charts**: Interactive business analytics
+- **Real-time Updates**: Live data visualization
+
+### Real-time Communication
+
+- **STOMP.js 7.1**: WebSocket messaging protocol
+- **WebRTC**: Peer-to-peer video communication
+- **Socket.io Client**: Real-time bidirectional communication
+- **Custom WebRTC Config**: Optimized video call setup
+
+### State Management
+
+- **React Context API**: Application state management
+- **Custom Hooks**: Reusable state logic
+- **Local Storage**: Persistent client-side storage
 
 ### Development Tools
 
-- **Turbopack** - Fast bundler for development
-- **ESLint** - Code linting and formatting
-- **PostCSS** - CSS processing
+- **ESLint 9**: Code linting and quality enforcement
+- **Prettier**: Code formatting and style consistency
+- **Husky**: Git hooks for quality assurance
+- **TypeScript Config**: Shared TypeScript configurations
 
-### Custom Hooks & Utilities
+### Specialized Libraries
 
-- **use-mobile** - Mobile device detection
-- **Custom UI Components** - Tailored business components
+- **React Icons**: Comprehensive icon library
+- **Sonner**: Beautiful toast notifications
+- **React Markdown**: Markdown rendering support
+- **FingerprintJS**: Device fingerprinting for security
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js** >= 18.0.0
-- **Yarn** 1.22.22 (recommended)
-- **Git** for version control
-
-### Installation
-
-1. **Clone the repository** (if not already done):
-
-   ```bash
-   git clone https://github.com/re-trade/rt-client.git
-   cd rt-client
-   ```
-
-2. **Install dependencies**:
-
-   ```bash
-   yarn install
-   ```
-
-3. **Set up environment variables**:
-   ```bash
-   cp apps/seller/.env.example apps/seller/.env.local
-   ```
-   Configure the following variables:
-   ```env
-   NEXT_PUBLIC_API_URL=your_api_endpoint
-   NEXT_PUBLIC_APP_ENV=development
-   NEXT_PUBLIC_SELLER_PORTAL_URL=your_seller_portal_url
-   ```
-
-### Development Commands
-
-```bash
-# Start development server with Turbopack
-yarn workspace @retrade/rt-client-seller dev
-
-# Build for production
-yarn workspace @retrade/rt-client-seller build
-
-# Start production server
-yarn workspace @retrade/rt-client-seller start
-
-# Run linting
-yarn workspace @retrade/rt-client-seller lint
-```
-
-### From Root Directory
-
-```bash
-# Start all applications
-yarn dev
-
-# Build all applications
-yarn build
-
-# Run seller app specifically
-yarn workspace @retrade/rt-client-seller dev
-```
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 apps/seller/
-├── app/                          # Next.js App Router
-│   ├── dashboard/                # Main dashboard
-│   │   ├── address-management/   # Address management
-│   │   ├── product-management/   # Product catalog
-│   │   ├── revenue-management/   # Financial tracking
-│   │   ├── shipping-management/  # Shipping configuration
-│   │   ├── shop-info-management/ # Shop settings
-│   │   ├── voucher-management/   # Promotions & discounts
-│   │   ├── layout.tsx            # Dashboard layout
-│   │   └── RelatedProduct.tsx              # Dashboard home
-│   ├── login/                    # Seller authentication
-│   ├── register/                 # Seller registration
-│   ├── globals.css               # Global styles
-│   └── layout.tsx                # Root layout
-├── components/                   # Shared components
-│   ├── step/                     # Multi-step components
-│   │   └── account-register/     # Registration steps
-│   │       ├── AccountRegisterStep1.tsx
-│   │       ├── AccountRegisterStep2.tsx
-│   │       ├── AccountRegisterStep3.tsx
-│   │       ├── AccountRegisterStep4.tsx
-│   │       └── AccountRegisterStep5.tsx
-│   └── ui/                       # UI components
-│       ├── avatar.tsx            # Avatar component
-│       ├── badge.tsx             # Badge component
-│       ├── button.tsx            # Button component
-│       ├── card.tsx              # Card component
-│       ├── dialog.tsx            # Dialog component
-│       ├── input.tsx             # Input component
-│       ├── label.tsx             # Label component
-│       ├── select.tsx            # Select component
-│       ├── separator.tsx         # Separator component
-│       ├── sheet.tsx             # Sheet component
-│       ├── sidebar.tsx           # Sidebar component
-│       ├── skeleton.tsx          # Skeleton loader
-│       ├── switch.tsx            # Switch component
-│       ├── table.tsx             # Table component
-│       ├── textarea.tsx          # Textarea component
-│       ├── tooltip.tsx           # Tooltip component
-│       └── dialog/               # Dialog variants
-│           ├── add/              # Create dialogs
-│           │   ├── create-address-dialog.tsx
-│           │   ├── create-product-dialog.tsx
-│           │   ├── create-shipping-dialog.tsx
-│           │   └── create-voucher-dialog.tsx
-│           └── view-update/      # Edit dialogs
-│               ├── edit-address-dialog.tsx
-│               ├── edit-product-dialog.tsx
-│               ├── edit-shipping-dialog.tsx
-│               ├── edit-voucher-dialog.tsx
-│               ├── revenue-detail-dialog.tsx
-│               └── shop-info-edit.tsx
-├── hooks/                        # Custom React hooks
-│   └── use-mobile.tsx            # Mobile detection hook
-├── lib/                          # Utility functions
-├── next.config.ts                # Next.js configuration
-├── package.json                  # Dependencies and scripts
-├── tailwind.config.ts            # Tailwind CSS configuration
-└── tsconfig.json                 # TypeScript configuration
+├── app/                      # Next.js App Router
+│   ├── dashboard/           # Main dashboard routes
+│   │   ├── address/        # Address management
+│   │   ├── chat/           # Customer communication
+│   │   ├── my-order/       # Personal orders
+│   │   ├── my-product/     # Product management
+│   │   ├── notifications/  # Notification center
+│   │   ├── orders/         # Order management
+│   │   ├── product/        # Product catalog
+│   │   ├── report/         # Reporting system
+│   │   ├── revenue/        # Financial analytics
+│   │   ├── review/         # Customer reviews
+│   │   ├── seller-info/    # Seller profile
+│   │   ├── shipping/       # Shipping management
+│   │   └── voucher/        # Voucher management
+│   ├── login/              # Authentication
+│   ├── register/           # Seller registration
+│   ├── pending/            # Account pending approval
+│   └── ban/                # Account suspended
+├── components/             # React components
+│   ├── chat/              # Communication components
+│   ├── common/            # Shared components
+│   ├── dashboard/         # Dashboard-specific components
+│   ├── dialog-common/     # Modal dialogs
+│   ├── notification/      # Notification components
+│   ├── order/             # Order-related components
+│   ├── product/           # Product components
+│   ├── registration/      # Registration flow
+│   ├── report/            # Reporting components
+│   ├── shared/            # Shared utilities
+│   └── ui/                # UI primitives
+├── context/               # React Context providers
+├── hooks/                 # Custom React hooks
+├── service/               # API service layer
+├── types/                 # TypeScript type definitions
+├── utils/                 # Utility functions
+└── public/                # Static assets
 ```
 
-## 🌐 API Integration
+## ⚡ Quick Start
 
-The Seller Dashboard integrates with the Retrade backend for:
+### Prerequisites
 
-### Business Management
+- Node.js >= 18.0.0
+- Yarn >= 1.22.22
+- Access to Retrade backend APIs
 
-- Seller registration and onboarding
-- Shop profile and branding management
-- Business verification and compliance
+### Installation & Development
 
-### Product Operations
+```bash
+# Navigate to seller directory
+cd apps/seller
 
-- Product CRUD operations
-- Inventory management
-- Category and attribute management
-- Image upload and processing
+# Install dependencies (from root)
+yarn install
 
-### Order Processing
+# Start development server with Turbopack
+yarn dev
 
-- Order retrieval and management
-- Shipping integration
-- Return and refund processing
-- Customer communication
+# Or run from root
+yarn workspace @retrade/rt-client-seller dev
+```
 
-### Financial Operations
-
-- Revenue tracking and analytics
-- Commission calculations
-- Payout management
-- Tax reporting
-
-### Marketing Tools
-
-- Voucher and promotion management
-- Campaign analytics
-- Customer targeting
-- Performance tracking
-
-## 🚀 Deployment
-
-### Production Build
+### Build for Production
 
 ```bash
 # Build the application
-yarn workspace @retrade/rt-client-seller build
+yarn build
 
 # Start production server
-yarn workspace @retrade/rt-client-seller start
+yarn start
 ```
+
+**Access the application:**
+
+- Development: http://localhost:3002
+- Production: https://seller.retrade.local
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env.local` file in the `apps/seller` directory:
+
+```env
+# API Configuration
+API_BASE_URL=https://api.retrade.local
+SOCKET_URL=wss://socket.retrade.local
+
+# Application Environment
+NEXT_PUBLIC_APP_ENV=development
+NEXT_PUBLIC_APP_NAME=Retrade Seller Dashboard
+
+# WebRTC Configuration
+NEXT_PUBLIC_WEBRTC_STUN_SERVER=stun:stun.l.google.com:19302
+NEXT_PUBLIC_WEBRTC_TURN_SERVER=turn:your-turn-server.com
+
+# Security
+NEXT_PUBLIC_FINGERPRINT_API_KEY=your_fingerprint_api_key
+
+# Optional: Analytics
+NEXT_PUBLIC_ANALYTICS_ID=your_analytics_id
+```
+
+## 📊 Dashboard Features
+
+### Main Dashboard
+
+- **Business Overview**: Key performance metrics and insights
+- **Recent Activity**: Latest orders, messages, and notifications
+- **Quick Actions**: Fast access to common seller tasks
+- **Performance Charts**: Visual representation of business data
+
+### Product Management
+
+- **Product Catalog**: Comprehensive product listing and management
+- **Inventory Control**: Stock level monitoring and alerts
+- **Product Analytics**: Performance metrics for each product
+- **Bulk Operations**: Efficient mass product updates
+
+### Order Fulfillment
+
+- **Order Queue**: Organized order processing workflow
+- **Shipping Management**: Integrated logistics and tracking
+- **Customer Communication**: Direct order-related messaging
+- **Return Processing**: Streamlined return and refund handling
+
+### Financial Analytics
+
+- **Revenue Dashboard**: Comprehensive financial overview
+- **Sales Trends**: Historical and predictive analytics
+- **Profit Margins**: Detailed profitability analysis
+- **Withdrawal System**: Easy payout request management
+
+## 💬 Communication Tools
+
+### Real-time Chat
+
+- **Customer Messaging**: Direct communication with buyers
+- **Message History**: Organized conversation management
+- **File Sharing**: Image and document sharing capabilities
+- **Typing Indicators**: Real-time conversation feedback
+
+### Video Communication
+
+- **WebRTC Integration**: High-quality video calls
+- **Screen Sharing**: Product demonstration capabilities
+- **Call Recording**: Optional call recording for quality assurance
+- **Mobile Support**: Cross-platform video communication
+
+### Notification System
+
+- **Real-time Alerts**: Instant notifications for important events
+- **Notification Center**: Centralized notification management
+- **Custom Preferences**: Personalized notification settings
+- **Push Notifications**: Browser and mobile push notifications
+
+## 🚀 Deployment
 
 ### Docker Deployment
 
 ```bash
 # Build Docker image
-docker build -f apps/seller/Dockerfile -t retrade-seller .
+docker build -t retrade-seller .
 
 # Run container
-docker run -p 3000:3000 retrade-seller
+docker run -p 3002:3000 retrade-seller
+
+# Using Docker Compose
+docker compose -f .docker/compose.yaml --profile seller up -d
 ```
 
-### Environment Variables
+### Production Considerations
 
-```env
-# Production environment
-NEXT_PUBLIC_API_URL=https://api.retrade.com
-NEXT_PUBLIC_APP_ENV=production
-NEXT_PUBLIC_SELLER_PORTAL_URL=https://seller.retrade.com
-NEXTAUTH_SECRET=your_secret_key
-NEXTAUTH_URL=https://seller.retrade.com
-```
+- **Environment Configuration**: Secure environment setup
+- **SSL/TLS**: HTTPS enforcement for security
+- **CDN Integration**: Optimized asset delivery
+- **Performance Monitoring**: Application health tracking
+- **Backup Strategy**: Data protection and recovery
 
-## 🔧 Development Guidelines
+## 📚 Development Guidelines
 
-### Code Style
+### Code Standards
 
-- Follow TypeScript best practices
-- Use ESLint and Prettier for code formatting
-- Implement proper error handling
-- Write meaningful component and function names
+- **TypeScript Strict Mode**: Comprehensive type safety
+- **Component Architecture**: Modular, reusable components
+- **Error Handling**: Robust error boundaries and fallbacks
+- **Performance Optimization**: Code splitting and lazy loading
+- **Accessibility**: WCAG-compliant user interface
 
 ### Component Development
 
-- Use Radix UI primitives for accessibility
-- Implement responsive designs with Tailwind CSS
-- Follow the established component structure
-- Add proper TypeScript types
+- **Radix UI Foundation**: Accessible component primitives
+- **Responsive Design**: Mobile-first development approach
+- **Animation Integration**: Smooth Framer Motion animations
+- **Theme Support**: Consistent design system implementation
+- **Internationalization**: Multi-language support ready
 
-### Business Logic
+### API Integration
 
-- Implement proper data validation
-- Handle edge cases for business operations
-- Maintain data consistency across operations
-- Implement proper error boundaries
+- **Service Layer**: Centralized API communication
+- **Real-time Updates**: WebSocket and STOMP integration
+- **Error Management**: Comprehensive error handling
+- **Caching Strategy**: Optimized data fetching
+- **Loading States**: User-friendly loading indicators
 
-### Performance Optimization
+### Testing Strategy
 
-- Optimize component rendering
-- Implement proper loading states
-- Use React.memo for expensive components
-- Optimize API calls and data fetching
-
-## 📊 Business Features
-
-### Multi-step Registration
-
-The seller onboarding process includes:
-
-1. **Basic Information** - Business details and contact info
-2. **Business Verification** - Legal documents and verification
-3. **Shop Setup** - Branding and shop configuration
-4. **Payment Setup** - Banking and payment information
-5. **Final Review** - Confirmation and activation
-
-### Dashboard Analytics
-
-- **Revenue Metrics** - Daily, weekly, monthly performance
-- **Product Performance** - Best sellers and inventory insights
-- **Customer Analytics** - Buyer behavior and demographics
-- **Growth Tracking** - Business expansion metrics
-
-### Advanced Management Tools
-
-- **Bulk Operations** - Mass product updates and management
-- **Automated Rules** - Business rule automation
-- **Integration APIs** - Third-party service connections
-- **Advanced Reporting** - Custom business reports
-
-## 📱 Mobile Responsiveness
-
-The Seller Dashboard is fully responsive with:
-
-- **Mobile-first Design** - Optimized for mobile devices
-- **Touch-friendly Interface** - Easy navigation on tablets
-- **Responsive Tables** - Adaptive data presentation
-- **Mobile Gestures** - Swipe and touch interactions
-
-## 🔒 Security & Compliance
-
-### Data Protection
-
-- Secure data transmission (HTTPS)
-- Input validation and sanitization
-- XSS and CSRF protection
-- Secure session management
-
-### Business Compliance
-
-- Tax calculation and reporting
-- Legal document management
-- Privacy policy compliance
-- GDPR and data protection
-
-### Financial Security
-
-- Secure payment processing
-- PCI DSS compliance
-- Fraud detection and prevention
-- Audit trail maintenance
-
-## 🚀 Performance Features
-
-- **Server-side Rendering** - Fast initial page loads
-- **Static Generation** - Optimized static pages
-- **Image Optimization** - Automatic image processing
-- **Code Splitting** - Efficient bundle loading
-- **Caching Strategies** - Optimized data caching
-
-## 📞 Support & Resources
-
-- **Seller Help Center** - Comprehensive documentation
-- **API Documentation** - Technical integration guides
-- **Business Resources** - Selling best practices
-- **Technical Support** - Developer assistance
+- **Component Testing**: Unit tests for React components
+- **Integration Testing**: API and service integration tests
+- **E2E Testing**: Critical user journey automation
+- **Performance Testing**: Load and stress testing
+- **Accessibility Testing**: WCAG compliance verification
 
 ---
 
-**Version**: 0.1.0
-**Last Updated**: 2024
-**Maintained by**: Retrade Development Team
+For more information about the overall Retrade platform, see the [main README](../../README.md).
