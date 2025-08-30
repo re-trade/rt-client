@@ -2,31 +2,19 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Filter, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 interface OrderSearchBarProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  onSearch: () => void;
   onClearSearch: () => void;
-  onToggleFilter: () => void;
-  isFilterOpen: boolean;
 }
 
 export default function OrderSearchBar({
   searchQuery,
   onSearchChange,
-  onSearch,
   onClearSearch,
-  onToggleFilter,
-  isFilterOpen,
 }: OrderSearchBarProps) {
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      onSearch();
-    }
-  };
-
   return (
     <div className="flex items-center gap-3">
       <div className="relative flex-1 sm:w-80">
@@ -35,7 +23,6 @@ export default function OrderSearchBar({
           placeholder="Tìm kiếm theo ID combo, tên người bán..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          onKeyPress={handleKeyPress}
           className="pl-10 pr-10"
         />
         {searchQuery && (
@@ -49,20 +36,6 @@ export default function OrderSearchBar({
           </Button>
         )}
       </div>
-
-      <Button onClick={onSearch} className="bg-orange-500 hover:bg-orange-600 text-white">
-        <Search className="h-4 w-4 mr-2" />
-        Tìm kiếm
-      </Button>
-
-      <Button
-        variant="outline"
-        onClick={onToggleFilter}
-        className="border-orange-200 text-orange-600 hover:bg-orange-50"
-      >
-        <Filter className="h-4 w-4 mr-2" />
-        Bộ lọc
-      </Button>
     </div>
   );
 }

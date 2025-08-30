@@ -11,7 +11,6 @@ import { useOrderComboManager } from '@/hooks/use-order-manager';
 import { TOrderCombo } from '@/services/order.api';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 export default function OrderManagementPage() {
   const router = useRouter();
@@ -22,26 +21,12 @@ export default function OrderManagementPage() {
     totalOrders,
     loading,
     error,
+    searchTerm,
     refetch,
     goToPage,
-    searchOrders,
+    updateSearchFilter,
+    clearSearch,
   } = useOrderComboManager();
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      searchOrders(searchQuery.trim());
-    } else {
-      refetch();
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchQuery('');
-    refetch();
-  };
 
   const handleRowClick = (combo: TOrderCombo) => {
     router.push(`/dashboard/order/${combo.comboId}`);
@@ -76,12 +61,9 @@ export default function OrderManagementPage() {
             <CardTitle className="text-xl font-bold text-slate-900">Danh sách đơn hàng</CardTitle>
 
             <OrderSearchBar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onSearch={handleSearch}
+              searchQuery={searchTerm}
+              onSearchChange={updateSearchFilter}
               onClearSearch={clearSearch}
-              onToggleFilter={() => setIsFilterOpen(!isFilterOpen)}
-              isFilterOpen={isFilterOpen}
             />
           </div>
         </CardHeader>
@@ -91,7 +73,7 @@ export default function OrderManagementPage() {
             orderCombos={orderCombos || []}
             loading={loading}
             onRowClick={handleRowClick}
-            searchQuery={searchQuery}
+            searchQuery={searchTerm}
           />
 
           <OrderPagination
@@ -99,7 +81,6 @@ export default function OrderManagementPage() {
             maxPage={maxPage}
             totalOrders={totalOrders}
             onPageChange={goToPage}
-            searchQuery={searchQuery}
           />
         </CardContent>
       </Card>

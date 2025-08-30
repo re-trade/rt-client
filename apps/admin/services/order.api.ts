@@ -159,10 +159,9 @@ export const orderApi = {
         params: {
           page,
           size,
-          ...(query ? { query } : {}),
+          ...(query ? { q: `keyword=${query}` } : {}),
         },
       });
-      // Transform direct array response to pagination format
       if (response.data.success && Array.isArray(response.data.content)) {
         const content = response.data.content;
         const startIndex = page * size;

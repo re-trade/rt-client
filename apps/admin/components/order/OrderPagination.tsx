@@ -7,8 +7,7 @@ interface OrderPaginationProps {
   page: number;
   maxPage: number;
   totalOrders: number;
-  onPageChange: (page: number, searchQuery?: string) => void;
-  searchQuery: string;
+  onPageChange: (page: number) => void;
 }
 
 export default function OrderPagination({
@@ -16,7 +15,6 @@ export default function OrderPagination({
   maxPage,
   totalOrders,
   onPageChange,
-  searchQuery,
 }: OrderPaginationProps) {
   return (
     <div className="flex items-center justify-between p-6 border-t border-slate-200">
@@ -28,7 +26,7 @@ export default function OrderPagination({
           variant="outline"
           size="sm"
           disabled={page === 1 || maxPage <= 1}
-          onClick={() => onPageChange(page - 1, searchQuery)}
+          onClick={() => onPageChange(page - 1)}
           className="border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -44,7 +42,7 @@ export default function OrderPagination({
                   key={pageNum}
                   variant={page === pageNum ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => onPageChange(pageNum, searchQuery)}
+                  onClick={() => onPageChange(pageNum)}
                   className={`h-8 w-8 p-0 ${
                     page === pageNum
                       ? 'bg-orange-500 hover:bg-orange-600 text-white border-orange-500'
@@ -71,7 +69,7 @@ export default function OrderPagination({
           variant="outline"
           size="sm"
           disabled={page === maxPage || maxPage <= 1}
-          onClick={() => onPageChange(page + 1, searchQuery)}
+          onClick={() => onPageChange(page + 1)}
           className="border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
         >
           Sau

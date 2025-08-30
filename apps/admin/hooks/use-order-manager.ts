@@ -136,20 +136,33 @@ const useOrderComboManager = () => {
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
   const pageSize = 10;
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const fetchOrderCombos = useCallback(
-    async (searchQuery?: string, customPage?: number) => {
+    async (customPage?: number, customSearch?: string) => {
       setLoading(true);
       setError(null);
       try {
+        const searchQuery = customSearch !== undefined ? customSearch : debouncedSearchTerm;
+        const currentPage = customPage !== undefined ? customPage : page;
+
         const response = await orderApi.getAllOrderCombos(
-          (customPage ?? page) - 1,
+          currentPage - 1,
           pageSize,
-          searchQuery,
+          searchQuery || undefined,
         );
         if (response.success) {
-          // Handle paginated response
           setOrderCombos(response.content.content || []);
           setMaxPage(response.content.totalPages || 1);
           setTotalOrders(response.content.totalElements || 0);
@@ -168,21 +181,37 @@ const useOrderComboManager = () => {
         setLoading(false);
       }
     },
-    [page],
+    [page, debouncedSearchTerm],
   );
 
+  // Fetch data when debounced search term or page changes
   useEffect(() => {
     fetchOrderCombos();
   }, [fetchOrderCombos]);
 
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    if (debouncedSearchTerm !== searchTerm) return;
+    if (page !== 1) {
+      setPage(1);
+    } else {
+      fetchOrderCombos(1);
+    }
+  }, [debouncedSearchTerm]);
+
   const refetch = () => fetchOrderCombos();
-  const goToPage = (newPage: number, searchQuery?: string) => {
+
+  const goToPage = (newPage: number) => {
     setPage(newPage);
-    fetchOrderCombos(searchQuery, newPage);
+    fetchOrderCombos(newPage);
   };
-  const searchOrders = (searchQuery: string) => {
-    setPage(1);
-    fetchOrderCombos(searchQuery, 1);
+
+  const updateSearchFilter = (search: string) => {
+    setSearchTerm(search);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
   };
 
   return {
@@ -192,9 +221,11 @@ const useOrderComboManager = () => {
     totalOrders,
     loading,
     error,
+    searchTerm,
     refetch,
     goToPage,
-    searchOrders,
+    updateSearchFilter,
+    clearSearch,
   };
 };
 
