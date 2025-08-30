@@ -1,6 +1,6 @@
 'use client';
 
-import { orderApi, TOrder } from '@/services/order.api';
+import { orderApi, TOrder, TOrderCombo } from '@/services/order.api';
 import { useCallback, useEffect, useState } from 'react';
 
 const useOrderManager = () => {
@@ -87,4 +87,46 @@ const useOrderManager = () => {
   };
 };
 
-export { useOrderManager };
+const useOrderCombo = (comboId?: string) => {
+  const [orderCombo, setOrderCombo] = useState<TOrderCombo | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchOrderCombo = useCallback(async () => {
+    if (!comboId) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await orderApi.getOrderCombo(comboId);
+      if (response.success) {
+        setOrderCombo(response.content);
+      } else {
+        setOrderCombo(null);
+        setError(response.message || 'Lỗi khi tải thông tin đơn hàng');
+      }
+    } catch (err) {
+      setOrderCombo(null);
+      setError(err instanceof Error ? err.message : 'Lỗi khi tải thông tin đơn hàng');
+    } finally {
+      setLoading(false);
+    }
+  }, [comboId]);
+
+  useEffect(() => {
+    if (comboId) {
+      fetchOrderCombo();
+    }
+  }, [fetchOrderCombo, comboId]);
+
+  const refetch = () => fetchOrderCombo();
+
+  return {
+    orderCombo,
+    loading,
+    error,
+    refetch,
+  };
+};
+
+export { useOrderCombo, useOrderManager };

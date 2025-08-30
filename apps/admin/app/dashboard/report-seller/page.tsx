@@ -15,7 +15,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -45,7 +44,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  Eye,
   Filter,
   Flag,
   MoreHorizontal,
@@ -432,11 +430,16 @@ const ReportDetailModal = ({
   );
 };
 
-const ReportActions = ({ report, onVerify, onReject, onView }: any) => {
+const ReportActions = ({ report, onVerify, onReject }: any) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // If no actions are available, don't show the dropdown
+  if (report.resolutionStatus !== 'PENDING') {
+    return null;
+  }
+
   return (
-    <div className="flex items-center justify-end">
+    <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
@@ -444,30 +447,20 @@ const ReportActions = ({ report, onVerify, onReject, onView }: any) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => onView(report)}>
-            <Eye className="h-4 w-4 mr-2" />
-            Xem chi tiết
+          <DropdownMenuItem
+            onClick={() => onVerify(report.id)}
+            className="text-green-600 hover:text-green-700"
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Đồng ý tố cáo
           </DropdownMenuItem>
-
-          {report.resolutionStatus === 'PENDING' && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => onVerify(report.id)}
-                className="text-green-600 hover:text-green-700"
-              >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Đồng ý tố cáo
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onReject(report.id)}
-                className="text-red-600 hover:text-red-700"
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                Từ chối tố cáo
-              </DropdownMenuItem>
-            </>
-          )}
+          <DropdownMenuItem
+            onClick={() => onReject(report.id)}
+            className="text-red-600 hover:text-red-700"
+          >
+            <XCircle className="h-4 w-4 mr-2" />
+            Từ chối tố cáo
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -1079,11 +1072,8 @@ export default function ReportManagementPage() {
     }
   };
 
-  // Removed handleView - using router now
-
   const handleViewEvidence = async (reportId: string) => {
     try {
-      // Now we navigate to the detail page with evidence tab selected
       router.push(`/dashboard/report-seller/${reportId}?tab=evidence`);
     } catch (error) {
       console.error('Error navigating to report details:', error);
@@ -1210,16 +1200,14 @@ export default function ReportManagementPage() {
                 <TableBody>
                   {filteredReports.length > 0 ? (
                     filteredReports.map((report) => (
-                      <TableRow key={report.id} className="hover:bg-gray-50 transition-colors">
+                      <TableRow
+                        key={report.id}
+                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => router.push(`/dashboard/report-seller/${report.id}`)}
+                      >
                         <TableCell className="font-medium max-w-xs">
                           <div className="truncate" title={report.content}>
-                            <Button
-                              variant="link"
-                              className="p-0 h-auto font-normal text-left text-blue-600 hover:text-blue-800 hover:underline"
-                              onClick={() => router.push(`/dashboard/report-seller/${report.id}`)}
-                            >
-                              {report.content || 'N/A'}
-                            </Button>
+                            {report.content || 'N/A'}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -1239,7 +1227,6 @@ export default function ReportManagementPage() {
                             report={report}
                             onVerify={handleVerify}
                             onReject={handleReject}
-                            onView={() => router.push(`/dashboard/report-seller/${report.id}`)}
                           />
                         </TableCell>
                       </TableRow>
@@ -1291,8 +1278,6 @@ export default function ReportManagementPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Removed modal in favor of detail page */}
     </div>
   );
 }

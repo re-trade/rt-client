@@ -52,6 +52,36 @@ export type TOrder = {
   updatedAt: string;
 };
 
+export type TOrderCombo = {
+  comboId: string;
+  sellerId: string;
+  sellerName: string;
+  sellerAvatarUrl: string;
+  orderStatusId: string;
+  orderStatus: string;
+  grandPrice: number;
+  items: {
+    itemId: string;
+    itemName: string;
+    itemThumbnail: string;
+    productId: string;
+    basePrice: number;
+    quantity: number;
+  }[];
+  destination: {
+    customerName: string;
+    phone: string;
+    state: string;
+    country: string;
+    district: string;
+    ward: string;
+    addressLine: string;
+  };
+  createDate: string;
+  updateDate: string;
+  paymentStatus: string;
+};
+
 export const orderApi = {
   async getAllOrders(
     page: number = 0,
@@ -95,5 +125,22 @@ export const orderApi = {
       return response.data.content;
     }
     throw new Error('Order not found');
+  },
+
+  async getOrderCombo(comboId: string): Promise<IResponseObject<TOrderCombo>> {
+    try {
+      const response = await authApi.default.get<IResponseObject<TOrderCombo>>(
+        `/orders/admin/combo/${comboId}`,
+      );
+      return response.data;
+    } catch (error) {
+      return {
+        success: false,
+        content: {} as TOrderCombo,
+        message: 'Failed to fetch order combo',
+        messages: ['Failed to fetch order combo'],
+        code: 'ERROR',
+      };
+    }
   },
 };
