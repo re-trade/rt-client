@@ -129,4 +129,73 @@ const useOrderCombo = (comboId?: string) => {
   };
 };
 
-export { useOrderCombo, useOrderManager };
+const useOrderComboManager = () => {
+  const [orderCombos, setOrderCombos] = useState<TOrderCombo[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [maxPage, setMaxPage] = useState<number>(1);
+  const [totalOrders, setTotalOrders] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const pageSize = 10;
+
+  const fetchOrderCombos = useCallback(
+    async (searchQuery?: string, customPage?: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await orderApi.getAllOrderCombos(
+          (customPage ?? page) - 1,
+          pageSize,
+          searchQuery,
+        );
+        if (response.success) {
+          // Handle paginated response
+          setOrderCombos(response.content.content || []);
+          setMaxPage(response.content.totalPages || 1);
+          setTotalOrders(response.content.totalElements || 0);
+        } else {
+          setOrderCombos([]);
+          setMaxPage(1);
+          setTotalOrders(0);
+          setError(response.message || 'Lỗi khi tải đơn hàng');
+        }
+      } catch (err) {
+        setOrderCombos([]);
+        setMaxPage(1);
+        setTotalOrders(0);
+        setError(err instanceof Error ? err.message : 'Lỗi khi tải đơn hàng');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page],
+  );
+
+  useEffect(() => {
+    fetchOrderCombos();
+  }, [fetchOrderCombos]);
+
+  const refetch = () => fetchOrderCombos();
+  const goToPage = (newPage: number, searchQuery?: string) => {
+    setPage(newPage);
+    fetchOrderCombos(searchQuery, newPage);
+  };
+  const searchOrders = (searchQuery: string) => {
+    setPage(1);
+    fetchOrderCombos(searchQuery, 1);
+  };
+
+  return {
+    orderCombos,
+    page,
+    maxPage,
+    totalOrders,
+    loading,
+    error,
+    refetch,
+    goToPage,
+    searchOrders,
+  };
+};
+
+export { useOrderCombo, useOrderComboManager, useOrderManager };

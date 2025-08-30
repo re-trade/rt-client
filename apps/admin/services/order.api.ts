@@ -58,7 +58,12 @@ export type TOrderCombo = {
   sellerName: string;
   sellerAvatarUrl: string;
   orderStatusId: string;
-  orderStatus: string;
+  orderStatus: {
+    id: string;
+    code: string;
+    name: string;
+    enabled: boolean;
+  };
   grandPrice: number;
   items: {
     itemId: string;
@@ -139,6 +144,60 @@ export const orderApi = {
         content: {} as TOrderCombo,
         message: 'Failed to fetch order combo',
         messages: ['Failed to fetch order combo'],
+        code: 'ERROR',
+      };
+    }
+  },
+
+  async getAllOrderCombos(
+    page: number = 0,
+    size: number = 10,
+    query?: string,
+  ): Promise<IResponseObject<IPaginationResponse<TOrderCombo>>> {
+    try {
+      const response = await authApi.default.get<IResponseObject<TOrderCombo[]>>('/orders/combo', {
+        params: {
+          page,
+          size,
+          ...(query ? { query } : {}),
+        },
+      });
+      // Transform direct array response to pagination format
+      if (response.data.success && Array.isArray(response.data.content)) {
+        const content = response.data.content;
+        const startIndex = page * size;
+        const endIndex = startIndex + size;
+        const paginatedContent = content.slice(startIndex, endIndex);
+        const totalPages = Math.max(1, Math.ceil(content.length / size));
+
+        return {
+          success: true,
+          content: {
+            content: paginatedContent,
+            page: page,
+            size: size,
+            totalElements: content.length,
+            totalPages: totalPages,
+          },
+          message: response.data.message,
+          messages: response.data.messages,
+          code: response.data.code,
+        };
+      }
+
+      return response.data as IResponseObject<IPaginationResponse<TOrderCombo>>;
+    } catch (error) {
+      return {
+        success: false,
+        content: {
+          content: [],
+          page: 0,
+          size: size,
+          totalElements: 0,
+          totalPages: 0,
+        },
+        message: 'Failed to fetch order combos',
+        messages: ['Failed to fetch order combos'],
         code: 'ERROR',
       };
     }
