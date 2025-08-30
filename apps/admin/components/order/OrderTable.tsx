@@ -176,7 +176,7 @@ export default function OrderTable({
               <TableCell className="font-medium">
                 <div>
                   <p className="font-mono text-sm bg-gray-100 px-2 py-1 rounded border inline-block">
-                    {combo.comboId}
+                    {combo.comboId.slice(0, 8)}
                   </p>
                 </div>
               </TableCell>
