@@ -62,7 +62,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.customer-ui.rule=Host(`${DOMAIN:-retrade.local}`)"
-      - "traefik.http.routers.customer-ui.entrypoints=web"
+      - "traefik.http.routers.customer-ui.entrypoints=websecure"
       - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
       - "traefik.http.services.customer-ui.loadbalancer.server.port=3000"
@@ -80,7 +80,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.admin-ui.rule=Host(`admin.${DOMAIN:-retrade.local}`)"
-      - "traefik.http.routers.admin-ui.entrypoints=web"
+      - "traefik.http.routers.admin-ui.entrypoints=websecure"
       - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
       - "traefik.http.services.admin-ui.loadbalancer.server.port=3000"
@@ -98,7 +98,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.seller-ui.rule=Host(`seller.${DOMAIN:-retrade.local}`)"
-      - "traefik.http.routers.seller-ui.entrypoints=web"
+      - "traefik.http.routers.seller-ui.entrypoints=websecure"
       - "traefik.docker.network=retrade-network"
       - "traefik.constraint-label=retrade-service"
       - "traefik.http.services.seller-ui.loadbalancer.server.port=3000"
