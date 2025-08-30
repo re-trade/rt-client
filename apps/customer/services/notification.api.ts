@@ -55,10 +55,7 @@ const notificationApi = {
       throw new Error(
         `API response indicates failure: ${response.data.message || 'Unknown error'}`,
       );
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-
-      // Provide more specific error messages
+    } catch (error: any) {
       if (error.response?.status === 401) {
         throw new Error('Unauthorized - Please login again');
       } else if (error.response?.status === 404) {
@@ -73,7 +70,7 @@ const notificationApi = {
 
   async markAsRead(notificationId: string): Promise<boolean> {
     try {
-      const response = await authApi.notification.put(`/notifications/${notificationId}/read`);
+      const response = await authApi.notification.patch(`/notifications/${notificationId}/read`);
       return response.data.success;
     } catch (error) {
       console.error('Failed to mark notification as read:', error);

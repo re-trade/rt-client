@@ -52,6 +52,41 @@ export type TOrder = {
   updatedAt: string;
 };
 
+export type TOrderCombo = {
+  comboId: string;
+  sellerId: string;
+  sellerName: string;
+  sellerAvatarUrl: string;
+  orderStatusId: string;
+  orderStatus: {
+    id: string;
+    code: string;
+    name: string;
+    enabled: boolean;
+  };
+  grandPrice: number;
+  items: {
+    itemId: string;
+    itemName: string;
+    itemThumbnail: string;
+    productId: string;
+    basePrice: number;
+    quantity: number;
+  }[];
+  destination: {
+    customerName: string;
+    phone: string;
+    state: string;
+    country: string;
+    district: string;
+    ward: string;
+    addressLine: string;
+  };
+  createDate: string;
+  updateDate: string;
+  paymentStatus: string;
+};
+
 export const orderApi = {
   async getAllOrders(
     page: number = 0,
@@ -95,5 +130,75 @@ export const orderApi = {
       return response.data.content;
     }
     throw new Error('Order not found');
+  },
+
+  async getOrderCombo(comboId: string): Promise<IResponseObject<TOrderCombo>> {
+    try {
+      const response = await authApi.default.get<IResponseObject<TOrderCombo>>(
+        `/orders/admin/combo/${comboId}`,
+      );
+      return response.data;
+    } catch (error) {
+      return {
+        success: false,
+        content: {} as TOrderCombo,
+        message: 'Failed to fetch order combo',
+        messages: ['Failed to fetch order combo'],
+        code: 'ERROR',
+      };
+    }
+  },
+
+  async getAllOrderCombos(
+    page: number = 0,
+    size: number = 10,
+    query?: string,
+  ): Promise<IResponseObject<IPaginationResponse<TOrderCombo>>> {
+    try {
+      const response = await authApi.default.get<IResponseObject<TOrderCombo[]>>('/orders/combo', {
+        params: {
+          page,
+          size,
+          ...(query ? { q: `keyword=${query}` } : {}),
+        },
+      });
+      if (response.data.success && Array.isArray(response.data.content)) {
+        const content = response.data.content;
+        const startIndex = page * size;
+        const endIndex = startIndex + size;
+        const paginatedContent = content.slice(startIndex, endIndex);
+        const totalPages = Math.max(1, Math.ceil(content.length / size));
+
+        return {
+          success: true,
+          content: {
+            content: paginatedContent,
+            page: page,
+            size: size,
+            totalElements: content.length,
+            totalPages: totalPages,
+          },
+          message: response.data.message,
+          messages: response.data.messages,
+          code: response.data.code,
+        };
+      }
+
+      return response.data as IResponseObject<IPaginationResponse<TOrderCombo>>;
+    } catch (error) {
+      return {
+        success: false,
+        content: {
+          content: [],
+          page: 0,
+          size: size,
+          totalElements: 0,
+          totalPages: 0,
+        },
+        message: 'Failed to fetch order combos',
+        messages: ['Failed to fetch order combos'],
+        code: 'ERROR',
+      };
+    }
   },
 };

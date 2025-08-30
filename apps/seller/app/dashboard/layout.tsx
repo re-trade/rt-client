@@ -13,6 +13,7 @@ import {
   LogOut,
   MessageCircle,
   Package,
+  RefreshCw,
   ShoppingCart,
   Star,
   Store,
@@ -60,6 +61,11 @@ const menuItems = [
         title: 'Quản lý sản phẩm',
         icon: Package,
         href: '/dashboard/product',
+      },
+      {
+        title: 'Sản phẩm Retrade',
+        icon: RefreshCw,
+        href: '/dashboard/my-product',
       },
       {
         title: 'Quản lý đơn hàng',

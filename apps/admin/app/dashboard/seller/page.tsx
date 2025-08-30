@@ -10,6 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -37,10 +44,12 @@ import {
   CheckCircle,
   Clock,
   CreditCard,
+  ExternalLink,
   Eye,
   Filter,
   Mail,
   MapPin,
+  MoreHorizontal,
   Phone,
   RefreshCw,
   Search,
@@ -1186,9 +1195,10 @@ export default function SellerManagementPage() {
                       {filteredSellers.map((seller, index) => (
                         <TableRow
                           key={seller.id}
-                          className={`hover:bg-gray-50 transition-colors ${
+                          className={`hover:bg-gray-50 transition-colors cursor-pointer ${
                             index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
                           }`}
+                          onClick={() => window.open(`/dashboard/seller/${seller.id}`, '_blank')}
                         >
                           <TableCell className="font-mono text-sm text-gray-600">
                             {seller.id.slice(0, 8)}
@@ -1268,15 +1278,61 @@ export default function SellerManagementPage() {
                           </TableCell>
 
                           <TableCell className="text-right">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleView(seller)}
-                              className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
-                            >
-                              <Eye className="h-4 w-4 mr-2" />
-                              Chi tiết
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0 hover:bg-gray-100"
+                                  title="Thao tác"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleView(seller);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  Xem chi tiết (Modal)
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(`/dashboard/seller/${seller.id}`, '_blank');
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Mở trang chi tiết
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    // Add verification logic here
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <Shield className="h-4 w-4 mr-2" />
+                                  Xác minh tài khoản
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    // Add ban logic here
+                                  }}
+                                  className="cursor-pointer text-red-600 focus:text-red-600"
+                                >
+                                  <ShieldOff className="h-4 w-4 mr-2" />
+                                  Khóa tài khoản
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ))}

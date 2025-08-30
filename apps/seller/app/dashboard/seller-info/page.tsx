@@ -211,10 +211,10 @@ export default function ShopInfoManagement() {
 
   const handleEmailSave = async () => {
     if (!formData) return;
-    const email = formData.email || "";
+    const email = formData.email || '';
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error("Email không hợp lệ!");
+      toast.error('Email không hợp lệ!');
       return;
     }
     const payload: SellerProfileUpdateRequest = {
@@ -242,10 +242,10 @@ export default function ShopInfoManagement() {
 
   const handlePhoneSave = async () => {
     if (!formData) return;
-    const phone = formData.phoneNumber || "";
+    const phone = formData.phoneNumber || '';
     const phoneRegex = /^0\d{9}$/;
     if (!phoneRegex.test(phone)) {
-      toast.error("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0!");
+      toast.error('Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0!');
       return;
     }
     const payload: SellerProfileUpdateRequest = {
@@ -503,10 +503,11 @@ export default function ShopInfoManagement() {
                               <Button
                                 onClick={handleSave}
                                 disabled={!hasChanges}
-                                className={`${hasChanges
-                                  ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-md hover:shadow-lg'
-                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                  } transition-all duration-300 py-2 px-4 text-sm font-semibold`}
+                                className={`${
+                                  hasChanges
+                                    ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-md hover:shadow-lg'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                } transition-all duration-300 py-2 px-4 text-sm font-semibold`}
                               >
                                 <Save className="h-4 w-4 mr-2" />
                                 <span className="hidden sm:inline">Lưu thay đổi</span>
@@ -657,7 +658,7 @@ export default function ShopInfoManagement() {
                               <Input
                                 value={formData.phoneNumber || ''}
                                 onChange={(e) => {
-                                  const value = e.target.value.replace(/\D/g, ""); // chỉ giữ số
+                                  const value = e.target.value.replace(/\D/g, ''); // chỉ giữ số
                                   setFormData({ ...formData, phoneNumber: value });
                                 }}
                                 maxLength={10} // giới hạn 10 ký tự

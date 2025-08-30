@@ -1,177 +1,243 @@
 # 🛒 Retrade Client Applications
 
-**Retrade** is a comprehensive e-commerce platform consisting of three specialized applications designed to serve different user roles in the marketplace ecosystem. Built with modern web technologies and a monorepo architecture, this project delivers scalable, performant, and user-friendly experiences across all touchpoints.
+Welcome to the **Retrade** client applications repository! This monorepo contains all frontend applications for the Retrade e-commerce platform, built with modern web technologies and designed for scalability and performance.
 
-## 🏗️ Project Overview
+## 📋 Table of Contents
 
-This monorepo contains three main applications:
+- [🛒 Retrade Client Applications](#-retrade-client-applications)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [🏗️ Architecture Overview](#️-architecture-overview)
+  - [🚀 Applications](#-applications)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [📦 Project Structure](#-project-structure)
+  - [⚡ Quick Start](#-quick-start)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Development](#development)
+    - [Production Build](#production-build)
+  - [🐳 Docker Deployment](#-docker-deployment)
+    - [Local Development](#local-development)
+    - [Production Deployment](#production-deployment)
+  - [🔧 Configuration](#-configuration)
+  - [📚 Development Guidelines](#-development-guidelines)
+  - [🧪 Testing & Quality](#-testing--quality)
+  - [📈 Performance](#-performance)
+  - [🔒 Security](#-security)
+  - [🚀 CI/CD Pipeline](#-cicd-pipeline)
+  - [🤝 Contributing](#-contributing)
+  - [📄 License](#-license)
 
-### 🛠️ [Admin Dashboard](./apps/admin/README.md)
+## 🏗️ Architecture Overview
 
-**Administrative Control Center**
+Retrade is a comprehensive e-commerce platform built with a microservices architecture. This repository contains three specialized frontend applications that interact with backend services through RESTful APIs, real-time WebSocket connections, and STOMP messaging.
 
-- Platform-wide analytics and monitoring
-- User and seller account management
-- Product catalog oversight and moderation
-- Financial reporting and revenue tracking
-- System configuration and policy management
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Customer App  │    │   Seller App    │    │   Admin App     │
+│   (Next.js 15)  │    │   (Next.js 15)  │    │   (Next.js 15)  │
+│   Port: 3001    │    │   Port: 3002    │    │   Port: 3000    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │  Backend APIs   │
+                    │  (Microservices)│
+                    │  + WebSocket    │
+                    │  + STOMP        │
+                    └─────────────────┘
+```
 
-### 🛒 [Customer Application](./apps/customer/README.md)
+## 🚀 Applications
 
-**E-commerce Shopping Platform**
+### 🛍️ Customer Application (`@retrade/rt-client-customer`)
 
-- Product browsing and search functionality
-- Shopping cart and checkout process
-- User account and profile management
-- Order tracking and purchase history
-- Responsive design for all devices
+- **Port**: 3001 (development)
+- **Purpose**: Main e-commerce storefront for customers
+- **Key Features**:
+  - 🛒 Product browsing and search
+  - 🛍️ Shopping cart with real-time updates
+  - 💳 Secure checkout and payment processing
+  - 👤 User account management and profiles
+  - 📦 Order tracking and history
+  - 💬 Real-time chat with sellers
+  - 📱 Responsive mobile-first design
+  - 🔔 Real-time notifications
+  - 💰 Digital wallet integration
+  - ⭐ Product reviews and ratings
+  - 📍 Address management
+  - 🎯 Personalized recommendations
 
-### 🏪 [Seller Dashboard](./apps/seller/README.md)
+### 🏪 Seller Dashboard (`@retrade/rt-client-seller`)
 
-**Business Management Platform**
+- **Port**: 3002 (development)
+- **Purpose**: Comprehensive seller management portal
+- **Key Features**:
+  - 📊 Advanced analytics and reporting
+  - 📦 Product catalog management
+  - 📋 Order processing and fulfillment
+  - 💰 Revenue tracking and financial reports
+  - 📈 Sales performance metrics
+  - 💬 Customer communication tools
+  - 🚚 Shipping and logistics management
+  - 🎫 Voucher and promotion management
+  - 📱 Mobile-responsive interface
+  - 🔔 Real-time order notifications
+  - 👥 Customer relationship management
+  - 📊 Interactive charts and dashboards
 
-- Product catalog and inventory management
-- Order processing and fulfillment
-- Revenue analytics and financial tracking
-- Shop branding and configuration
-- Marketing tools and promotions
+### 🛠️ Admin Dashboard (`@retrade/rt-client-admin`)
 
-## 🛠️ Technology Stack
+- **Port**: 3000 (development)
+- **Purpose**: Platform administration and management
+- **Key Features**:
+  - 👥 User and seller management
+  - 🏢 Brand and category administration
+  - 📊 Platform-wide analytics
+  - 💰 Financial oversight and platform fees
+  - 🚨 Alert and monitoring systems
+  - 📋 Report management
+  - ⚙️ System configuration
+  - 🔒 Security and access control
+  - 📈 Revenue and growth tracking
+  - 🎫 Voucher system management
+  - 💸 Withdrawal request processing
 
-### Core Framework
+## 🛠️ Tech Stack
 
-- **Next.js 15+** - React framework with App Router
-- **React 19** - Latest React with concurrent features
-- **TypeScript 5** - Type-safe development
-- **Turbo** - Monorepo build system
+### Core Technologies
 
-### UI & Styling
+- **Framework**: [Next.js 15](https://nextjs.org/) with App Router & Turbopack
+- **Language**: [TypeScript 5.5+](https://www.typescriptlang.org/) (Strict mode)
+- **Styling**: [Tailwind CSS 4.1+](https://tailwindcss.com/) with DaisyUI
+- **Build Tool**: [Turbo 2.5+](https://turbo.build/) (Monorepo management)
+- **Package Manager**: [Yarn 1.22+](https://yarnpkg.com/) with Workspaces
+- **Runtime**: Node.js 18+
 
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **Radix UI** - Accessible component primitives
-- **DaisyUI** - Component library (Customer app)
-- **Lucide React** - Modern icon library
-- **React Icons** - Comprehensive icon collection
+### UI Components & Design System
 
-### State Management
+- **Component Library**: [Radix UI](https://www.radix-ui.com/) (Accessible primitives)
+- **Icons**: [Lucide React](https://lucide.dev/), [Heroicons](https://heroicons.com/), [Tabler Icons](https://tabler.io/icons)
+- **Charts**: [Recharts 3.1+](https://recharts.org/) (Admin), [Recharts 2.15+](https://recharts.org/) (Seller)
+- **Animations**: [Framer Motion 12+](https://www.framer.com/motion/)
+- **Notifications**: [Sonner](https://sonner.emilkowal.ski/)
+- **Styling Utils**: [clsx](https://github.com/lukeed/clsx), [tailwind-merge](https://github.com/dcastil/tailwind-merge)
 
-- **Redux Toolkit** - Predictable state container
-- **React Redux** - React bindings for Redux
+### State Management & Data Fetching
 
-### Development Tools
+- **HTTP Client**: [Axios 1.7+](https://axios-http.com/) with custom interceptors
+- **State Management**:
+  - React Context API (Customer, Seller)
+  - Redux Toolkit 2.5+ (Admin)
+- **Real-time Communication**:
+  - [STOMP.js 7.1+](https://stomp-js.github.io/) over WebSocket
+  - Socket.io Client 4.8+ (Utility package)
+- **Form Handling**: Custom hooks with [Joi](https://joi.dev/) validation
 
-- **Turbopack** - Fast bundler for development
-- **ESLint** - Code linting and quality
-- **Prettier** - Code formatting
-- **Husky** - Git hooks for code quality
+### Development & Build Tools
 
-## 🚀 Quick Start
+- **Linting**: [ESLint 9+](https://eslint.org/) with Next.js config
+- **Formatting**: [Prettier 3.5+](https://prettier.io/) with plugins
+- **Git Hooks**: [Husky 9.1+](https://typicode.github.io/husky/)
+- **Type Checking**: TypeScript strict mode with custom configs
+- **Device Fingerprinting**: [FingerprintJS 4.6+](https://fingerprintjs.com/)
+
+### Specialized Libraries
+
+- **File Processing**: [XLSX](https://sheetjs.com/) (Admin)
+- **Markdown**: [React Markdown](https://github.com/remarkjs/react-markdown) with GFM
+- **Date Handling**: [date-fns 4.1+](https://date-fns.org/) (Customer)
+- **Color Processing**: [ColorThief 2.6+](https://lokeshdhakar.com/projects/color-thief/) (Customer)
+- **WebRTC**: Custom WebRTC configuration for video calls
+
+## 📦 Project Structure
+
+```
+retrade-client/
+├── apps/
+│   ├── customer/              # Customer-facing e-commerce app
+│   │   ├── app/              # Next.js App Router pages
+│   │   ├── components/       # React components
+│   │   ├── context/          # React Context providers
+│   │   ├── hooks/            # Custom React hooks
+│   │   ├── services/         # API service layer
+│   │   └── utils/            # Utility functions
+│   ├── seller/               # Seller dashboard application
+│   │   ├── app/              # Next.js App Router pages
+│   │   ├── components/       # React components
+│   │   ├── context/          # React Context providers
+│   │   ├── hooks/            # Custom React hooks
+│   │   ├── service/          # API service layer
+│   │   └── utils/            # Utility functions
+│   └── admin/                # Admin dashboard application
+│       ├── app/              # Next.js App Router pages
+│       ├── components/       # React components
+│       ├── hooks/            # Custom React hooks
+│       ├── services/         # API service layer
+│       └── lib/              # Utility functions
+├── packages/
+│   ├── components/           # Shared UI components
+│   ├── util/                 # Shared utilities and APIs
+│   │   ├── src/api/          # HTTP client configuration
+│   │   ├── src/socket/       # WebSocket/STOMP configuration
+│   │   ├── src/webrtc/       # WebRTC configuration
+│   │   └── src/file/         # File handling utilities
+│   └── typescript-config/    # Shared TypeScript configurations
+├── .docker/                  # Docker configurations
+│   ├── compose.yaml          # Production deployment
+│   ├── compose.local.yaml    # Local development
+│   └── compose.build.yaml    # Build configuration
+├── .github/                  # GitHub Actions workflows
+│   └── workflows/
+│       ├── main.yaml         # Main deployment pipeline
+│       ├── deploy-dev.yaml   # Development deployment
+│       └── build-image.yaml  # Docker image building
+└── .husky/                   # Git hooks configuration
+```
+
+## ⚡ Quick Start
 
 ### Prerequisites
 
-- **Node.js** >= 18.0.0
-- **Yarn** 1.22.22 (recommended)
-- **Git** for version control
+- **Node.js**: >= 18.0.0
+- **Yarn**: >= 1.22.22
+- **Docker**: >= 20.0.0 (for containerized deployment)
+- **Git**: Latest version
 
 ### Installation
 
-1. **Clone the repository**:
+```bash
+# Clone the repository
+git clone <repository-url>
+cd retrade-client
 
-   ```bash
-   git clone https://github.com/re-trade/rt-client.git
-   cd rt-client
-   ```
+# Install dependencies for all workspaces
+yarn install
 
-2. **Install dependencies**:
+# Build shared packages
+yarn build
+```
 
-   ```bash
-   yarn install
-   ```
-
-3. **Set up environment variables** for each app:
-   ```bash
-   # Copy environment templates
-   cp apps/admin/.env.example apps/admin/.env.local
-   cp apps/customer/.env.example apps/customer/.env.local
-   cp apps/seller/.env.example apps/seller/.env.local
-   ```
-
-### Development Commands
+### Development
 
 ```bash
-# Start all applications in development mode
+# Start all applications in development mode with Turbopack
 yarn dev
 
 # Start specific application
-yarn workspace @retrade/rt-client-admin dev      # Admin Dashboard
-yarn workspace @retrade/rt-client-customer dev   # Customer App
-yarn workspace @retrade/rt-client-seller dev     # Seller Dashboard
+yarn workspace @retrade/rt-client-customer dev
+yarn workspace @retrade/rt-client-seller dev
+yarn workspace @retrade/rt-client-admin dev
 
-# Build all applications
-yarn build
-
-# Run linting across all apps
-yarn lint
-
-# Format code across all apps
-yarn format
+# Run with specific port (if needed)
+yarn workspace @retrade/rt-client-customer dev -- --port 3001
 ```
 
-## 📁 Project Structure
+**Application URLs:**
 
-```
-rt-client/
-├── apps/                         # Applications
-│   ├── admin/                    # Admin Dashboard
-│   ├── customer/                 # Customer Application
-│   └── seller/                   # Seller Dashboard
-├── packages/                     # Shared packages
-│   ├── components/               # Shared UI components
-│   ├── typescript-config/        # TypeScript configurations
-│   └── util/                     # Shared utilities
-├── .husky/                       # Git hooks
-├── package.json                  # Root package configuration
-├── turbo.json                    # Turbo configuration
-└── yarn.lock                     # Dependency lock file
-```
-
-## 🌐 Application URLs
-
-When running in development mode:
-
-- **Admin Dashboard**: http://localhost:3000 (default)
-- **Customer Application**: http://localhost:3001
+- **Customer App**: http://localhost:3001
 - **Seller Dashboard**: http://localhost:3002
-
-## 🔧 Development Workflow
-
-### Code Quality
-
-This project includes automated code quality tools:
-
-- **Pre-commit Hooks**: Automatically format code before commits
-- **Cross-platform Support**: Works on Windows PowerShell, Linux, and macOS
-- **ESLint**: Consistent code style and error detection
-- **Prettier**: Automatic code formatting
-- **TypeScript**: Type safety and better developer experience
-
-### Git Workflow
-
-```bash
-# The pre-commit hook will automatically run yarn format
-git add .
-git commit -m "Your commit message"
-# Code is automatically formatted before commit
-```
-
-### Monorepo Benefits
-
-- **Shared Dependencies**: Efficient dependency management
-- **Code Sharing**: Reusable components and utilities
-- **Consistent Tooling**: Unified development experience
-- **Atomic Changes**: Cross-application updates in single commits
-
-## 🚀 Deployment
+- **Admin Dashboard**: http://localhost:3000
 
 ### Production Build
 
@@ -180,83 +246,214 @@ git commit -m "Your commit message"
 yarn build
 
 # Build specific application
-yarn workspace @retrade/rt-client-admin build
 yarn workspace @retrade/rt-client-customer build
-yarn workspace @retrade/rt-client-seller build
+
+# Start production server
+yarn workspace @retrade/rt-client-customer start
 ```
 
-### Docker Support
+## 🐳 Docker Deployment
 
-Each application includes Docker configuration:
+### Local Development
 
 ```bash
-# Build Docker images
-docker build -f apps/admin/Dockerfile -t retrade-admin .
-docker build -f apps/customer/Dockerfile -t retrade-customer .
-docker build -f apps/seller/Dockerfile -t retrade-seller .
+# Start all services locally with development profile
+docker compose -f .docker/compose.local.yaml --profile dev up -d
+
+# Start specific service
+docker compose -f .docker/compose.local.yaml --profile customer up -d
+docker compose -f .docker/compose.local.yaml --profile seller up -d
+docker compose -f .docker/compose.local.yaml --profile admin up -d
+
+# View logs
+docker compose -f .docker/compose.local.yaml logs -f
 ```
 
-### Environment Configuration
+### Production Deployment
 
-Each application requires specific environment variables. See individual README files for detailed configuration:
+```bash
+# Deploy to staging environment
+docker compose -f .docker/compose.yaml --profile stag up -d
 
-- [Admin Environment Setup](./apps/admin/README.md#getting-started)
-- [Customer Environment Setup](./apps/customer/README.md#getting-started)
-- [Seller Environment Setup](./apps/seller/README.md#getting-started)
+# Deploy to production environment
+docker compose -f .docker/compose.yaml --profile prod up -d
 
-## 📚 Documentation
+# Deploy specific service to production
+docker compose -f .docker/compose.yaml --profile customer up -d
+```
 
-### Application-Specific Documentation
+**Production URLs:**
 
-- **[Admin Dashboard](./apps/admin/README.md)** - Complete admin features and setup
-- **[Customer Application](./apps/customer/README.md)** - Shopping platform details
-- **[Seller Dashboard](./apps/seller/README.md)** - Business management tools
+- **Customer**: `https://retrade.local` (prod) / `https://dev.retrade.local` (staging)
+- **Seller**: `https://seller.retrade.local` (prod) / `https://seller-dev.retrade.local` (staging)
+- **Admin**: `https://admin.retrade.local` (prod) / `https://admin-dev.retrade.local` (staging)
 
-### Development Resources
+## 🔧 Configuration
 
-- **Component Library**: Shared UI components in `/packages/components`
-- **TypeScript Config**: Shared configurations in `/packages/typescript-config`
-- **Utilities**: Common functions in `/packages/util`
+Each application uses environment variables for configuration. Create `.env.local` files in each app directory:
 
-## 🤝 Contributing
+### Customer App (`.env.local`)
 
-### Development Setup
+```env
+API_BASE_URL=https://api.retrade.local
+SOCKET_URL=wss://socket.retrade.local
+NEXT_PUBLIC_APP_ENV=development
+```
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+### Seller App (`.env.local`)
 
-### Code Standards
+```env
+API_BASE_URL=https://api.retrade.local
+SOCKET_URL=wss://socket.retrade.local
+NEXT_PUBLIC_APP_ENV=development
+```
 
-- Follow TypeScript best practices
-- Use ESLint and Prettier configurations
-- Write meaningful commit messages
-- Add proper documentation for new features
-- Ensure responsive design implementation
+### Admin App (`.env.local`)
+
+```env
+API_BASE_URL=https://api.retrade.local
+SOCKET_URL=wss://socket.retrade.local
+NEXT_PUBLIC_APP_ENV=development
+```
+
+## 📚 Development Guidelines
+
+### Code Style & Standards
+
+- Follow TypeScript strict mode with proper type definitions
+- Use functional components with React hooks
+- Implement proper error boundaries for robust error handling
+- Follow the established folder structure and naming conventions
+- Use ESLint and Prettier for consistent code formatting
+
+### Component Development
+
+- Use Radix UI primitives for accessible, unstyled components
+- Implement responsive design with Tailwind CSS mobile-first approach
+- Create reusable components in the shared packages when applicable
+- Follow the compound component pattern for complex UI elements
+- Use proper TypeScript interfaces for component props
+
+### API Integration
+
+- Use the shared API utilities from `@retrade/util` package
+- Implement comprehensive error handling with user-friendly messages
+- Use TypeScript interfaces for all API request/response types
+- Handle loading, success, and error states consistently across components
+- Implement proper caching strategies for frequently accessed data
+
+### State Management
+
+- Use React Context for application-wide state in Customer and Seller apps
+- Use Redux Toolkit for complex state management in Admin app
+- Implement proper state normalization for complex data structures
+- Use custom hooks to encapsulate state logic and side effects
+
+## 🧪 Testing & Quality
+
+```bash
+# Run linting across all workspaces
+yarn lint
+
+# Format code with Prettier
+yarn format
+
+# Type checking
+yarn type-check
+
+# Run specific linting
+yarn workspace @retrade/rt-client-customer lint
+```
+
+### Quality Assurance
+
+- **ESLint**: Configured with Next.js and TypeScript rules
+- **Prettier**: Automated code formatting with custom configuration
+- **Husky**: Pre-commit hooks for code quality enforcement
+- **TypeScript**: Strict mode enabled for type safety
+
+## 📈 Performance
+
+### Optimization Strategies
+
+- **Bundle Optimization**: Next.js automatic code splitting and tree shaking
+- **Image Optimization**: Next.js Image component with remote pattern support
+- **Lazy Loading**: Component-level code splitting with dynamic imports
+- **Caching**: Proper HTTP caching headers and Next.js built-in caching
+- **Turbopack**: Fast bundler for development with hot module replacement
+
+### Performance Monitoring
+
+- Built-in Next.js analytics and performance metrics
+- Custom performance tracking for critical user journeys
+- Bundle analyzer integration for bundle size monitoring
 
 ## 🔒 Security
 
-- **Authentication**: Secure user authentication across all applications
-- **Authorization**: Role-based access control
-- **Data Protection**: HTTPS enforcement and data encryption
-- **Input Validation**: Comprehensive input sanitization
-- **Security Headers**: Proper security header configuration
+### Security Measures
 
-## 📞 Support
+- **Authentication**: JWT-based authentication with refresh tokens
+- **Authorization**: Role-based access control (RBAC)
+- **HTTPS**: Enforced in production with proper SSL/TLS configuration
+- **Input Validation**: Client and server-side validation with Joi schemas
+- **XSS Protection**: Sanitized user inputs and CSP headers
+- **Device Fingerprinting**: FingerprintJS for enhanced security
+- **Secure Headers**: Comprehensive security headers configuration
 
-- **Technical Documentation**: Individual app README files
-- **Issue Tracking**: GitHub Issues
-- **Development Team**: Contact for technical support
-- **Business Inquiries**: Contact for partnership opportunities
+### Data Protection
 
----
+- Sensitive data encryption in transit and at rest
+- Proper session management and token handling
+- GDPR-compliant data handling practices
 
-**Version**: 0.1.0
-**Last Updated**: 2024
-**Maintained by**: Retrade Development Team
+## 🚀 CI/CD Pipeline
+
+### GitHub Actions Workflows
+
+#### Main Pipeline (`main.yaml`)
+
+- Triggers on push to `main` branch
+- Builds Docker images for all applications
+- Deploys to both staging and production environments
+
+#### Build Process (`build-image.yaml`)
+
+- Matrix strategy for parallel builds (customer, seller, admin)
+- Separate builds for development and production environments
+- Pushes images to GitHub Container Registry (GHCR)
+
+#### Deployment (`deploy-dev.yaml`)
+
+- Automated deployment to development and production servers
+- Docker Compose orchestration with proper profiles
+- Automatic cleanup of old images and containers
+
+### Deployment Environments
+
+- **Development**: Continuous deployment from `main` branch
+- **Staging**: Pre-production testing environment
+- **Production**: Stable production environment with manual approval
+
+## 🤝 Contributing
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes following the coding standards
+4. Run tests and linting (`yarn lint && yarn type-check`)
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request with detailed description
+
+### Pull Request Guidelines
+
+- Provide clear description of changes
+- Include screenshots for UI changes
+- Ensure all checks pass (linting, type checking)
+- Update documentation if necessary
+- Request review from relevant team members
 
 ## 📄 License
 
-This project is proprietary software. All rights reserved.
+This project is proprietary and confidential. All rights reserved by Retrade Platform.

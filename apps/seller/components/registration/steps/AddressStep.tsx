@@ -2,18 +2,12 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Textarea } from '@/components/ui/textarea';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useRegistrationAddressData } from '@/hooks/use-registration-address-data';
 import { useRegistrationValidation } from '@/hooks/use-registration-validation';
-import { CheckCircle2, Loader2, MapPin, X } from 'lucide-react';
+import { CheckCircle2, MapPin, X } from 'lucide-react';
 import React from 'react';
 
 export default function AddressStep() {
@@ -79,34 +73,22 @@ export default function AddressStep() {
                 Tỉnh/Thành phố
                 <span className="text-red-500 ml-1">*</span>
               </Label>
-              <Select
+              <SearchableSelect
+                options={provinces.map((province) => ({
+                  value: province.code.toString(),
+                  label: province.name,
+                }))}
                 value={formData.state}
                 onValueChange={(value) => handleSelectChange('state', value)}
-              >
-                <SelectTrigger
-                  className={`h-12 border-2 transition-all duration-200 ${
-                    errors.state
-                      ? 'border-red-400 focus:border-red-500'
-                      : 'border-orange-200 focus:border-orange-400'
-                  }`}
-                >
-                  <SelectValue placeholder="Chọn tỉnh/thành phố" />
-                </SelectTrigger>
-                <SelectContent>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="ml-2 text-sm">Đang tải...</span>
-                    </div>
-                  ) : (
-                    provinces.map((province) => (
-                      <SelectItem key={province.code} value={province.code.toString()}>
-                        {province.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+                placeholder="Chọn tỉnh/thành phố"
+                searchPlaceholder="Tìm tỉnh/thành phố..."
+                emptyMessage="Không tìm thấy tỉnh/thành phố phù hợp"
+                error={!!errors.state}
+                disabled={loading}
+                loading={loading}
+                className="border-2 transition-all duration-200"
+              />
+
               {errors.state && (
                 <p className="text-red-600 text-sm flex items-center gap-2">
                   <X className="w-4 h-4" />
@@ -121,35 +103,22 @@ export default function AddressStep() {
                 Quận/Huyện
                 <span className="text-red-500 ml-1">*</span>
               </Label>
-              <Select
+              <SearchableSelect
+                options={districts.map((district) => ({
+                  value: district.code.toString(),
+                  label: district.name,
+                }))}
                 value={formData.district}
                 onValueChange={(value) => handleSelectChange('district', value)}
-                disabled={!formData.state}
-              >
-                <SelectTrigger
-                  className={`h-12 border-2 transition-all duration-200 ${
-                    errors.district
-                      ? 'border-red-400 focus:border-red-500'
-                      : 'border-orange-200 focus:border-orange-400'
-                  }`}
-                >
-                  <SelectValue placeholder="Chọn quận/huyện" />
-                </SelectTrigger>
-                <SelectContent>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="ml-2 text-sm">Đang tải...</span>
-                    </div>
-                  ) : (
-                    districts.map((district) => (
-                      <SelectItem key={district.code} value={district.code.toString()}>
-                        {district.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+                placeholder="Chọn quận/huyện"
+                searchPlaceholder="Tìm quận/huyện..."
+                emptyMessage="Không tìm thấy quận/huyện phù hợp"
+                error={!!errors.district}
+                disabled={!formData.state || loading}
+                loading={!!(loading && formData.state)}
+                className="border-2 transition-all duration-200"
+              />
+
               {errors.district && (
                 <p className="text-red-600 text-sm flex items-center gap-2">
                   <X className="w-4 h-4" />
@@ -164,35 +133,22 @@ export default function AddressStep() {
                 Phường/Xã
                 <span className="text-red-500 ml-1">*</span>
               </Label>
-              <Select
+              <SearchableSelect
+                options={wards.map((ward) => ({
+                  value: ward.code.toString(),
+                  label: ward.name,
+                }))}
                 value={formData.ward}
                 onValueChange={(value) => handleSelectChange('ward', value)}
-                disabled={!formData.district}
-              >
-                <SelectTrigger
-                  className={`h-12 border-2 transition-all duration-200 ${
-                    errors.ward
-                      ? 'border-red-400 focus:border-red-500'
-                      : 'border-orange-200 focus:border-orange-400'
-                  }`}
-                >
-                  <SelectValue placeholder="Chọn phường/xã" />
-                </SelectTrigger>
-                <SelectContent>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="ml-2 text-sm">Đang tải...</span>
-                    </div>
-                  ) : (
-                    wards.map((ward) => (
-                      <SelectItem key={ward.code} value={ward.code.toString()}>
-                        {ward.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+                placeholder="Chọn phường/xã"
+                searchPlaceholder="Tìm phường/xã..."
+                emptyMessage="Không tìm thấy phường/xã phù hợp"
+                error={!!errors.ward}
+                disabled={!formData.district || loading}
+                loading={!!(loading && formData.district)}
+                className="border-2 transition-all duration-200"
+              />
+
               {errors.ward && (
                 <p className="text-red-600 text-sm flex items-center gap-2">
                   <X className="w-4 h-4" />

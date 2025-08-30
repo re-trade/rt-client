@@ -16,7 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useWithdrawHistoryPagination } from '@/hooks/use-withdraw-history-pagination';
-import { snipppetCode } from '@/service/snippetCode';
 import { WithdrawHistoryResponse } from '@/service/wallet.api';
 import {
   AlertCircle,
@@ -25,7 +24,6 @@ import {
   CheckCircle,
   Clock,
   Eye,
-  Hash,
   MoreVertical,
   TrendingDown,
   XCircle,
@@ -227,13 +225,10 @@ export function WithdrawHistoryActiveTab() {
                 return (
                   <TableRow
                     key={withdraw.id}
-                    className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${index === withdrawHistory.length - 1 ? 'border-b-0' : ''
-                      }`}
+                    className={`hover:bg-blue-50/50 transition-all duration-200 border-b border-gray-100 group ${
+                      index === withdrawHistory.length - 1 ? 'border-b-0' : ''
+                    }`}
                   >
-
-
-
-
                     <TableCell className="py-5">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">

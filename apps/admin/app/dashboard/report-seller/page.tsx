@@ -1,8 +1,9 @@
 'use client';
 
+import MetricCard from '@/components/dashboard/MetricCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -37,8 +44,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
-  Eye,
   Filter,
+  Flag,
+  MoreHorizontal,
   Package,
   Plus,
   RefreshCw,
@@ -48,7 +56,8 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const ReportStats = ({ reports }: { reports: any[] }) => {
@@ -62,55 +71,48 @@ const ReportStats = ({ reports }: { reports: any[] }) => {
       title: 'Tổng số tố cáo',
       value: totalReports,
       icon: TrendingUp,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      iconBg: 'bg-blue-100',
+      color: 'from-blue-500 to-blue-600',
+      trend: 'neutral' as const,
+      change: 'Toàn bộ tố cáo',
     },
     {
       title: 'Đã duyệt',
       value: verifiedReports,
       icon: CheckCircle,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      iconBg: 'bg-green-100',
+      color: 'from-green-500 to-green-600',
+      trend: 'up' as const,
+      change: `${Math.round((verifiedReports / totalReports) * 100) || 0}% tổng số`,
     },
     {
       title: 'Đã từ chối',
       value: rejectedReports,
       icon: XCircle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      iconBg: 'bg-red-100',
+      color: 'from-red-500 to-red-600',
+      trend: 'down' as const,
+      change: `${Math.round((rejectedReports / totalReports) * 100) || 0}% tổng số`,
     },
     {
       title: 'Đang chờ',
       value: pendingReports,
       icon: Clock,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      iconBg: 'bg-orange-100',
+      color: 'from-orange-500 to-orange-600',
+      trend: 'neutral' as const,
+      change: `${Math.round((pendingReports / totalReports) * 100) || 0}% tổng số`,
     },
   ];
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat, index) => (
-        <Card
+        <MetricCard
           key={index}
-          className={`${stat.bgColor} border-0 shadow-sm hover:shadow-md transition-shadow`}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
-              </div>
-              <div className={`${stat.iconBg} p-3 rounded-full`}>
-                <stat.icon className={`h-6 w-6 ${stat.color}`} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          title={stat.title}
+          value={stat.value}
+          icon={stat.icon}
+          color={stat.color}
+          trend={stat.trend}
+          change={stat.change}
+        />
       ))}
     </div>
   );
@@ -166,6 +168,32 @@ const ReportDetailModal = ({
   onVerify?: (id: string) => void;
   onReject?: (id: string) => void;
 }) => {
+  const [activeTab, setActiveTab] = useState<'details' | 'evidence'>('details');
+  const [evidenceData, setEvidenceData] = useState<TEvidence[] | null>(null);
+  const [evidenceLoading, setEvidenceLoading] = useState<boolean>(false);
+  const { fetchEvidence } = useReportSeller();
+
+  useEffect(() => {
+    if (isOpen && report && activeTab === 'evidence') {
+      loadEvidence();
+    }
+  }, [isOpen, report, activeTab]);
+
+  const loadEvidence = async () => {
+    if (!report?.id) return;
+
+    setEvidenceLoading(true);
+    try {
+      const evidenceArray = await fetchEvidence(report.id);
+      setEvidenceData(evidenceArray);
+    } catch (error) {
+      console.error('Error loading evidence:', error);
+      setEvidenceData([]);
+    } finally {
+      setEvidenceLoading(false);
+    }
+  };
+
   if (!report) return null;
 
   return (
@@ -177,101 +205,202 @@ const ReportDetailModal = ({
             Thông tin tố cáo
           </DialogTitle>
           <DialogDescription>Thông tin chi tiết về tố cáo</DialogDescription>
+
+          {/* Tabs */}
+          <div className="flex border-b space-x-8">
+            <button
+              onClick={() => setActiveTab('details')}
+              className={`pb-2 px-1 font-medium text-sm transition-colors ${
+                activeTab === 'details'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              Chi tiết tố cáo
+            </button>
+            <button
+              onClick={() => setActiveTab('evidence')}
+              className={`pb-2 px-1 font-medium text-sm transition-colors flex items-center gap-1 ${
+                activeTab === 'evidence'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              Bằng chứng
+              {evidenceLoading && <RefreshCw className="h-3 w-3 animate-spin ml-1" />}
+            </button>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-6">
-          <div className="grid gap-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  ID Tố cáo
-                </p>
-                <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
-                  {report.id}
-                </p>
+        {activeTab === 'details' && (
+          <div className="space-y-6">
+            <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    ID Tố cáo
+                  </p>
+                  <p className="font-mono text-sm bg-gray-50 p-2 rounded border break-all">
+                    {report.id}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    ID Khách hàng
+                  </p>
+                  <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
+                    {report.customerId}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    ID Sản phẩm
+                  </p>
+                  <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
+                    {report.productId}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    ID Đơn hàng
+                  </p>
+                  <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
+                    {report.orderId}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    ID Người bán
+                  </p>
+                  <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
+                    {report.sellerId}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    Loại tố cáo
+                  </p>
+                  <Badge variant="secondary" className="text-sm">
+                    {report.typeReport}
+                  </Badge>
+                </div>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  ID Khách hàng
-                </p>
-                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
-                  {report.customerId}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  ID Sản phẩm
-                </p>
-                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">
-                  {report.productId}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  ID Đơn hàng
-                </p>
-                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">{report.orderId}</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  ID Người bán
-                </p>
-                <p className="font-mono text-sm bg-gray-50 p-2 rounded border">{report.sellerId}</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  Loại tố cáo
-                </p>
-                <Badge variant="secondary" className="text-sm">
-                  {report.typeReport}
-                </Badge>
-              </div>
-            </div>
 
-            <Separator />
+              <Separator />
 
-            <div className="space-y-2">
-              <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                Nội dung
-              </p>
-              <div className="bg-gray-50 p-4 rounded-lg border">
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{report.content}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  Ngày tạo
+                  Nội dung
                 </p>
-                <p className="text-sm bg-gray-50 p-2 rounded border">
-                  {new Date(report.createdAt).toLocaleDateString('vi-VN')}
-                </p>
+                <div className="bg-gray-50 p-4 rounded-lg border">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{report.content}</p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                  Trạng thái
-                </p>
-                <Badge
-                  variant={
-                    report.resolutionStatus === 'ACCEPTED'
-                      ? 'default'
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    Ngày tạo
+                  </p>
+                  <p className="text-sm bg-gray-50 p-2 rounded border">
+                    {new Date(report.createdAt).toLocaleDateString('vi-VN')}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    Trạng thái
+                  </p>
+                  <Badge
+                    variant={
+                      report.resolutionStatus === 'ACCEPTED'
+                        ? 'default'
+                        : report.resolutionStatus === 'REJECTED'
+                          ? 'destructive'
+                          : 'secondary'
+                    }
+                    className="text-sm"
+                  >
+                    {report.resolutionStatus === 'ACCEPTED'
+                      ? 'Đã xác minh'
                       : report.resolutionStatus === 'REJECTED'
-                        ? 'destructive'
-                        : 'secondary'
-                  }
-                  className="text-sm"
-                >
-                  {report.resolutionStatus === 'ACCEPTED'
-                    ? 'Đã xác minh'
-                    : report.resolutionStatus === 'REJECTED'
-                      ? 'Đã từ chối'
-                      : 'Chờ duyệt'}
-                </Badge>
+                        ? 'Đã từ chối'
+                        : 'Chờ duyệt'}
+                  </Badge>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'evidence' && (
+          <div className="space-y-4">
+            {evidenceLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center space-y-3">
+                  <RefreshCw className="h-10 w-10 animate-spin text-blue-500 mx-auto" />
+                  <p className="text-gray-600">Đang tải bằng chứng...</p>
+                </div>
+              </div>
+            ) : evidenceData && evidenceData.length > 0 ? (
+              <div className="space-y-6">
+                {evidenceData.map((item, index) => (
+                  <Card key={index} className="overflow-hidden">
+                    <CardHeader className="bg-gray-50 p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-sm font-medium">{item.senderName || 'N/A'}</p>
+                          <p className="text-xs text-gray-500">{item.senderRole || 'N/A'}</p>
+                        </div>
+                        <Badge variant="outline">{new Date().toLocaleDateString('vi-VN')}</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                            {item.notes || 'Không có ghi chú'}
+                          </p>
+                        </div>
+
+                        {item.evidenceUrls && item.evidenceUrls.length > 0 && (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
+                            {item.evidenceUrls.map((url, urlIndex) => {
+                              const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?$/i.test(url);
+                              return isImage ? (
+                                <div key={urlIndex} className="relative group">
+                                  <img
+                                    src={url || '/placeholder.svg'}
+                                    alt={`Bằng chứng ${urlIndex + 1}`}
+                                    className="w-full h-20 sm:h-24 object-cover rounded border cursor-pointer hover:opacity-90"
+                                  />
+                                </div>
+                              ) : (
+                                <a
+                                  key={urlIndex}
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline text-sm truncate block p-2 border rounded hover:bg-blue-50"
+                                >
+                                  {url}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600 text-lg">Chưa có bằng chứng cho tố cáo này</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {report.resolutionStatus === 'PENDING' && (
           <>
@@ -301,32 +430,39 @@ const ReportDetailModal = ({
   );
 };
 
-const ReportActions = ({ report, onVerify, onReject, onView }: any) => {
+const ReportActions = ({ report, onVerify, onReject }: any) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // If no actions are available, don't show the dropdown
+  if (report.resolutionStatus !== 'PENDING') {
+    return null;
+  }
+
   return (
-    <div className="flex items-center gap-1">
-      <Button variant="ghost" size="sm" onClick={() => onView(report)} className="h-8 w-8 p-0">
-        <Eye className="h-4 w-4" />
-      </Button>
-      {report.resolutionStatus === 'PENDING' && (
-        <>
-          <Button
-            variant="ghost"
-            size="sm"
+    <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem
             onClick={() => onVerify(report.id)}
-            className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+            className="text-green-600 hover:text-green-700"
           >
-            <CheckCircle className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Đồng ý tố cáo
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={() => onReject(report.id)}
-            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="text-red-600 hover:text-red-700"
           >
-            <XCircle className="h-4 w-4" />
-          </Button>
-        </>
-      )}
+            <XCircle className="h-4 w-4 mr-2" />
+            Từ chối tố cáo
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
@@ -386,7 +522,7 @@ const EvidenceDetailModal = ({
 
   const handleFileChange = (e: any) => {
     const files = Array.from(e.target.files || []);
-    setNewEvidence((prev) => ({ ...prev, evidenceFiles: files }));
+    setNewEvidence((prev) => ({ ...prev, evidenceFiles: files as File[] }));
     if (files.length > 0 && validationErrors.files) {
       setValidationErrors((prev) => ({ ...prev, files: false }));
     }
@@ -879,10 +1015,8 @@ const EvidenceDetailModal = ({
 export default function ReportManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedReport, setSelectedReport] = useState<any>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const router = useRouter();
   const [selectedEvidence, setSelectedEvidence] = useState<TEvidence[] | null>(null);
-  const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
 
   const {
     reports = [],
@@ -898,10 +1032,6 @@ export default function ReportManagementPage() {
     rejectReport,
     fetchEvidence,
   } = useReportSeller();
-
-  const handleEvidenceUpdate = (newEvidence: TEvidence[]) => {
-    setSelectedEvidence(newEvidence);
-  };
 
   const handleRefresh = () => {
     refetch();
@@ -942,23 +1072,14 @@ export default function ReportManagementPage() {
     }
   };
 
-  const handleView = (report: any) => {
-    setSelectedReport(report);
-    setIsDetailModalOpen(true);
-  };
-
   const handleViewEvidence = async (reportId: string) => {
     try {
-      const evidenceArray = await fetchEvidence(reportId);
-      setSelectedEvidence(evidenceArray);
-      setSelectedReport({ id: reportId });
-      setIsEvidenceModalOpen(true);
+      router.push(`/dashboard/report-seller/${reportId}?tab=evidence`);
     } catch (error) {
-      console.error('Error fetching evidence:', error);
-      toast.error('Lỗi khi tải bằng chứng', {
-        description: 'Không thể tải dữ liệu bằng chứng vào lúc này',
+      console.error('Error navigating to report details:', error);
+      toast.error('Lỗi khi chuyển hướng tới trang chi tiết báo cáo', {
+        description: 'Không thể tải thông tin báo cáo vào lúc này',
       });
-      setSelectedEvidence([]);
     }
   };
 
@@ -983,188 +1104,180 @@ export default function ReportManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold text-gray-900">Quản lý tố cáo người bán</h1>
-            <p className="text-gray-600 text-lg">Xem và xử lý các tố cáo từ khách hàng</p>
+    <div className="container mx-auto p-6 max-w-7xl">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-50 rounded-xl border border-orange-200/50 shadow-sm">
+              <Flag className="h-8 w-8 text-orange-600" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
+                Quản lý tố cáo người bán
+              </h1>
+              <p className="text-gray-600">Xem và xử lý các tố cáo từ khách hàng</p>
+            </div>
           </div>
-          <Button
-            onClick={handleRefresh}
-            variant="outline"
-            size="lg"
-            className="shadow-sm bg-transparent"
-          >
+          <Button onClick={handleRefresh} variant="outline" size="lg" className="shadow-sm">
             <RefreshCw className="h-5 w-5 mr-2" />
             Làm mới
           </Button>
         </div>
+      </div>
 
-        {/* Error Message */}
-        {error && (
-          <Card className="border-red-200 bg-red-50 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3 text-red-700">
-                <AlertTriangle className="h-5 w-5" />
-                <div className="flex-1">
-                  <span className="font-semibold">Lỗi:</span> {error}
-                </div>
+      {/* Error Message */}
+      {error && (
+        <Card className="border-red-200 bg-red-50 shadow-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3 text-red-700">
+              <AlertTriangle className="h-5 w-5" />
+              <div className="flex-1">
+                <span className="font-semibold">Lỗi:</span> {error}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Stats */}
+      {/* Stats */}
+      <div className="mb-8">
         <ReportStats reports={reports} />
+      </div>
 
-        {/* Filters */}
+      {/* Filters */}
+      <div className="mb-8">
         <AdvancedFilters
           searchQuery={searchQuery}
           onSearch={handleSearch}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
         />
+      </div>
 
-        {/* Reports Table */}
-        <Card className="shadow-sm">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl">Danh sách tố cáo</CardTitle>
-              <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                Tổng cộng: {totalReports} tố cáo
+      {/* Reports Table */}
+      <Card className="shadow-lg shadow-slate-200/50 border-slate-200/50 bg-white/80 backdrop-blur-sm">
+        <CardHeader className="border-b border-slate-200/50 bg-slate-50/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-slate-900">
+                <Flag className="h-5 w-5 text-orange-600" />
+                Danh sách tố cáo
+              </CardTitle>
+              <CardDescription className="text-slate-600">
+                {totalReports > 0
+                  ? `Quản lý và xử lý ${totalReports} tố cáo trong hệ thống`
+                  : 'Không có tố cáo nào trong hệ thống'}
+              </CardDescription>
+            </div>
+            <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              Tổng cộng: {totalReports} tố cáo
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="text-center space-y-4">
+                <RefreshCw className="h-12 w-12 animate-spin text-orange-500 mx-auto" />
+                <p className="text-gray-600 text-lg">Đang tải dữ liệu...</p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="text-center space-y-4">
-                  <RefreshCw className="h-12 w-12 animate-spin text-blue-500 mx-auto" />
-                  <p className="text-gray-600 text-lg">Đang tải dữ liệu...</p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead className="font-semibold">Nội dung tố cáo</TableHead>
-                      <TableHead className="font-semibold">Loại tố cáo</TableHead>
-                      <TableHead className="font-semibold">Trạng thái</TableHead>
-                      <TableHead className="font-semibold">Ngày tạo</TableHead>
-                      <TableHead className="font-semibold text-center">Hành động</TableHead>
-                      <TableHead className="font-semibold text-center">Bằng chứng</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredReports.length > 0 ? (
-                      filteredReports.map((report) => (
-                        <TableRow key={report.id} className="hover:bg-gray-50 transition-colors">
-                          <TableCell className="font-medium max-w-xs">
-                            <div className="truncate" title={report.content}>
-                              {report.content || 'N/A'}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant="outline"
-                              className="bg-blue-50 text-blue-700 border-blue-200"
-                            >
-                              {report.typeReport || 'N/A'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{getStatusBadge(report.resolutionStatus)}</TableCell>
-                          <TableCell className="text-sm text-gray-600">
-                            {new Date(report.createdAt).toLocaleDateString('vi-VN')}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <ReportActions
-                              report={report}
-                              onVerify={handleVerify}
-                              onReject={handleReject}
-                              onView={handleView}
-                            />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleViewEvidence(report.id)}
-                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            >
-                              <Package className="h-4 w-4 mr-1" />
-                              Xem
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-12">
-                          <div className="space-y-3">
-                            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto" />
-                            <p className="text-gray-500 text-lg">Không có tố cáo nào</p>
+          ) : (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-200 bg-slate-50/50 select-none">
+                    <TableHead className="font-semibold text-slate-700">Nội dung tố cáo</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Loại tố cáo</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Trạng thái</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Ngày tạo</TableHead>
+                    <TableHead className="font-semibold text-slate-700 text-right w-28">
+                      Thao tác
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredReports.length > 0 ? (
+                    filteredReports.map((report) => (
+                      <TableRow
+                        key={report.id}
+                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => router.push(`/dashboard/report-seller/${report.id}`)}
+                      >
+                        <TableCell className="font-medium max-w-xs">
+                          <div className="truncate" title={report.content}>
+                            {report.content || 'N/A'}
                           </div>
                         </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className="bg-blue-50 text-blue-700 border-blue-200"
+                          >
+                            {report.typeReport || 'N/A'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(report.resolutionStatus)}</TableCell>
+                        <TableCell className="text-sm text-gray-600">
+                          {new Date(report.createdAt).toLocaleDateString('vi-VN')}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <ReportActions
+                            report={report}
+                            onVerify={handleVerify}
+                            onReject={handleReject}
+                          />
+                        </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-12">
+                        <div className="space-y-3">
+                          <AlertCircle className="h-12 w-12 text-gray-400 mx-auto" />
+                          <p className="text-gray-500 text-lg">Không có tố cáo nào</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
 
-                {/* Pagination */}
-                {filteredReports.length > 0 && (
-                  <div className="mt-6 flex justify-between items-center pt-4 border-t">
-                    <div className="text-sm text-gray-600">
-                      Hiển thị {(page - 1) * 10 + 1} - {Math.min(page * 10, totalReports)} trong số{' '}
-                      {totalReports} tố cáo
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page === 1}
-                        onClick={() => handlePageChange(page - 1)}
-                      >
-                        Trước
-                      </Button>
-                      <div className="px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded-md font-medium">
-                        {page} / {maxPage}
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page === maxPage}
-                        onClick={() => handlePageChange(page + 1)}
-                      >
-                        Sau
-                      </Button>
-                    </div>
+              {/* Pagination */}
+              {filteredReports.length > 0 && (
+                <div className="mt-6 flex justify-between items-center p-4 border-t">
+                  <div className="text-sm text-gray-600">
+                    Hiển thị {(page - 1) * 10 + 1} - {Math.min(page * 10, totalReports)} trong số{' '}
+                    {totalReports} tố cáo
                   </div>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Modals */}
-        <ReportDetailModal
-          report={selectedReport}
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          onVerify={handleVerify}
-          onReject={handleReject}
-        />
-
-        <EvidenceDetailModal
-          evidence={selectedEvidence}
-          isOpen={isEvidenceModalOpen}
-          onClose={() => setIsEvidenceModalOpen(false)}
-          reportId={selectedReport?.id || ''}
-          onEvidenceUpdate={handleEvidenceUpdate}
-        />
-      </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page === 1}
+                      onClick={() => handlePageChange(page - 1)}
+                    >
+                      Trước
+                    </Button>
+                    <div className="px-4 py-2 text-sm bg-orange-100 text-orange-800 rounded-md font-medium">
+                      {page} / {maxPage}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page === maxPage}
+                      onClick={() => handlePageChange(page + 1)}
+                    >
+                      Sau
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
