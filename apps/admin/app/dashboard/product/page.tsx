@@ -24,6 +24,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
 
@@ -467,6 +468,7 @@ const ProductActions = ({
 };
 
 export default function ProductManagementPage() {
+  const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -531,6 +533,10 @@ export default function ProductManagementPage() {
   const handleView = (product: TProduct) => {
     setSelectedProduct(product);
     setIsDetailModalOpen(true);
+  };
+
+  const handleRowClick = (productId: string) => {
+    router.push(`/dashboard/product/${productId}`);
   };
 
   // Verification status styling (verified field - Admin approval status)
@@ -853,8 +859,9 @@ export default function ProductManagementPage() {
                   {products.map((product, index) => (
                     <TableRow
                       key={product.id}
-                      className="hover:bg-slate-50/50 transition-colors border-b border-slate-100"
+                      className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 cursor-pointer"
                       style={{ animationDelay: `${index * 50}ms` }}
+                      onClick={() => handleRowClick(product.id)}
                     >
                       <TableCell>
                         <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-slate-100 shadow-sm">
@@ -950,7 +957,7 @@ export default function ProductManagementPage() {
                         </div>
                         <div className="text-xs text-slate-500">{product.sellerId}</div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <ProductActions
                           product={product}
                           onView={handleView}
