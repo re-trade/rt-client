@@ -125,6 +125,24 @@ export function EditProductDialog({
     };
   }, [imagePreviews, thumbnailPreview]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [open]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      document.body.style.overflow = 'unset';
+    } else {
+      document.body.style.overflow = 'hidden';
+    }
+    onOpenChange(open);
+  };
+
   const handleFormChange = (field: string, value: any) => {
     if (!isEdit) return;
 
@@ -253,6 +271,23 @@ export function EditProductDialog({
       return;
     }
 
+    if (formData.shortDescription.trim().length > 100) {
+      toast.error('Mô tả ngắn không được vượt quá 100 ký tự');
+      return;
+    }
+    if (formData.description.trim().length > 2000) {
+      toast.error('Mô tả không được vượt quá 2000 ký tự');
+      return;
+    }
+    if (formData.tags.length === 0) {
+      toast.error('Vui lòng nhập ít nhất một thẻ cho sản phẩm');
+      return;
+    }
+    if (formData.tags.length > 3) {
+      toast.error('Không được nhập quá 3 thẻ cho sản phẩm');
+      return;
+    }
+
     if (formData.hasWarranty) {
       if (!formData.warrantyExpiryDate) {
         toast.error('Vui lòng chọn ngày hết hạn bảo hành');
@@ -354,21 +389,24 @@ export function EditProductDialog({
 
         onUpdateProduct(response.content);
         toast.success('Cập nhật sản phẩm thành công');
-        onOpenChange(false);
+        handleOpenChange(false);
       }
-    } catch (error) {
-      console.error('Error updating product:', error);
-      toast.error('Không thể cập nhật sản phẩm. Vui lòng thử lại.');
+    } catch (error: any) {
+      toast.dismiss(loadingToastId);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Không thể cập nhật sản phẩm. Vui lòng thử lại.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
-      // Bỏ toast.dismiss() ở đây vì nó sẽ dismiss cả success toast
     }
   };
 
   // ...existing code...
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-6 border-b">
           <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -533,7 +571,7 @@ export function EditProductDialog({
                   value={formData.categoryIds}
                   currentCategoryId={product?.categories || []}
                   onChange={(selected) => handleFormChange('categoryIds', selected)}
-                  disabled={formData.retraded}
+                  disabled={!isEdit || formData.retraded}
                 />
                 {formData.retraded && (
                   <Lock className="absolute right-3 top-3 h-4 w-4 text-amber-500" />
@@ -611,10 +649,15 @@ export function EditProductDialog({
               </Label>
               <TagInput
                 value={formData.tags}
-                onChange={(tags) => handleFormChange('tags', tags)}
+                onChange={(tags) => {
+                  if (tags.length <= 3) {
+                    handleFormChange('tags', tags);
+                  }
+                }}
                 placeholder="Nhập tag và nhấn Enter"
                 disabled={!isEdit}
               />
+              <div className="text-xs text-gray-500 text-right">{formData.tags.length}/3 thẻ</div>
             </div>
           </div>
 
@@ -629,7 +672,7 @@ export function EditProductDialog({
               {/* Mô tả ngắn */}
               <div className="space-y-2">
                 <Label htmlFor="shortDescription" className="text-sm font-medium text-gray-700">
-                  Mô tả ngắn
+                  Mô tả ngắn <span className="text-red-500">*</span>
                 </Label>
                 <div className="rounded-md shadow-sm border border-gray-300">
                   <MDEditor
@@ -645,12 +688,15 @@ export function EditProductDialog({
                     }}
                   />
                 </div>
+                <div className="text-xs text-gray-500 text-right">
+                  {formData.shortDescription.length}/100 ký tự
+                </div>
               </div>
 
               {/* Mô tả chi tiết */}
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                  Mô tả chi tiết
+                  Mô tả chi tiết <span className="text-red-500">*</span>
                 </Label>
                 <div className="rounded-md shadow-sm border border-gray-300">
                   <MDEditor
@@ -665,6 +711,9 @@ export function EditProductDialog({
                       placeholder: 'Nhập mô tả chi tiết về sản phẩm',
                     }}
                   />
+                </div>
+                <div className="text-xs text-gray-500 text-right">
+                  {formData.description.length}/2000 ký tự
                 </div>
               </div>
             </div>

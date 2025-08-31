@@ -184,12 +184,24 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
       toast.error('Vui lòng nhập mô tả ngắn cho sản phẩm');
       return;
     }
+    if (formData.shortDescription.trim().length > 100) {
+      toast.error('Mô tả ngắn không được vượt quá 100 ký tự');
+      return;
+    }
     if (formData.description.trim().length === 0) {
       toast.error('Vui lòng nhập mô tả cho sản phẩm');
       return;
     }
+    if (formData.description.trim().length > 2000) {
+      toast.error('Mô tả không được vượt quá 2000 ký tự');
+      return;
+    }
     if (formData.tags.length === 0) {
       toast.error('Vui lòng nhập ít nhất một thẻ cho sản phẩm');
+      return;
+    }
+    if (formData.tags.length > 3) {
+      toast.error('Không được nhập quá 3 thẻ cho sản phẩm');
       return;
     }
     if (!thumbnailFile) {
@@ -262,15 +274,18 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
       };
       const response = await productApi.createProduct(productData);
       if (!response.success) {
-        toast.error(response.message);
+        toast.error(response.message || 'Không thể tạo sản phẩm');
+        return;
       }
       toast.success('Tạo sản phẩm thành công');
-      onOpenChange(false);
-      resetForm();
+      handleOpenChange(false);
       onSuccess();
-    } catch (error) {
-      console.error('Error creating product:', error);
-      toast.error('Không thể tạo sản phẩm. Vui lòng thử lại.');
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Không thể tạo sản phẩm. Vui lòng thử lại.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
       toast.dismiss();
@@ -304,8 +319,27 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
     setTick(false);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      resetForm();
+      document.body.style.overflow = 'unset';
+    } else {
+      document.body.style.overflow = 'hidden';
+    }
+    onOpenChange(open);
+  };
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [open]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-6 border-b">
           <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -405,7 +439,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                 <SelectBrand
                   value={formData.brandId}
                   onChange={(selectedBrand) => handleFormChange('brandId', selectedBrand ?? '')}
-                  disabled={!formData.categorySelected}
+                  disabled={false}
                 />
               </div>
               <div className="space-y-2">
@@ -476,9 +510,14 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
               </Label>
               <TagInput
                 value={formData.tags}
-                onChange={(tags) => handleFormChange('tags', tags)}
+                onChange={(tags) => {
+                  if (tags.length <= 3) {
+                    handleFormChange('tags', tags);
+                  }
+                }}
                 placeholder="Nhập tag và nhấn Enter"
               />
+              <div className="text-xs text-gray-500 text-right">{formData.tags.length}/3 thẻ</div>
             </div>
           </div>
 
@@ -492,7 +531,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="shortDescription" className="text-sm font-medium text-gray-700">
-                  Mô tả ngắn
+                  Mô tả ngắn <span className="text-red-500">*</span>
                 </Label>
                 <MDEditor
                   id="shortDescription"
@@ -505,11 +544,14 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                     placeholder: 'Nhập mô tả ngắn gọn về sản phẩm',
                   }}
                 />
+                <div className="text-xs text-gray-500 text-right">
+                  {formData.shortDescription.length}/100 ký tự
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium text-gray-700">
-                  Mô tả chi tiết
+                  Mô tả chi tiết <span className="text-red-500">*</span>
                 </Label>
                 <MDEditor
                   id="description"
@@ -522,6 +564,9 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
                     placeholder: 'Nhập mô tả chi tiết về sản phẩm',
                   }}
                 />
+                <div className="text-xs text-gray-500 text-right">
+                  {formData.description.length}/2000 ký tự
+                </div>
               </div>
             </div>
           </div>
@@ -675,7 +720,7 @@ export function CreateProductDialog({ onSuccess, open, onOpenChange }: CreatePro
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             disabled={isSubmitting}
             className="flex-1"
           >
