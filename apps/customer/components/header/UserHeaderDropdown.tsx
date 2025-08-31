@@ -6,6 +6,7 @@ import { SELLER_ROUTES } from '@/lib/constants';
 import {
   IconBuildingStore,
   IconLogout,
+  IconMessage,
   IconPackage,
   IconShoppingCart,
   IconUser,
@@ -111,6 +112,13 @@ const UserHeaderDropdown = () => {
             >
               <IconPackage size={18} className="text-orange-500" />
               Đơn hàng của tôi
+            </Link>
+            <Link
+              href="/chat"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 text-gray-700"
+            >
+              <IconMessage size={18} className="text-orange-500" />
+              Tin nhắn
             </Link>
             <Link
               href="/cart"

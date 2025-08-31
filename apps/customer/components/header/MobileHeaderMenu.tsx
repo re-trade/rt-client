@@ -5,6 +5,7 @@ import { SELLER_ROUTES } from '@/lib/constants';
 import {
   IconBuildingStore,
   IconLogout,
+  IconMessage,
   IconPackage,
   IconShoppingCart,
   IconUser,
@@ -66,6 +67,14 @@ const MobileMenu = ({ open, setOpen }: Props) => {
               >
                 <IconPackage size={20} className="text-orange-500" />
                 Đơn hàng của tôi
+              </Link>
+              <Link
+                href="/chat"
+                className="flex items-center gap-3 p-3 hover:bg-orange-50 rounded-xl text-gray-700"
+                onClick={() => setOpen(false)}
+              >
+                <IconMessage size={20} className="text-orange-500" />
+                Tin nhắn
               </Link>
               <Link
                 href="/cart"
