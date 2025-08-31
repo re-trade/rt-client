@@ -1,5 +1,6 @@
 'use client';
 
+import { uploadFile } from '@/services/file.api';
 import {
   ClientToServerEvents,
   getWebRTCConfig,
@@ -12,16 +13,19 @@ import {
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Socket } from 'socket.io-client';
+import { useFastSocketAuth } from './use-fast-socket-auth';
 
 export function useMessenger() {
   const [selectedContact, setSelectedContact] = useState<Room | null>(null);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSomeoneTyping, setIsSomeoneTyping] = useState(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Room[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+
+  const { getValidToken } = useFastSocketAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const [isVideoCall, setIsVideoCall] = useState(false);
@@ -95,26 +99,58 @@ export function useMessenger() {
   useEffect(() => {
     socketRef.current = socket;
 
-    const token = localStorage.getItem('access-token');
-    if (!token) {
-      socket.disconnect();
-      router.push('/login');
-      return;
-    }
+    const initializeSocket = async () => {
+      // Get token quickly
+      const token = await getValidToken();
+      if (!token) {
+        return; // getValidToken already handles redirect
+      }
 
-    socket.on('connect', () => {
-      socket.emit('authenticate', {
-        token,
-        senderType: 'customer',
-      });
-    });
+      // Set up socket event handlers
+      const handleAuthSuccess = () => {
+        setIsAuthenticated(true);
+        socket.emit('getRooms');
+      };
 
-    const handleAuthSuccess = () => {
-      setIsAuthenticated(true);
-      socket.emit('getRooms');
+      const handleAuthError = async (error: any) => {
+        const newToken = await getValidToken();
+        if (newToken && newToken !== token) {
+          socket.emit('authenticate', {
+            token: newToken,
+            senderType: 'customer',
+          });
+        } else {
+          router.push('/login');
+        }
+      };
+
+      socket.on('authSuccess', handleAuthSuccess);
+      socket.on('authError', handleAuthError);
+
+      if (socket.connected) {
+        socket.emit('authenticate', {
+          token,
+          senderType: 'customer',
+        });
+      } else {
+        if (!socket.connected) {
+          socket.connect();
+        }
+
+        const handleConnect = () => {
+          socket.emit('authenticate', {
+            token,
+            senderType: 'customer',
+          });
+          socket.off('connect', handleConnect);
+        };
+        socket.on('connect', handleConnect);
+      }
     };
 
-    socket.on('authSuccess', handleAuthSuccess);
+    initializeSocket();
+
+    // Set up other socket event handlers
     socket.on('rooms', (rooms) => setContacts(rooms));
     socket.on('roomJoined', (room) => {
       setSelectedContact(room);
@@ -155,7 +191,6 @@ export function useMessenger() {
       setIsVideoCall(false);
       setIsAudioCall(false);
       stopCamera();
-      console.log('Call rejected:', data.reason);
     });
 
     socket.on('call-ended', (data) => {
@@ -167,19 +202,17 @@ export function useMessenger() {
       stopCamera();
     });
 
-    // Add error handling for WebRTC issues
     socket.on('error', (error) => {
-      console.error('Socket error:', error);
       if (error.code === 'USER_OFFLINE') {
         alert('Người dùng hiện không trực tuyến. Vui lòng thử lại sau.');
       } else if (error.code === 'CALL_IN_PROGRESS') {
         alert('Người dùng đang trong cuộc gọi khác.');
       } else if (error.code === 'AUTH_ERROR') {
         alert('Lỗi xác thực. Vui lòng đăng nhập lại.');
+        router.push('/login');
       } else {
         alert('Có lỗi xảy ra khi thực hiện cuộc gọi.');
       }
-      // Reset call state on error
       setCallState('idle');
       setIsCalling(false);
       setIsVideoCall(false);
@@ -196,9 +229,12 @@ export function useMessenger() {
     };
 
     socket.on('typing', handleTypingEvent);
+
     return () => {
       socket.disconnect();
-      socket.off('authSuccess', handleAuthSuccess);
+      socket.off('connect');
+      socket.off('authSuccess');
+      socket.off('authError');
       socket.off('rooms');
       socket.off('roomJoined');
       socket.off('message');
@@ -210,7 +246,7 @@ export function useMessenger() {
       socket.off('error');
       socket.off('typing', handleTypingEvent);
     };
-  }, [router]);
+  }, [router, getValidToken]);
 
   useEffect(() => {
     if (!socketRef.current) return;
@@ -238,6 +274,23 @@ export function useMessenger() {
       receiverId: seller.id,
     });
     setNewMessage('');
+  };
+
+  const handleSendImage = async (file: File) => {
+    if (!selectedContact || !socketRef.current) return;
+    const seller = selectedContact.participants.filter((p) => p.senderRole === 'seller').pop();
+    if (!seller) return;
+
+    try {
+      const response = await uploadFile(file);
+      if (response?.url) {
+        socketRef.current.emit('sendMessage', {
+          content: response.url,
+          receiverId: seller.id,
+          type: 'image',
+        });
+      }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -286,13 +339,9 @@ export function useMessenger() {
         const peer = new RTCPeerConnection(webRTCConfig);
         peerRef.current = peer;
 
-        peer.onconnectionstatechange = () => {
-          console.log('Connection state:', peer.connectionState);
-        };
+        peer.onconnectionstatechange = () => {};
 
-        peer.oniceconnectionstatechange = () => {
-          console.log('ICE connection state:', peer.iceConnectionState);
-        };
+        peer.oniceconnectionstatechange = () => {};
 
         stream.getTracks().forEach((track) => {
           peer.addTrack(track, stream);
@@ -320,7 +369,6 @@ export function useMessenger() {
 
         return peer;
       } catch (error) {
-        console.error('Failed to start camera:', error);
         throw error;
       }
     },
@@ -329,7 +377,6 @@ export function useMessenger() {
 
   const startVideoCall = async () => {
     if (!socketRef.current || !selectedContact) {
-      console.error('Socket or contact not available');
       return;
     }
 
@@ -337,7 +384,6 @@ export function useMessenger() {
     setIsCalling(true);
     setCallState('calling');
 
-    // Find the seller ID for customer app
     const sellerId =
       selectedContact.participants?.find((p) => p.senderRole === 'seller')?.id ||
       selectedContact.id;
@@ -347,12 +393,10 @@ export function useMessenger() {
       roomId: selectedContact.id,
     };
 
-    console.log('Starting video call with data:', callData);
     socketRef.current.emit('initiateCall', callData);
 
     setTimeout(() => {
       if (callState === 'calling') {
-        console.log('Call timeout - no answer');
         endCall();
       }
     }, 30000);
@@ -360,7 +404,6 @@ export function useMessenger() {
 
   const startAudioCall = async () => {
     if (!socketRef.current || !selectedContact) {
-      console.error('Socket or contact not available');
       return;
     }
 
@@ -375,7 +418,6 @@ export function useMessenger() {
 
     setTimeout(() => {
       if (callState === 'calling') {
-        console.log('Call timeout - no answer');
         endCall();
       }
     }, 30000);
@@ -466,6 +508,7 @@ export function useMessenger() {
     searchQuery,
     setSearchQuery,
     handleSendMessage,
+    handleSendImage,
     videoRef,
     remoteVideoRef,
     audioRef,

@@ -27,3 +27,13 @@ export const fileApi = {
     return response.data;
   },
 };
+
+export const uploadFile = async (file: File): Promise<{ url: string } | null> => {
+  try {
+    const url = await fileApi.fileUpload(file);
+    return { url };
+  } catch (error) {
+    console.error('Upload failed:', error);
+    return null;
+  }
+};

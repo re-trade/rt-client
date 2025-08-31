@@ -4,6 +4,16 @@ import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import type { Message } from '@retrade/util';
 import { useEffect, useRef, useState } from 'react';
 
+const isImageUrl = (url: string): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  return (
+    /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico)(\?.*)?$/i.test(url) ||
+    url.includes('/storage/') ||
+    url.includes('/files/') ||
+    url.includes('image')
+  );
+};
+
 interface MessagesListProps {
   messages: Message[];
   isSomeoneTyping?: boolean;
@@ -74,7 +84,32 @@ export function MessagesList({ messages, isSomeoneTyping = false, typingUser }: 
                     : 'bg-white text-gray-900 border border-gray-200 hover:border-gray-300 rounded-bl-md'
                 }`}
               >
-                <p className="text-base leading-relaxed">{message.content}</p>
+                {message.type === 'image' || isImageUrl(message.content) ? (
+                  <div className="max-w-xs">
+                    <img
+                      src={message.content}
+                      alt="Shared image"
+                      className="rounded-lg max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => window.open(message.content, '_blank')}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const textElement = target.parentElement?.nextElementSibling as HTMLElement;
+                        if (textElement) textElement.style.display = 'block';
+                      }}
+                    />
+                    <p
+                      className="text-base leading-relaxed whitespace-pre-wrap break-words"
+                      style={{ display: 'none' }}
+                    >
+                      {message.content}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
+                    {message.content}
+                  </p>
+                )}
                 <p
                   className={`text-xs mt-2 ${
                     message.sender?.senderRole === 'customer' ? 'text-orange-100' : 'text-gray-500'

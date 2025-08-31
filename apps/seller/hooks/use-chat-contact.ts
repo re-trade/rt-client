@@ -1,6 +1,6 @@
+import { storageApi } from '@/service/storage.api';
 import {
   ClientToServerEvents,
-  ETokenName,
   getWebRTCConfig,
   mediaConstraints,
   Message,
@@ -10,19 +10,20 @@ import {
 } from '@retrade/util';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-import { refreshTokenCall } from '@/service/auth.api';
 import { Socket } from 'socket.io-client';
+import { useFastSocketAuth } from './use-fast-socket-auth';
 
 export function useMessenger() {
   const [selectedContact, setSelectedContact] = useState<Room | null>(null);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSomeoneTyping, setIsSomeoneTyping] = useState(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Room[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+
+  const { getValidToken } = useFastSocketAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const [isVideoCall, setIsVideoCall] = useState(false);
@@ -94,37 +95,58 @@ export function useMessenger() {
   useEffect(() => {
     socketRef.current = socket;
 
-    const token = localStorage.getItem(ETokenName.ACCESS_TOKEN);
-    if (!token) {
-      refreshTokenCall();
+    const initializeSocket = async () => {
+      // Get token quickly
+      const token = await getValidToken();
       if (!token) {
-        localStorage.removeItem(ETokenName.ACCESS_TOKEN);
-        socket.disconnect();
-        router.push('/login');
-        return;
+        return; // getValidToken already handles redirect
       }
-    }
 
-    socket.on('connect', () => {
-      socket.emit('authenticate', {
-        token,
-        senderType: 'seller',
-      });
-    });
+      // Set up socket event handlers
+      const handleAuthSuccess = () => {
+        setIsAuthenticated(true);
+        socket.emit('getRooms');
+      };
 
-    const handleAuthSuccess = () => {
-      setIsAuthenticated(true);
-      socket.emit('getRooms');
+      const handleAuthError = async (error: any) => {
+        const newToken = await getValidToken();
+        if (newToken && newToken !== token) {
+          socket.emit('authenticate', {
+            token: newToken,
+            senderType: 'seller',
+          });
+        } else {
+          router.push('/login');
+        }
+      };
+
+      socket.on('authSuccess', handleAuthSuccess);
+      socket.on('authError', handleAuthError);
+
+      if (socket.connected) {
+        socket.emit('authenticate', {
+          token,
+          senderType: 'seller',
+        });
+      } else {
+        if (!socket.connected) {
+          socket.connect();
+        }
+
+        const handleConnect = () => {
+          socket.emit('authenticate', {
+            token,
+            senderType: 'seller',
+          });
+          socket.off('connect', handleConnect);
+        };
+        socket.on('connect', handleConnect);
+      }
     };
 
-    const handleAuthError = (error: any) => {
-      setIsAuthenticated(false);
-      localStorage.removeItem(ETokenName.ACCESS_TOKEN);
-      router.push('/login');
-    };
+    initializeSocket();
 
-    socket.on('authSuccess', handleAuthSuccess);
-    socket.on('authError', handleAuthError);
+    // Set up other socket event handlers
     socket.on('rooms', (rooms) => {
       if (rooms && rooms.length > 0) {
         setContacts(rooms);
@@ -173,7 +195,6 @@ export function useMessenger() {
       setIsVideoCall(false);
       setIsAudioCall(false);
       stopCamera();
-      console.log('Call rejected:', data.reason);
     });
 
     socket.on('call-ended', (data) => {
@@ -186,13 +207,13 @@ export function useMessenger() {
     });
 
     socket.on('error', (error) => {
-      console.error('Socket error:', error);
       if (error.code === 'USER_OFFLINE') {
         alert('Khách hàng hiện không trực tuyến. Vui lòng thử lại sau.');
       } else if (error.code === 'CALL_IN_PROGRESS') {
         alert('Khách hàng đang trong cuộc gọi khác.');
       } else if (error.code === 'AUTH_ERROR') {
         alert('Lỗi xác thực. Vui lòng đăng nhập lại.');
+        router.push('/login');
       } else {
         alert('Có lỗi xảy ra khi thực hiện cuộc gọi.');
       }
@@ -207,14 +228,11 @@ export function useMessenger() {
       setTypingUser(data.isTyping ? data.username : null);
     });
 
-    if (!socket.connected) {
-      socket.connect();
-    }
-
     return () => {
       socket.disconnect();
-      socket.off('authSuccess', handleAuthSuccess);
-      socket.off('error', handleAuthError);
+      socket.off('connect');
+      socket.off('authSuccess');
+      socket.off('authError');
       socket.off('rooms');
       socket.off('roomJoined');
       socket.off('message');
@@ -226,7 +244,7 @@ export function useMessenger() {
       socket.off('error');
       socket.off('typing');
     };
-  }, [router]);
+  }, [router, getValidToken]);
 
   useEffect(() => {
     if (!socketRef.current) return;
@@ -254,6 +272,23 @@ export function useMessenger() {
       receiverId: customer.id,
     });
     setNewMessage('');
+  };
+
+  const handleSendImage = async (file: File) => {
+    if (!selectedContact || !socketRef.current) return;
+    const customer = selectedContact.participants.filter((p) => p.senderRole === 'customer').pop();
+    if (!customer) return;
+
+    try {
+      const url = await storageApi.fileUpload(file);
+      if (url) {
+        socketRef.current.emit('sendMessage', {
+          content: url,
+          receiverId: customer.id,
+          type: 'image',
+        });
+      }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -300,13 +335,9 @@ export function useMessenger() {
         const peer = new RTCPeerConnection(webRTCConfig);
         peerRef.current = peer;
 
-        peer.onconnectionstatechange = () => {
-          console.log('Connection state:', peer.connectionState);
-        };
+        peer.onconnectionstatechange = () => {};
 
-        peer.oniceconnectionstatechange = () => {
-          console.log('ICE connection state:', peer.iceConnectionState);
-        };
+        peer.oniceconnectionstatechange = () => {};
 
         stream.getTracks().forEach((track) => {
           peer.addTrack(track, stream);
@@ -353,7 +384,6 @@ export function useMessenger() {
       roomId: selectedContact.id,
     };
 
-    console.log('Starting audio call with data:', callData);
     socketRef.current.emit('initiateCall', callData);
   };
 
@@ -374,7 +404,6 @@ export function useMessenger() {
       roomId: selectedContact.id,
     };
 
-    console.log('Starting video call with data:', callData);
     socketRef.current.emit('initiateCall', callData);
   };
 
@@ -472,6 +501,7 @@ export function useMessenger() {
     searchQuery,
     setSearchQuery,
     handleSendMessage,
+    handleSendImage,
     videoRef,
     remoteVideoRef,
     audioRef,

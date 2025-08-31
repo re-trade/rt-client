@@ -7,9 +7,15 @@ interface MessageInputProps {
   message: string;
   onMessageChange: (message: string) => void;
   onSendMessage: () => void;
+  onSendImage?: (file: File) => void;
 }
 
-export function MessageInput({ message, onMessageChange, onSendMessage }: MessageInputProps) {
+export function MessageInput({
+  message,
+  onMessageChange,
+  onSendMessage,
+  onSendImage,
+}: MessageInputProps) {
   const handleKeyPress = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -20,11 +26,11 @@ export function MessageInput({ message, onMessageChange, onSendMessage }: Messag
   const handleFileAttachment = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '*/*';
+    input.accept = 'image/*';
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        console.log('File selected:', file.name);
+      if (file && onSendImage) {
+        onSendImage(file);
       }
     };
     input.click();
@@ -37,8 +43,8 @@ export function MessageInput({ message, onMessageChange, onSendMessage }: Messag
     input.capture = 'environment';
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        console.log('Image captured:', file.name);
+      if (file && onSendImage) {
+        onSendImage(file);
       }
     };
     input.click();
@@ -70,12 +76,22 @@ export function MessageInput({ message, onMessageChange, onSendMessage }: Messag
         <div className="flex-1 relative">
           <textarea
             value={message}
-            onChange={(e) => onMessageChange(e.target.value)}
+            onChange={(e) => {
+              onMessageChange(e.target.value);
+              const target = e.target;
+              target.style.height = 'auto';
+              target.style.height = Math.min(target.scrollHeight, 120) + 'px';
+            }}
             onKeyPress={handleKeyPress}
             placeholder="Nhập tin nhắn..."
             rows={1}
             className="w-full px-4 py-3 border border-gray-200 text-gray-700 rounded-3xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400 focus:bg-white transition-all duration-200 placeholder-gray-500 text-base resize-none"
-            style={{ minHeight: '48px', maxHeight: '120px' }}
+            style={{
+              minHeight: '48px',
+              maxHeight: '120px',
+              height: '48px',
+              overflowY: 'auto',
+            }}
           />
         </div>
 

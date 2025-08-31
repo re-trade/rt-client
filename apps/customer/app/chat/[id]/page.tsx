@@ -31,6 +31,7 @@ export default function MessageDetailPage() {
     setSelectedChatId,
     handleSendMessage,
     handleTyping,
+    handleSendImage,
     isSomeoneTyping,
     typingUser,
     startVideoCall,
@@ -127,6 +128,7 @@ export default function MessageDetailPage() {
           message={newMessage}
           onMessageChange={handleMessageChange}
           onSendMessage={handleSendMessage}
+          onSendImage={handleSendImage}
         />
       </div>
 
