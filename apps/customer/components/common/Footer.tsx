@@ -28,11 +28,11 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3 text-gray-600">
                 <IconPhone size={18} className="text-orange-500 flex-shrink-0" />
-                <span className="text-sm">1900 1234 (8:00 - 21:00)</span>
+                <span className="text-sm">0.123.456.789 (8:00 - 21:00)</span>
               </div>
               <div className="flex items-center gap-3 text-gray-600">
                 <IconMail size={18} className="text-orange-500 flex-shrink-0" />
-                <span className="text-sm">support@retrade.vn</span>
+                <span className="text-sm">support@retrades.trade</span>
               </div>
             </div>
           </div>
