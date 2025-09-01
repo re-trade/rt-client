@@ -103,6 +103,20 @@ export const orderApi = {
     }
   },
 
+  async getOrderDetailById(orderId: string): Promise<OrderDetailResponse> {
+    try {
+      const response = await authApi.default.get<IResponseObject<OrderDetailResponse>>(
+        `/orders/${orderId}`,
+      );
+      if (response.data.success) {
+        return response.data.content;
+      }
+      throw new Error('Failed to fetch order details');
+    } catch (error) {
+      throw error;
+    }
+  },
+
   async getMyOrders(page: number = 0, size: number = 10, query?: string): Promise<OrdersResponse> {
     try {
       const response = await authApi.default.get<OrdersResponse>('/orders/customer/combo', {
@@ -258,6 +272,46 @@ export interface OrderResponse {
   destination: OrderDestination;
   items: OrderItem[];
   orderCombos: OrderCombo[];
+  subtotal: number;
+  taxTotal: number;
+  discountTotal: number;
+  shippingCost: number;
+  grandTotal: number;
+  paymentMethod: PaymentMethod;
+  status: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderDetailItem {
+  productId: string;
+  productName: string;
+  productThumbnail: string;
+  sellerName: string;
+  sellerId: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  shortDescription: string;
+}
+
+export interface OrderDetailCombo {
+  comboId: string;
+  sellerId: string;
+  sellerName: string;
+  grandPrice: number;
+  status: string;
+  itemIds: string[];
+}
+
+export interface OrderDetailResponse {
+  orderId: string;
+  customerId: string;
+  customerName: string;
+  destination: OrderDestination;
+  items: OrderDetailItem[];
+  orderCombos: OrderDetailCombo[];
   subtotal: number;
   taxTotal: number;
   discountTotal: number;

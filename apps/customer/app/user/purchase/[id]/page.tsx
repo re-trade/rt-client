@@ -2,10 +2,10 @@
 
 import BuyAgainDialog from '@/components/common/BuyAgainDialog';
 import OrderStatusChangeDialog from '@/components/order/OrderStatusChangeDialog';
-import PaymentStatus from '@/components/payment/PaymentStatus';
 import { useToast } from '@/context/ToastContext';
 import { useOrderDetail } from '@/hooks/use-order-detail';
 import { orderApi } from '@/services/order.api';
+import { paymentApi } from '@/services/payment.api';
 import { getSellerProfile } from '@/services/seller.api';
 import {
   ArrowLeft,
@@ -153,6 +153,19 @@ export default function OrderDetailPage() {
     }
   };
 
+  const handleGoToPayment = async () => {
+    try {
+      const paymentStatus = await paymentApi.getPaymentStatus(orderId);
+      if (paymentStatus.orderId) {
+        router.push(`/order/${paymentStatus.orderId}`);
+      } else {
+        showToast('Không thể tìm thấy thông tin thanh toán', 'error');
+      }
+    } catch (error: any) {
+      showToast(error.message || 'Có lỗi xảy ra khi tải thông tin thanh toán', 'error');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-25 via-orange-50 to-orange-25">
@@ -278,7 +291,6 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        <PaymentStatus orderId={orderId} />
         <BuyAgainDialog
           isOpen={showBuyAgainDialog}
           onClose={() => setShowBuyAgainDialog(false)}
@@ -483,6 +495,14 @@ export default function OrderDetailPage() {
 
         <div className="bg-white rounded-xl shadow-lg border border-orange-200 p-6">
           <div className="flex flex-wrap gap-3">
+            <button
+              onClick={handleGoToPayment}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <Receipt className="w-4 h-4" />
+              <span>Xem hóa đơn</span>
+            </button>
+
             {currentOrder.orderStatus === 'DELIVERED' && (
               <>
                 <button className="flex items-center gap-2 px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors duration-200">

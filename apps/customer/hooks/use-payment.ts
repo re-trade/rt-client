@@ -1,6 +1,11 @@
 'use client';
 
-import { PaymentInitRequest, PaymentStatusResponse, paymentApi } from '@/services/payment.api';
+import {
+  PaymentHistoryItem,
+  PaymentInitRequest,
+  PaymentStatusResponse,
+  paymentApi,
+} from '@/services/payment.api';
 import { useCallback, useState } from 'react';
 
 export interface PaymentMethod {
@@ -18,6 +23,8 @@ export interface PaymentState {
   isLoadingMethods: boolean;
   isInitializingPayment: boolean;
   isLoadingStatus: boolean;
+  isLoadingOrderStatus: boolean;
+  isLoadingHistory: boolean;
   error: string | null;
 }
 
@@ -28,6 +35,8 @@ export function usePayment() {
     isLoadingMethods: false,
     isInitializingPayment: false,
     isLoadingStatus: false,
+    isLoadingOrderStatus: false,
+    isLoadingHistory: false,
     error: null,
   });
 
@@ -140,6 +149,69 @@ export function usePayment() {
     }
   }, []);
 
+  const getOrderPaymentStatus = useCallback(
+    async (orderId: string): Promise<{ paid: boolean; orderId: string }> => {
+      setPaymentState((prev) => ({
+        ...prev,
+        isLoadingOrderStatus: true,
+        error: null,
+      }));
+
+      try {
+        const response = await paymentApi.getOrderPaymentStatus(orderId);
+
+        setPaymentState((prev) => ({
+          ...prev,
+          isLoadingOrderStatus: false,
+          error: null,
+        }));
+
+        return response;
+      } catch (error: any) {
+        const errorMessage = error.message || 'Không thể tải trạng thái thanh toán đơn hàng';
+
+        setPaymentState((prev) => ({
+          ...prev,
+          isLoadingOrderStatus: false,
+          error: errorMessage,
+        }));
+
+        throw error;
+      }
+    },
+    [],
+  );
+
+  const getPaymentHistory = useCallback(async (orderId: string): Promise<PaymentHistoryItem[]> => {
+    setPaymentState((prev) => ({
+      ...prev,
+      isLoadingHistory: true,
+      error: null,
+    }));
+
+    try {
+      const response = await paymentApi.getPaymentHistory(orderId);
+
+      setPaymentState((prev) => ({
+        ...prev,
+        isLoadingHistory: false,
+        error: null,
+      }));
+
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.message || 'Không thể tải lịch sử thanh toán';
+
+      setPaymentState((prev) => ({
+        ...prev,
+        isLoadingHistory: false,
+        error: errorMessage,
+      }));
+
+      throw error;
+    }
+  }, []);
+
   const resetPaymentState = useCallback(() => {
     setPaymentState({
       paymentMethods: [],
@@ -147,6 +219,8 @@ export function usePayment() {
       isLoadingMethods: false,
       isInitializingPayment: false,
       isLoadingStatus: false,
+      isLoadingOrderStatus: false,
+      isLoadingHistory: false,
       error: null,
     });
   }, []);
@@ -164,6 +238,8 @@ export function usePayment() {
     selectPaymentMethod,
     initPayment,
     getPaymentStatus,
+    getOrderPaymentStatus,
+    getPaymentHistory,
     resetPaymentState,
     clearError,
   };

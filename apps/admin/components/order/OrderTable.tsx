@@ -54,12 +54,13 @@ export default function OrderTable({
   };
 
   const paymentStatusConfig = {
-    PAID: { label: 'Đã thanh toán', color: 'bg-green-100 text-green-800 border-green-300' },
-    PENDING: { label: 'Chờ thanh toán', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
-    FAILED: { label: 'Thất bại', color: 'bg-red-100 text-red-800 border-red-300' },
-    CANCELLED: { label: 'Đã hủy', color: 'bg-red-100 text-red-800 border-red-300' },
-    REFUNDED: { label: 'Đã hoàn tiền', color: 'bg-gray-100 text-gray-800 border-gray-300' },
-    PROCESSING: { label: 'Đang xử lý', color: 'bg-blue-100 text-blue-800 border-blue-300' },
+    PAYMENT_CONFIRMATION: {
+      label: 'Đã thanh toán',
+      color: 'bg-green-100 text-green-800 border-green-300',
+    },
+    UNPAID: { label: 'Chưa thanh toán', color: 'bg-yellow-100 text-yellow-800 border-yellow-300' },
+    PAYMENT_FAILED: { label: 'Thất bại', color: 'bg-red-100 text-red-800 border-red-300' },
+    PAYMENT_CANCELLED: { label: 'Đã hủy', color: 'bg-red-100 text-red-800 border-red-300' },
     DEFAULT: { label: 'Khác', color: 'bg-gray-100 text-gray-800 border-gray-300' },
   };
 
