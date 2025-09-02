@@ -127,10 +127,10 @@ export default function SellerDetailPage() {
 
     setActionLoading(true);
     try {
-      const result = await approveSeller(seller.id, true, false); // Force = true by passing identityVerified = false
+      const result = await approveSeller(seller.id, true, false);
       if (result?.success) {
         toast.success('Xác minh tài khoản thành công!');
-        await fetchSellerDetail(); // Refresh data
+        await fetchSellerDetail();
       } else {
         toast.error('Không thể xác minh tài khoản');
       }
@@ -177,7 +177,7 @@ export default function SellerDetailPage() {
       const result = await banSeller(seller.id);
       if (result?.success) {
         toast.success('Khóa tài khoản thành công!');
-        await fetchSellerDetail(); // Refresh data
+        await fetchSellerDetail();
       } else {
         toast.error('Không thể khóa tài khoản');
       }
@@ -398,12 +398,22 @@ export default function SellerDetailPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="text-lg font-semibold text-gray-900">{seller.shopName}</h3>
-                    <div
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${verificationStatus.color}`}
-                    >
-                      {verificationStatus.icon}
-                      {verificationStatus.text}
-                    </div>
+                    {seller.verified ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="text-sm text-green-600">Đã xác minh</span>
+                      </>
+                    ) : seller.rejectReason ? (
+                      <>
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span className="text-sm text-red-600">Đã bị từ chối</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="h-4 w-4 text-yellow-600" />
+                        <span className="text-sm text-yellow-600">Chờ xác minh</span>
+                      </>
+                    )}
                   </div>
                   <p className="text-gray-600 text-sm mb-3">
                     {seller.description || 'Chưa có mô tả cửa hàng'}
@@ -654,6 +664,11 @@ export default function SellerDetailPage() {
                       <>
                         <CheckCircle className="h-4 w-4 text-green-600" />
                         <span className="text-sm text-green-600">Đã xác minh</span>
+                      </>
+                    ) : seller.rejectReason ? (
+                      <>
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span className="text-sm text-red-600">Đã bị từ chối</span>
                       </>
                     ) : (
                       <>

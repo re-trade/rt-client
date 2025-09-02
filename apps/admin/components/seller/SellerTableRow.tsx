@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { TSellerProfile, approveSeller } from '@/services/seller.api';
+import { approveSeller, TSellerProfile } from '@/services/seller.api';
 import {
   ExternalLink,
   Eye,
@@ -18,6 +18,7 @@ import {
   ShieldOff,
   Store,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { SellerStatusBadge } from './SellerStatusBadge';
 
@@ -29,6 +30,7 @@ interface SellerTableRowProps {
 }
 
 export const SellerTableRow = ({ seller, index, onView, refetch }: SellerTableRowProps) => {
+  const router = useRouter();
   const handleQuickApprove = async () => {
     const result = await approveSeller(seller.id, true, false); // Force = true by passing identityVerified = false
     if (result.success) {
@@ -53,7 +55,7 @@ export const SellerTableRow = ({ seller, index, onView, refetch }: SellerTableRo
       className={`hover:bg-gray-50 transition-colors cursor-pointer ${
         index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
       }`}
-      onClick={() => window.open(`/dashboard/seller/${seller.id}`, '_blank')}
+      onClick={() => router.push(`/dashboard/seller/${seller.id}`)}
     >
       <TableCell className="font-mono text-sm text-gray-600">{seller.id.slice(0, 8)}</TableCell>
 
@@ -78,7 +80,6 @@ export const SellerTableRow = ({ seller, index, onView, refetch }: SellerTableRo
           </div>
           <div>
             <p className="font-medium text-gray-900">{seller.shopName}</p>
-            <p className="text-xs text-gray-500">{seller.businessType || 'Chưa phân loại'}</p>
           </div>
         </div>
       </TableCell>
@@ -135,7 +136,7 @@ export const SellerTableRow = ({ seller, index, onView, refetch }: SellerTableRo
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                window.open(`/dashboard/seller/${seller.id}`, '_blank');
+                router.push(`/dashboard/seller/${seller.id}`);
               }}
               className="cursor-pointer"
             >

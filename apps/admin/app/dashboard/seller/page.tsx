@@ -79,7 +79,6 @@ const SellerStats = ({ sellers }: { sellers: TSellerProfile[] }) => {
   );
 };
 
-// AdvancedFilters component (updated to match customer styling)
 const AdvancedFilters = ({
   sellers,
   searchQuery,
@@ -92,10 +91,6 @@ const AdvancedFilters = ({
   setEndDate,
   selectedState,
   setSelectedState,
-  sortField,
-  setSortField,
-  sortOrder,
-  setSortOrder,
   onClearFilters,
 }: {
   sellers: TSellerProfile[];
