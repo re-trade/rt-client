@@ -188,4 +188,20 @@ export const productApi = {
     const response = await authApi.default.put<IResponseObject<null>>(`/products/${id}/unverify`);
     return response.data;
   },
+
+  async approveProduct(
+    id: string,
+    approved: boolean,
+    reason?: string,
+  ): Promise<IResponseObject<null>> {
+    const payload: { approved: boolean; reason?: string } = { approved };
+    if (!approved && reason) {
+      payload.reason = reason;
+    }
+    const response = await authApi.default.put<IResponseObject<null>>(
+      `/products/${id}/approve`,
+      payload,
+    );
+    return response.data;
+  },
 };

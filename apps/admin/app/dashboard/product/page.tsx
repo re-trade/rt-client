@@ -1,5 +1,6 @@
 'use client';
 
+import { ProductApprovalDialog } from '@/components/product/ProductApprovalDialog';
 import {
   AlertCircle,
   Award,
@@ -28,6 +29,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
 
+import AdminProductFilter from '@/components/product/AdminProductFilter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,8 +42,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-// Removed unused Input and Select imports
-import AdminProductFilter from '@/components/product/AdminProductFilter';
 import {
   Table,
   TableBody,
@@ -123,9 +123,6 @@ const ProductStats = ({ products }: { products: TProduct[] }) => {
   );
 };
 
-// Legacy AdvancedFilters component replaced with AdminProductFilter
-
-// Helper function để chuyển đổi condition text
 const getConditionText = (condition: string) => {
   switch (condition) {
     case 'NEW':
@@ -146,13 +143,11 @@ const ProductDetailModal = ({
   isOpen,
   onClose,
   onVerify,
-  onReject,
 }: {
   product: TProduct | null;
   isOpen: boolean;
   onClose: () => void;
   onVerify?: (id: string) => void;
-  onReject?: (id: string) => void;
 }) => {
   if (!product) return null;
 
@@ -387,20 +382,11 @@ const ProductDetailModal = ({
               <Button
                 variant="outline"
                 size="lg"
-                className="border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent font-bold px-6 py-3 text-base sm:text-lg min-h-[48px] transition-all duration-200"
+                className="border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent font-bold px-6 py-3 text-base sm:text-lg min-h-[48px] transition-all duration-200 mx-auto sm:mx-0"
                 onClick={() => onVerify && onVerify(product.id)}
               >
                 <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3" />
                 Duyệt sản phẩm
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-red-500 text-red-600 hover:bg-red-500 hover:text-white bg-transparent font-bold px-6 py-3 text-base sm:text-lg min-h-[48px] transition-all duration-200"
-                onClick={() => onReject && onReject(product.id)}
-              >
-                <XCircle className="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3" />
-                Từ chối
               </Button>
             </div>
           )}
@@ -471,8 +457,10 @@ export default function ProductManagementPage() {
   const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [approvalLoading, setApprovalLoading] = useState(false);
 
   const {
     products,
@@ -496,38 +484,59 @@ export default function ProductManagementPage() {
   } = useProductManager();
 
   const handleVerify = async (productId: string) => {
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setIsApprovalDialogOpen(true);
+    }
+  };
+
+  const handleApproveProduct = async () => {
+    if (!selectedProduct) return;
+
+    setApprovalLoading(true);
     try {
-      // Find the product to check its status
-      const product = products.find((p) => p.id === productId);
-      const result = await verifyProduct(productId);
+      const result = await verifyProduct(selectedProduct.id);
       if (result.success) {
-        if (product?.status === 'INIT') {
-          toast.success(
-            'Duyệt sản phẩm thành công! Sản phẩm đã được xác minh và có thể hoạt động.',
-          );
-        } else {
-          toast.success('Xác minh sản phẩm thành công!');
-        }
+        toast.success('Duyệt sản phẩm thành công! Sản phẩm đã được xác minh và có thể hoạt động.');
+        setIsApprovalDialogOpen(false);
       } else {
         toast.error(result.message || 'Lỗi xác minh sản phẩm');
       }
     } catch (err: any) {
       const errorMessage = err?.response?.data?.message || 'Lỗi xác minh sản phẩm';
       toast.error(errorMessage);
+    } finally {
+      setApprovalLoading(false);
     }
   };
 
-  const handleReject = async (productId: string) => {
+  const handleDenyProduct = async (reason: string) => {
+    if (!selectedProduct) return;
+
+    setApprovalLoading(true);
     try {
-      const result = await unverifyProduct(productId);
+      const result = await unverifyProduct(selectedProduct.id);
       if (result.success) {
-        toast.success('Hủy xác minh sản phẩm thành công!');
+        toast.success('Từ chối sản phẩm thành công!');
+        setIsApprovalDialogOpen(false);
       } else {
-        toast.error(result.message || 'Lỗi hủy xác minh sản phẩm');
+        toast.error(result.message || 'Lỗi từ chối sản phẩm');
       }
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || 'Lỗi hủy xác minh sản phẩm';
+      const errorMessage = err?.response?.data?.message || 'Lỗi từ chối sản phẩm';
       toast.error(errorMessage);
+    } finally {
+      setApprovalLoading(false);
+    }
+  };
+
+  // Keep for backward compatibility with other components
+  const handleReject = async (productId: string) => {
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setIsApprovalDialogOpen(true);
     }
   };
   const handleView = (product: TProduct) => {
@@ -1035,7 +1044,16 @@ export default function ProductManagementPage() {
           isOpen={isDetailModalOpen}
           onClose={() => setIsDetailModalOpen(false)}
           onVerify={handleVerify}
-          onReject={handleReject}
+        />
+
+        {/* Product Approval Dialog */}
+        <ProductApprovalDialog
+          product={selectedProduct}
+          isOpen={isApprovalDialogOpen}
+          onClose={() => setIsApprovalDialogOpen(false)}
+          onApprove={handleApproveProduct}
+          onDeny={handleDenyProduct}
+          loading={approvalLoading}
         />
       </div>
     </div>
