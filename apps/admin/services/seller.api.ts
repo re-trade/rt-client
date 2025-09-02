@@ -15,15 +15,17 @@ export type TSellerProfile = {
   background: string | null;
   phoneNumber: string;
   verified: boolean;
-  identityVerifiedStatus: 'VERIFIED' | 'PENDING' | 'REJECTED' | 'UNVERIFIED';
+  rejectReason: string | null;
+  identityVerifiedStatus: 'WAITING' | 'VERIFIED' | 'FAILED' | 'INIT';
   createdAt: string;
   updatedAt: string;
 };
 
 interface ApproveSellerRequest {
   sellerId: string;
-  forced: boolean;
+  forced?: boolean;
   approve: boolean;
+  reason?: string;
 }
 
 const getSellers = async (
@@ -75,23 +77,37 @@ const getIdCardImage = async (id: string, cardType: 'FRONT' | 'BACK'): Promise<s
 const approveSeller = async (
   sellerId: string,
   approve: boolean,
-  forced: boolean = true,
-): Promise<IResponseObject<any> | undefined> => {
+  identityVerified: boolean = true,
+  reason?: string,
+): Promise<IResponseObject<any>> => {
   try {
     const payload: ApproveSellerRequest = {
       sellerId,
-      forced,
       approve,
     };
 
-    const result = await authApi.default.patch<IResponseObject<any>>(`/sellers/approve`, payload);
-    if (result.data.success) {
-      return result.data;
+    if (!identityVerified) {
+      payload.forced = true;
     }
-  } catch {
-    return undefined;
+
+    if (!approve && reason) {
+      payload.reason = reason;
+    }
+
+    const result = await authApi.default.patch<IResponseObject<any>>(`/sellers/approve`, payload);
+    return result.data;
+  } catch (error: any) {
+    if (error.response?.data) {
+      return error.response.data;
+    }
+    return {
+      message: 'Có lỗi xảy ra',
+      content: null,
+      messages: ['Có lỗi xảy ra khi xử lý yêu cầu'],
+      code: 'ERROR',
+      success: false,
+    };
   }
-  return undefined;
 };
 
 const banSeller = async (id: string): Promise<IResponseObject<null> | undefined> => {
