@@ -98,6 +98,10 @@ export function RevenueTableActiveTab() {
     });
   };
 
+  const formatFeePercent = (fee: number) => {
+    return fee * 100;
+  };
+
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
@@ -254,7 +258,7 @@ export function RevenueTableActiveTab() {
                     {revenue.totalPrice.toLocaleString('vi-VN')}₫
                   </TableCell>
                   <TableCell className="text-right text-red-600">
-                    {revenue.feePercent.toFixed(2)}%
+                    {formatFeePercent(revenue.feePercent)}%
                   </TableCell>
                   <TableCell className="text-right text-red-600">
                     -{revenue.feeAmount.toLocaleString('vi-VN')}₫
