@@ -101,7 +101,7 @@ export function RevenueTableActiveTab() {
   const formatFeePercent = (fee: number) => {
     return fee * 100;
   };
-  
+
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };

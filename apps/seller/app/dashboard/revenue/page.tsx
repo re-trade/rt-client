@@ -98,8 +98,8 @@ export default function RevenueManagement() {
                 {revenueStats.totalRevenue.toLocaleString('vi-VN')}₫
               </div>
               <div className="flex items-center mt-1">
-                <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
-                <span className="text-sm text-gray-500">+20.1% so với tháng trước</span>
+                {/* <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" /> */}
+                {/* <span className="text-sm text-gray-500">+20.1% so với tháng trước</span> */}
               </div>
             </CardContent>
           </Card>
@@ -113,7 +113,7 @@ export default function RevenueManagement() {
               <div className="text-2xl font-bold text-green-600">
                 {wallet?.balance.toLocaleString('vi-VN')}₫
               </div>
-              <p className="text-xs text-gray-500 mt-1">Có thể rút ngay</p>
+              {/* <p className="text-xs text-gray-500 mt-1">Có thể rút ngay</p> */}
             </CardContent>
           </Card>
 
@@ -125,8 +125,8 @@ export default function RevenueManagement() {
             <CardContent>
               <div className="text-2xl font-bold">{revenueStats.totalOrder}</div>
               <div className="flex items-center mt-1">
-                <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
-                <span className="text-sm text-gray-500">+15% so với tháng trước</span>
+                {/* <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" /> */}
+                {/* <span className="text-sm text-gray-500">+15% so với tháng trước</span> */}
               </div>
             </CardContent>
           </Card>
@@ -141,8 +141,8 @@ export default function RevenueManagement() {
             <CardContent>
               <div className="text-2xl font-bold">{revenueStats.totalItemsSold}</div>
               <div className="flex items-center mt-1">
-                <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
-                <span className="text-sm text-gray-500">+15% so với tháng trước</span>
+                {/* <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" /> */}
+                {/* <span className="text-sm text-gray-500">+15% so với tháng trước</span> */}
               </div>
             </CardContent>
           </Card>
@@ -157,8 +157,8 @@ export default function RevenueManagement() {
                 {revenueStats.averageOrderValue.toLocaleString('vi-VN')}₫
               </div>
               <div className="flex items-center mt-1">
-                <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" />
-                <span className="text-sm text-gray-500">+5.2% so với tháng trước</span>
+                {/* <ArrowUpRight className="h-4 w-4 mr-1 text-green-500" /> */}
+                {/* <span className="text-sm text-gray-500">+5.2% so với tháng trước</span> */}
               </div>
             </CardContent>
           </Card>
