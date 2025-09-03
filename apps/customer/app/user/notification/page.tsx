@@ -46,13 +46,6 @@ export default function NotificationPage() {
     markAllAsRead: markAllAsReadContext,
   } = notificationContext || {};
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (isAuthenticated === false) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, router]);
-
   // Merge real-time notifications with paginated notifications
   const allNotifications = useMemo(() => {
     try {
@@ -149,7 +142,6 @@ export default function NotificationPage() {
   const hasFilters = filters.type !== 'ALL' || filters.read !== undefined;
   const hasNotifications = allNotifications.length > 0;
 
-  // Show loading while authentication is being determined
   if (isAuthenticated === undefined || isAuthenticated === null) {
     return (
       <div className="min-h-screen bg-gradient-to-r from-white to-orange-50 flex items-center justify-center">
@@ -159,11 +151,6 @@ export default function NotificationPage() {
         </div>
       </div>
     );
-  }
-
-  // Don't render if not authenticated (will redirect)
-  if (isAuthenticated === false) {
-    return null;
   }
 
   return (

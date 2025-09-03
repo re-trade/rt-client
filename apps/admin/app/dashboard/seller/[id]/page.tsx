@@ -14,10 +14,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
 import {
   approveSeller,
   banSeller,
@@ -36,11 +34,9 @@ import {
   Clock,
   Copy,
   Eye,
-  FileText,
   Mail,
   MapPin,
   MoreHorizontal,
-  Package,
   Phone,
   RefreshCw,
   Shield,
@@ -72,6 +68,8 @@ export default function SellerDetailPage() {
   const [showIdCardWarning, setShowIdCardWarning] = useState(false);
   const [showVerifyDialog, setShowVerifyDialog] = useState(false);
   const [showBanDialog, setShowBanDialog] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
@@ -129,10 +127,10 @@ export default function SellerDetailPage() {
 
     setActionLoading(true);
     try {
-      const result = await approveSeller(seller.id, true, true);
+      const result = await approveSeller(seller.id, true, false);
       if (result?.success) {
         toast.success('Xác minh tài khoản thành công!');
-        await fetchSellerDetail(); // Refresh data
+        await fetchSellerDetail();
       } else {
         toast.error('Không thể xác minh tài khoản');
       }
@@ -144,6 +142,33 @@ export default function SellerDetailPage() {
     }
   };
 
+  const handleRejectAccount = async () => {
+    if (!seller) return;
+
+    if (!rejectReason.trim()) {
+      toast.error('Vui lòng nhập lý do từ chối');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const isIdentityVerified = seller.identityVerifiedStatus === 'VERIFIED';
+      const result = await approveSeller(seller.id, false, isIdentityVerified, rejectReason);
+      if (result?.success) {
+        toast.success('Từ chối người bán thành công!');
+        await fetchSellerDetail(); // Refresh data
+      } else {
+        toast.error('Không thể từ chối người bán');
+      }
+    } catch (err) {
+      toast.error('Có lỗi xảy ra khi từ chối người bán');
+    } finally {
+      setActionLoading(false);
+      setShowRejectDialog(false);
+      setRejectReason('');
+    }
+  };
+
   const handleBanAccount = async () => {
     if (!seller) return;
 
@@ -152,7 +177,7 @@ export default function SellerDetailPage() {
       const result = await banSeller(seller.id);
       if (result?.success) {
         toast.success('Khóa tài khoản thành công!');
-        await fetchSellerDetail(); // Refresh data
+        await fetchSellerDetail();
       } else {
         toast.error('Không thể khóa tài khoản');
       }
@@ -311,29 +336,32 @@ export default function SellerDetailPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem className="cursor-pointer">
-                <Eye className="h-4 w-4 mr-2" />
-                Xem cửa hàng
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <Package className="h-4 w-4 mr-2" />
-                Xem sản phẩm
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => setShowVerifyDialog(true)}
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Xác minh tài khoản
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer text-red-600 focus:text-red-600"
-                onClick={() => setShowBanDialog(true)}
-              >
-                <ShieldOff className="h-4 w-4 mr-2" />
-                Khóa tài khoản
-              </DropdownMenuItem>
+              {!seller.verified ? (
+                <>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => setShowVerifyDialog(true)}
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Xác minh tài khoản
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-600 focus:text-red-600"
+                    onClick={() => setShowRejectDialog(true)}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Từ chối
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-600 focus:text-red-600"
+                  onClick={() => setShowBanDialog(true)}
+                >
+                  <ShieldOff className="h-4 w-4 mr-2" />
+                  Khóa tài khoản
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -347,7 +375,7 @@ export default function SellerDetailPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Store className="h-5 w-5 text-orange-600" />
-                Thông tin cửa hàng
+                Thông tin người bán
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -370,12 +398,22 @@ export default function SellerDetailPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className="text-lg font-semibold text-gray-900">{seller.shopName}</h3>
-                    <div
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${verificationStatus.color}`}
-                    >
-                      {verificationStatus.icon}
-                      {verificationStatus.text}
-                    </div>
+                    {seller.verified ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="text-sm text-green-600">Đã xác minh</span>
+                      </>
+                    ) : seller.rejectReason ? (
+                      <>
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span className="text-sm text-red-600">Đã bị từ chối</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="h-4 w-4 text-yellow-600" />
+                        <span className="text-sm text-yellow-600">Chờ xác minh</span>
+                      </>
+                    )}
                   </div>
                   <p className="text-gray-600 text-sm mb-3">
                     {seller.description || 'Chưa có mô tả cửa hàng'}
@@ -552,35 +590,35 @@ export default function SellerDetailPage() {
               <CardTitle className="text-lg">Thao tác nhanh</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start" variant="outline">
-                <Eye className="h-4 w-4 mr-2" />
-                Xem cửa hàng
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Package className="h-4 w-4 mr-2" />
-                Quản lý sản phẩm
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <FileText className="h-4 w-4 mr-2" />
-                Lịch sử đơn hàng
-              </Button>
-              <Separator />
-              <Button
-                className="w-full justify-start"
-                variant="outline"
-                onClick={() => setShowVerifyDialog(true)}
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Xác minh tài khoản
-              </Button>
-              <Button
-                className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                variant="outline"
-                onClick={() => setShowBanDialog(true)}
-              >
-                <ShieldOff className="h-4 w-4 mr-2" />
-                Khóa tài khoản
-              </Button>
+              {!seller.verified ? (
+                <>
+                  <Button
+                    className="w-full justify-start"
+                    variant="outline"
+                    onClick={() => setShowVerifyDialog(true)}
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Xác minh tài khoản
+                  </Button>
+                  <Button
+                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                    variant="outline"
+                    onClick={() => setShowRejectDialog(true)}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Từ chối
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                  variant="outline"
+                  onClick={() => setShowBanDialog(true)}
+                >
+                  <ShieldOff className="h-4 w-4 mr-2" />
+                  Khóa tài khoản
+                </Button>
+              )}
             </CardContent>
           </Card>
 
@@ -626,6 +664,11 @@ export default function SellerDetailPage() {
                       <>
                         <CheckCircle className="h-4 w-4 text-green-600" />
                         <span className="text-sm text-green-600">Đã xác minh</span>
+                      </>
+                    ) : seller.rejectReason ? (
+                      <>
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <span className="text-sm text-red-600">Đã bị từ chối</span>
                       </>
                     ) : (
                       <>
@@ -726,6 +769,82 @@ export default function SellerDetailPage() {
                 </>
               ) : (
                 'Xác minh'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Account Dialog */}
+      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader className="text-center pb-6">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-200">
+              <XCircle className="h-8 w-8 text-red-600" />
+            </div>
+            <DialogTitle className="text-xl font-semibold text-gray-900">
+              Từ chối người bán
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 mt-2">
+              Từ chối duyệt người bán <strong>{seller?.shopName}</strong>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mb-6">
+            <div className="text-center mb-4">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Lý do từ chối</h3>
+              <p className="text-gray-600 text-sm">
+                Vui lòng cho biết lý do tại sao bạn từ chối duyệt người bán này
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+                Lý do từ chối <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Ví dụ: Thông tin không chính xác, tài liệu không rõ ràng, vi phạm chính sách..."
+                className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg focus:border-red-500 focus:ring-red-500 resize-none"
+              />
+              <p className="text-xs text-gray-500">
+                Lý do này sẽ được gửi đến người bán để họ có thể khắc phục và nộp lại hồ sơ.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-3 pt-6 border-t border-gray-200">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRejectDialog(false);
+                setRejectReason('');
+              }}
+              disabled={actionLoading}
+              className="px-6"
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              onClick={handleRejectAccount}
+              disabled={actionLoading}
+              className="px-6 bg-red-600 hover:bg-red-700"
+            >
+              {actionLoading ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Xác nhận từ chối
+                </>
               )}
             </Button>
           </DialogFooter>

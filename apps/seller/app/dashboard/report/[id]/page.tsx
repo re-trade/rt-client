@@ -16,7 +16,6 @@ export default function ReportDetailPage() {
   const { id } = useParams<{ id: string }>();
 
   const {
-    // State
     report,
     orderDetails,
     evidences,
@@ -45,7 +44,6 @@ export default function ReportDetailPage() {
     // Helpers
     getStatusColor,
     getSenderRoleStyle,
-    formatCreatedDate,
   } = useReportDetail({ id });
 
   return (

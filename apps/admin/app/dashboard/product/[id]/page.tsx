@@ -42,19 +42,17 @@ export default function ProductDetailPage() {
       <ProductDetailHeader productId={product.id} loading={loading} onRefresh={refetchProduct} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <ProductInfoCard product={product} />
           <ProductDetailsTabs product={product} />
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
           <ProductQuickActions
             product={product}
             actionLoading={actionLoading}
-            onVerify={handleVerifyProduct}
-            onUnverify={handleUnverifyProduct}
+            onApprove={handleVerifyProduct}
+            onDeny={handleUnverifyProduct}
           />
 
           <ProductSellerProfile
