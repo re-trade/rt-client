@@ -37,7 +37,6 @@ export default function AddEvidenceDialog({
   uploadStatus,
 }: AddEvidenceDialogProps) {
   const [evidenceNote, setEvidenceNote] = useState('');
-  const [evidenceUrls, setEvidenceUrls] = useState<string[]>(['']);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,36 +80,16 @@ export default function AddEvidenceDialog({
     }
   };
 
-  const handleAddUrlField = () => {
-    setEvidenceUrls([...evidenceUrls, '']);
-  };
-
-  const handleUrlChange = (index: number, value: string) => {
-    const newUrls = [...evidenceUrls];
-    newUrls[index] = value;
-    setEvidenceUrls(newUrls);
-  };
-
-  const handleRemoveUrl = (index: number) => {
-    const newUrls = evidenceUrls.filter((_, i) => i !== index);
-    if (newUrls.length === 0) {
-      newUrls.push('');
-    }
-    setEvidenceUrls(newUrls);
-  };
-
   const handleSubmit = async () => {
-    const filteredUrls = evidenceUrls.filter((url) => url.trim() !== '');
     await onSubmit({
       evidenceFiles: selectedFiles,
-      evidenceUrls: filteredUrls,
+      evidenceUrls: [],
       note: evidenceNote,
     });
   };
 
   const resetForm = () => {
     setEvidenceNote('');
-    setEvidenceUrls(['']);
     setSelectedFiles([]);
   };
 
@@ -155,45 +134,6 @@ export default function AddEvidenceDialog({
               rows={4}
               disabled={isSubmitting}
             />
-          </div>
-
-          {/* URL Section */}
-          <div className="grid gap-3">
-            <Label className="text-base font-medium">Liên kết bằng chứng</Label>
-            <div className="space-y-2">
-              {evidenceUrls.map((url, index) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    value={url}
-                    onChange={(e) => handleUrlChange(index, e.target.value)}
-                    placeholder="https://example.com/evidence.jpg"
-                    disabled={isSubmitting}
-                    className="flex-1"
-                  />
-                  {evidenceUrls.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleRemoveUrl(index)}
-                      disabled={isSubmitting}
-                    >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAddUrlField}
-                disabled={isSubmitting}
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Thêm liên kết
-              </Button>
-            </div>
           </div>
 
           {/* File Upload Section */}
@@ -317,12 +257,7 @@ export default function AddEvidenceDialog({
               size="lg"
               className="min-w-[180px] bg-orange-500 hover:bg-orange-600 text-white"
               onClick={handleSubmit}
-              disabled={
-                isSubmitting ||
-                (evidenceNote.trim() === '' &&
-                  selectedFiles.length === 0 &&
-                  evidenceUrls.every((url) => url.trim() === ''))
-              }
+              disabled={isSubmitting || (evidenceNote.trim() === '' && selectedFiles.length === 0)}
             >
               <div className="flex items-center justify-center gap-2">
                 <PlusCircle className="h-5 w-5" />

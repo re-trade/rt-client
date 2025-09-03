@@ -184,11 +184,8 @@ export function useRegistrationSubmission() {
   const handleNextStep = useCallback(async () => {
     if (validateStep(currentStep, formData)) {
       if (currentStep === 4) {
-        console.log('Submitting registration from step 4'); // Debug log
         const success = await submitRegistration();
-        console.log('Registration result:', success); // Debug log
         if (success) {
-          console.log('Moving to next step (step 5)'); // Debug log
           nextStep();
         }
       } else {
